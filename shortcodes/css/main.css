@@ -1,0 +1,9 @@
+.bad-input {
+    border-color: #f00;
+}
+.mpop-field-error {
+    font-size: 0.8vw;
+    border: 1px #f00 solid;
+    background-color: rgb(255 0 0 / 30%);
+    padding: 3px;
+}
