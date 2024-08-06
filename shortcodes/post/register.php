@@ -63,19 +63,13 @@ $user_id = wp_insert_user([
         'mpop_mail_to_confirm' => true,
         'mpop_mail_changing' => false,
         'mpop_card_active' => false,
-        'mpop_user_doc_key' => false,
-        'mpop_password_change_required' => false
+        'mpop_user_doc_key' => false
     ]
 ]);
 
 if (is_int($user_id)) {
     $token = $this->create_temp_token( $user_id, 'email_confirmation_link' );
-    $mail = [
-        'subject' => 'Conferma email',
-        'body' => 'Clicca sul link per confermare la tua email: <a href="'. $confirmation_link . '?mpop_mail_token=' . $token . '" target="_blank">'. $confirmation_link . '?mpop_mail_token=' . $token . '</a>',
-        'to' => $post_data['email']
-    ];
-    $res = $this->send_mail($mail);
+    $res = $this->send_confirmation_mail($token, $post_data['email']);
     if ($res === true) {
         $res_data['data'] = 'ok';
     } else {

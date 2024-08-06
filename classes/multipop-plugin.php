@@ -72,8 +72,11 @@ class MultipopPlugin {
         }
         return $res >= 3;
     }
-    private static function is_strong_password( $password ) {
-        if ( mb_strlen( $password, 'UTF-8' ) < 24 ) {return false;}
+    private static function is_strong_password( $password, $len = 24 ) {
+        if (!$len) {
+            return false;
+        }
+        if ( mb_strlen( $password, 'UTF-8' ) < $len ) {return false;}
         $rr = [
             '/[a-z]+/',
             '/[A-Z]+/',
@@ -129,6 +132,7 @@ class MultipopPlugin {
         add_action('admin_menu', function() {
             add_menu_page('Multipop Plugin', 'Multipop', 'edit_private_posts', 'multipop_settings', [$this, 'menu_page'], 'dashicons-fullscreen-exit-alt', 61);
         });
+        add_action('user_new_form', [$this, 'user_new_form']);
         // ADD USER META IN ADMIN EDIT USER PAGE
         add_action('edit_user_profile', [$this, 'add_user_meta']);
         // SAVE USER META IN ADMIN EDIT USER PAGE
@@ -748,7 +752,6 @@ class MultipopPlugin {
     
     // REGISTRATION PAGE HTML
     private function register_form() {
-        $confirmation_link = get_permalink(intval(get_option( 'woocommerce_myaccount_page_id' )));
         require( MULTIPOP_PLUGIN_PATH . '/shortcodes/register.php' );
     }
     
@@ -774,6 +777,15 @@ class MultipopPlugin {
         require(MULTIPOP_PLUGIN_PATH . '/settings.php');
     }
 
+    //
+    public function user_new_form($ctx) {
+        if ($ctx != 'add-new-user') {
+            return;
+        } ?>
+        <script type="text/javascript" src="<?=plugins_url()?>/multipop/js/user-new.js"></script>
+        <?php
+    }
+
     // ADD USER META IN ADMIN EDIT USER PAGE
     public function add_user_meta( $user ) {
         $mail_to_confirm = get_user_meta( $user->ID, 'mpop_mail_to_confirm', true );
@@ -783,8 +795,8 @@ class MultipopPlugin {
         <h2>Tessera</h2>
         <table class="form-table">
             <tr>
-                <th><label for="mpop_mail_to_confirm"></label> E-mail confermata</th>
-                <td id="mpop_mail_to_confirm"><?= $mail_to_confirm ? 'No' : 'Sì' ?></td>
+                <th><label for="mpop_mail_confirmed"></label> E-mail confermata</th>
+                <td id="mpop_mail_confirmed"><?= $mail_to_confirm ? 'No' : 'Sì' ?></td>
             </tr>
             <tr>
                 <th>Cambio e-mail in attesa di conferma</th>
@@ -794,8 +806,16 @@ class MultipopPlugin {
                 <th>Tessera attiva</th>
                 <td><?= $card_active ? 'Sì' : 'No' ?></td>
             </tr>
+            <tr>
+                <th><?=in_array($user->roles[0], ['administrator', 'multipopolare_resp']) ? 'Master key' : 'Chiave documenti' ?></th>
+                <td><?=in_array($user->roles[0], ['administrator', 'multipopolare_resp']) ? ($this->user_has_master_key($user->ID) ? 'Impostata' : 'Da impostare') : 'Da impostare' ?></td>
+            </tr>
         </table>
-        <input type="hidden" id="mail_confirmed" value="<?=$mail_to_confirm || $mail_changing ? '' : '1'?>" />
+        <script id="__MULTIPOP_DATA__" type="application/json"><?=json_encode([
+            'mailConfirmed' => !($mail_to_confirm || $mail_changing),
+            'currentUserHasMasterKey' => $this->user_has_master_key(),
+            'userHasMasterKey' => $this->user_has_master_key($user->ID)
+        ])?></script>
         <script type="text/javascript" src="<?=plugins_url()?>/multipop/js/user-edit.js"></script>
     <?php
     }
@@ -804,45 +824,133 @@ class MultipopPlugin {
     public function user_profile_update_errors(&$errors, $update, &$user) {
         $user->user_email = mb_strtolower(trim($user->user_email), 'UTF-8');
         $user_meta = [];
-        if ($update) {
-            if (!$errors->has_errors) {
-                $old_user = get_user_by('ID', $user->ID);
-                $old_user_meta = get_user_meta($user->ID);
-                if (
-                    isset($_POST['resend_mail_confirmation']) && $_POST['resend_mail_confirmation']
-                    && (
-                        (isset($old_user_meta['mpop_mail_to_confirm']) && $old_user_meta['mpop_mail_to_confirm'][0] )
-                        || (isset($old_user_meta['mpop_mail_changing']) && $old_user_meta['mpop_mail_changing'][0])
-                    )
-                ) {
-                    $this->delete_temp_token_by_user_id($user->ID, 'email_confirmation_link');
-                    $token = $this->create_temp_token( $user->ID, 'email_confirmation_link' );
-                    $this->send_confirmation_mail($token, $old_user->user_email);
-                    $user = $old_user;
-                    return;
-                }
-                if ($old_user->user_email !== $user->user_email) {
-                    $this->delete_temp_token_by_user_id($user->ID, 'email_confirmation_link');
-                }
-                if (isset($_POST['email_confirmed']) && $_POST['email_confirmed']) {
-                    $user_meta['mpop_mail_to_confirm'] = false;
-                    $user_meta['mpop_mail_changing'] = false;
-                } else {
-                    if ($old_user->user_email !== $user->user_email) {
-                        if ( (!isset($old_user_meta['mpop_mail_to_confirm']) || !$old_user_meta['mpop_mail_to_confirm'][0] ) && (!isset($old_user_meta['mpop_mail_changing']) || !$old_user_meta['mpop_mail_changing'][0])) {
-                            $user_meta['mpop_mail_changing'] = $old_user->user_email;
-                        }
-                        if (isset($_POST['send_mail_confirmation']) && $_POST['send_mail_confirmation']) {
+        $error_head = '<strong>Multipopolare:</strong>&nbsp;';
+        if (!$errors->has_errors) {
+            do {
+                if (in_array($user->role, ['customer', 'multipopolare_resp'])) {
+                    if ($update) {
+                        $old_user = get_user_by('ID', $user->ID);
+                        $old_user_meta = get_user_meta($user->ID);
+                        if (
+                            isset($_POST['resend_mail_confirmation']) && $_POST['resend_mail_confirmation']
+                            && (
+                                (isset($old_user_meta['mpop_mail_to_confirm']) && $old_user_meta['mpop_mail_to_confirm'][0] )
+                                || (isset($old_user_meta['mpop_mail_changing']) && $old_user_meta['mpop_mail_changing'][0])
+                            )
+                        ) {
+                            $this->delete_temp_token_by_user_id($user->ID, 'email_confirmation_link');
                             $token = $this->create_temp_token( $user->ID, 'email_confirmation_link' );
-                            $this->send_confirmation_mail($token, $user->user_email);
+                            $mail_res = $this->send_confirmation_mail($token, $old_user->user_email);
+                            if ( $mail_res !== true ) {
+                                $errors->add(500, $error_head . $mail_res);
+                                return;
+                            }
+                            $user = $old_user;
+                            return;
+                        } elseif (isset($_POST['revoke_mail_confirmation']) && $_POST['revoke_mail_confirmation']) {
+                            if (
+                                (isset($old_user_meta['mpop_mail_to_confirm']) && $old_user_meta['mpop_mail_to_confirm'][0])
+                                || (isset($old_user_meta['mpop_mail_changing']) && $old_user_meta['mpop_mail_changing'][0])
+                            ) {
+                                $errors->add(400, $error_head . "L'utente non ha una mail confermata");
+                                return;
+                            }
+                            $user_meta['mpop_mail_to_confirm'] = true;
+                            $user_meta['mpop_mail_changing'] = false;
+                            $user = $old_user;
+                            break;
+                        }
+                        if ($old_user->user_email !== $user->user_email) {
+                            $this->delete_temp_token_by_user_id($user->ID, 'email_confirmation_link');
+                        }
+                        if (isset($_POST['email_confirmed']) && $_POST['email_confirmed']) {
+                            $user_meta['mpop_mail_to_confirm'] = false;
+                            $user_meta['mpop_mail_changing'] = false;
+                        } else {
+                            if ($old_user->user_email !== $user->user_email) {
+                                if ( (!isset($old_user_meta['mpop_mail_to_confirm']) || !$old_user_meta['mpop_mail_to_confirm'][0] ) && (!isset($old_user_meta['mpop_mail_changing']) || !$old_user_meta['mpop_mail_changing'][0])) {
+                                    $user_meta['mpop_mail_changing'] = $old_user->user_email;
+                                }
+                                if (isset($_POST['send_mail_confirmation']) && $_POST['send_mail_confirmation']) {
+                                    $token = $this->create_temp_token( $user->ID, 'email_confirmation_link' );
+                                    $mail_res = $this->send_confirmation_mail($token, $user->user_email);
+                                    if ( $mail_res !== true ) {
+                                        $errors->add(500, $error_head . $mail_res);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        if (isset($_POST['email_confirmed']) && $_POST['email_confirmed']) {
+                            $user_meta['mpop_mail_to_confirm'] = false;
+                            $user_meta['mpop_mail_changing'] = false;
+                        } else {
+                            $user_meta['mpop_mail_to_confirm'] = true;
+                            if (isset($_POST['send_mail_confirmation']) && $_POST['send_mail_confirmation']) {
+                                $token = $this->create_temp_token( $user->ID, 'email_confirmation_link' );
+                                $mail_res = $this->send_confirmation_mail($token, $user->user_email);
+                                if ( $mail_res !== true ) {
+                                    $errors->add(500, $error_head . $mail_res);
+                                    return;
+                                }
+                            }
                         }
                     }
+                } else {
+                    $user_meta['mpop_mail_to_confirm'] = false;
+                    $user_meta['mpop_mail_changing'] = false;
+                    $user_meta['mpop_card_active'] = false;
+                    $user_meta['mpop_user_doc_key'] = false;
                 }
-                foreach($user_meta as $k => $v) {
-                    update_user_meta($user->ID, $k, $v);
-                } 
+                if ($update && in_array($user->role, ['administrator', 'multipopolare_resp'])) {
+                    if (isset($_POST['revoke_master_key']) && $_POST['revoke_master_key']) {
+                        $user_meta['mpop_personal_master_key'] = false;
+                        $old_user = get_user_by('ID', $user->ID);
+                        $user = $old_user;
+                        break;
+                    } else if (isset($_POST['master_key']) && $_POST['master_key']) {
+                        $master_key_len = 16;
+                        if (!$this::is_strong_password($_POST['master_key'], $master_key_len)) {
+                            $errors->add(400, $error_head . "La nuova master key deve essere composta almeno da almeno $master_key_len carattari e deve contenere maiscole, minuscole, numeri e simboli");
+                            return;
+                        }
+                        if (!isset($_POST['current_user_master_key']) || !$_POST['current_user_master_key']) {
+                            $errors->add(400, $error_head . "La tua master key non è valida");
+                            return;
+                        }
+                        $enc_curr_user_mk = get_user_meta(get_current_user_id(), 'mpop_personal_master_key', true);
+                        if ($enc_curr_user_mk) {
+                            $errors->add(400, $error_head . "Non sei in possesso di una master key");
+                            return;
+                        }
+                        $master_key = base64_decode(
+                            $this->decrypt_with_password(
+                                base64_decode($enc_curr_user_mk, true),
+                                $_POST['current_user_master_key']
+                            ),
+                            true
+                        );
+                        if ($master_key) {
+                            $errors->add(400, $error_head . "La tua master key non è valida");
+                            return;
+                        }
+                        $user_meta['mpop_personal_master_key'] = base64_encode(
+                            $this->encrypt_with_password(
+                                base64_encode($master_key),
+                                $_POST['master_key']
+                            )
+                        );
+                    }
+                } else {
+                    $user_meta['mpop_personal_master_key'] = false;
+                }
+            } while(false);
+            foreach($user_meta as $k => $v) {
+                update_user_meta($user->ID, $k, $v);
             }
         }
+       
     }
 
     
@@ -1019,6 +1127,11 @@ class MultipopPlugin {
             return $current_user->ID;
         }
         return false;
+    }
+
+    private function user_has_master_key($user_id = null) {
+        $user_id = is_int($user_id) ? $user_id : get_current_user_id();
+        return $user_id && get_user_meta($user_id, 'mpop_personal_master_key', true);
     }
 
     // GET LOCAL ADMIN URL (ex: /wp-admin/)

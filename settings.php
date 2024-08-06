@@ -1,6 +1,6 @@
 <?php
 defined( 'ABSPATH' ) || exit;
-if ( !in_array('administrator', wp_get_current_user()->roles) ) {
+if ( !$this->current_user_is_admin() ) {
     echo '<p>Accesso non consentito</p>';
     exit;
 }
@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_REQUEST['mpop-admin-settings
             $first_master_key = false;
             if (trim($_REQUEST['master_doc_key'])) {
                 if (!$this::is_strong_password($_REQUEST['master_doc_key'])) {
-                    $this->add_admin_notice( 'La master key deve essere composta almeno da 24 carattari, contenere maiscole, minuscole, numeri e simboli' );
+                    $this->add_admin_notice( 'La master key deve essere composta almeno da almeno 24 carattari e deve contenere maiscole, minuscole, numeri e simboli' );
                 } else if ($_REQUEST['master_doc_key'] !== $_REQUEST['master_doc_key_confirm']) {
                     $this->add_admin_notice( 'I campi per la nuova password non combaciano' );
                 } else {
@@ -175,7 +175,7 @@ do_action('mpop_settings_notices', $this->get_settings());
     <span><?=$this::show_date_time($this->settings['last_tempmail_update'])?></span>
     <input type="hidden" id="force_tempmail_update" name="force_tempmail_update" value="" />
     <br><br>
-    <button id="force_tempmail_update_button">Force update</button>
+    <button class="button" id="force_tempmail_update_button">Force update</button>
     <hr>
     <h3>Mail settings</h3>
     <h4>Mail host</h4>
@@ -201,10 +201,10 @@ do_action('mpop_settings_notices', $this->get_settings());
     <h4>Send a test mail to:</h4>
     <input type="text" id="send_test_mail" name="send_test_mail" value="" />
     <br><br>
-    <button id="send_test_mail_button">Send test mail</button>
+    <button class="button" id="send_test_mail_button">Send test mail</button>
     <hr>
     <h3>Master key</h3>
-    <button id="master_doc_key_button"><?=!$this->settings['master_doc_key'] ? 'Imposta' : 'Aggiorna'?> master key</button>
+    <button class="button" id="master_doc_key_button"><?=!$this->settings['master_doc_key'] ? 'Imposta' : 'Aggiorna'?> master key</button>
     <span id="master_doc_key_field" style="display:none">
         <h4><?=!$this->settings['master_doc_key'] ? 'Imposta' : 'Nuova'?> master key</h4>
         <input type="password" name="master_doc_key" />
@@ -214,13 +214,13 @@ do_action('mpop_settings_notices', $this->get_settings());
             <h4>Master key attuale</h4>
             <input type="password" name="master_doc_key_old" />
         <?php } else {?>
-            <p>Al primo settaggio della master key sarà impostata anche la tua personale</p>
+            <p><strong>NOTA:</strong> Al primo settaggio della master key sarà impostata anche la tua personale</p>
         <?php }
         ?>
     </span>
     <hr>
     <?php wp_nonce_field( 'mpop-admin-settings', 'mpop-admin-settings-nonce' ); ?>
-    <button id="mpop_settings_save">Save</button>
+    <button class="button button-primary" id="mpop_settings_save">Save</button>
 </form>
 <script type="text/javascript" src="<?=plugins_url()?>/multipop/js/settings.js"></script>
 <?php
