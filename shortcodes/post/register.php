@@ -61,9 +61,8 @@ $user_id = wp_insert_user([
     'locale' => 'it_IT',
     'meta_input' => [
         'mpop_mail_to_confirm' => true,
-        'mpop_mail_changing' => false,
-        'mpop_card_active' => false,
-        'mpop_user_doc_key' => false
+        '_new_email' => false,
+        'mpop_card_active' => false
     ]
 ]);
 

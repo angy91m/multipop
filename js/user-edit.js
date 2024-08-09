@@ -1,10 +1,11 @@
 window.onload = () => {
-    const {mailConfirmed, currentUserHasMasterKey} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
+    document.querySelector('form').removeAttribute('action');
+    const {mailConfirmed} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
     let emailEl = document.getElementById('email');
     const emailOriginal = emailEl.value,
-    emailRow = emailEl.parentElement;
-    let roleSelect = document.querySelector('select[name="role"]');
-    const roleMultipop = ['customer', 'multipopolare_resp'].includes(roleSelect.value),
+    emailRow = emailEl.parentElement,
+    roleSelect = document.querySelector('select[name="role"]'),
+    roleMultipop = ['customer', 'multipopolare_resp'].includes(roleSelect.value),
     options = Array.from(roleSelect.querySelectorAll('option'));
     options.unshift( options.splice(options.findIndex(o => o.value == 'multipopolare_resp'), 1).pop() );
     options.unshift( options.splice(options.findIndex(o => o.value == 'customer'), 1).pop() );
@@ -23,34 +24,37 @@ window.onload = () => {
     sendMailConfirmationEl = document.getElementById('send_mail_confirmation'),
     customContainer = document.getElementById('multipop_custom_container'),
     revokeMailConfirmationButton = document.getElementById('revoke_mail_confirmation_button');
-    roleSelect = document.querySelector('select[name="role"]');
     emailEl = document.getElementById('email');
     emailEl.addEventListener('input', () => {
-        if (emailEl.value == emailOriginal) {
-            sendMailConfirmationButton.style.display = mailConfirmed ? 'none' : 'unset';
-            if (sendMailConfirmationContEl.style.display != 'none') {
-                sendMailConfirmationEl.checked = false;
-                sendMailConfirmationEl.disabled = true;
-                sendMailConfirmationContEl.style.display = 'none';
-                confirmedEl.disabled = mailConfirmed;
-                if (mailConfirmed) {
-                    confirmedEl.checked = true;
+        if (customContainer.style.display !== 'none') {
+            if (emailEl.value == emailOriginal) {
+                sendMailConfirmationButton.style.display = mailConfirmed ? 'none' : 'unset';
+                revokeMailConfirmationButton.style.display = mailConfirmed ? 'unset' : 'none';
+                if (sendMailConfirmationContEl.style.display != 'none') {
+                    sendMailConfirmationEl.checked = false;
+                    sendMailConfirmationEl.disabled = true;
+                    sendMailConfirmationContEl.style.display = 'none';
+                    confirmedEl.disabled = mailConfirmed;
+                    if (mailConfirmed) {
+                        confirmedEl.checked = true;
+                    }
+                    sendMailConfirmationButton.disabled = mailConfirmed || confirmedEl.checked;
+                } else if (confirmedEl.disabled) {
+                    confirmedEl.disabled = mailConfirmed;
+                    confirmedEl.checked = mailConfirmed;
                 }
-                sendMailConfirmationButton.disabled = mailConfirmed || confirmedEl.checked;
-            } else if (confirmedEl.disabled) {
-                confirmedEl.disabled = mailConfirmed;
-                confirmedEl.checked = mailConfirmed;
-            }
-        } else {
-            sendMailConfirmationButton.style.display = 'none';
-            if (sendMailConfirmationEl.disabled) {
-                sendMailConfirmationContEl.style.display = 'unset';
-                sendMailConfirmationEl.disabled = confirmedEl.disabled ? false : confirmedEl.checked;
-                sendMailConfirmationEl.checked = sendMailConfirmationEl.disabled ? false : true;
-            }
-            if (confirmedEl.disabled) {
-                confirmedEl.disabled = false;
-                confirmedEl.checked = false;
+            } else {
+                revokeMailConfirmationButton.style.display = 'none';
+                sendMailConfirmationButton.style.display = 'none';
+                if (sendMailConfirmationEl.disabled) {
+                    sendMailConfirmationContEl.style.display = 'unset';
+                    sendMailConfirmationEl.disabled = confirmedEl.disabled ? false : confirmedEl.checked;
+                    sendMailConfirmationEl.checked = sendMailConfirmationEl.disabled ? false : true;
+                }
+                if (confirmedEl.disabled) {
+                    confirmedEl.disabled = false;
+                    confirmedEl.checked = false;
+                }
             }
         }
     });
@@ -70,6 +74,7 @@ window.onload = () => {
                 confirmedEl.disabled = mailConfirmed;
                 confirmedEl.checked = mailConfirmed;
                 confirmedEl.dispatchEvent(new Event('change'));
+                emailEl.dispatchEvent(new Event('input'));
             }
             if (mailConfirmed) {
                 revokeMailConfirmationButton.style.display = 'unset';
@@ -86,4 +91,49 @@ window.onload = () => {
             revokeMailConfirmationButton.style.display = 'none';
         }
     });
+    const setMasterKeyButton = document.getElementById('set_master_key_button');
+    if (setMasterKeyButton) {
+        const cancelSetMasterKeyButton = document.getElementById('cancel_set_master_key_button'),
+        setMasterKeyContainer = document.getElementById('set_master_key_container'),
+        masterKeyField = document.getElementById('master_key'),
+        masterKeyFieldConfirmation = document.getElementById('master_key_confirmation'),
+        currentUserMasterKey = document.getElementById('current_user_master_key'),
+        masterKeyError = document.getElementById('master_key_error'),
+        submitButton = document.querySelector('p.submit input'),
+        checkMasterKeyConfirmation = () => {
+            if (masterKeyField.value !== masterKeyFieldConfirmation.value) {
+                submitButton.disabled = true;
+                masterKeyField.classList.add('bad-input');
+                masterKeyFieldConfirmation.classList.add('bad-input');
+                masterKeyError.style.display = 'unset';
+            } else {
+                submitButton.disabled = false;
+                masterKeyField.classList.remove('bad-input');
+                masterKeyFieldConfirmation.classList.remove('bad-input');
+                masterKeyError.style.display = 'none';
+            }
+        };
+        setMasterKeyButton.addEventListener('click', e => {
+            e.preventDefault();
+            setMasterKeyButton.style.display = 'none';
+            setMasterKeyContainer.style.display = 'unset';
+            masterKeyField.disabled = false;
+            currentUserMasterKey.disabled = false;
+            masterKeyField.value = '';
+            masterKeyFieldConfirmation.value = '';
+            currentUserMasterKey.value = '';
+            masterKeyField.addEventListener('input', checkMasterKeyConfirmation);
+            masterKeyFieldConfirmation.addEventListener('input', checkMasterKeyConfirmation);
+        });
+        cancelSetMasterKeyButton.addEventListener('click', e => {
+            e.preventDefault();
+            setMasterKeyButton.style.display = 'unset';
+            setMasterKeyContainer.style.display = 'none';
+            masterKeyField.removeEventListener('input', checkMasterKeyConfirmation);
+            masterKeyFieldConfirmation.removeEventListener('input', checkMasterKeyConfirmation);
+            submitButton.disabled = false;
+            masterKeyField.disabled = true;
+            currentUserMasterKey.disabled = true;
+        });
+    }
 };

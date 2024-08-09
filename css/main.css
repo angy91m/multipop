@@ -1,5 +1,5 @@
 .bad-input {
-    border-color: #f00;
+    border-color: #f00 !important;
 }
 .mpop-field-error {
     font-size: 0.8vw;

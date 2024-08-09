@@ -15,7 +15,7 @@ if (
 }
 
 ?>
-<link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/main.css">
+<link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/main.css">
 <div id="app" class="woocommerce woocommerce-page">
     <template v-if="!registered">
         <form class="woocommerce-form woocommerce-form-register register">
