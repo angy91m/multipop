@@ -1,9 +1,90 @@
+form.mpop-form * {
+    width: 100%;
+}
 .bad-input {
     border-color: #f00 !important;
 }
+.bad-captcha iframe {
+    border: #f00 solid 1px !important;
+}
 .mpop-field-error {
-    font-size: 0.8vw;
+    font-size: 13px;
     border: 1px #f00 solid;
-    background-color: rgb(255 0 0 / 30%);
+    border-radius: 5px;
+    background-color: rgb(255 0 0 / 10%);
     padding: 3px;
+}
+:where(.wp-site-blocks *:focus) {
+    outline: unset;
+}
+p.mpop-form-row input[type="text"],
+p.mpop-form-row input[type="password"],
+p.mpop-form-row input[type="email"],
+p.mpop-form-row input[type="button"],
+p.mpop-form-row input[type="submit"],
+p.mpop-form-row button,
+#mpop-tabs button.mpop-button {
+    border: 1px #555 solid;
+    padding: 10px;
+    border-radius: 9px;
+    box-sizing: border-box;
+    margin-right: 10px;
+}
+
+p.mpop-form-row input[type="button"],
+p.mpop-form-row input[type="submit"],
+p.mpop-form-row button,
+#mpop-tabs button.mpop-button {
+    padding: 15px;
+    border: 0px;
+}
+
+p.mpop-form-row input[type="button"].primary,
+p.mpop-form-row input[type="submit"].primary,
+p.mpop-form-row button.primary,
+#mpop-tabs button.mpop-button {
+    background-color: rgb(0, 132, 255);
+    color: #fff;
+    text-transform: uppercase;
+}
+#mpop-tabs button.mpop-button.btn-error {
+    background-color: #f00;
+}
+#mpop-tabs button.mpop-button.btn-success {
+    background-color: rgb(0, 207, 17);
+}
+p.mpop-form-row input[type="button"]:disabled,
+p.mpop-form-row input[type="submit"]:disabled,
+p.mpop-form-row button:disabled,
+#mpop-tabs button.mpop-button:disabled {
+    opacity: 0.6;
+    color: #e3e3e3;
+}
+
+.mpop-notice {
+    border: solid 1px;
+    padding: 10px;
+    box-sizing: border-box;
+    max-width: 90%;
+    font-size: 13px;
+    border-radius: 9px;
+}
+.mpop-notice.notice-error {
+    border-color: #f00;
+    background-color: rgb(255 0 0 / 10%);
+}
+.mpop-notice.notice-success {
+    border-color: rgb(0, 207, 17);
+    background-color: rgb(0 207 17 / 10%);
+}
+.mpop-notice.notice-warning {
+    border-color: rgb(255, 187, 0);
+    background-color: rgb(255 187 0 / 10%);
+}
+.mpop-notice.notice-info {
+    border-color: rgb(0, 132, 255);
+    background-color: rgb(0 132 255 / 10%);
+}
+.mpop-notice p {
+    margin: 0;
 }

@@ -9,14 +9,52 @@ defined( 'ABSPATH' ) || exit;
 $user->user_email = mb_strtolower(trim($user->user_email), 'UTF-8');
 $user_meta = [];
 $error_head = '<strong>Multipopolare:</strong>&nbsp;';
+$master_key_len = 16;
 if (!$errors->has_errors()) {
     if (defined('MPOP_PERSONAL_UPDATE') && MPOP_PERSONAL_UPDATE) {
-        $old_user = get_user_by('ID', $user->ID);
-        $old_user->description = $user->description;
-        $user = $old_user;
+        if (isset($_POST['master_key']) && $_POST['master_key']) {
+            if (!$this::is_strong_password($_POST['master_key'], $master_key_len)) {
+                $errors->add(400, $error_head . "La nuova master key deve essere composta almeno da almeno $master_key_len carattari e deve contenere maiscole, minuscole, numeri e simboli");
+                return;
+            }
+            if (!isset($_POST['current_user_master_key']) || !$_POST['current_user_master_key']) {
+                $errors->add(400, $error_head . "La master key attuale non è valida");
+                return;
+            }
+            $enc_curr_user_mk = get_user_meta($user->ID, 'mpop_personal_master_key', true);
+            if (!$enc_curr_user_mk) {
+                $errors->add(400, $error_head . "Non sei in possesso di una master key");
+                return;
+            }
+            $master_key = base64_decode(
+                $this->decrypt_with_password(
+                    base64_decode($enc_curr_user_mk, true),
+                    $_POST['current_user_master_key']
+                ),
+                true
+            );
+            if (!$master_key || strlen($master_key) <= 32) {
+                $errors->add(400, $error_head . "La master key attuale non è valida");
+                return;
+            }
+            $user_meta['mpop_personal_master_key'] = base64_encode(
+                $this->encrypt_with_password(
+                    base64_encode($master_key),
+                    $_POST['master_key']
+                )
+            );
+        }
+        if (!$this->current_user_is_admin()) {
+            $old_user = get_user_by('ID', $user->ID);
+            $old_user->description = $user->description;
+            if (isset($user->user_pass) && $user->user_pass) {
+                $old_user->user_pass = $user->user_pass;
+            }
+            $user = $old_user;
+        }
     } else {
         do {
-            if (in_array($user->role, ['customer', 'multipopolare_resp'])) {
+            if (in_array($user->role, ['multipopolano', 'multipopolare_resp'])) {
                 if ($update) {
                     $old_user = get_user_by('ID', $user->ID);
                     $old_user_meta = get_user_meta($user->ID);
@@ -88,7 +126,6 @@ if (!$errors->has_errors()) {
                 }
             } else {
                 $user_meta['mpop_mail_to_confirm'] = false;
-                $user_meta['mpop_card_active'] = false;
             }
             if ($update && in_array($user->role, ['administrator', 'multipopolare_resp'])) {
                 if (isset($_POST['revoke_master_key']) && $_POST['revoke_master_key']) {
@@ -122,7 +159,6 @@ if (!$errors->has_errors()) {
                     if ($errors->has_errors()) {
                         return;
                     }
-                    $master_key_len = 16;
                     if (!$this::is_strong_password($_POST['master_key'], $master_key_len)) {
                         $errors->add(400, $error_head . "La nuova master key deve essere composta almeno da almeno $master_key_len carattari e deve contenere maiscole, minuscole, numeri e simboli");
                         return;
@@ -143,7 +179,7 @@ if (!$errors->has_errors()) {
                         ),
                         true
                     );
-                    if (!$master_key) {
+                    if (!$master_key || strlen($master_key) <= 32) {
                         $errors->add(400, $error_head . "La tua master key non è valida");
                         return;
                     }

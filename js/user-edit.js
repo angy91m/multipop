@@ -5,10 +5,10 @@ window.onload = () => {
     const emailOriginal = emailEl.value,
     emailRow = emailEl.parentElement,
     roleSelect = document.querySelector('select[name="role"]'),
-    roleMultipop = ['customer', 'multipopolare_resp'].includes(roleSelect.value),
+    roleMultipop = ['multipopolano', 'multipopolare_resp'].includes(roleSelect.value),
     options = Array.from(roleSelect.querySelectorAll('option'));
     options.unshift( options.splice(options.findIndex(o => o.value == 'multipopolare_resp'), 1).pop() );
-    options.unshift( options.splice(options.findIndex(o => o.value == 'customer'), 1).pop() );
+    options.unshift( options.splice(options.findIndex(o => o.value == 'multipopolano'), 1).pop() );
     const optContainer = document.createElement('div');
     options.forEach(o => optContainer.append(o));
     roleSelect.innerHTML = optContainer.innerHTML;
@@ -68,7 +68,7 @@ window.onload = () => {
         }
     });
     roleSelect.addEventListener('change', () => {
-        if (['customer', 'multipopolare_resp'].includes(roleSelect.value)) {
+        if (['multipopolano', 'multipopolare_resp'].includes(roleSelect.value)) {
             if (confirmedEl.disabled) {
                 customContainer.style.display = 'unset';
                 confirmedEl.disabled = mailConfirmed;
@@ -115,6 +115,7 @@ window.onload = () => {
         };
         setMasterKeyButton.addEventListener('click', e => {
             e.preventDefault();
+            submitButton.disabled = true;
             setMasterKeyButton.style.display = 'none';
             setMasterKeyContainer.style.display = 'unset';
             masterKeyField.disabled = false;

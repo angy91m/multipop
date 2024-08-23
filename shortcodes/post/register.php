@@ -4,6 +4,7 @@ $post_data = json_decode( file_get_contents('php://input'), true );
 $res_data = [];
 if (
     !isset($post_data['nonce']) || !is_string($post_data['nonce'])
+    || !isset($post_data['hcaptcha-response']) || !is_string($post_data['hcaptcha-response'])
     || !isset($post_data['username']) || !is_string($post_data['username'])
     || !isset($post_data['email']) || !is_string($post_data['email'])
     || !isset($post_data['password']) || !is_string($post_data['password'])
@@ -33,6 +34,12 @@ if ( !$this::is_valid_password( $post_data['password'] ) ) {
     }
     $res_data['error'][] = 'password';
 }
+if ( !$this->verify_hcaptcha( $post_data['hcaptcha-response'] ) ) {
+    if (!isset($res_data['error'])) {
+        $res_data['error'] = [];
+    }
+    $res_data['error'][] = 'captcha';
+}
 
 if (isset($res_data['error'])) {
     http_response_code( 400 );
@@ -57,12 +64,18 @@ $user_id = wp_insert_user([
     'user_nicename' => $post_data['username'],
     'user_email' => $post_data['email'],
     'user_pass' => $post_data['password'],
-    'role' => 'customer',
+    'role' => 'multipopolano',
     'locale' => 'it_IT',
     'meta_input' => [
         'mpop_mail_to_confirm' => true,
         '_new_email' => false,
-        'mpop_card_active' => false
+        'mpop_card_active' => false,
+        'mpop_birthdate' => false,
+        'mpop_birthplace' => false,
+        'mpop_billing_address' => false,
+        'mpop_billing_city' => false,
+        'mpop_billing_state' => false,
+        'mpop_billing_zip' => false
     ]
 ]);
 

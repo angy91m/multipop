@@ -1,0 +1,115 @@
+#app {
+    max-width: 100%;
+}
+#app table#mpop-main-table {
+    width: 100%;
+}
+#app table#mpop-main-table > tbody > tr > td {
+    vertical-align: top;
+}
+#app table#mpop-main-table > tbody > tr > td:first-child {
+    margin-bottom: 18px;
+}
+#app table#mpop-main-table > tbody > tr > td:first-child div {
+    padding-right: 15px;
+    border: solid 1px #aaa;
+    border-radius: 5px;
+    text-transform: uppercase;
+}
+#app table#mpop-main-table > tbody > tr > td:first-child label {
+    font-family: sans-serif;
+    font-size: 11px;
+    margin-top: 5px;
+    margin-left: 8px;
+    cursor: pointer;
+    display: block;
+}
+#app table#mpop-main-table > tbody > tr > td:first-child ul {
+    cursor: pointer;
+    padding-left: 15px;
+    font-family: sans-serif;
+    font-size: 14px;
+}
+#app table#mpop-main-table > tbody > tr > td:nth-child(2) {
+    width: 100%;
+}
+#mpop-tabs > div {
+    margin-left: 15px;
+}
+#mpop-tabs > div > *:first-child {
+    margin-top: 0;
+}
+span.mpop-app-notice {
+    border: solid 1px #aaa;
+    display: block;
+    border-radius: 5px;
+    box-sizing: border-box;
+    padding: 8px;
+    font-size: 11px;
+    margin-bottom: 10px;
+}
+span.mpop-app-notice.notice-warning {
+    border-color: rgb(255, 187, 0);
+    background-color: rgb(255 187 0 / 10%);
+}
+span.mpop-app-notice.notice-error {
+    border-color: #f00;
+    background-color: rgb(255 0 0 / 10%);
+}
+span.mpop-app-notice.notice-success {
+    border-color: rgb(0, 207, 17);
+    background-color: rgb(0 207 17 / 10%);
+}
+span.mpop-app-notice.notice-info {
+    border-color: rgb(0, 132, 255);
+    background-color: rgb(0 132 255 / 10%);
+}
+span.mpop-app-notice > span > span.dashicons-before.dashicons-no-alt {
+    display: block;
+    width: fit-content;
+    text-align: right;
+    margin-left: auto;
+    cursor: pointer;
+}
+#mpop-profile-table {
+    width: 100%;
+}
+#app #mpop-profile-table tr td:first-child {
+    white-space: nowrap;
+}
+#mpop-profile-table tr td:first-child {
+    width: fit-content;
+}
+#mpop-profile-table td:nth-child(2),
+#mpop-profile-table td:nth-child(2) input {
+    width: 100%;
+}
+#mpop-profile-table td:nth-child(2) input[type="date"] {
+    max-width: 190px;
+}
+#mpop-profile-table textarea {
+    min-width: 200px;
+}
+#mpop-profile-table input,
+#mpop-profile-table select,
+#mpop-profile-table textarea {
+    font-size: var(--wp--preset--font-size--medium);
+    padding: 5px;
+    font-family: inherit;
+}
+#birthplace-select:not(:disabled) {
+    background: #fff;
+}
+#billing-city-select:not(:disabled) {
+    background: #fff;
+}
+@media only screen and (min-width : 1024px) {
+    #mpop-profile-table tr td:first-child {
+        vertical-align: top;
+    }
+}
+@media only screen and (max-width : 1023px) {
+    #app table td {
+        display: block;
+    }
+}

@@ -13,6 +13,12 @@ function forceUpdateTempmail(e) {
     document.getElementById('force_tempmail_update').value = '1';
     document.getElementById('mpop_settings_form').submit();
 }
+function forceUpdateComuni(e) {
+    e.preventDefault();
+    document.getElementById('force_comuni_update_button').disabled = true;
+    document.getElementById('force_comuni_update').value = '1';
+    document.getElementById('mpop_settings_form').submit();
+}
 function saveSettings(e) {
     document.getElementById('mpop_settings_save').disabled = true;
     e.preventDefault();
@@ -26,5 +32,6 @@ function setMasterKey(e) {
 }
 document.getElementById('send_test_mail_button').addEventListener('click', sendTestMail);
 document.getElementById('force_tempmail_update_button').addEventListener('click', forceUpdateTempmail);
+document.getElementById('force_comuni_update_button').addEventListener('click', forceUpdateComuni);
 document.getElementById('mpop_settings_save').addEventListener('click', saveSettings);
 document.getElementById('master_doc_key_button').addEventListener('click', setMasterKey);

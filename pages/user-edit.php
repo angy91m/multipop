@@ -9,6 +9,12 @@ if ($this->current_user_is_admin()) {
     $card_active = get_user_meta( $user->ID, 'mpop_card_active', true );
     ?>
         <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/main.css">
+        <style type="text/css">
+            #fieldset-billing + h2,
+            #fieldset-shipping {
+                display: none;
+            }
+        </style>
         <br>
         <h2>Multipopolare</h2>
         <table class="form-table">

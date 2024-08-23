@@ -22,6 +22,7 @@ class MultipopPlugin {
     private bool $wp_yet_loaded = false;
     private string $req_url = '';
     private string $req_path = '';
+    private array $user_notices = [];
 
     // FORMAT DATETIME TO LOCAL STRING YYYY-MM-DD HH:MM:SS TZ
     private static function show_date_time($date) {
@@ -91,8 +92,8 @@ class MultipopPlugin {
         return true;
     }
 
-    private function dashicon(string $icon = '', string $ba = 'before') {
-        return '<span class="dashicons-'.$ba.' dashicons-'.$icon.'" />&nbsp;';
+    private static function dashicon(string $icon = '', string $ba = 'before') {
+        return '<span class="dashicons-'.$ba.' dashicons-'.$icon.'">&nbsp;</span>';
     }
 
     // DB PREFIX FOR PLUGIN TABLES
@@ -102,17 +103,33 @@ class MultipopPlugin {
         return $prefix;
     }
 
+    private static function export_GET() {
+        $res = [];
+        foreach($_GET as $k => $v) {
+            $res[] = "$k=$v";
+        }
+        return implode('&', $res);
+    }
+
     function __construct() {
+
+        $req_url = (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) ? 'https': 'http') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $this->req_url = $req_url;
+        $this->req_path = preg_replace('/^https?:\/\/[^\/]+/', '', $req_url);
+        
         // INIT HOOK
         add_action('init', [$this, 'init']);
         // ACTIVATION HOOK
         register_activation_hook(MULTIPOP_PLUGIN_PATH . '/multipop.php', [$this, 'activate']);
+        // DEACTIVATION HOOK
+        register_deactivation_hook(MULTIPOP_PLUGIN_PATH . '/multipop.php', [$this, 'deactivate']);
         // TEMPLATE REDIRECT HOOK
-        add_action('template_redirect', [$this, 'template_redirect'] );
+        // add_action('template_redirect', [$this, 'template_redirect'] );
         // CONNECT wp_mail to $this->send_mail()
         add_filter('pre_wp_mail', function ($res, $atts) {
             return $this->send_mail(['to' => $atts['to'], 'subject' => $atts['subject'], 'body' => $atts['message'], 'attachments' => $atts['attachments']]);
         }, 10, 2 );
+        add_action('wp_head', [$this, 'wp_head'] );
         // `wp_loaded` HOOK
         add_action( 'wp_loaded', [$this, 'wp_loaded'] );
         // `admin_init` HOOK
@@ -123,63 +140,56 @@ class MultipopPlugin {
 
         // LOGIN
         // ADD ELEMENTS TO LOGIN PAGE
-        add_action( 'woocommerce_login_form_start', [$this, 'html_login_mail_confirm'] );
-        // CHANGE STYLE FOR LOGIN PAGE
-        add_action( 'woocommerce_login_form_end', [$this, 'html_login_placeholder'] );
+        //add_action( 'woocommerce_login_form_start', [$this, 'html_login_mail_confirm'] );
         // CHECK AFTER LOGIN
         add_action('wp_login', [$this,'filter_login'], 10, 2);
 
+        // SHOW USER NOTICES
+        add_filter('the_content', [$this, 'show_user_notices'], 10);
         // REGISTRATION PAGE SHORTCODE
         add_shortcode('mpop_register_form', [$this, 'register_sc'] );
-        // PASSWORD CHANGE PAGE SHORTCODE
-        // add_shortcode('mpop_password_change_form', [$this, 'password_change_sc']);
+        // MYACCOUNT PAGE SHORTCODE
+        add_shortcode('mpop_myaccount', [$this, 'myaccount_sc'] );
+        // FILTER NAV MENU ITEMS AND ADD LOGOFF BUTTON
+        add_filter( 'block_core_navigation_render_inner_blocks', [$this, 'filter_menu_items'], 10 );
     
         // ADD MULTIPOPOLARE DASHBOARD
         add_action('admin_menu', function() {
             add_menu_page('Multipop Plugin', 'Multipop', 'edit_private_posts', 'multipop_settings', [$this, 'menu_page'], 'dashicons-fullscreen-exit-alt', 61);
         });
         add_action('user_new_form', [$this, 'user_new_form']);
+
+        add_action('show_user_profile', [$this, 'add_profile_meta']);
         // ADD USER META IN ADMIN EDIT USER PAGE
         add_action('edit_user_profile', [$this, 'add_user_meta']);
         // SAVE USER META IN ADMIN EDIT USER PAGE
         add_action('user_profile_update_errors', [$this, 'user_profile_update_errors'], 10, 3);
         add_action('personal_options_update', [$this, 'personal_options_update']);
-
-        // MY ACCOUNT USER PAGE
-        // ADD/REMOVE MENU ITEMS TO MY ACCOUNT PAGE
-        add_filter('woocommerce_account_menu_items', [$this, 'add_my_account_menu_items'], 10, 2);
-        // PERSONAL CARD PAGE TITLE
-        add_filter('the_title', [$this, 'filter_my_account_card_page_title'], 10, 2);
-        // PERSONAL CARD PAGE CONTENT
-        add_action('woocommerce_account_card_endpoint', [$this, 'my_account_card_html']);
+        add_filter('run_wptexturize', [$this, 'run_wptexturize']);
     }
 
     // INITIALIZE PLUGIN
     public function init() {
-        $this->disable_without_woocommerce();
         $this->get_settings();
         $this->flush_db();
         $this->update_tempmail();
-
-        // SET `customer` role name to 'Multipopolano'
-        global $wp_roles;
-        if ( ! isset( $wp_roles ) ) {
-            $wp_roles = new WP_Roles();
-        }
-        $wp_roles->roles['customer']['name'] = 'Multipopolano';
-        $wp_roles->role_names['customer'] = 'Multipopolano';
-
-        $req_url = (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) ? 'https': 'http') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-        $this->req_url = $req_url;
-        $this->req_path = preg_replace('/^https?:\/\/[^\/]+/', '', $req_url);
+        $this->update_comuni();
 
         if ($this->current_user_is_admin()) {
             return;
         }
+
+        // HIDE ADMIN BAR
+        $current_user = wp_get_current_user();
+
+        if (count($current_user->roles) == 1 && ($current_user->roles[0] == 'multipopolano' || $current_user->roles[0] == 'multipopolare_resp')) {
+            show_admin_bar(false);
+        }
+
         // REDIRECT AFTER EMAIL CONFIRMATION
         // (IF USER CLICK ON A CONFIRMATION LINK BUT HE'S LOGGED IN WITH ANOTHER USER)
         if (
-            str_starts_with($req_url, get_permalink(intval(get_option( 'woocommerce_myaccount_page_id' ))))
+            str_starts_with($this->req_url, get_permalink($this->settings['myaccount_page']))
             && isset($_REQUEST['mpop_mail_token'])
         ) {
             if ( !preg_match('/^[a-f0-9]{32}$/', $_REQUEST['mpop_mail_token']) ) {
@@ -189,52 +199,103 @@ class MultipopPlugin {
             if (!$user_verified) {
                 $this->location_not_found();
             }
-            $user_id = get_current_user_id();
+            $user_id = $current_user->ID;
             if ($user_id == $user_verified) {
-                $mail_to_confirm = get_user_meta($user_id, 'mpop_mail_to_confirm', true);
-                if ($mail_to_confirm) {
-                    $this->logout_redirect($req_url);
-                } else {
+                $mail_changing = get_user_meta($user_id, '_new_email', true);
+                if ($mail_changing) {
                     $this->delete_temp_token($_REQUEST['mpop_mail_token']);
-                    update_user_meta($user_id, '_new_email', false);
-                    wp_redirect(get_permalink(intval(get_option( 'woocommerce_myaccount_page_id' ))) . '?mpop_mail_confirmed=1');
+                    wp_update_user($user_id, [
+                       'ID' => $user_id,
+                        'user_email' => $mail_changing,
+                        'meta_input' => [
+                            '_new_email' => false
+                        ]
+                    ]);
+                    wp_redirect(get_permalink($this->settings['myaccount_page']) . '?mpop_mail_confirmed=1');
                     exit;
+                } else {
+                    $this->logout_redirect($this->req_url);
                 }
             } elseif ($user_id) {
-                $this->logout_redirect($req_url);
+                $this->logout_redirect($this->req_url);
             }
         }
-
-        // ADD USER CARD PERSONAL PAGE ENDPOINT
-        add_rewrite_endpoint( 'card', EP_ROOT | EP_PAGES );
     }
 
     public function admin_head() {
         // ADD CUSTOM STYLE TO profile.php
         if (defined('IS_PROFILE_PAGE') && IS_PROFILE_PAGE) {
-            require(MULTIPOP_PLUGIN_PATH .'/pages/profile.php');
+            require(MULTIPOP_PLUGIN_PATH .'/pages/profile-head.php');
         }
     }
 
     // PLUGIN ACTIVATION TRIGGER
     public function activate() {
-        if (!$this->check_woocommerce_activation()) {
-            return wp_die('WooCommerce not activated!');
+        $register_page = get_posts([
+            'numberposts' => 1,
+            'post_type' => 'page',
+            'meta_key' => 'mpop_page',
+            'meta_value' => 'register'
+        ]);
+        if (!count($register_page)) {
+            $register_page = wp_insert_post([
+                'post_title' => 'Registrati',
+                'post_type' => 'page',
+                'post_content' => '[mpop_register_form]',
+                'post_status' => 'publish',
+                'meta_input' => [
+                    'mpop_page' => 'register'
+                ]
+            ]);
+        } else {
+            $register_page = $register_page[0]->ID;
         }
-        $this->set_db_tables();
 
+        $myaccount_page = get_posts([
+            'numberposts' => 1,
+            'post_type' => 'page',
+            'meta_key' => 'mpop_page',
+            'meta_value' => 'myaccount'
+        ]);
+        if (!count($myaccount_page)) {
+            $myaccount_page = wp_insert_post([
+                'post_title' => 'Il mio account',
+                'post_type' => 'page',
+                'post_content' => '[mpop_myaccount]',
+                'post_status' => 'publish',
+                'meta_input' => [
+                    'mpop_page' => 'myaccount'
+                ]
+            ]);
+        } else {
+            $myaccount_page = $myaccount_page[0]->ID;
+        }
+
+        $this->set_db_tables($register_page, $myaccount_page);
     
         // remove_role('multipopolare_resp');
+        // ADD MULTIPOPOLANO ROLE
+        add_role('multipopolano', 'Multipopolano', [
+            'read' => true
+        ]);
         // ADD RESPONSABILE ROLE
         add_role('multipopolare_resp', 'Responsabile Multipopolare', [
-            'read' => true,
-            'level_0' => true,
-            'view_admin_dashboard' => true
+            'read' => true
         ]);
 
         // ADD DYNAMIC PAGES
-        add_rewrite_endpoint( 'card', EP_ROOT | EP_PAGES );
-        flush_rewrite_rules();
+        // add_rewrite_endpoint( 'card', EP_ROOT | EP_PAGES );
+        // flush_rewrite_rules();
+    }
+
+    // PLUGIN DEACTIVATION HOOK
+    public static function deactivate() {
+
+    }
+
+    public function wp_head() {?>
+        <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/main.css">
+        <?php
     }
 
     // `wp_loaded` TRIGGER
@@ -250,22 +311,34 @@ class MultipopPlugin {
                 $this->add_user_notice('Token di conferma non valido');
             }
             if (isset($_REQUEST['mpop_mail_not_confirmed'])) {
-                $this->add_user_notice("L'indirizzo e-mail non è ancora confermato. Controlla nella tua casella di posta per il link di conferma.", 'error', ['id'=> 'mail_not_confirmed']);
+                $this->add_user_notice("L'indirizzo e-mail non è ancora confermato. Controlla nella tua casella di posta per il link di conferma.");
+            }
+            if (isset($_REQUEST['mpop_sent_reset_mail'])) {
+                $this->add_user_notice("Dovresti aver ricevuto un'e-mail contenente un link per resettare la password", 'info');
             }
         } else {
             $mail_changing = get_user_meta($user_id, '_new_email', true);
             if ($mail_changing) {
-                $this->add_user_notice("L'indirizzo e-mail non è ancora confermato. Controlla nella tua casella di posta per il link di conferma.", 'error', ['id' => 'mail_not_confirmed']);
+                $this->add_user_notice("L'indirizzo e-mail non è ancora confermato. Controlla nella tua casella di posta per il link di conferma.");
+            }
+            if (isset($_REQUEST['mpop_mail_not_confirmed'])) {
+                $this->add_user_notice("L'indirizzo e-mail non è ancora confermato. Controlla nella tua casella di posta per il link di conferma.");
             }
             if (isset($_REQUEST['mpop_mail_confirmed'])) {
-                $this->remove_user_notice('mail_not_confirmed');
-                $this->add_user_notice("Indirizzo e-mail confermato correttamente", 'success', ['id'=> 'mail_confirmed']);
+                $this->add_user_notice("Indirizzo e-mail confermato correttamente", 'success');
             }
         }
     }
     
     // `admin_init` TRIGGER
     public function admin_init() {
+        // HIDE ADMIN BAR
+        $current_user = wp_get_current_user();
+
+        if (count($current_user->roles) == 1 && ($current_user->roles[0] == 'multipopolano' || $current_user->roles[0] == 'multipopolare_resp')) {
+            wp_redirect(site_url('/'));
+            exit();
+        }
         if ( $this->current_user_is_admin() && !$this->settings['master_doc_key'] ) {
             if (isset($_GET['page']) && $_GET['page'] == 'multipop_settings') {
                 return add_action('mpop_settings_notices', function() {
@@ -279,7 +352,7 @@ class MultipopPlugin {
     }
 
     // CREATE DB TABLES ON INIT
-    private function set_db_tables() {
+    private function set_db_tables($register_page, $myaccount_page) {
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
         global $wpdb;
         
@@ -297,7 +370,16 @@ class MultipopPlugin {
             `mail_from_name` VARCHAR(255) NOT NULL,
             `mail_general_notifications` TEXT NOT NULL,
             `last_webcard_number` BIGINT,
-            `master_doc_key` VARCHAR(255) NULL,
+            `master_doc_key` TEXT NULL,
+            `master_doc_pubkey` TEXT NULL,
+            `hcaptcha_site_key` VARCHAR(255) NULL,
+            `hcaptcha_secret` VARCHAR(255) NULL,
+            `pp_client_id` VARCHAR(255) NULL,
+            `pp_client_secret` VARCHAR(255) NULL,
+            `pp_access_token` VARCHAR(255) NULL,
+            `pp_token_expiration` BIGINT UNSIGNED NOT NULL,
+            `register_page` BIGINT NOT NULL,
+            `myaccount_page` BIGINT NOT NULL,
             PRIMARY KEY (`id`)
         ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
         dbDelta( $q );
@@ -316,7 +398,7 @@ class MultipopPlugin {
         $q = "CREATE TABLE IF NOT EXISTS " . $this::db_prefix('subscription_proposal') . " (
             `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             `user_id` BIGINT UNSIGNED NOT NULL,
-            `YEAR` INT UNSIGNED NOT NULL,
+            `year` INT UNSIGNED NOT NULL,
             PRIMARY KEY (`id`)
         ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
         dbDelta( $q );
@@ -324,24 +406,13 @@ class MultipopPlugin {
         // ADD SETTINGS ROW IF NOT EXISTS
         if (!$this->get_settings()) {
             $q = "INSERT INTO " . $this::db_prefix('plugin_settings')
-                . " (`id`, `tempmail_urls`, `last_tempmail_update`, `mail_host`, `mail_port`, `mail_encryption`, `mail_username`, `mail_password`, `mail_from`, `mail_from_name`, `mail_general_notifications`, `last_webcard_number`)"
-                . " VALUES (1, '" . json_encode(['block' => [], 'allow' => []]) . "', 0, '', 465, 'SMTPS', '', '', '" . get_bloginfo('admin_email') . "', '" . get_bloginfo('name') . "', '" . get_bloginfo('admin_email') . "', 0) ;";
+                . " (`id`, `tempmail_urls`, `last_tempmail_update`, `mail_host`, `mail_port`, `mail_encryption`, `mail_username`, `mail_password`, `mail_from`, `mail_from_name`, `mail_general_notifications`, `last_webcard_number`, `pp_token_expiration`)"
+                . " VALUES (1, '" . json_encode(['block' => [], 'allow' => []]) . "', 0, '', 465, 'SMTPS', '', '', '" . get_bloginfo('admin_email') . "', '" . get_bloginfo('name') . "', '" . get_bloginfo('admin_email') . "', 0, 0) ;";
             $wpdb->query($q);
-            $this->get_settings();
         }
-    }
-
-    // CHECK IF WOOCOMMERCE IS ENABLED
-    private function check_woocommerce_activation() {
-        return in_array( 'woocommerce/woocommerce.php', get_option('active_plugins') );
-    }
-
-    // AUTO-DISABLE IF WOOCOMMERCE IS DISABLED
-    private function disable_without_woocommerce() {
-        if (!$this->check_woocommerce_activation()) {
-            require_once(ABSPATH . '/wp-admin/includes/plugin.php');
-            deactivate_plugins('multipop/multipop.php');
-        }
+        $q = "UPDATE " . $this::db_prefix('plugin_settings') . " SET `register_page` = $register_page, `myaccount_page` = $myaccount_page WHERE `id` = 1;";
+        $wpdb->query($q);
+        $this->get_settings();
     }
 
     // RETURN ECHO FROM FUNCTION NAME TO STRING
@@ -352,13 +423,18 @@ class MultipopPlugin {
     }
 
     // DOWLOAD FILE
-    private function file_download($url, $timeout = 5) {
+    private function curl_exec($url, $settings = []) {
+        $settings = $settings + [
+            CURLOPT_AUTOREFERER => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_NOSIGNAL => true,
+            CURLOPT_TIMEOUT => 5
+        ];
         $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_AUTOREFERER, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_NOSIGNAL, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+        foreach($settings as $key => $value) {
+            curl_setopt($ch, $key, $value);
+        }
         $data = curl_exec($ch);
         if(curl_error($ch) || empty(trim($data))) {
             curl_close($ch);
@@ -456,7 +532,7 @@ class MultipopPlugin {
     }
 
     private function send_confirmation_mail($token, $to) {
-        $confirmation_link = get_permalink(intval(get_option( 'woocommerce_myaccount_page_id' )));
+        $confirmation_link = get_permalink($this->settings['myaccount_page']);
         return $this->send_mail([
             'to' => $to,
             'subject' =>'Conferma email',
@@ -563,6 +639,8 @@ class MultipopPlugin {
         $settings['last_tempmail_update'] = intval($settings['last_tempmail_update']);
         $settings['mail_port'] = intval($settings['mail_port']);
         $settings['master_doc_key'] = boolval($settings['master_doc_key']);
+        $settings['register_page'] = intval($settings['register_page']);
+        $settings['myaccount_page'] = intval($settings['myaccount_page']);
         $this->settings = $settings;
         return $this->settings;
     }
@@ -590,7 +668,7 @@ class MultipopPlugin {
                 $old_list = file_get_contents(MULTIPOP_PLUGIN_PATH . 'tempmail/list.txt');
                 $block_list = $old_list !== false ? preg_split('/\r\n|\r|\n/', trim($old_list)) : [];
                 foreach($this->settings['tempmail_urls']['block'] as $l ) {
-                    $res = $this->file_download($l);
+                    $res = $this->curl_exec($l);
                     if (!$res) continue;
                     $res = preg_split('/\r\n|\r|\n/', trim($res));
                     foreach($res as $i=>$b) {
@@ -600,7 +678,7 @@ class MultipopPlugin {
                 }
                 $block_list = array_values( $block_list );
                 foreach($this->settings['tempmail_urls']['allow'] as $l) {
-                    $res = $this->file_download($l);
+                    $res = $this->curl_exec($l);
                     if (!$res) continue;
                     $res = preg_split('/\r\n|\r|\n/', trim($res));
                     foreach($res as $a) {
@@ -620,6 +698,22 @@ class MultipopPlugin {
                 $wpdb->query($q);
             }
         }
+    }
+
+    private function last_comuni_update() {
+        $last_file_name = explode(',', file_get_contents(MULTIPOP_PLUGIN_PATH . 'comuni/bk/last-cycle.txt'))[0];
+        return date_create_from_format('YmdHis', explode('.',explode('-', $last_file_name)[2])[0], wp_timezone() );
+    }
+
+    private function update_comuni($force = false) {
+        if (!$force) {
+            $last_update = $this->last_comuni_update();
+            $last_update->add(new DateInterval('P30D'));
+            if (time() < $last_update->getTimestamp()) {
+                return;
+            }
+        }
+        exec(MULTIPOP_PLUGIN_PATH . 'comuni/comuni-update.sh --skip-on-error=attivi,soppressi,multicap > /dev/null &');
     }
 
     // LOGOUT AND REDIRECT TO URL OR HOME
@@ -659,49 +753,29 @@ class MultipopPlugin {
     }
 
     // ADD USER NOTICE
-    private function add_user_notice($msg, $type = 'error', $data = []) {
-        $session = WC()->session;
-        if ( null === $session ) {
-            return;
-        }
-        $all_notices = $session->get( 'wc_notices', [] );
-        if (!isset($all_notices[$type])) {
-            $all_notices[$type] = [];
-        }
-        $found = array_filter($all_notices[$type], function($n) use ($msg) {return $n['notice'] === $msg;});
-        if (!count($found)) {
-            $all_notices[$type][] = ['notice' => $msg, 'data' => $data];
-            $session->set('wc_notices', $all_notices);
-        }
+    private function add_user_notice($msg, $type = 'error') {
+        $this->user_notices[] = '<div class="mpop-notice notice-'.$type.'"><p>'.$msg.'</p></div>';
     }
 
-    // REMOVE USER NOTICE BY data['id']
-    private function remove_user_notice($data_id) {
-        $session = WC()->session;
-        if ( null === $session ) {
-            return;
+    public function show_user_notices($content) {
+        if (in_the_loop()) {
+            $content = implode('',$this->user_notices) . $content;
         }
-        $all_notices = $session->get( 'wc_notices', array() );
-        foreach ($all_notices as $k=>$notice_group) {
-            $all_notices[$k] = array_values(array_filter($notice_group, function ($notice) use ($data_id) {
-                return !isset($notice['data']) || !is_array($notice['data']) || !isset($notice['data']['id']) || $notice['data']['id'] != $data_id;
-            }));
-        }
-        $session->set('wc_notices', $all_notices);
+        return $content;
     }
 
     // MAIN TEMPLATE REDIRECT
     // (USED TO HIDE SOME MY ACCOUNT SUB-PAGES)
-    public function template_redirect() {
-        global $wp;
-        if (isset($wp->query_vars['pagename']) && $wp->query_vars['pagename'] == $this->my_account_page_slug() && isset($wp->query_vars['edit-address'])) {
-            $this->location_not_found();
-        }
-    }
+    // public function template_redirect() {
+    //     global $wp;
+    //     if (isset($wp->query_vars['pagename']) && $wp->query_vars['pagename'] == $this->my_account_page_slug() && isset($wp->query_vars['edit-address'])) {
+    //         $this->location_not_found();
+    //     }
+    // }
 
     // RETUTN MY ACCOUNT PAGE SLUG
     private function my_account_page_slug() {
-        $my_account_addr_arr = explode('/',preg_replace('/https?:\/\//', '', get_permalink(intval(get_option( 'woocommerce_myaccount_page_id' )))));
+        $my_account_addr_arr = explode('/',preg_replace('/https?:\/\//', '', get_permalink($this->settings['myaccount_page'])));
         $my_account_addr_arr = array_values(array_filter($my_account_addr_arr, function($e) {return !empty(trim($e));}));
         unset($my_account_addr_arr[0]);
         return implode('/', $my_account_addr_arr);
@@ -718,25 +792,13 @@ class MultipopPlugin {
         }
     }
 
-    // CHANGE STYLE FOR LOGIN PAGE
-    public function html_login_placeholder() { ?>
-        <script type="text/javascript">
-            Array.from(document.querySelectorAll('.woocommerce-form-login label')).forEach(e => {
-                if (e.nextElementSibling.type == 'text' || e.nextElementSibling.type == 'password') {
-                    e.nextElementSibling.placeholder = e.innerText.replaceAll('*', '').trim();
-                    e.remove();
-                }
-            });
-        </script>
-        <?php
-    }
-
     // CHECK AFTER LOGIN
     public function filter_login($username, $user) {
+        wp_set_current_user($user->ID);
         $roles = $user->roles;
         if (count( $roles ) == 0) {
             $this->logout_redirect();
-        } else if (count( $roles ) == 1 && $roles[0] == 'customer') {
+        } else if (count( $roles ) == 1 && in_array($roles[0], ['multipopolano', 'multipopolare_resp'])) {
             $mail_to_confirm = get_user_meta($user->ID, 'mpop_mail_to_confirm', true);
             $mail_changing = get_user_meta($user->ID, '_new_email', true);
             if ($mail_to_confirm || $mail_changing) {
@@ -747,22 +809,49 @@ class MultipopPlugin {
                     $user_id = $this->verify_temp_token($_REQUEST['mpop_mail_token'], 'email_confirmation_link');
                     if ($user_id == $user->ID) {
                         $this->delete_temp_token($_REQUEST['mpop_mail_token']);
-                        update_user_meta( $user->ID, $mail_to_confirm ? 'mpop_mail_to_confirm' : '_new_email', false );
-                        wp_redirect(preg_replace('/&?mpop_mail_token=[a-f0-9]{32}/', '', $this->req_url) . '&mpop_mail_confirmed=1');
+                        if ($mail_changing) {
+                            wp_update_user([
+                                'ID' => $user->ID,
+                                'user_email' => $mail_changing,
+                                'meta_input' => [
+                                    '_new_email' => false
+                                ]
+                            ]);
+                        } else {
+                            wp_update_user([
+                                'ID' => $user->ID,
+                                'meta_input' => [
+                                    'mpop_mail_to_confirm' => false
+                                ]
+                            ]);
+                        }
+                        unset($_GET['mpop_mail_token']);
+                        unset($_GET['invalid_mpop_login']);
+                        $_GET['mpop_mail_confirmed'] = '1';
+                        wp_redirect(explode('?',$this->req_url)[0] . '?' . $this->export_GET());
                         exit;
                     } else {
                         if ($user_id) {
                             $this->delete_temp_token($_REQUEST['mpop_mail_token']);
                         }
-                        $this->logout_redirect(get_permalink(intval(get_option( 'woocommerce_myaccount_page_id' ))) . '?invalid_mpop_mail_token=1');
+                        $this->logout_redirect(get_permalink($this->settings['myaccount_page']) . '?invalid_mpop_mail_token=1');
                     }
                 } else if ($mail_to_confirm) {
-                    $this->logout_redirect(get_permalink(intval(get_option( 'woocommerce_myaccount_page_id' ))) . '?mpop_mail_not_confirmed=1');
+                    $this->logout_redirect(get_permalink($this->settings['myaccount_page']) . '?mpop_mail_not_confirmed=1');
                 }
             }
         }
     }
 
+
+    private function render_blocks($html_blocks) {
+        $html = '';
+        $blocks = parse_blocks($html_blocks);
+        foreach($blocks as $b) {
+            $html .= render_block($b);
+        }
+        return $html;
+    }
 
     // REGISTRATION
     
@@ -776,14 +865,16 @@ class MultipopPlugin {
         return $this->html_to_string( [$this, 'register_form'] );
     }
 
+    // MYACCOUNT PAGE HTML
+    private function myaccount_page() {
+        require( MULTIPOP_PLUGIN_PATH . '/shortcodes/myaccount.php' );
+    }
 
-    // PASSWORD CHANGE
-    // private function password_change_form() {
-    //     require( MULTIPOP_PLUGIN_PATH . '/shortcodes/password-change.php' );
-    // }
-    // public function password_change_sc() {
-    //     return $this->html_to_string( [$this, 'password_change_form'] );
-    // }
+    // MYACCOUNT PAGE SHORTCODE
+    public function myaccount_sc() {
+        return $this->html_to_string( [$this, 'myaccount_page'] );
+    }
+
 
 
     // DASHBOARD
@@ -802,6 +893,9 @@ class MultipopPlugin {
         <?php
     }
 
+    public function add_profile_meta( $user ) {
+        require(MULTIPOP_PLUGIN_PATH . '/pages/profile.php');
+    }
     // ADD USER META IN ADMIN EDIT USER PAGE
     public function add_user_meta( $user ) {
         require(MULTIPOP_PLUGIN_PATH . '/pages/user-edit.php');
@@ -816,34 +910,6 @@ class MultipopPlugin {
         define('MPOP_PERSONAL_UPDATE', true);
     }
 
-    
-    // MY ACCOUNT USER PAGE
-
-    // ADD/REMOVE MENU ITEMS TO MY ACCOUNT PAGE
-    public function add_my_account_menu_items($items, $endpoints) {
-        $new_items = [];
-        $i = 0;
-        foreach( $items as $k => $v ) {
-            if ($i == 1) {
-                $new_items['card'] = 'Tessera';
-            }
-            if ($k != 'edit-address') {
-                $new_items[$k] = $v;
-            }
-            $i++;
-        }
-        return $new_items;
-    }
-    // PERSONAL CARD PAGE TITLE
-    public function filter_my_account_card_page_title($title, $post_id) {
-        if ( is_singular() && in_the_loop() && is_main_query() && $post_id == intval(get_option( 'woocommerce_myaccount_page_id' )) ) {
-            global $wp;
-            if (isset($wp->query_vars['card'])) {
-                return 'Tessera';
-            }
-        }
-        return $title;
-    }
     // PERSONAL CARD PAGE CONTENT
     public function my_account_card_html() {
         ?>
@@ -856,15 +922,22 @@ class MultipopPlugin {
             $user_id = get_current_user_id();
         } else if (is_string($user_id)) {
             $user_id = intval($user_id);
-        } else if (get_class($user_id) == 'WP_User') {
+        } else if (is_object($user_id)) {
             $user_id = $user_id->ID;
         }
         if (!is_int($user_id) || $user_id <= 0) {
             return false;
         }
-        return (bool) get_user_meta($user->ID, 'mpop_card_active', true);
+        return (bool) get_user_meta($user_id, 'mpop_card_active', true);
     }
 
+    private function generate_asym_keys($priv_key_len = 8192) {
+        $keys = openssl_pkey_new(['private_key_bits'=> $priv_key_len, 'private_key_type' => OPENSSL_KEYTYPE_RSA]);
+        $public_key_pem = base64_decode(str_replace(array("-----BEGIN PUBLIC KEY-----","-----END PUBLIC KEY-----","\r\n", "\n", "\r"), '', openssl_pkey_get_details($keys)['key']));
+        openssl_pkey_export($keys, $private_key_pem);
+        $private_key_pem = base64_decode( str_replace(array("-----BEGIN PRIVATE KEY-----","-----END PRIVATE KEY-----","\r\n", "\n", "\r"), '', $private_key_pem) );
+        return ['priv' => $private_key_pem, 'pub' => $public_key_pem];
+    }
 
     // ENCRYPTION
 
@@ -917,6 +990,18 @@ class MultipopPlugin {
             $mac_key,
             $iv
         );
+    }
+
+    // ENCRYPT DATA WITH ASYMMETRIC PUBLIC KEY
+    private function encrypt_asym(
+        #[\SensitiveParameter]
+            string $data = '',
+        #[\SensitiveParameter]
+            string $pub_key = ''
+    ) {
+        $pub_key = openssl_pkey_get_public( "-----BEGIN PUBLIC KEY-----\n". base64_encode($pub_key) . "\n-----END PUBLIC KEY-----");
+        openssl_public_encrypt($data, $enc, $pub_key, OPENSSL_PKCS1_OAEP_PADDING);
+        return $enc;
     }
     
     
@@ -983,6 +1068,19 @@ class MultipopPlugin {
         );
     }
 
+    // DECRYPT DATA WITH ASYMMETRIC PRIVATE KEY
+    private function decrypt_asym(
+        #[\SensitiveParameter]
+            string $data = '',
+        #[\SensitiveParameter]
+            string $priv_key = ''
+    ) {
+        $priv_key = openssl_pkey_get_private( "-----BEGIN PRIVATE KEY-----\n". base64_encode($priv_key) . "\n-----END PRIVATE KEY-----");
+        openssl_private_decrypt($data, $dec, $priv_key, OPENSSL_PKCS1_OAEP_PADDING);
+        return $dec;
+    }
+
+
     // CHECK IF CURRENT USER IS ADMIN
     private function current_user_is_admin() {
         $current_user = wp_get_current_user();
@@ -1003,7 +1101,8 @@ class MultipopPlugin {
     }
 
     private function count_valid_master_keys() {
-        return count(get_users(['role__in' => ['administrator', 'multipopolare_resp'],
+        return count(get_users([
+            'role__in' => ['administrator', 'multipopolare_resp'],
             'meta_query' => [
                 'relation' => 'AND',
                 [
@@ -1041,6 +1140,115 @@ class MultipopPlugin {
                 ]
             ]
         ]));
+    }
+    public function filter_menu_items($sorted_menu_items) {
+        $new_items = [];
+        foreach($sorted_menu_items as $item) {
+            $new_items[] = $item;
+        }
+        if (get_current_user_id()) {
+            $new_items[] = new WP_Block(parse_blocks('<!-- wp:loginout /-->')[0]);
+        } else {
+            $rp = get_post($this->settings['register_page']);
+            $new_items[] = new WP_Block(parse_blocks('<!-- wp:navigation-link {"label":"'.$rp->post_title.'","type":"page","id":'.$rp->ID.',"url":"/'.$rp->post_name.'","kind":"post-type"} /-->')[0]);
+        }
+        return new WP_Block_List( $new_items );
+    }
+    private function show_hcaptcha_script() { ?>
+        <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+        <script type="text/javascript">
+            function hcaptchaCallback(token) {
+                document.querySelector("input[name=hcaptcha-response]").value = token;
+            }
+        </script>
+        <?php
+    }
+    private function create_hcaptcha() {
+        if ($this->settings['hcaptcha_site_key'] ) {
+            return '<div class="h-captcha" data-sitekey="'.$this->settings['hcaptcha_site_key'].'" data-callback="hcaptchaCallback"></div><input type="hidden" name="hcaptcha-response" />';
+        }
+        return '';
+    }
+    private function verify_hcaptcha($response) {
+        if (!$this->settings['hcaptcha_site_key'] ) {return true;}
+        if (!$this->settings['hcaptcha_secret'] ) {return false;}
+        $res = $this->curl_exec('https://hcaptcha.com/siteverify', [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => 'secret='.$this->settings['hcaptcha_secret'] . '&site_key=' . $this->settings['hcaptcha_site_key']. '&response=' . $response
+        ]);
+        if (!$res) {return false;}
+        $res = json_decode($res, true);
+        return $res['success'];
+    }
+    public function run_wptexturize($run_texturize) {
+        if (get_the_ID() == $this->settings['myaccount_page']) {
+            return false;
+        }
+        return $run_texturize;
+    }
+    private function get_comuni_all() {
+        return json_decode(file_get_contents(MULTIPOP_PLUGIN_PATH . '/comuni/comuni.json'), true);
+    }
+    private function add_birthplace_labels(...$comuni) {
+        foreach($comuni as $i=>$c) {
+            $comuni[$i]['untouched_label'] = mb_strtoupper($c['nome'], 'UTF-8') . ' (' . $c['provincia']['sigla'] . ') - ' . $c['codiceCatastale'] . (isset($c['soppresso']) && $c['soppresso'] ? ' (soppresso)' : '');
+            $comuni[$i]['label'] = iconv('UTF-8','ASCII//TRANSLIT', $comuni[$i]['untouched_label']);
+        }
+        return $comuni;
+    }
+
+    private function add_billing_city_labels(...$comuni) {
+        foreach($comuni as $i=>$c) {
+            $comuni[$i]['label'] = iconv('UTF-8','ASCII//TRANSLIT',  mb_strtoupper($c['nome'], 'UTF-8') . ' (' . $c['provincia']['sigla'] . ')');
+        }
+        return $comuni;
+    }
+    private function get_province_all() {
+        return json_decode(file_get_contents(MULTIPOP_PLUGIN_PATH . '/comuni/province.json'), true);
+    }
+    private function myaccount_get_profile($user, $add_labels = false) {
+        if (is_int($user)) {
+            $user = get_user_by('ID', $user);
+        }
+        $user_meta = get_user_meta($user->ID);
+        $parsed_user = [
+            'ID' => $user->ID,
+            'login' => $user->user_login,
+            'email' => $user->user_email,
+            'registered' => $user->user_registered,
+            'role' => $user->roles[0],
+            'first_name' => $user_meta['first_name'][0],
+            'last_name' => $user_meta['last_name'][0],
+            '_new_email' => isset($user_meta['_new_email']) ? boolval($user_meta['_new_email'][0] ) : false,
+            'mpop_mail_to_confirm' => isset($user_meta['mpop_mail_to_confirm']) ? boolval($user_meta['mpop_mail_to_confirm'][0] ) : false,
+            'mpop_card_active' => isset($user_meta['mpop_card_active']) ? boolval($user_meta['mpop_card_active'][0] ) : false,
+            'mpop_birthdate' => isset($user_meta['mpop_birthdate']) ? $user_meta['mpop_birthdate'][0] : '',
+            'mpop_birthplace' => isset($user_meta['mpop_birthplace']) ? $user_meta['mpop_birthplace'][0] : '',
+            'mpop_billing_address' => isset($user_meta['mpop_billing_address']) ? $user_meta['mpop_billing_address'][0] : '',
+            'mpop_billing_city' => isset($user_meta['mpop_billing_city']) ? $user_meta['mpop_billing_city'][0] : '',
+            'mpop_billing_zip' => isset($user_meta['mpop_billing_zip']) ? $user_meta['mpop_billing_zip'][0] : '',
+            'mpop_billing_state' => isset($user_meta['mpop_billing_state']) ? $user_meta['mpop_billing_state'][0] : ''
+        ];
+        if ($add_labels) {
+            $comuni = false;
+            if ($parsed_user['mpop_birthplace']) {
+                $comuni = $this->get_comuni_all();
+                $fc = array_values(array_filter($comuni, function($c) use ($parsed_user) {return $c['codiceCatastale'] == $parsed_user['mpop_birthplace'];}));
+                if (count($fc)) {
+                    $parsed_user['mpop_birthplace'] = $this->add_birthplace_labels(...$fc)[0];
+                }
+            }
+            if ($parsed_user['mpop_billing_city']) {
+                if (!isset($comuni)) {
+                    $comuni = $this->get_comuni_all();
+                }
+                $fc = array_values(array_filter($comuni, function($c) use ($parsed_user) {return $c['codiceCatastale'] == $parsed_user['mpop_billing_city'];}));
+                if (count($fc)) {
+                    $parsed_user['mpop_billing_city'] = $this->add_billing_city_labels(...$fc)[0];
+                }
+            }
+        }
+        return $parsed_user;
     }
 }
 

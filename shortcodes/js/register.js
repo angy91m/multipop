@@ -1,4 +1,4 @@
-import { createApp, ref, computed, reactive } from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
+import { createApp, ref, computed, reactive, onMounted, onUnmounted } from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
 const mailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/s,
 usernameRegex = {
     rr: [
@@ -44,10 +44,19 @@ createApp({
         passwordConfirm = ref(''),
         registered = ref(false),
         requesting = ref(false),
-        isValidForm = computed( () => isValidUsername() && isValidEmail() && isValidPassword() && isValidPasswordConfirm() ),
+        hcaptchaRes = ref(''),
+        isValidForm = computed( () => isValidCaptcha() && isValidUsername() && isValidEmail() && isValidPassword() && isValidPasswordConfirm() ),
         startedFields = reactive(new Set([])),
         errorFields = reactive(new Set([])),
         acceptedSymbols = passwordRegex.acceptedSymbols;
+        let observer = null;
+        onMounted(()=> {
+            observer = new MutationObserver(() => {
+                hcaptchaRes.value = document.querySelector('input[name="hcaptcha-response"]').value.trim();
+            });
+            observer.observe(document.querySelector('input[name="hcaptcha-response"]'), {attributes: true, attributeFilter: ['value']});
+        });
+        onUnmounted(()=> observer && observer.disconnect());
         function startField(field) {
             errorFields.clear();
             startedFields.add(field);
@@ -64,6 +73,9 @@ createApp({
         function isValidPasswordConfirm() {
             return password.value === passwordConfirm.value;
         }
+        function isValidCaptcha() {
+            return hcaptchaRes.value;
+        }
         async function register(e) {
             e.preventDefault();
             requesting.value = true;
@@ -73,7 +85,8 @@ createApp({
                     username: username.value.trim(),
                     email: email.value.trim(),
                     password: password.value,
-                    nonce: document.getElementById('mpop-register-nonce').value
+                    nonce: document.getElementById('mpop-register-nonce').value,
+                    'hcaptcha-response': hcaptchaRes.value
                 }),
                 headers: {
                     'Content-Type': 'application/json'
@@ -82,7 +95,15 @@ createApp({
             try {
                 const json = await res.json();
                 if (res.ok && json.data == 'ok') registered.value = true;
-                if (json.error) json.error.forEach(e => errorFields.add(e));
+                if (json.error) {
+                    json.error.forEach(e => {
+                        if (e == 'captcha') {
+                            document.querySelector('.h-captcha').classList.add('bad-captcha');
+                        } else {
+                            errorFields.add(e);
+                        }
+                    });
+                };
             } catch {
                 errorFields.add('server');
             }
@@ -100,6 +121,7 @@ createApp({
             isValidUsername,
             isValidPassword,
             isValidPasswordConfirm,
+            isValidCaptcha,
             registered,
             errorFields,
             startField,
