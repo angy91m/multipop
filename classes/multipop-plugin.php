@@ -204,14 +204,14 @@ class MultipopPlugin {
                 $mail_changing = get_user_meta($user_id, '_new_email', true);
                 if ($mail_changing) {
                     $this->delete_temp_token($_REQUEST['mpop_mail_token']);
-                    wp_update_user($user_id, [
+                    wp_update_user([
                        'ID' => $user_id,
                         'user_email' => $mail_changing,
                         'meta_input' => [
                             '_new_email' => false
                         ]
                     ]);
-                    wp_redirect(get_permalink($this->settings['myaccount_page']) . '?mpop_mail_confirmed=1');
+                    wp_redirect(get_permalink($this->settings['myaccount_page']));
                     exit;
                 } else {
                     $this->logout_redirect($this->req_url);
@@ -317,15 +317,17 @@ class MultipopPlugin {
                 $this->add_user_notice("Dovresti aver ricevuto un'e-mail contenente un link per resettare la password", 'info');
             }
         } else {
-            $mail_changing = get_user_meta($user_id, '_new_email', true);
-            if ($mail_changing) {
-                $this->add_user_notice("L'indirizzo e-mail non è ancora confermato. Controlla nella tua casella di posta per il link di conferma.");
-            }
-            if (isset($_REQUEST['mpop_mail_not_confirmed'])) {
-                $this->add_user_notice("L'indirizzo e-mail non è ancora confermato. Controlla nella tua casella di posta per il link di conferma.");
-            }
-            if (isset($_REQUEST['mpop_mail_confirmed'])) {
-                $this->add_user_notice("Indirizzo e-mail confermato correttamente", 'success');
+            if (get_the_ID() != $this->settings['myaccount_page']) {
+                $mail_changing = get_user_meta($user_id, '_new_email', true);
+                if ($mail_changing) {
+                    $this->add_user_notice("L'indirizzo e-mail non è ancora confermato. Controlla nella tua casella di posta per il link di conferma.");
+                }
+                if (isset($_REQUEST['mpop_mail_not_confirmed'])) {
+                    $this->add_user_notice("L'indirizzo e-mail non è ancora confermato. Controlla nella tua casella di posta per il link di conferma.");
+                }
+                if (isset($_REQUEST['mpop_mail_confirmed'])) {
+                    $this->add_user_notice("Indirizzo e-mail confermato correttamente", 'success');
+                }
             }
         }
     }

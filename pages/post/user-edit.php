@@ -125,7 +125,7 @@ if (!$errors->has_errors()) {
                     }
                 }
             } else {
-                $user_meta['mpop_mail_to_confirm'] = false;
+                delete_user_meta($user->ID, 'mpop_mail_to_confirm');
             }
             if ($update && in_array($user->role, ['administrator', 'multipopolare_resp'])) {
                 if (isset($_POST['revoke_master_key']) && $_POST['revoke_master_key']) {
@@ -133,8 +133,7 @@ if (!$errors->has_errors()) {
                         $errors->add(400, "Non puoi revocare l'ultima master key assegnata");
                         return;
                     }
-                    $user_meta['mpop_personal_master_key'] = false;
-                    $user = get_user_by('ID', $user->ID);
+                    delete_user_meta($user->ID, 'mpop_personal_master_key');
                     break;
                 } else if (isset($_POST['master_key']) && $_POST['master_key']) {
                     $old_user_meta = get_user_meta($user->ID);
@@ -191,7 +190,7 @@ if (!$errors->has_errors()) {
                     );
                 }
             } else {
-                $user_meta['mpop_personal_master_key'] = false;
+                delete_user_meta($user->ID, 'mpop_personal_master_key');
             }
         } while(false);
     }

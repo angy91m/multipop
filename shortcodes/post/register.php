@@ -85,6 +85,7 @@ if (is_int($user_id)) {
     if ($res === true) {
         $res_data['data'] = 'ok';
     } else {
+        $this->delete_temp_token( $token );
         http_response_code( 500 );
         $res_data['error'] = ['server'];
     }

@@ -8,6 +8,8 @@ if (!isset($post_data['action']) || !is_string($post_data['action']) || !trim($p
     echo json_encode( $res_data );
     exit;
 }
+$min_birthdate = date_create('1910-10-13', new DateTimeZone('Europe/Rome'));
+$min_birthdate->setTime(0,0,0,0);
 switch ($post_data['action']) {
     case 'get_birth_cities':
         if (!isset($post_data['mpop_birthplace']) || !is_string($post_data['mpop_birthplace']) || strlen(trim($post_data['mpop_birthplace'])) < 2) {
@@ -35,6 +37,12 @@ switch ($post_data['action']) {
         $post_birthdate = date_create('now', new DateTimeZone('Europe/Rome'));
         $post_birthdate->setDate($date_arr[0], $date_arr[1], $date_arr[2]);
         $post_birthdate->setTime(0,0,0,0);
+        if ($post_birthdate->getTimestamp() < $min_birthdate->getTimestamp()) {
+            $res_data['error'] = ['mpop_birthdate'];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
         $post_birthplace = trim(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper( $post_data['mpop_birthplace'], 'UTF-8' )));
         $comuni = $this->get_comuni_all();
         $filtered_comuni = [];
@@ -104,7 +112,10 @@ switch ($post_data['action']) {
             $post_data['email'] = mb_strtolower( trim($post_data['email']), 'UTF-8' );
         }
         if (!isset($post_data['first_name']) || !is_string($post_data['first_name']) || strlen(trim($post_data['first_name'])) < 2) {
-            $res_data['error'] = ['first_name'];
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'first_name';
         } else {
             $post_data['first_name'] = mb_strtoupper( trim($post_data['first_name']), 'UTF-8' );
         }
@@ -158,11 +169,20 @@ switch ($post_data['action']) {
                 count($date_arr) != 3
                 || !checkdate($date_arr[1], $date_arr[2], $date_arr[0])
             ) {
-                $res_data['error'] = ['mpop_birthdate'];
+                if (!isset($res_data['error'])) {
+                    $res_data['error'] = [];
+                }
+                $res_data['error'][] = 'mpop_birthdate';
             } else {
                 $post_data['mpop_birthdate'] = date_create('now', new DateTimeZone('Europe/Rome'));
                 $post_data['mpop_birthdate']->setDate($date_arr[0], $date_arr[1], $date_arr[2]);
                 $post_data['mpop_birthdate']->setTime(0,0,0,0);
+                if ($post_data['mpop_birthdate']->getTimestamp() < $min_birthdate->getTimestamp()) {
+                    if (!isset($res_data['error'])) {
+                        $res_data['error'] = [];
+                    }
+                    $res_data['error'][] = 'mpop_birthdate';
+                }
             }
             if (!isset($post_data['mpop_birthplace']) || !preg_match('/^[A-Z]\d{3}$/', $post_data['mpop_birthplace'])) {
                 if (!isset($res_data['error'])) {
@@ -211,12 +231,33 @@ switch ($post_data['action']) {
             echo json_encode( $res_data );
             exit;
         }
-        $email_update = false;
         $user_edits = [];
         if ($current_user->user_email != $post_data['email']) {
-            $email_update = $post_data['email'];
+            $duplicated = get_user_by('email', $post_data['email']);
+            if ($duplicated) {
+                $res_data['error'] = ['email'];
+                http_response_code( 400 );
+                echo json_encode( $res_data );
+                exit;
+            }
+            $duplicated = get_users(['meta_key' => '_new_email', 'meta_value' => $post_data['email']]);
+            if (count($duplicated)) {
+                $res_data['error'] = ['email'];
+                http_response_code( 400 );
+                echo json_encode( $res_data );
+                exit;
+            }
+            $token = $this->create_temp_token( $current_user->ID, 'email_confirmation_link' );
+            $res_mail = $this->send_confirmation_mail($token, $post_data['email']);
+            if (!$res_mail) {
+                $this->delete_temp_token( $token );
+                $res_data['error'] = ['email'];
+                http_response_code( 400 );
+                echo json_encode( $res_data );
+                exit;
+            }
             $user_edits['meta_input'] = [
-                '_new_email' => $email_update
+                '_new_email' => $post_data['email']
             ];
         }
         if ($this->is_card_active($current_user->ID)) {
@@ -261,6 +302,9 @@ switch ($post_data['action']) {
                     default:
                         $user_edits['meta_input'][$prop] = $post_data[$prop];
                 }
+            }
+            if (count($user_edits)) {
+                delete_user_meta( $current_user->ID, 'mpop_profile_pending_edits' );
             }
         }
         if (count($user_edits)) {

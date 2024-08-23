@@ -34,30 +34,30 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                             <button class="mpop-button" @click="editProfile">Modifica profilo</button>
                         </template>
                         <template v-else>
-                            <button class="mpop-button btn-error" @click="cancelEditProfile">Annulla</button>
-                            <button class="mpop-button btn-success" @click="updateProfile" :disabled="!validProfileForm">Salva</button>
+                            <button class="mpop-button btn-error" @click="cancelEditProfile" :disabled="saving">Annulla</button>
+                            <button class="mpop-button btn-success" @click="updateProfile" :disabled="!validProfileForm || saving">Salva</button>
                         </template>
                         <br><br>
                         <table id="mpop-profile-table">
                             <tr>
                                 <td><strong>E-mail:</strong></td>
                                 <td v-if="!profileEditing">{{user.email}}</td>
-                                <td v-else><input type="text" v-model="userInEditing.email"/></td>
+                                <td v-else><input type="text" :class="savingProfileErrors.includes('email') ? 'bad-input' : ''" v-model="userInEditing.email"/></td>
                             </tr>
                             <tr>
                                 <td><strong>Nome:</strong></td>
                                 <td v-if="!profileEditing">{{user.first_name}}</td>
-                                <td v-else><input type="text" style="text-transform: uppercase" v-model="userInEditing.first_name"/></td>
+                                <td v-else><input type="text" :class="savingProfileErrors.includes('first_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="userInEditing.first_name"/></td>
                             </tr>
                             <tr>
                                 <td><strong>Cognome:</strong></td>
                                 <td v-if="!profileEditing">{{user.last_name}}</td>
-                                <td v-else><input type="text" style="text-transform: uppercase" v-model="userInEditing.last_name"/></td>
+                                <td v-else><input type="text" :class="savingProfileErrors.includes('last_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="userInEditing.last_name"/></td>
                             </tr>
                             <tr>
                                 <td><strong>Data di nascita:</strong></td>
                                 <td v-if="!profileEditing">{{displayLocalDate(user.mpop_birthdate)}}</td>
-                                <td v-else><input type="date" :max="maxBirthDate" v-model="userInEditing.mpop_birthdate"/></td>
+                                <td v-else><input type="date" :class="savingProfileErrors.includes('mpop_birthdate') ? 'bad-input' : ''" min="1910-10-13" :max="maxBirthDate" v-model="userInEditing.mpop_birthdate"/></td>
                             </tr>
                             <tr>
                                 <td><strong>Luogo di nascita:</strong></td>
@@ -65,11 +65,12 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                                 <td v-else>
                                     <v-select
                                         id="birthplace-select"
+                                        :class="savingProfileErrors.includes('mpop_birthplace') ? 'bad-input' : ''"
                                         v-model="userInEditing.mpop_birthplace"
                                         :options="birthCities"
                                         :disabled="!userInEditing.mpop_birthdate"
                                         @close="birthplaceOpen = false"
-                                        @open="birthplaceOpen = true"
+                                        @open="searchOpen('birthplace')"
                                         :label="birthplaceOpen ? 'label' : 'untouched_label'"
                                         @search="(searchTxt, loading) => {
                                             if (searchTxt.trim().length > 1) {
@@ -106,16 +107,19 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                                 <td v-if="!profileEditing">{{ user.mpop_billing_city ? user.mpop_billing_city.nome : ''}}</td>
                                 <td v-else>
                                     <v-select
-                                        id="billing-city-select"
+                                        id="billingCity-select"
                                         v-model="userInEditing.mpop_billing_city"
+                                        :class="savingProfileErrors.includes('mpop_billing_city') ? 'bad-input' : ''"
                                         :options="billingCities"
                                         @close="billingCityOpen = false"
-                                        @open="billingCityOpen = true"
+                                        @open="searchOpen('billingCity')"
                                         :label="billingCityOpen ? 'label' : 'nome'"
                                         @option:selected="c => {
                                             userInEditing.mpop_billing_state = c.provincia.sigla;
                                             if (c.cap.length == 1) {
                                                 userInEditing.mpop_billing_zip = c.cap[0];
+                                            } else {
+                                                userInEditing.mpop_billing_zip = '';
                                             }
                                         }"
                                         @option:deselected="() => {
@@ -156,7 +160,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                                 <td><strong>Provincia di residenza:</strong></td>
                                 <td v-if="!profileEditing">{{user.mpop_billing_state}}</td>
                                 <td v-else>
-                                    <select v-model="userInEditing.mpop_billing_state" disabled>
+                                    <select v-model="userInEditing.mpop_billing_state" :class="savingProfileErrors.includes('mpop_billing_state') ? 'bad-input' : ''" disabled>
                                         <option
                                             v-if="userInEditing.mpop_billing_city"
                                             :value="userInEditing.mpop_billing_city.provincia.sigla">{{userInEditing.mpop_billing_city.provincia.sigla}}</option>
@@ -167,7 +171,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                                 <td><strong>CAP:</strong></td>
                                 <td v-if="!profileEditing">{{user.mpop_billing_zip}}</td>
                                 <td v-else>
-                                    <select v-model="userInEditing.mpop_billing_zip" :disabled="!userInEditing.mpop_billing_city || userInEditing.mpop_billing_city.cap.length == 1">
+                                    <select v-model="userInEditing.mpop_billing_zip" :class="savingProfileErrors.includes('mpop_billing_zip') ? 'bad-input' : ''" :disabled="!userInEditing.mpop_billing_city || userInEditing.mpop_billing_city.cap.length == 1">
                                         <template v-if="userInEditing.mpop_billing_city">
                                             <option v-for="cap in userInEditing.mpop_billing_city.cap" :value="cap">{{cap}}</option>
                                         </template>
@@ -177,12 +181,12 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                             <tr>
                                 <td><strong>Indirizzo di residenza:</strong></td>
                                 <td v-if="!profileEditing">{{user.mpop_billing_address}}</td>
-                                <td v-else><textarea v-model="userInEditing.mpop_billing_address" :disabled="!userInEditing.mpop_billing_zip"></textarea></td>
+                                <td v-else><textarea v-model="userInEditing.mpop_billing_address" :class="savingProfileErrors.includes('mpop_billing_address') ? 'bad-input' : ''" :disabled="!userInEditing.mpop_billing_zip"></textarea></td>
                             </tr>
                         </table>
                     </div>
                     <div v-if="selectedTab == 'card'">
-                        <?=html_dump($current_user)?>
+                        <?=html_dump('ciao')?>
                         Tessera
                     </div>
                 </div>

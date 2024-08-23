@@ -29,6 +29,8 @@ createApp({
         profileEditing = ref(false),
         birthplaceOpen = ref(false),
         billingCityOpen = ref(false),
+        saving = ref(false),
+        savingProfileErrors = reactive([]),
         userNotices = reactive([]),
         helloName = computed(()=> user.first_name ? user.first_name : user.login),
         birthCities = reactive([]),
@@ -47,6 +49,7 @@ createApp({
         maxBirthDate = new Date();
         maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
         async function birthCitiesSearch(searchText) {
+            savingProfileErrors.length = 0;
             if (searchText.trim().length > 1) {
                 const res = await serverReq({
                     'action': 'get_birth_cities',
@@ -69,7 +72,7 @@ createApp({
                     try {
                         const {error} = await res.json();
                         if (error) {
-                            console.error(error);
+                            savingProfileErrors.push(...error);
                         } else {
                             console.error('Unknown error');
                         }
@@ -80,6 +83,7 @@ createApp({
             }
         }
         async function billingCitiesSearch(searchText) {
+            savingProfileErrors.length = 0;
             if (searchText.trim().length > 1) {
                 const res = await serverReq({
                     'action': 'get_billing_cities',
@@ -101,7 +105,7 @@ createApp({
                     try {
                         const {error} = await res.json();
                         if (error) {
-                            console.error(error);
+                            savingProfileErrors.push(...error);
                         } else {
                             console.error('Unknown error');
                         }
@@ -113,6 +117,8 @@ createApp({
 
         }
         async function updateProfile() {
+            saving.value = true;
+            savingProfileErrors.length = 0;
             const res = await serverReq({
                 'action': 'update_profile',
                 'email': userInEditing.email.trim(),
@@ -129,6 +135,7 @@ createApp({
                 if (newUser.data && newUser.data.user) {
                     Object.assign(user, newUser.data.user);
                     profileEditing.value = false;
+                    generateNotices();
                 } else {
                     console.error('Unknown error');
                 }
@@ -136,7 +143,7 @@ createApp({
                 try {
                     const {error} = await res.json();
                     if (error) {
-                        console.error(error);
+                        savingProfileErrors.push(...error);
                     } else {
                         console.error('Unknown error');
                     }
@@ -144,6 +151,7 @@ createApp({
                     console.error('Unknown error');
                 }
             }
+            saving.value = false;
         }
         function generateNotices() {
             userNotices.length = 0;
@@ -189,6 +197,7 @@ createApp({
             userNotices.splice(noticeInd, 1);
         }
         function editProfile() {
+            savingProfileErrors.length = 0;
             profileEditing.value = true;
             birthCities.length = 0;
             billingCities.length = 0;
@@ -231,6 +240,11 @@ createApp({
             Object.assign(user, parsedUser);
             generateNotices();
         });
+        function searchOpen(tag) {
+            const openVar = eval(tag + 'Open');
+            openVar.value = true;
+            setTimeout(()=> document.querySelector('#'+tag+'-select .vs__search').select(),300);
+        }
         return {
             selectedTab,
             user,
@@ -251,6 +265,9 @@ createApp({
             billingCities,
             billingCitiesSearch,
             updateProfile,
+            searchOpen,
+            saving,
+            savingProfileErrors,
             validProfileForm,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
         };
