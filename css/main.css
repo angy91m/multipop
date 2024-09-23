@@ -32,6 +32,7 @@ p.mpop-form-row button,
     border-radius: 9px !important;
     box-sizing: border-box;
     margin-right: 10px;
+    margin-bottom: 10px;
 }
 
 p.mpop-form-row input[type="button"],

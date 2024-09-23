@@ -91,11 +91,60 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
                 $edits['mail_general_notifications'] = implode(',', $emails);
             }
         }
+        if (is_string($_REQUEST['authorized_subscription_years'])) {
+            $_REQUEST['authorized_subscription_years'] = trim($_REQUEST['authorized_subscription_years']);
+            if (empty($_REQUEST['authorized_subscription_years'])) {
+                $edits['authorized_subscription_years'] = '';
+            } else {
+                $_REQUEST['authorized_subscription_years'] = array_unique( array_map( function($v) {return intval(trim($v));}, explode(',', $_REQUEST['authorized_subscription_years'])));
+                $valid_years = [];
+                $this_year = intval(current_time('Y'));
+                foreach($_REQUEST['authorized_subscription_years'] as $y) {
+                    if (is_int($y) && $y >= $this_year) {
+                        $valid_years[] = $y;
+                    } else {
+                        $this->add_admin_notice( 'Anno ' . $y . ' non valido' );
+                    }
+                }
+                sort($valid_years);
+                $edits['authorized_subscription_years'] = implode(',', $valid_years);
+            }
+        }
+        if (is_string($_REQUEST['subscription_storage_path'])) {
+            $_REQUEST['subscription_storage_path'] = trim($_REQUEST['subscription_storage_path']);
+            if (empty($_REQUEST['subscription_storage_path'])) {
+                $edits['subscription_storage_path'] = '';
+            } else {
+                $_REQUEST['subscription_storage_path'] = array_unique(array_map( function($v) {return trim($v);}, explode(',',$_REQUEST['subscription_storage_path'])));
+                $valid_paths = [];
+                foreach ($_REQUEST['subscription_storage_path'] as $p) {
+                    if (!empty($p)) {
+                        if (is_dir($p)) {
+                            $valid_paths[] = realpath($p);
+                        }
+                    }
+                }
+                $edits['subscription_storage_path'] = implode(',', array_unique($valid_paths));
+            }
+        }
+        if (is_string($_REQUEST['min_subscription_payment']) && is_numeric($_REQUEST['min_subscription_payment'])) {
+            $min_v = (double) $_REQUEST['min_subscription_payment'];
+            $min_v = round($min_v * 100) / 100;
+            if ($min_v > 0) {
+                $edits['min_subscription_payment'] = "$min_v";
+            }
+        }
         if (is_string($_REQUEST['hcaptcha_site_key'])) {
             $edits['hcaptcha_site_key'] = trim($_REQUEST['hcaptcha_site_key']);
         }
         if (is_string($_REQUEST['hcaptcha_secret'])) {
             $edits['hcaptcha_secret'] = trim($_REQUEST['hcaptcha_secret']);
+        }
+        $edits['pp_sandbox'] = '';
+        if (isset($_REQUEST['pp_sandbox']) && is_string($_REQUEST['pp_sandbox'])) {
+            if ($_REQUEST['pp_sandbox'] == '1') {
+                $edits['pp_sandbox'] = '1';
+            }
         }
         if (is_string($_REQUEST['pp_client_id'])) {
             $edits['pp_client_id'] = trim($_REQUEST['pp_client_id']);
@@ -153,6 +202,9 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
             if (is_string($v)) {
                 $q_arr[] = " $k = %s";
                 $q_values[] = $v;
+            } else if (is_bool($v)) {
+                $q_arr[] = " $k = %d";
+                $q_values[] = $v ? 1 : 0;
             } else if (is_int($v)) {
                 $q_arr[] = " $k = %d";
                 $q_values[] = $v;

@@ -129,13 +129,13 @@ ob_start();
         <br/>&nbsp;&nbsp;&nbsp;&nbsp;b) al trattamento di dati personali che lo riguardano a fini di invio di materiale pubblicitario o di vendita diretta o per il compimento di ricerche di mercato
         <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o di comunicazione commerciale.
         <br/>Per esercitare i propri diritti o per ottenere le informazioni relative all’eventuale trasferimento dei Suoi dati verso un Paese terzo, potrà formulare espressa richiesta scritta da inviarsi all’Ufficio Tesseramento di MULTIPOPOLARE APS all’indirizzo di posta elettronica:
-        <br/><span style="font-family:'helveticamedium'">organizzazione@multipopolare.com</span>
+        <br/><span style="font-family:'helveticamedium'">organizzazione@multipopolare.it</span>
         <br/>Fatto salvo ogni altro ricorso amministrativo o giurisdizionale, Lei ha il diritto di proporre reclamo a un’Autorità di controllo, qualora ritenga che il trattamento che La riguarda violi il GDPR.
         <br/><span style="font-family:'helveticamedium'">Titolare e responsabili del trattamento</span>
-        <br/>Titolare del trattamento dei dati personali è MULTIPOPOLARE APS, e-mail: <span style="font-family:'helveticamedium'">organizzazione@multipopolare.com</span>
+        <br/>Titolare del trattamento dei dati personali è MULTIPOPOLARE APS, e-mail: <span style="font-family:'helveticamedium'">organizzazione@multipopolare.it</span>
         <br/>
         <br/><span style="font-family:'helveticamedium'">IL PRESENTE MODULO VA COMPILATO E FIRMATO IN OGNI SUA PARTE E SPEDITO PER MAIL AL SEGUENTE INDIRIZZO:</span>
-        <br/><span style="font-family:'helveticamedium'">organizzazione@multipopolare.com</span>
+        <br/><span style="font-family:'helveticamedium'">organizzazione@multipopolare.it</span>
     </p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);

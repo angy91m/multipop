@@ -23,6 +23,14 @@ class MultipopPlugin {
     private string $req_url = '';
     private string $req_path = '';
     private array $user_notices = [];
+    private array $subs_statuses = [
+        'tosee',
+        'seen',
+        'refused',
+        'canceled',
+        'completed',
+        'refunded'
+    ];
 
     // FORMAT DATETIME TO LOCAL STRING YYYY-MM-DD HH:MM:SS TZ
     private static function show_date_time($date) {
@@ -39,8 +47,12 @@ class MultipopPlugin {
     }
 
     // EMAIL VALIDATION
-    private static function is_valid_email( $email ) {
-        return filter_var($email, FILTER_VALIDATE_EMAIL);
+    private static function is_valid_email( $email, $check_temp_mail = false ) {
+        $res = filter_var($email, FILTER_VALIDATE_EMAIL);
+        if ($res && $check_temp_mail && file_exists(MULTIPOP_PLUGIN_PATH . 'tempmail/list.txt')) {
+            $res = !in_array(explode('@', $email)[1], preg_split('/\r\n|\r|\n/', file_get_contents(MULTIPOP_PLUGIN_PATH . 'tempmail/list.txt')));
+        }
+        return $res;
     }
 
     // USERNAME VALIDATION
@@ -179,9 +191,9 @@ class MultipopPlugin {
             return;
         }
 
-        // HIDE ADMIN BAR
         $current_user = wp_get_current_user();
 
+        // HIDE ADMIN BAR
         if (count($current_user->roles) == 1 && ($current_user->roles[0] == 'multipopolano' || $current_user->roles[0] == 'multipopolare_resp')) {
             show_admin_bar(false);
         }
@@ -201,16 +213,36 @@ class MultipopPlugin {
             }
             $user_id = $current_user->ID;
             if ($user_id == $user_verified) {
-                $mail_changing = get_user_meta($user_id, '_new_email', true);
-                if ($mail_changing) {
+                if ($current_user->_new_email) {
                     $this->delete_temp_token($_REQUEST['mpop_mail_token']);
-                    wp_update_user([
-                       'ID' => $user_id,
-                        'user_email' => $mail_changing,
-                        'meta_input' => [
-                            '_new_email' => false
-                        ]
+                    $duplicated = get_users([
+                        'search' => $current_user->_new_email,
+                        'search_columns' => ['user_email']
                     ]);
+                    if (!count($duplicated)) {
+                        $duplicated = get_users([
+                            'meta_key' => '_new_email',
+                            'meta_value' => $current_user->_new_email,
+                            'meta_compare' => '=',
+                            'login__not_in' => [$current_user->user_login]
+                        ]);
+                    }
+                    if (count($duplicated)) {
+                        wp_update_user([
+                            'ID' => $user_id,
+                            'meta_input' => [
+                                '_new_email' => false
+                            ]
+                        ]);
+                    } else {
+                        wp_update_user([
+                            'ID' => $user_id,
+                             'user_email' => $current_user->_new_email,
+                             'meta_input' => [
+                                 '_new_email' => false
+                             ]
+                         ]);
+                    }
                     wp_redirect(get_permalink($this->settings['myaccount_page']));
                     exit;
                 } else {
@@ -296,6 +328,7 @@ class MultipopPlugin {
     public function wp_head() {?>
         <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/main.css">
         <?php
+        wp_enqueue_style('dashicons');
     }
 
     // `wp_loaded` TRIGGER
@@ -371,7 +404,11 @@ class MultipopPlugin {
             `mail_from` VARCHAR(255) NOT NULL,
             `mail_from_name` VARCHAR(255) NOT NULL,
             `mail_general_notifications` TEXT NOT NULL,
+            `subscription_storage_path` VARCHAR(255) NULL,
             `last_webcard_number` BIGINT,
+            `authorized_subscription_years` VARCHAR(255) NOT NULL,
+            `last_year_checked` INT NOT NULL,
+            `min_subscription_payment` DOUBLE NOT NULL,
             `master_doc_key` TEXT NULL,
             `master_doc_pubkey` TEXT NULL,
             `hcaptcha_site_key` VARCHAR(255) NULL,
@@ -380,36 +417,81 @@ class MultipopPlugin {
             `pp_client_secret` VARCHAR(255) NULL,
             `pp_access_token` VARCHAR(255) NULL,
             `pp_token_expiration` BIGINT UNSIGNED NOT NULL,
+            `pp_sandbox` TINYINT(1) NOT NULL,
             `register_page` BIGINT NOT NULL,
             `myaccount_page` BIGINT NOT NULL,
             PRIMARY KEY (`id`)
-        ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
+        ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
         dbDelta( $q );
     
-        // EMAIL CONFIRMATION TABLE
+        // TOKEN TABLE
         $q = "CREATE TABLE IF NOT EXISTS " . $this::db_prefix('temp_tokens') . " (
             `id` CHAR(32) NOT NULL,
             `user_id` BIGINT UNSIGNED NOT NULL,
             `expiration` BIGINT UNSIGNED NOT NULL,
             `scope` VARCHAR(255) NOT NULL,
             PRIMARY KEY (`id`)
-        ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
+        ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
         dbDelta( $q );
     
-        // EMAIL CONFIRMATION TABLE
-        $q = "CREATE TABLE IF NOT EXISTS " . $this::db_prefix('subscription_proposal') . " (
+        // SUBSCRIPTIONS TABLE
+        $q = "CREATE TABLE IF NOT EXISTS " . $this::db_prefix('subscriptions') . " (
             `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            `card_id` VARCHAR(255) NULL UNIQUE,
+            `filename` VARCHAR(255) NULL,
             `user_id` BIGINT UNSIGNED NOT NULL,
-            `year` INT UNSIGNED NOT NULL,
+            `year` SMALLINT UNSIGNED NOT NULL,
+            `status` VARCHAR(255) NOT NULL,
+            `created_at` BIGINT UNSIGNED NOT NULL,
+            `signed_at` BIGINT UNSIGNED NULL,
+            `completed_at` BIGINT UNSIGNED NULL,
+            `author_id` BIGINT UNSIGNED NOT NULL,
+            `pp_order_id` VARCHAR(255) NULL,
             PRIMARY KEY (`id`)
-        ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
+        ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
         dbDelta( $q );
     
         // ADD SETTINGS ROW IF NOT EXISTS
         if (!$this->get_settings()) {
             $q = "INSERT INTO " . $this::db_prefix('plugin_settings')
-                . " (`id`, `tempmail_urls`, `last_tempmail_update`, `mail_host`, `mail_port`, `mail_encryption`, `mail_username`, `mail_password`, `mail_from`, `mail_from_name`, `mail_general_notifications`, `last_webcard_number`, `pp_token_expiration`)"
-                . " VALUES (1, '" . json_encode(['block' => [], 'allow' => []]) . "', 0, '', 465, 'SMTPS', '', '', '" . get_bloginfo('admin_email') . "', '" . get_bloginfo('name') . "', '" . get_bloginfo('admin_email') . "', 0, 0) ;";
+                . " (
+                    `id`,
+                    `tempmail_urls`,
+                    `last_tempmail_update`,
+                    `mail_host`,
+                    `mail_port`,
+                    `mail_encryption`,
+                    `mail_username`,
+                    `mail_password`,
+                    `mail_from`,
+                    `mail_from_name`,
+                    `mail_general_notifications`,
+                    `last_webcard_number`,
+                    `authorized_subscription_years`,
+                    `last_year_checked`,
+                    `min_subscription_payment`,
+                    `pp_token_expiration`,
+                    `pp_sandbox`
+                )"
+                . " VALUES (
+                    1,
+                    '" . json_encode(['block' => [], 'allow' => []]) . "',
+                    0,
+                    '',
+                    465,
+                    'SMTPS',
+                    '',
+                    '',
+                    '" . get_bloginfo('admin_email') . "',
+                    '" . get_bloginfo('name') . "',
+                    '" . get_bloginfo('admin_email') . "',
+                    0,
+                    '',
+                    0,
+                    15,
+                    0,
+                    1
+                ) ;";
             $wpdb->query($q);
         }
         $q = "UPDATE " . $this::db_prefix('plugin_settings') . " SET `register_page` = $register_page, `myaccount_page` = $myaccount_page WHERE `id` = 1;";
@@ -637,7 +719,19 @@ class MultipopPlugin {
         if (!$settings) {
             return;
         }
+        if ($settings['authorized_subscription_years']) {
+            $this_year = intval(current_time('Y'));
+            $settings['authorized_subscription_years'] = array_values(array_filter(array_map(function($v) {return intval($v);},explode(',', $settings['authorized_subscription_years'])), function($v) {return $v >= $this_year;}));
+        } else {
+            $settings['authorized_subscription_years'] = [];
+        }
+        $settings['subscription_storage_path'] = $settings['subscription_storage_path'] ? explode( ',', $settings['subscription_storage_path'] ) : [];
+        $settings['min_subscription_payment'] = (double) $settings['min_subscription_payment'];
+        $settings['pp_token_expiration'] = intval($settings['pp_token_expiration']);
+        $settings['pp_sandbox'] = intval($settings['pp_sandbox']);
+        $settings['pp_url'] = 'https://api-m.'. ($settings['pp_sandbox'] ? 'sandbox.' : '') .'paypal.com';
         $settings['tempmail_urls'] = json_decode($settings['tempmail_urls'], true);
+        $settings['last_year_checked'] = intval($settings['last_year_checked']);
         $settings['last_tempmail_update'] = intval($settings['last_tempmail_update']);
         $settings['mail_port'] = intval($settings['mail_port']);
         $settings['master_doc_key'] = boolval($settings['master_doc_key']);
@@ -658,6 +752,7 @@ class MultipopPlugin {
         global $wpdb;
         $q = "DELETE FROM " . $this::db_prefix('temp_tokens') . " WHERE expiration <= " . time() . ";";
         $wpdb->query($q);
+        $this->flush_subscriptions();
     }
 
     // UPDATE TEMPMAIL LIST
@@ -698,6 +793,34 @@ class MultipopPlugin {
                 global $wpdb;
                 $q = "UPDATE " . $this::db_prefix('plugin_settings') . " SET `last_tempmail_update` = " . time() . " WHERE `id` = 1 ;";
                 $wpdb->query($q);
+            }
+        }
+    }
+
+    private function flush_subscriptions() {
+        if (isset( $this->settings ) && is_array( $this->settings )) {
+            $this_year = intval(current_time('Y'));
+            if ( $this_year > $this->settings['last_year_checked'] ) {
+                global $wpdb;
+                $users_to_disable = $wpdb->get_col(
+                    "SELECT `user_id` FROM " . $this::db_prefix('subscriptions') . " WHERE `status` = 'completed' AND `year` < $this_year AND `user_id` NOT IN (
+                        SELECT `user_id` FROM " . $this::db_prefix('subscriptions') . " WHERE `status` = 'completed' AND `year` = $this_year
+                    );"
+                );
+                foreach ($users_to_disable as $u) {
+                    update_user_meta(intval($u), 'mpop_card_active', false);
+                }
+
+                // SET NEW YEAR
+                $wpdb->query("UPDATE " . $this::db_prefix('plugin_settings') . " SET `last_year_checked` = $this_year WHERE `id` = 1 ;");
+
+                // CHECK FOR CURRENT USER
+                $cu = wp_get_current_user();
+                if ($cu && $cu->ID && in_array(strval($cu->ID), $users_to_disable)) {
+                    $id = $cu->ID;
+                    wp_set_current_user(0);
+                    wp_set_current_user($id);
+                }
             }
         }
     }
@@ -801,9 +924,7 @@ class MultipopPlugin {
         if (count( $roles ) == 0) {
             $this->logout_redirect();
         } else if (count( $roles ) == 1 && in_array($roles[0], ['multipopolano', 'multipopolare_resp'])) {
-            $mail_to_confirm = get_user_meta($user->ID, 'mpop_mail_to_confirm', true);
-            $mail_changing = get_user_meta($user->ID, '_new_email', true);
-            if ($mail_to_confirm || $mail_changing) {
+            if ($user->mpop_mail_to_confirm || $user->_new_email) {
                 if (
                     isset($_REQUEST['mpop_mail_token'])
                     && preg_match('/^[a-f0-9]{32}$/', $_REQUEST['mpop_mail_token'])
@@ -811,14 +932,35 @@ class MultipopPlugin {
                     $user_id = $this->verify_temp_token($_REQUEST['mpop_mail_token'], 'email_confirmation_link');
                     if ($user_id == $user->ID) {
                         $this->delete_temp_token($_REQUEST['mpop_mail_token']);
-                        if ($mail_changing) {
-                            wp_update_user([
-                                'ID' => $user->ID,
-                                'user_email' => $mail_changing,
-                                'meta_input' => [
-                                    '_new_email' => false
-                                ]
+                        if ($user->_new_email) {
+                            $duplicated = get_users([
+                                'search' => $user->_new_email,
+                                'search_columns' => ['user_email']
                             ]);
+                            if (!count($duplicated)) {
+                                $duplicated = get_users([
+                                    'meta_key' => '_new_email',
+                                    'meta_value' => $user->_new_email,
+                                    'meta_compare' => '=',
+                                    'login__not_in' => [$user->user_login]
+                                ]);
+                            }
+                            if (count($duplicated)) {
+                                wp_update_user([
+                                    'ID' => $user->ID,
+                                    'meta_input' => [
+                                        '_new_email' => false
+                                    ]
+                                ]);
+                            } else {
+                                wp_update_user([
+                                    'ID' => $user->ID,
+                                    'user_email' => $user->_new_email,
+                                    'meta_input' => [
+                                        '_new_email' => false
+                                    ]
+                                ]);
+                            }
                         } else {
                             wp_update_user([
                                 'ID' => $user->ID,
@@ -838,7 +980,7 @@ class MultipopPlugin {
                         }
                         $this->logout_redirect(get_permalink($this->settings['myaccount_page']) . '?invalid_mpop_mail_token=1');
                     }
-                } else if ($mail_to_confirm) {
+                } else if ($user->mpop_mail_to_confirm) {
                     $this->logout_redirect(get_permalink($this->settings['myaccount_page']) . '?mpop_mail_not_confirmed=1');
                 }
             }
@@ -891,6 +1033,12 @@ class MultipopPlugin {
         if ($ctx != 'add-new-user') {
             return;
         } ?>
+        <style type="text/css">
+            #first_name,
+            #last_name {
+                text-transform: uppercase
+            }
+        </style>
         <script type="text/javascript" src="<?=plugins_url()?>/multipop/js/user-new.js"></script>
         <?php
     }
@@ -1208,28 +1356,124 @@ class MultipopPlugin {
     private function get_province_all() {
         return json_decode(file_get_contents(MULTIPOP_PLUGIN_PATH . '/comuni/province.json'), true);
     }
+    private function search_zones($search = '') {
+        $zones = [];
+        if (!is_string($search) || mb_strlen(trim($search), 'UTF-8') < 2) {
+            return $zones;
+        } else {
+            $search = trim(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper( $search, 'UTF-8' )));
+        }
+        $regioni = [];
+        $province_all = $this->get_province_all();
+        foreach($province_all as $p) {
+            if (!$p['soppressa']) {
+                if (
+                    strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper( $p['nome'], 'UTF-8' )),$search) !== false
+                    || strpos($p['sigla'], $search) !== false
+                ) {
+                    $pp = $p + [
+                        'type' => 'provincia',
+                        'untouched_label' => 'Provincia: ' . mb_strtoupper($p['nome'], 'UTF-8')
+                    ];
+                    $pp['label'] = iconv('UTF-8','ASCII//TRANSLIT',  $pp['untouched_label']);
+                    $zones[] = $pp;
+                }
+                if (!in_array($p['regione'], $regioni) && strpos(iconv('UTF-8', 'ASCII//TRANSLIT',mb_strtoupper($p['regione'], 'UTF-8')), $search) !== false) {
+                    $regioni[] = $p['regione'];
+                }
+            }
+        }
+        foreach($regioni as $r) {
+            $zone = [
+              'nome' => $r,
+              'type' => 'regione',
+              'untouched_label' => 'Regione: ' . mb_strtoupper($r, 'UTF-8'),
+            ];
+            $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT',  $zone['untouched_label']);
+            $zones[] = $zone;
+        }
+        $comuni_all = $this->get_comuni_all();
+        foreach($comuni_all as $c) {
+            if (
+                (!isset($c['soppresso']) || !$c['soppresso'])
+                && strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper($c['nome'], 'UTF-8')), $search) !== false
+            ) {
+                $zone = $c;
+                $zone['type'] = 'comune';
+                $zone['untouched_label'] = 'Comune: ' . mb_strtoupper($c['nome'], 'UTF-8');
+                $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT',  $zone['untouched_label']);
+                $zones[] = $zone;
+            }
+        }
+        function cmp_comune($a, $b) {
+            if ($b['type'] == 'comune') {
+                if ($a['provincia']['regione'] == $b['provincia']['regione']) {
+                    if ($a['provincia']['nome'] == $b['provincia']['nome']) {
+                        if ($a['nome'] == $b['nome']) {
+                            return 0;
+                        }
+                        return $a['nome'] < $b['nome'] ? -1 : 1;
+                    }
+                    return (mb_strtoupper( $a['provincia']['nome'], 'UTF-8') < mb_strtoupper( $b['provincia']['nome'], 'UTF-8') ) ? -1 : 1;
+                }
+                return mb_strtoupper( $a['provincia']['regione'], 'UTF-8') < mb_strtoupper( $b['provincia']['regione'], 'UTF-8') ? -1 : 1;
+            }
+            if ($b['type'] == 'provincia')  {
+                if ($a['provincia']['nome'] == $b['nome']) {
+                    return 1;
+                }
+                return mb_strtoupper( $a['provincia']['nome'], 'UTF-8') < mb_strtoupper( $b['nome'], 'UTF-8') ? -1 : 1;
+            }
+            if ($a['provincia']['regione'] == $b['nome']) {
+                return 1;
+            }
+            return mb_strtoupper( $a['provincia']['regione'], 'UTF-8') < mb_strtoupper( $b['nome'], 'UTF-8') ? -1 : 1;
+        }
+        function cmp_province($a, $b) {
+            if ($b['type'] == 'provincia') {
+                return mb_strtoupper( $a['nome'], 'UTF-8') < mb_strtoupper( $b['nome'], 'UTF-8') ? -1 : 1;
+            }
+            if ($a['regione'] == $b['nome']) {
+                return 1;
+            }
+            return mb_strtoupper( $a['regione'], 'UTF-8') < mb_strtoupper( $b['nome'], 'UTF-8') ? -1 : 1;
+        }
+        usort($zones, function($a, $b) {
+            if ($a['type'] == 'comune') {
+                return cmp_comune($a, $b);
+            } else if ($b['type'] == 'comune') {
+                return -(cmp_comune($b, $a));
+            } else if ($a['type'] == 'provincia') {
+                return cmp_province($a, $b);
+            } else if ($b['type'] == 'provincia') {
+                return -(cmp_province($b, $a));
+            } else {
+                return mb_strtoupper( $a['nome'], 'UTF-8') < mb_strtoupper( $b['nome'], 'UTF-8') ? -1 : 1;
+            }
+        });
+        return $zones;
+    }
     private function myaccount_get_profile($user, $add_labels = false) {
         if (is_int($user)) {
             $user = get_user_by('ID', $user);
         }
-        $user_meta = get_user_meta($user->ID);
         $parsed_user = [
             'ID' => $user->ID,
             'login' => $user->user_login,
             'email' => $user->user_email,
             'registered' => $user->user_registered,
             'role' => $user->roles[0],
-            'first_name' => $user_meta['first_name'][0],
-            'last_name' => $user_meta['last_name'][0],
-            '_new_email' => isset($user_meta['_new_email']) ? boolval($user_meta['_new_email'][0] ) : false,
-            'mpop_mail_to_confirm' => isset($user_meta['mpop_mail_to_confirm']) ? boolval($user_meta['mpop_mail_to_confirm'][0] ) : false,
-            'mpop_card_active' => isset($user_meta['mpop_card_active']) ? boolval($user_meta['mpop_card_active'][0] ) : false,
-            'mpop_birthdate' => isset($user_meta['mpop_birthdate']) ? $user_meta['mpop_birthdate'][0] : '',
-            'mpop_birthplace' => isset($user_meta['mpop_birthplace']) ? $user_meta['mpop_birthplace'][0] : '',
-            'mpop_billing_address' => isset($user_meta['mpop_billing_address']) ? $user_meta['mpop_billing_address'][0] : '',
-            'mpop_billing_city' => isset($user_meta['mpop_billing_city']) ? $user_meta['mpop_billing_city'][0] : '',
-            'mpop_billing_zip' => isset($user_meta['mpop_billing_zip']) ? $user_meta['mpop_billing_zip'][0] : '',
-            'mpop_billing_state' => isset($user_meta['mpop_billing_state']) ? $user_meta['mpop_billing_state'][0] : ''
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            '_new_email' => $user->_new_email ? $user->_new_email : false,
+            'mpop_mail_to_confirm' => boolval( $user->mpop_mail_to_confirm ),
+            'mpop_card_active' => boolval($user->mpop_card_active ),
+            'mpop_birthdate' => $user->mpop_birthdate,
+            'mpop_birthplace' => $user->mpop_birthplace,
+            'mpop_billing_address' => $user->mpop_billing_address,
+            'mpop_billing_city' => $user->mpop_billing_city,
+            'mpop_billing_zip' => $user->mpop_billing_zip,
+            'mpop_billing_state' => $user->mpop_billing_state
         ];
         if ($add_labels) {
             $comuni = false;
@@ -1251,6 +1495,371 @@ class MultipopPlugin {
             }
         }
         return $parsed_user;
+    }
+    private function discourse_group_names() {
+        $sanitize_names = function($name) {
+            return preg_replace(
+                '/ |\'/',
+                '-',
+                str_replace(
+                    " - ",
+                    '-',
+                    mb_strtolower(
+                        iconv('UTF-8','ASCII//TRANSLIT', $name),
+                        'UTF-8'
+                    )
+                )
+            );
+        };
+        $group_names = ['wp_admins'];
+        $province = $this->get_province_all();
+        if ($province) {
+            foreach($province as $p) {
+                if ($p['soppressa']) {
+                    continue;
+                }
+                $r = ($sanitize_names)($p['regione']);
+                if (!in_array("wp_regione_$r", $group_names)) {
+                    $group_names[] = "wp_regione_$r";
+                }
+                $group_names[] = "wp_provincia_" . (($sanitize_names)($p['sigla']));
+            }
+        }
+        sort($group_names);
+        return $group_names;
+    }
+    public function discourse_groups($user) {
+        $sanitize_names = function($name) {
+            return preg_replace(
+                '/ |\'/',
+                '-',
+                str_replace(
+                    " - ",
+                    '-',
+                    mb_strtolower(
+                        iconv('UTF-8','ASCII//TRANSLIT', $name),
+                        'UTF-8'
+                    )
+                )
+            );
+        };
+        if (!isset($user)) {
+            return '';
+        }
+        if (is_string($user) ) {
+            $user = intval($user);
+        }
+        if (is_int($user) && $user) {
+            $user = get_user_by('ID', $user);
+        }
+        if (!is_object($user) || !isset($user->ID) || !$user->ID) {
+            return '';
+        }
+        
+        $group_names = $this->discourse_group_names();
+        foreach ($group_names as $gn) {
+            
+        }
+    }
+
+    private function pp_auth() {
+        if (
+            !isset($this->settings['pp_client_id'])
+            || !$this->settings['pp_client_id']
+            || !isset($this->settings['pp_client_secret'])
+            || !$this->settings['pp_client_secret']
+        ) {
+            return false;
+        }
+        $res = $this->curl_exec($this->settings['pp_url'] . '/v1/oauth2/token', [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => 'grant_type=client_credentials',
+            CURLOPT_USERPWD => $this->settings['pp_client_id'] . ':' . $this->settings['pp_client_secret']
+        ]);
+        if ($res) {
+            $res = json_decode($res, true);
+            if ($res['access_token']) {
+                global $wpdb;
+                $wpdb->query( "UPDATE " . $this::db_prefix('plugin_settings') . " SET `pp_access_token` = '$res[access_token]', `pp_token_expiration` = " . ($res['expires_in'] + time()) . ";" );
+                $this->get_settings();
+                $res = true;
+            }
+        }
+        return $res;
+    }
+    private function pp_req($url, $curl_settings = []) {
+        if (!isset($this->settings['pp_access_token'])) {
+            $auth_res = $this->pp_auth();
+            if ($auth_res !== true) {
+                return false;
+            }
+        }
+        if ($this->settings['pp_token_expiration'] < (time()+30)) {
+            $auth_res = $this->pp_auth();
+            if ($auth_res !== true) {
+                return false;
+            }
+        }
+        if (isset($curl_settings[CURLOPT_HTTPHEADER])) {
+            $curl_settings[CURLOPT_HTTPHEADER] = $curl_settings[CURLOPT_HTTPHEADER] + [
+                'Authorization: Bearer ' . $this->settings['pp_access_token']
+            ];
+        }
+        $curl_settings = $curl_settings + [
+            CURLOPT_POST => true
+        ];
+        $res = $this->curl_exec($this->settings['pp_url'] . $url, $curl_settings);
+        if ($res) {
+            $res = json_decode($res, true);
+        }
+        return $res;
+    }
+    private function pp_create_order($args = []) {
+        $site_url = (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) ? 'https': 'http') . "://$_SERVER[HTTP_HOST]";
+        $brand_name = 'Multipopolare';
+        if (!isset($args['brand_name'])) {
+            $brand_name = $args['brand_name'];
+            unset($args['brand_name']);
+        }
+        $args = $args + [
+            'req_id' => null,
+            'intent' => 'AUTHORIZE',
+            'purchase_units' => [],
+            'payment_source' => [
+                'paypal' => [
+                    'experience_context' => [
+                        'payment_method_preference' => 'UNRESTRICTED',
+                        'brand_name' => $brand_name,
+                        'locale' => 'it-IT',
+                        'landing_page' => 'LOGIN',
+                        'shipping_preference' => 'NO_SHIPPING',
+                        'user_action' => 'CONTINUE',
+                        'return_url' => $site_url . '/mpop-pp-success',
+                        'cancel_url' => $site_url . '/mpop-pp-cancel'
+                    ]
+                ]
+            ]
+        ];
+        $headers = [
+            'Content-Type: application/json',
+            'Prefer: return=representation'
+        ];
+        if ($args['req_id']) {
+            $headers[] = 'PayPal-Request-Id: '. $args['req_id'];
+        }
+        unset($args['req_id']);
+        return $this->pp_req('/v2/checkout/orders', [
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_POSTFIELDS => json_encode($args)
+        ]);
+    }
+    private function pp_get_order($order_id) {
+        return $this->pp_req('/v2/checkout/orders/' . $order_id, [
+            CURLOPT_POST => false
+        ]);
+    }
+    private function create_subscription_pp_order($args, $req_id = true) {
+        if (!isset($args['subs_id']) || !is_int($args['subs_id'])) {
+            return false;
+        }
+        if (!isset($args['payment']) || !is_numeric($args['payment'])) {
+            return false;
+        }
+        $args['payment'] = round(((double) $args['payment']) * 100) /100;
+        if ($args['payment'] < $this->settings['min_subscription_payment']) {
+            return false;
+        }
+        return $this->pp_create_order([
+            'req_id' => $req_id ? 'subs-' . $args['subs_id'] : null,
+            'purchase_units' => [[
+                'reference_id' => "$args[subs_id]",
+                'items' => [[
+                    'quantity' => '1',
+                    'name' => 'Iscrizione',
+                    'category' => 'DIGITAL_GOODS',
+                    'unit_amount' => [
+                        'currency_code' => 'EUR',
+                        'value' => "$args[payment]"
+                    ]
+                ]],
+                'amount' => [
+                    'currency_code' => 'EUR',
+                    'value' => "$args[payment]",
+                    'breakdown' => [
+                        'item_total' => [
+                            'currency_code' => 'EUR',
+                            'value' => "$args[payment]"
+                        ]
+                    ]
+                ]
+            ]]
+        ]);
+    }
+    private function create_subscription() {
+
+    }
+    public function user_search_pre_user_query($q) {
+        global $wpdb;
+        $sanitized_value = '%' . $wpdb->esc_like($q->query_vars['mpop_custom_search']) . '%';
+        $q->query_where .= $wpdb->prepare(
+            " AND (user_login LIKE %s OR user_email LIKE %s OR (search_first_name.meta_key = 'first_name' AND search_first_name.meta_value LIKE %s) OR (search_last_name.meta_key = 'last_name' AND search_last_name.meta_value LIKE %s))",
+            $sanitized_value,
+            $sanitized_value,
+            $sanitized_value,
+            $sanitized_value
+        );
+        $q->query_from .= ' INNER JOIN ' . $wpdb->prefix . 'usermeta AS search_first_name ON ( ' . $wpdb->prefix . 'users.ID = search_first_name.user_id ) INNER JOIN ' . $wpdb->prefix . 'usermeta AS search_last_name ON ( ' . $wpdb->prefix . 'users.ID = search_last_name.user_id )';
+        remove_action('pre_user_query', [$this, 'user_search_pre_user_query']);
+    }
+    private function user_search($txt= '', $roles = true, $page = 1, $sort_by = ['ID' => true], $limit = 100) {
+        $res = [];
+        if (!is_array($roles) && $roles !== true) {
+            return $res;
+        }
+        $allowed_roles = ['administrator', 'multipopolano', 'multipopolare_resp', 'others'];
+        if ($roles === true) {
+            $roles = $allowed_roles;
+        }
+        if (!is_int($page) || $page < 1) {
+            $page = 1;
+        }
+        if (!is_int($limit) || $limit < 1 || $limit > 100) {
+            $limit = 100;
+        }
+        $query = [
+            'paged' => $page,
+            'number' => $limit
+        ];
+        $meta_q = [
+            'relation' => 'AND',
+            'role' => [
+                'relation' => 'OR'
+            ]
+        ];
+        foreach ($roles as $role) {
+            if (!is_string($role) || !trim($role) || !in_array($role, $allowed_roles)) {
+                return $res;
+            }
+        }
+        $roles = array_unique($roles);
+        if (in_array('others', $roles)) {
+            array_slice($roles, array_search('others', $roles), 1);
+            array_push($roles, ...array_filter(array_keys(wp_roles()->role_names), function($r) {return !in_array($r,$allowed_roles);}));
+        }
+        if (count($roles)) {
+            sort($roles);
+            foreach($roles as $role) {
+                $meta_q['role'][] = [
+                    'key' => 'wp_capabilities',
+                    'value' => "\"$role\"",
+                    'compare' => 'LIKE'
+                ];
+            }
+        } else {
+            $meta_q['role'][] = [
+                'key' => 'wp_capabilities',
+                'compare' => 'NOT EXISTS'
+            ];
+        }
+        if (is_string($txt) && trim($txt) && !preg_match("\r|\n|\t",$txt)) {
+            $query['mpop_custom_search'] = $txt;
+            add_action('pre_user_query', [$this, 'user_search_pre_user_query']);
+        }
+        $allowed_field_sorts = [
+            'ID',
+            'login',
+            'user_login',
+            'email',
+            'user_email',
+            'registered',
+            'user_registered',
+            'role'
+        ];
+        $allowed_meta_sorts = [
+            'mpop_mail_to_confirm',
+            'first_name',
+            'last_name',
+            'mpop_billing_state',
+            'mpop_billing_city'
+        ];
+        if (!is_array($sort_by)) {
+            $sort_by = ['ID' => 'ASC'];
+        } else {
+            $sort_keys = array_keys($sort_by);
+            $fsort_by = [];
+            foreach ($sort_keys as $k) {
+                if (in_array($k, $allowed_field_sorts)) {
+                    if ($k == 'role') {
+                        $fsort_by['wp_usermeta'] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
+                    } else {
+                        $fsort_by[$k] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
+                    }
+                } else if (in_array($k, $allowed_meta_sorts)) {
+                    switch ($k) {
+                        case 'first_name':
+                            $meta_q[$k] = [
+                                'key' => $k,
+                                'compare' => 'EXISTS'
+                            ];
+                            $fsort_by[$k] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
+                            break;
+                        case 'last_name':
+                            $meta_q[$k] = [
+                                'key' => $k,
+                                'compare' => 'EXISTS'
+                            ];
+                            $fsort_by[$k] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
+                            break;
+                        default:
+                            $meta_q[$k] = [
+                                'relation' => 'OR',
+                                $k.'_exists' => [
+                                    'key' => $k,
+                                    'compare' => 'EXISTS'
+                                ],
+                                $k.'_notexists' => [
+                                    'key' => $k,
+                                    'compare' => 'NOT EXISTS'
+                                ],
+                            ];
+                            $fsort_by[$k.'_exists'] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
+                    }
+                } else {
+                    unset($sort_by[$k]);
+                }
+            }
+            $sort_by = $fsort_by;
+            if (empty($sort_by)) {
+                $sort_by = ['ID' => 'ASC'];
+            }
+        }
+        $query['meta_query'] = $meta_q;
+        $query['orderby'] = $sort_by;
+        $user_query = new WP_User_Query($query);
+        $total = $user_query->get_total();
+        $res = $user_query->get_results();
+        $comuni_all = false;
+        if (count($res)) {
+            $comuni_all = $this->get_comuni_all();
+        }
+        $users = [];
+        foreach($res as $u) {
+            $billing_city = $u->mpop_billing_city ? array_pop(array_filter($comuni_all, function($c) use ($u) {return $c['codiceCatastale'] == $u->mpop_billing_city; } )) : '';
+            $users[] = [
+                'ID' => intval($u->ID),
+                'login' => $u->user_login,
+                'email' => $u->user_email,
+                'role' => $u->roles[0],
+                'registred' => $u->user_registered,
+                'first_name' => $u->first_name,
+                'last_name' => $u->last_name,
+                'mpop_mail_to_confirm' => boolval($u->mpop_mail_to_confirm ),
+                'mpop_billing_state' => $u->mpop_billing_state,
+                'mpop_billing_city' => $billing_city ? $billing_city['nome'] : '',
+                'zones' => []
+            ];
+        }
+        return [$users, $total, $limit];
     }
 }
 

@@ -17,8 +17,7 @@ if (
 }
 $post_data['email'] = mb_strtolower(trim($post_data['email']), 'UTF-8');
 if (
-    !$this::is_valid_email( $post_data['email'] )
-    || in_array(explode('@', $post_data['email'])[1], preg_split('/\r\n|\r|\n/', file_get_contents(MULTIPOP_PLUGIN_PATH . 'tempmail/list.txt')))
+    !$this::is_valid_email( $post_data['email'], true )
 ) {
     $res_data['error'] = ['email'];
 }
@@ -52,6 +51,17 @@ if (get_user_by( 'email', $post_data['email'] )) {
     echo json_encode( $res_data );
     exit;
 }
+$duplicated = get_users([
+    'meta_key' => '_new_email',
+    'meta_value' => $post_data['email'],
+    'meta_compare' => '='
+]);
+if (count($duplicated)) {
+    $res_data['error'] = ['email', 'duplicated'];
+    http_response_code( 400 );
+    echo json_encode( $res_data );
+    exit;
+}
 if (get_user_by( 'login', $post_data['username'] )) {
     $res_data['error'] = ['username', 'duplicated'];
     http_response_code( 400 );
@@ -75,7 +85,12 @@ $user_id = wp_insert_user([
         'mpop_billing_address' => false,
         'mpop_billing_city' => false,
         'mpop_billing_state' => false,
-        'mpop_billing_zip' => false
+        'mpop_billing_zip' => false,
+        'mpop_id_card_type' => false,
+        'mpop_id_card_id' => false,
+        'mpop_id_card_issuer' => false,
+        'mpop_id_card_issue_date' => false,
+        'mpop_id_card_expiration' => false,
     ]
 ]);
 

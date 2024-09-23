@@ -22,7 +22,9 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                     <label for="mpop-tabs-nav" @click="displayNav = !displayNav">Menù</label>
                     <nav id="mpop-tabs-nav" v-if="displayNav">
                         <ul @click="selectTab('summary')">Riepilogo</ul>
+                        <ul @click="selectTab('passwordChange')">Cambio password</ul>
                         <ul @click="selectTab('card')">Tessera</ul>
+                        <ul v-if="profile.role == 'administrator'" @click="selectTab('users')">Utenti</ul>
                     </nav>
                 </div>
             </td>
@@ -37,45 +39,301 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                             <button class="mpop-button btn-error" @click="cancelEditProfile" :disabled="saving">Annulla</button>
                             <button class="mpop-button btn-success" @click="updateProfile" :disabled="!validProfileForm || saving">Salva</button>
                         </template>
-                        <br><br>
                         <table id="mpop-profile-table">
                             <tr>
                                 <td><strong>E-mail:</strong></td>
-                                <td v-if="!profileEditing">{{user.email}}</td>
-                                <td v-else><input type="text" :class="savingProfileErrors.includes('email') ? 'bad-input' : ''" v-model="userInEditing.email"/></td>
+                                <td v-if="!profileEditing">{{profile.email}}<template v-if="profile._new_email"><br>Da confermare: {{profile._new_email}}</template></td>
+                                <td v-else><input type="text" :class="savingProfileErrors.includes('email') ? 'bad-input' : ''" v-model="profileInEditing.email"/></td>
                             </tr>
                             <tr>
                                 <td><strong>Nome:</strong></td>
-                                <td v-if="!profileEditing">{{user.first_name}}</td>
-                                <td v-else><input type="text" :class="savingProfileErrors.includes('first_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="userInEditing.first_name"/></td>
+                                <td v-if="!profileEditing">{{profile.first_name}}</td>
+                                <td v-else><input type="text" :class="savingProfileErrors.includes('first_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="profileInEditing.first_name"/></td>
                             </tr>
                             <tr>
                                 <td><strong>Cognome:</strong></td>
-                                <td v-if="!profileEditing">{{user.last_name}}</td>
-                                <td v-else><input type="text" :class="savingProfileErrors.includes('last_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="userInEditing.last_name"/></td>
+                                <td v-if="!profileEditing">{{profile.last_name}}</td>
+                                <td v-else><input type="text" :class="savingProfileErrors.includes('last_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="profileInEditing.last_name"/></td>
                             </tr>
                             <tr>
                                 <td><strong>Data di nascita:</strong></td>
-                                <td v-if="!profileEditing">{{displayLocalDate(user.mpop_birthdate)}}</td>
-                                <td v-else><input type="date" :class="savingProfileErrors.includes('mpop_birthdate') ? 'bad-input' : ''" min="1910-10-13" :max="maxBirthDate" v-model="userInEditing.mpop_birthdate"/></td>
+                                <td v-if="!profileEditing">{{displayLocalDate(profile.mpop_birthdate)}}</td>
+                                <td v-else>
+                                    <input type="date"
+                                        :class="savingProfileErrors.includes('mpop_birthdate') ? 'bad-input' : ''"
+                                        min="1910-10-13" :max="maxBirthDate"
+                                        v-model="profileInEditing.mpop_birthdate"
+                                        @change="()=> {if (!profileInEditing.mpop_birthdate) profileInEditing.mpop_birthplace = '';}"
+                                    />
+                                </td>
                             </tr>
                             <tr>
                                 <td><strong>Luogo di nascita:</strong></td>
-                                <td v-if="!profileEditing">{{user.mpop_birthplace ? (user.mpop_birthplace.nome + ' (' + user.mpop_birthplace.provincia.sigla +')' ) : ''}}</td>
+                                <td v-if="!profileEditing">{{profile.mpop_birthplace ? (profile.mpop_birthplace.nome + ' (' + profile.mpop_birthplace.provincia.sigla +')' ) : ''}}</td>
                                 <td v-else>
                                     <v-select
                                         id="birthplace-select"
                                         :class="savingProfileErrors.includes('mpop_birthplace') ? 'bad-input' : ''"
+                                        v-model="profileInEditing.mpop_birthplace"
+                                        :options="birthCities"
+                                        :disabled="!profileInEditing.mpop_birthdate"
+                                        @close="birthplaceOpen = false"
+                                        @open="searchOpen('birthplace')"
+                                        :get-option-label="(option) => option.untouched_label"
+                                        :filter="fuseSearch"
+                                        @search="(searchTxt, loading) => {
+                                            if (searchTxt.trim().length > 1) {
+                                                loading(true);
+                                                birthCitiesSearch(searchTxt)
+                                                .then(()=> loading(false));
+                                            }
+                                        }"
+                                    >
+                                        <template #search="{ attributes, events }">
+                                            <input
+                                                class="vs__search"
+                                                :style="'display: ' + (birthplaceOpen || !profileInEditing.mpop_birthplace ? 'unset' : 'none')"
+                                                v-bind="attributes"
+                                                v-on="events"
+                                            />
+                                        </template>
+                                        <template v-slot:option="city">
+                                            {{city.untouched_label}}
+                                        </template>
+                                        <template v-slot:no-options="{search}">
+                                            <template v-if="search.trim().length > 1">
+                                                Nessun risultato per "{{search}}"
+                                            </template>
+                                            <template v-else>
+                                                Inserisci almeno 2 caratteri
+                                            </template>
+                                        </template>
+                                    </v-select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Comune di residenza:</strong></td>
+                                <td v-if="!profileEditing">{{ profile.mpop_billing_city ? profile.mpop_billing_city.nome : ''}}</td>
+                                <td v-else>
+                                    <v-select
+                                        id="billingCity-select"
+                                        v-model="profileInEditing.mpop_billing_city"
+                                        :class="savingProfileErrors.includes('mpop_billing_city') ? 'bad-input' : ''"
+                                        :options="billingCities"
+                                        @close="billingCityOpen = false"
+                                        @open="searchOpen('billingCity')"
+                                        :get-option-label="(option) => option.nome"
+                                        :filter="fuseSearch"
+                                        @option:selected="c => {
+                                            profileInEditing.mpop_billing_state = c.provincia.sigla;
+                                            if (c.cap.length == 1) {
+                                                profileInEditing.mpop_billing_zip = c.cap[0];
+                                            } else {
+                                                profileInEditing.mpop_billing_zip = '';
+                                            }
+                                        }"
+                                        @option:deselected="() => {
+                                            profileInEditing.mpop_billing_state = '';
+                                            profileInEditing.mpop_billing_zip = '';
+                                        }"
+                                        @search="(searchTxt, loading) => {
+                                            if (searchTxt.trim().length > 1) {
+                                                loading(true);
+                                                billingCitiesSearch(searchTxt)
+                                                .then(()=> loading(false));
+                                            }
+                                        }"
+                                    >
+                                        <template #search="{ attributes, events }">
+                                            <input
+                                                class="vs__search"
+                                                :style="'display: ' + (billingCityOpen || !profileInEditing.mpop_billing_city ? 'unset' : 'none')"
+                                                v-bind="attributes"
+                                                v-on="events"
+                                            />
+                                        </template>
+                                        <template v-slot:option="city">
+                                            {{city.nome}} ({{city.provincia.sigla}})
+                                        </template>
+                                        <template v-slot:no-options="{search}">
+                                            <template v-if="search.trim().length > 1">
+                                                Nessun risultato per "{{search}}"
+                                            </template>
+                                            <template v-else>
+                                                Inserisci almeno 2 caratteri
+                                            </template>
+                                        </template>
+                                    </v-select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Provincia di residenza:</strong></td>
+                                <td v-if="!profileEditing">{{profile.mpop_billing_state}}</td>
+                                <td v-else>
+                                    <select v-model="profileInEditing.mpop_billing_state" :class="savingProfileErrors.includes('mpop_billing_state') ? 'bad-input' : ''" disabled>
+                                        <option
+                                            v-if="profileInEditing.mpop_billing_city"
+                                            :value="profileInEditing.mpop_billing_city.provincia.sigla">{{profileInEditing.mpop_billing_city.provincia.sigla}}</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>CAP:</strong></td>
+                                <td v-if="!profileEditing">{{profile.mpop_billing_zip}}</td>
+                                <td v-else>
+                                    <select v-model="profileInEditing.mpop_billing_zip" :class="savingProfileErrors.includes('mpop_billing_zip') ? 'bad-input' : ''" :disabled="!profileInEditing.mpop_billing_city || profileInEditing.mpop_billing_city.cap.length == 1">
+                                        <template v-if="profileInEditing.mpop_billing_city">
+                                            <option v-for="cap in profileInEditing.mpop_billing_city.cap" :value="cap">{{cap}}</option>
+                                        </template>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Indirizzo di residenza:</strong></td>
+                                <td v-if="!profileEditing">{{profile.mpop_billing_address}}</td>
+                                <td v-else><textarea v-model="profileInEditing.mpop_billing_address" :class="savingProfileErrors.includes('mpop_billing_address') ? 'bad-input' : ''" :disabled="!profileInEditing.mpop_billing_zip"></textarea></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div v-if="selectedTab == 'passwordChange'">
+                        <h3>Cambio password</h3>
+                        <button class="mpop-button" :disabled="pwdChanging ||pwdChangeErrors.length || !pwdChangeFields.current" @click="changePassword">Cambia password</button>
+                        <div id="mpop-passwordChange">
+                            <input v-model="pwdChangeFields.current" @input="staticPwdErrors.length = 0" :class="pwdChangeErrors.includes('current') ? 'bad-input' : ''" type="password" placeholder="Password attuale"/>
+                            <input v-model="pwdChangeFields.new" @input="staticPwdErrors.length = 0" :class="pwdChangeErrors.includes('new') ? 'bad-input' : ''" type="password" placeholder="Nuova password"/>
+                            <input v-model="pwdChangeFields.confirm" @input="staticPwdErrors.length = 0" :class="pwdChangeErrors.includes('confirm') ? 'bad-input' : ''" type="password" placeholder="Conferma"/>
+                        </div>
+                    </div>
+                    <div v-if="selectedTab == 'card'">
+                        <?=html_dump($this->search_zones('latina'))?>
+                        Tessera
+                    </div>
+                    <div v-if="selectedTab == 'users'" id="mpop-user-search">
+                        <h3>Utenti</h3>
+                        <div class="mpop-user-search-field">
+                            <input type="text" v-model="userSearch.txt" @input="triggerSearchUsers" placeholder="Cerca utente" />
+                        </div>
+                        <div class="mpop-user-search-field" v-for="role in userRoles">
+                            <label :for="'user-search-'+role">{{showRole(role)}}</label>
+                            <input :id="'user-search-'+role" type="checkbox" v-model="userSearch.roles" @change="triggerSearchUsers" :value="role"/>
+                        </div>
+                        <div>Totale: {{foundUsersTotal}}</div>
+                        <div id="mpop-page-buttons">
+                            <button class="mpop-button" @click="changeUserSearchPage(1)" v-if="userSearch.page != 1 && !pageButtons.includes(1) && userSearch.page -2 > 0" style="width:auto">Inizio</button>
+                            <button class="mpop-button" @click="changeUserSearchPage(userSearch.page -1)" v-if="userSearch.page != 1 && !pageButtons.includes(userSearch.page -1)" style="padding:1px"><?=$this->dashicon('arrow-left')?></button>
+                            <button :class="'mpop-button' + (p == userSearch.page ? ' mpop-page-selected' : '')" v-for="p in pageButtons" @click="changeUserSearchPage(p)">{{p}}</button>
+                            <button class="mpop-button" @click="changeUserSearchPage(userSearch.page +1)" v-if="userSearch.page != foundUsersPageTotal && !pageButtons.includes(userSearch.page +1)" style="padding:1px"><?=$this->dashicon('arrow-right')?></button>
+                            <button class="mpop-button" @click="changeUserSearchPage(foundUsersPageTotal)" v-if="userSearch.page != foundUsersPageTotal && !pageButtons.includes(foundUsersPageTotal) && userSearch.page +2 <= foundUsersPageTotal" style="width:auto">Fine</button>
+                        </div>
+                        <br>
+                        <table id="mpop-user-search-table">
+                            <thead>
+                                <tr>
+                                    <th class="mpop-click" @click="userSearchSortBy('ID')"><div class="th-inner"><span>ID</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'ID'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['ID']">▲</span><span v-else>▼</span></span></div></th>
+                                    <th class="mpop-click" @click="userSearchSortBy('login')"><div class="th-inner"><span>Nome utente</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'login'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['login']">▲</span><span v-else>▼</span></span></div></th>
+                                    <th class="mpop-click" @click="userSearchSortBy('email')"><div class="th-inner"><span>E&#8209;mail</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'email'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['email']">▲</span><span v-else>▼</span></span></div></th>
+                                    <th class="mpop-click" @click="userSearchSortBy('mpop_mail_to_confirm')"><div class="th-inner"><span>E&#8209;mail confermata</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'mpop_mail_to_confirm'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['mpop_mail_to_confirm']">▲</span><span v-else>▼</span></span></div></th>
+                                    <th class="mpop-click" @click="userSearchSortBy('role')"><div class="th-inner"><span>Ruolo</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'role'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['role']">▲</span><span v-else>▼</span></span></div></th>
+                                    <th class="mpop-click" @click="userSearchSortBy('first_name')"><div class="th-inner"><span>Nome</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'first_name'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['first_name']">▲</span><span v-else>▼</span></span></div></th>
+                                    <th class="mpop-click" @click="userSearchSortBy('last_name')"><div class="th-inner"><span>Cognome</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'last_name'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['last_name']">▲</span><span v-else>▼</span></span></div></th>
+                                    <th class="mpop-click" @click="userSearchSortBy('mpop_billing_state')"><div class="th-inner"><span>Provincia</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'mpop_billing_state'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['mpop_billing_state']">▲</span><span v-else>▼</span></span></div></th>
+                                    <th class="mpop-click" @click="userSearchSortBy('mpop_billing_city')"><div class="th-inner"><span>Comune</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'mpop_billing_city'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['mpop_billing_city']">▲</span><span v-else>▼</span></span></div></th>
+                                    <th>Zone</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="u in foundUsers" class="mpop-click" @click="viewUser(u.ID)">
+                                    <td>{{u.ID}}</td>
+                                    <td>{{u.login}}</td>
+                                    <td>{{u.email}}</td>
+                                    <td>{{u.mpop_mail_to_confirm ? 'No' : 'Sì'}}</td>
+                                    <td>{{showRole(u.role)}}</td>
+                                    <td>{{u.first_name ? u.first_name : ''}}</td>
+                                    <td>{{u.last_name ? u.last_name : ''}}</td>
+                                    <td>{{u.mpop_billing_state ? u.mpop_billing_state : ''}}</td>
+                                    <td>{{u.mpop_billing_city ? u.mpop_billing_city : ''}}</td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div v-if="selectedTab == 'userView'" id="mpop-user-view"><template v-if="userInView">
+                        <h3>{{userInView.ID}} - {{userInView.login}}</h3>
+                        <template v-if="profile.role == 'administrator'">
+                            <a :href="'/wp-admin/user-edit.php?user_id='+userInView.ID" target="_blank">Vedi in dashboard&nbsp;<?=$this::dashicon('external')?></a>
+                            <br><br>
+                        </template>
+                        <template v-if="!userEditing">
+                            <button class="mpop-button" @click="editUser">Modifica utente</button>
+                        </template>
+                        <template v-else>
+                            <button class="mpop-button btn-error" @click="cancelEditUser" :disabled="saving">Annulla</button>
+                            <button class="mpop-button btn-success" @click="updateUser" :disabled="!validUserForm || saving">Salva</button>
+                        </template>
+                        <table id="mpop-user-table">
+                            <tr>
+                                <td><strong>E-mail:</strong></td>
+                                <td v-if="!userEditing">{{userInView.email}}<template v-if="userInView.mpop_mail_to_confirm"> - (Da confermare)</template><template v-if="userInView._new_email"><br>Da confermare: {{userInView._new_email}}</template></td>
+                                <td v-else>
+                                    <input
+                                        type="email"
+                                        @input="() => {
+                                            if (userInEditing.email == userInView.email) {
+                                                userInEditing.mpop_mail_confirmed = true;
+                                            } else if (userInEditing.emailOldValue == userInView.email) {
+                                                userInEditing.mpop_mail_confirmed = false;
+                                            }
+                                            userInEditing.emailOldValue = userInEditing.email;
+                                        }"
+                                        :class="savingProfileErrors.includes('email') ? 'bad-input' : ''"
+                                        v-model="userInEditing.email"
+                                    />
+                                    <template v-if="userInView._new_email">&nbsp;<button class="mpop-button" style="margin-top:5px" @click="()=>{userInEditing.email = userInView.email; userInEditing.mpop_mail_confirmed = true;}">Ripristina</button></template></td>
+                            </tr>
+                            <tr v-if="userEditing">
+                                <td><strong>Confermata:</strong></td>
+                                <td><input type="checkbox" v-model="userInEditing.mpop_mail_confirmed"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nome:</strong></td>
+                                <td v-if="!userEditing">{{userInView.first_name}}</td>
+                                <td v-else><input type="text" :class="savingProfileErrors.includes('first_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="userInEditing.first_name"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cognome:</strong></td>
+                                <td v-if="!userEditing">{{userInView.last_name}}</td>
+                                <td v-else><input type="text" :class="savingProfileErrors.includes('last_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="userInEditing.last_name"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data di nascita:</strong></td>
+                                <td v-if="!userEditing">{{displayLocalDate(userInView.mpop_birthdate)}}</td>
+                                <td v-else>
+                                    <input type="date"
+                                        :class="savingProfileErrors.includes('mpop_birthdate') ? 'bad-input' : ''"
+                                        min="1910-10-13" :max="maxBirthDate"
+                                        v-model="userInEditing.mpop_birthdate"
+                                        @change="()=> {if (!userInEditing.mpop_birthdate) userInEditing.mpop_birthplace = '';}"
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Luogo di nascita:</strong></td>
+                                <td v-if="!userEditing">{{userInView.mpop_birthplace ? (userInView.mpop_birthplace.nome + ' (' + userInView.mpop_birthplace.provincia.sigla +')' ) : ''}}</td>
+                                <td v-else>
+                                    <v-select
+                                        id="birthplace-select"
+                                        :class="savingUserErrors.includes('mpop_birthplace') ? 'bad-input' : ''"
                                         v-model="userInEditing.mpop_birthplace"
                                         :options="birthCities"
                                         :disabled="!userInEditing.mpop_birthdate"
                                         @close="birthplaceOpen = false"
                                         @open="searchOpen('birthplace')"
-                                        :label="birthplaceOpen ? 'label' : 'untouched_label'"
+                                        :get-option-label="(option) => option.untouched_label"
+                                        :filter="fuseSearch"
                                         @search="(searchTxt, loading) => {
                                             if (searchTxt.trim().length > 1) {
                                                 loading(true);
-                                                birthCitiesSearch(searchTxt)
+                                                birthCitiesSearch(searchTxt, true)
                                                 .then(()=> loading(false));
                                             }
                                         }"
@@ -104,16 +362,17 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                             </tr>
                             <tr>
                                 <td><strong>Comune di residenza:</strong></td>
-                                <td v-if="!profileEditing">{{ user.mpop_billing_city ? user.mpop_billing_city.nome : ''}}</td>
+                                <td v-if="!userEditing">{{ userInView.mpop_billing_city ? userInView.mpop_billing_city.nome : ''}}</td>
                                 <td v-else>
                                     <v-select
                                         id="billingCity-select"
                                         v-model="userInEditing.mpop_billing_city"
-                                        :class="savingProfileErrors.includes('mpop_billing_city') ? 'bad-input' : ''"
+                                        :class="savingUserErrors.includes('mpop_billing_city') ? 'bad-input' : ''"
                                         :options="billingCities"
                                         @close="billingCityOpen = false"
                                         @open="searchOpen('billingCity')"
-                                        :label="billingCityOpen ? 'label' : 'nome'"
+                                        :get-option-label="(option) => option.nome"
+                                        :filter="fuseSearch"
                                         @option:selected="c => {
                                             userInEditing.mpop_billing_state = c.provincia.sigla;
                                             if (c.cap.length == 1) {
@@ -158,9 +417,9 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                             </tr>
                             <tr>
                                 <td><strong>Provincia di residenza:</strong></td>
-                                <td v-if="!profileEditing">{{user.mpop_billing_state}}</td>
+                                <td v-if="!userEditing">{{userInView.mpop_billing_state}}</td>
                                 <td v-else>
-                                    <select v-model="userInEditing.mpop_billing_state" :class="savingProfileErrors.includes('mpop_billing_state') ? 'bad-input' : ''" disabled>
+                                    <select v-model="userInEditing.mpop_billing_state" :class="savingUserErrors.includes('mpop_billing_state') ? 'bad-input' : ''" disabled>
                                         <option
                                             v-if="userInEditing.mpop_billing_city"
                                             :value="userInEditing.mpop_billing_city.provincia.sigla">{{userInEditing.mpop_billing_city.provincia.sigla}}</option>
@@ -169,9 +428,9 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                             </tr>
                             <tr>
                                 <td><strong>CAP:</strong></td>
-                                <td v-if="!profileEditing">{{user.mpop_billing_zip}}</td>
+                                <td v-if="!userEditing">{{userInView.mpop_billing_zip}}</td>
                                 <td v-else>
-                                    <select v-model="userInEditing.mpop_billing_zip" :class="savingProfileErrors.includes('mpop_billing_zip') ? 'bad-input' : ''" :disabled="!userInEditing.mpop_billing_city || userInEditing.mpop_billing_city.cap.length == 1">
+                                    <select v-model="userInEditing.mpop_billing_zip" :class="savingUserErrors.includes('mpop_billing_zip') ? 'bad-input' : ''" :disabled="!userInEditing.mpop_billing_city || userInEditing.mpop_billing_city.cap.length == 1">
                                         <template v-if="userInEditing.mpop_billing_city">
                                             <option v-for="cap in userInEditing.mpop_billing_city.cap" :value="cap">{{cap}}</option>
                                         </template>
@@ -180,15 +439,11 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                             </tr>
                             <tr>
                                 <td><strong>Indirizzo di residenza:</strong></td>
-                                <td v-if="!profileEditing">{{user.mpop_billing_address}}</td>
-                                <td v-else><textarea v-model="userInEditing.mpop_billing_address" :class="savingProfileErrors.includes('mpop_billing_address') ? 'bad-input' : ''" :disabled="!userInEditing.mpop_billing_zip"></textarea></td>
+                                <td v-if="!userEditing">{{userInView.mpop_billing_address}}</td>
+                                <td v-else><textarea v-model="userInEditing.mpop_billing_address" :class="savingUserErrors.includes('mpop_billing_address') ? 'bad-input' : ''" :disabled="!userInEditing.mpop_billing_zip"></textarea></td>
                             </tr>
                         </table>
-                    </div>
-                    <div v-if="selectedTab == 'card'">
-                        <?=html_dump('ciao')?>
-                        Tessera
-                    </div>
+                    </template></div>
                 </div>
             </td>
         </tr>

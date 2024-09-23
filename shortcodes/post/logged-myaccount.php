@@ -4,15 +4,27 @@ $post_data = json_decode( file_get_contents('php://input'), true );
 $res_data = [];
 if (!isset($post_data['action']) || !is_string($post_data['action']) || !trim($post_data['action'])) {
     $res_data['error'] = ['action'];
+    $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
     http_response_code( 400 );
     echo json_encode( $res_data );
     exit;
 }
 $min_birthdate = date_create('1910-10-13', new DateTimeZone('Europe/Rome'));
 $min_birthdate->setTime(0,0,0,0);
+$max_birthdate = date_create('now', new DateTimeZone('Europe/Rome'));
+$max_birthdate->setTime(0,0,0,0);
+$max_birthdate->sub(new DateInterval('P18Y'));
+if (str_starts_with($post_data['action'], 'admin_')) {
+    if ($this->current_user_is_admin()) {
+        require('admin-actions.php');
+    } else {
+        http_response_code( 401 );
+    }
+    exit;
+}
 switch ($post_data['action']) {
     case 'get_birth_cities':
-        if (!isset($post_data['mpop_birthplace']) || !is_string($post_data['mpop_birthplace']) || strlen(trim($post_data['mpop_birthplace'])) < 2) {
+        if (!isset($post_data['mpop_birthplace']) || !is_string($post_data['mpop_birthplace']) || mb_strlen(trim($post_data['mpop_birthplace']), 'UTF-8') < 2) {
             $res_data['error'] = ['mpop_birthplace'];
             http_response_code( 400 );
             echo json_encode( $res_data );
@@ -37,7 +49,10 @@ switch ($post_data['action']) {
         $post_birthdate = date_create('now', new DateTimeZone('Europe/Rome'));
         $post_birthdate->setDate($date_arr[0], $date_arr[1], $date_arr[2]);
         $post_birthdate->setTime(0,0,0,0);
-        if ($post_birthdate->getTimestamp() < $min_birthdate->getTimestamp()) {
+        if (
+            $post_birthdate->getTimestamp() < $min_birthdate->getTimestamp()
+            || $post_birthdate->getTimestamp() > $max_birthdate->getTimestamp()
+        ) {
             $res_data['error'] = ['mpop_birthdate'];
             http_response_code( 400 );
             echo json_encode( $res_data );
@@ -69,18 +84,18 @@ switch ($post_data['action']) {
                 && (
                     strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper($c['nome'], 'UTF-8')), $post_birthplace) !== false
                     || strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper($c['provincia']['nome'], 'UTF-8')), $post_birthplace) !== false
-                    || strpos(mb_strtoupper($c['provincia']['sigla'], 'UTF-8'), $post_birthplace) !== false
-                    || ( isset($c['codiceCatastale']) && strpos(mb_strtoupper($c['codiceCatastale'], 'UTF-8'), $post_birthplace) !== false)
+                    || strpos($c['provincia']['sigla'], $post_birthplace) !== false
+                    || ( isset($c['codiceCatastale']) && strpos($c['codiceCatastale'], $post_birthplace) !== false)
                 )
             ) {
                 $c = $this->add_birthplace_labels($c)[0];
                 $filtered_comuni[] = $c;
             }
         }
-        $res_data['data'] =['comuni' => $filtered_comuni];
+        $res_data['data'] = ['comuni' => $filtered_comuni];
         break;
     case 'get_billing_cities':
-        if (!isset($post_data['mpop_billing_city']) || !is_string($post_data['mpop_billing_city']) || strlen(trim($post_data['mpop_billing_city'])) < 2) {
+        if (!isset($post_data['mpop_billing_city']) || !is_string($post_data['mpop_billing_city']) || mb_strlen(trim($post_data['mpop_billing_city']), 'UTF-8') < 2) {
             $res_data['error'] = ['mpop_billing_city'];
             http_response_code( 400 );
             echo json_encode( $res_data );
@@ -100,18 +115,18 @@ switch ($post_data['action']) {
                 $filtered_comuni[] = $c;
             }
         }
-        $res_data['data'] =['comuni' => $filtered_comuni];
+        $res_data['data'] = ['comuni' => $filtered_comuni];
         break;
     case 'update_profile':
         $comuni = false;
         $found_caps = [];
         $card_active = $this->is_card_active($current_user->ID);
-        if (!isset($post_data['email']) || !is_string($post_data['email']) || !$this->is_valid_email(trim($post_data['email']))) {
+        if (!isset($post_data['email']) || !is_string($post_data['email']) || !$this::is_valid_email(trim($post_data['email']), true)) {
             $res_data['error'] = ['email'];
         } else {
             $post_data['email'] = mb_strtolower( trim($post_data['email']), 'UTF-8' );
         }
-        if (!isset($post_data['first_name']) || !is_string($post_data['first_name']) || strlen(trim($post_data['first_name'])) < 2) {
+        if (!isset($post_data['first_name']) || !is_string($post_data['first_name']) || mb_strlen(trim($post_data['first_name']), 'UTF-8') < 2) {
             if (!isset($res_data['error'])) {
                 $res_data['error'] = [];
             }
@@ -119,7 +134,7 @@ switch ($post_data['action']) {
         } else {
             $post_data['first_name'] = mb_strtoupper( trim($post_data['first_name']), 'UTF-8' );
         }
-        if (!isset($post_data['last_name']) || !is_string($post_data['last_name']) || strlen(trim($post_data['last_name'])) < 2) {
+        if (!isset($post_data['last_name']) || !is_string($post_data['last_name']) || mb_strlen(trim($post_data['last_name']), 'UTF-8') < 2) {
             if (!isset($res_data['error'])) {
                 $res_data['error'] = [];
             }
@@ -145,7 +160,7 @@ switch ($post_data['action']) {
                 $found_caps = $found_bc[0]['cap'];
             }
         }
-        if (!isset($post_data['mpop_billing_address']) || !is_string($post_data['mpop_billing_address']) || strlen(trim($post_data['mpop_billing_address'])) < 2) {
+        if (!isset($post_data['mpop_billing_address']) || !is_string($post_data['mpop_billing_address']) || mb_strlen(trim($post_data['mpop_billing_address']), 'UTF-8') < 2) {
             if (!isset($res_data['error'])) {
                 $res_data['error'] = [];
             }
@@ -173,11 +188,16 @@ switch ($post_data['action']) {
                     $res_data['error'] = [];
                 }
                 $res_data['error'][] = 'mpop_birthdate';
+                $post_data['mpop_birthdate'] = '';
+                $post_data['mpop_birthplace'] = '';
             } else {
                 $post_data['mpop_birthdate'] = date_create('now', new DateTimeZone('Europe/Rome'));
                 $post_data['mpop_birthdate']->setDate($date_arr[0], $date_arr[1], $date_arr[2]);
                 $post_data['mpop_birthdate']->setTime(0,0,0,0);
-                if ($post_data['mpop_birthdate']->getTimestamp() < $min_birthdate->getTimestamp()) {
+                if (
+                    $post_data['mpop_birthdate']->getTimestamp() < $min_birthdate->getTimestamp()
+                    || $post_data['mpop_birthdate']->getTimestamp() > $max_birthdate->getTimestamp()
+                ) {
                     if (!isset($res_data['error'])) {
                         $res_data['error'] = [];
                     }
@@ -232,7 +252,10 @@ switch ($post_data['action']) {
             exit;
         }
         $user_edits = [];
-        if ($current_user->user_email != $post_data['email']) {
+        if (
+            (!$current_user->_new_email && $current_user->user_email != $post_data['email'])
+            || ($current_user->_new_email ? $current_user->_new_email != $post_data['email'] : false)
+        ) {
             $duplicated = get_user_by('email', $post_data['email']);
             if ($duplicated) {
                 $res_data['error'] = ['email'];
@@ -240,27 +263,42 @@ switch ($post_data['action']) {
                 echo json_encode( $res_data );
                 exit;
             }
-            $duplicated = get_users(['meta_key' => '_new_email', 'meta_value' => $post_data['email']]);
+            $duplicated = get_users([
+                'meta_key' => '_new_email',
+                'meta_value' => $post_data['email'],
+                'meta_compare' => '=',
+                'login__not_in' => [$current_user->user_login]
+            ]);
             if (count($duplicated)) {
                 $res_data['error'] = ['email'];
                 http_response_code( 400 );
                 echo json_encode( $res_data );
                 exit;
+            } else {
+                $this->delete_temp_token_by_user_id($current_user->ID);
+                $token = $this->create_temp_token( $current_user->ID, 'email_confirmation_link' );
+                $res_mail = $this->send_confirmation_mail($token, $post_data['email']);
+                if (!$res_mail) {
+                    $this->delete_temp_token( $token );
+                    $res_data['error'] = ['email'];
+                    http_response_code( 400 );
+                    echo json_encode( $res_data );
+                    exit;
+                }
+                $user_edits['meta_input'] = [
+                    '_new_email' => $post_data['email']
+                ];
+                $res_data['notices'] = [['type'=>'info', 'msg' => 'È stata inviata un\'e-mail di conferma all\'indirizzo indicato']];
             }
-            $token = $this->create_temp_token( $current_user->ID, 'email_confirmation_link' );
-            $res_mail = $this->send_confirmation_mail($token, $post_data['email']);
-            if (!$res_mail) {
-                $this->delete_temp_token( $token );
-                $res_data['error'] = ['email'];
-                http_response_code( 400 );
-                echo json_encode( $res_data );
-                exit;
+        } else {
+            if ($current_user->user_email == $post_data['email']) {
+                if (isset($user_edits['meta_input'])) {
+                    $user_edits['meta_input'] = [];
+                }
+                $user_edits['meta_input']['_new_email'] = false;
             }
-            $user_edits['meta_input'] = [
-                '_new_email' => $post_data['email']
-            ];
         }
-        if ($this->is_card_active($current_user->ID)) {
+        if ($card_active) {
             $curr_profile = $this->myaccount_get_profile($current_user);
             $pending_edits = [];
             foreach([
@@ -280,6 +318,10 @@ switch ($post_data['action']) {
                     $user_edits['meta_input'] = [];
                 }
                 $user_edits['meta_input']['mpop_profile_pending_edits'] = json_encode($pending_edits);
+                if (!isset($res_data['notices'])) {
+                    $res_data['notices'] = [];
+                }
+                $res_data['notices'][] = ['type'=>'info', 'msg' => 'I dati modificati sono in attesa di revisione'];
             }
         } else {
             if (!isset($user_edits['meta_input'])) {
@@ -305,6 +347,10 @@ switch ($post_data['action']) {
             }
             if (count($user_edits)) {
                 delete_user_meta( $current_user->ID, 'mpop_profile_pending_edits' );
+                if (!isset($res_data['notices'])) {
+                    $res_data['notices'] = [];
+                }
+                $res_data['notices'][] = ['type'=>'success', 'msg' => 'Dati salvati correttamente'];
             }
         }
         if (count($user_edits)) {
@@ -313,8 +359,56 @@ switch ($post_data['action']) {
         }
         $res_data['data'] = ['user' => $this->myaccount_get_profile($current_user->ID, true)];
         break;
+    case 'password_change':
+        if (
+            !isset($post_data['current'])
+            || !is_string($post_data['current'])
+            || !$post_data['current']
+        ) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'current';
+        }
+        if (
+            !isset($post_data['new'])
+            || !is_string($post_data['new'])
+            || !$post_data['new']
+            || !$this->is_valid_password($post_data['new'])
+        ) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'new';
+        }
+        if (!wp_check_password($post_data['current'], $current_user->user_pass, $current_user->ID)) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'current';
+            if (!isset($res_data['notices'])) {
+                $res_data['notices'] = [];
+            }
+            $res_data['notices'][] = ['type'=>'error', 'msg' => 'Password attuale non corretta'];
+        }
+        if (isset($res_data['error'])) {
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        wp_set_password($post_data['new'], $current_user->ID);
+        wp_set_auth_cookie($current_user->ID);
+        wp_set_current_user($current_user->ID);
+        do_action('wp_login', $current_user->user_login, $current_user);
+        $res_data['data']['pwdRes'] = 'ok';
+        if (!isset($res_data['notices'])) {
+            $res_data['notices'] = [];
+        }
+        $res_data['notices'][] = ['type'=>'success', 'msg' => 'Password modificata correttamente'];
+        break;
     default:
         $res_data['error'] = ['action'];
+        $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
         http_response_code( 400 );
         echo json_encode( $res_data );
         exit;

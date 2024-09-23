@@ -1,8 +1,8 @@
 window.onload = () => {
     document.querySelector('form').removeAttribute('action');
-    const {mailConfirmed} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
+    const {mailConfirmed, _new_email} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
     let emailEl = document.getElementById('email');
-    const emailOriginal = emailEl.value,
+    const emailOriginal = _new_email || emailEl.value,
     emailRow = emailEl.parentElement,
     roleSelect = document.querySelector('select[name="role"]'),
     roleMultipop = ['multipopolano', 'multipopolare_resp'].includes(roleSelect.value),
@@ -136,5 +136,8 @@ window.onload = () => {
             masterKeyField.disabled = true;
             currentUserMasterKey.disabled = true;
         });
+    }
+    if (_new_email) {
+        emailEl.value = _new_email;
     }
 };

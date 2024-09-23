@@ -1,7 +1,8 @@
 import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
+import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import * as Vue from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
 //import * as s from '/wp-content/plugins/multipop/js/vue-select.js';
-const { createApp, ref, computed, reactive, onMounted, onUnmounted, defineAsyncComponent } = Vue,
+const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent } = Vue,
 { loadModule } = window['vue3-sfc-loader'];
 
 const vSel = loadModule(`/wp-content/plugins/multipop/js/vue-select.js`, {
@@ -16,7 +17,30 @@ const vSel = loadModule(`/wp-content/plugins/multipop/js/vue-select.js`, {
     },
     addStyle() {}
 }),
-mailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/s;
+mailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/s,
+passwordRegex = {
+    rr: [
+        /[a-z]+/s,
+        /[A-Z]+/s,
+        /[0-9]+/s,
+        /[ |\\!"£$%&/()=?'^,.;:_@°#*+[\]{}_-]+/s
+    ],
+    test(password) {
+        if (password.length < 8 || password.length > 64) return false;
+        let validRegex = 0;
+        passwordRegex.rr.forEach(r => validRegex += r.test(password) ? 1 : 0);
+        return validRegex >= 3;
+    },
+    acceptedSymbols: "SPACE | \\ ! \" £ $ % & / ( ) = ? ' ^ , . ; : _ @ ° # * + [ ] { } _ -"
+},
+userRoles = [
+    'multipopolano',
+    'multipopolare_resp',
+    'administrator',
+    'others'
+],
+historyTabs = [];
+let searchUsersTimeout;
 createApp({
     components: {
         'v-select': defineAsyncComponent(() => vSel)
@@ -24,37 +48,107 @@ createApp({
     setup() {
         const selectedTab = ref('summary'),
         displayNav = ref(false),
-        user = reactive({}),
+        profile = reactive({}),
+        profileInEditing = reactive({}),
         userInEditing = reactive({}),
+        userInView = reactive({}),
         profileEditing = ref(false),
+        userEditing = ref(false),
         birthplaceOpen = ref(false),
         billingCityOpen = ref(false),
         saving = ref(false),
         savingProfileErrors = reactive([]),
+        savingUserErrors = reactive([]),
         userNotices = reactive([]),
-        helloName = computed(()=> user.first_name ? user.first_name : user.login),
+        helloName = computed(()=> profile.first_name ? profile.first_name : profile.login),
         birthCities = reactive([]),
         billingCities = reactive([]),
+        pwdChangeFields = reactive({}),
+        pwdChanging = ref(false),
+        userSearch = reactive({
+            txt: '',
+            roles: [
+                'multipopolano',
+                'multipopolare_resp',
+                'administrator'
+            ],
+            page: 1,
+            sortBy: {
+                ID: true
+            }
+        }),
+        userSearchLimit = ref(100),
+        foundUsers = reactive([]),
+        foundUsersTotal = ref(0),
+        foundUsersPageTotal = computed(() => {
+            return Math.ceil(foundUsersTotal.value / userSearchLimit.value) || 1;
+        }),
+        pageButtons = computed(()=> {
+            const buttons = [userSearch.page],
+            maxButtons = 7,
+            halfButtons =((maxButtons % 2) ? maxButtons-1 : maxButtons) / 2;
+            for (let i = userSearch.page - 1; i > 0 && i >= userSearch.page - halfButtons; i--) {
+                buttons.unshift(i);
+            }
+            const missingButtons = 4 - userSearch.page;
+            for (let i = userSearch.page + 1; i <= userSearch.page + halfButtons + missingButtons && i <= foundUsersPageTotal.value; i++) {
+                buttons.push(i);
+            }
+            return buttons;
+        }),
         validProfileForm = computed(()=>
-            mailRegex.test(userInEditing.email.trim())
-            && userInEditing.first_name.trim()
-            && userInEditing.last_name.trim()
-            && userInEditing.mpop_birthdate
-            && userInEditing.mpop_birthplace
-            && userInEditing.mpop_billing_city
-            && userInEditing.mpop_billing_state
-            && userInEditing.mpop_billing_address.trim()
-            && userInEditing.mpop_billing_zip
+            mailRegex.test(profileInEditing.email.trim())
+            && profileInEditing.first_name.trim()
+            && profileInEditing.last_name.trim()
+            && profileInEditing.mpop_birthdate
+            && profileInEditing.mpop_birthplace
+            && profileInEditing.mpop_billing_city
+            && profileInEditing.mpop_billing_state
+            && profileInEditing.mpop_billing_address.trim()
+            && profileInEditing.mpop_billing_zip
         ),
+        validUserForm = computed(()=>
+            mailRegex.test(userInEditing.email.trim())
+            && ( !userInView.first_name || userInEditing.first_name.trim() )
+            && ( !userInView.last_name || userInEditing.last_name.trim() )
+            && ( !userInView.mpop_birthdate || userInEditing.mpop_birthdate )
+            && ( !userInView.mpop_birthplace || userInEditing.mpop_birthplace )
+            && ( !userInView.mpop_billing_city || userInEditing.mpop_billing_city )
+            && ( !userInView.mpop_billing_state || userInEditing.mpop_billing_state )
+            && ( !userInView.mpop_billing_address || userInEditing.mpop_billing_address.trim() )
+            && ( !userInView.mpop_billing_zip || userInEditing.mpop_billing_zip )
+        ),
+        staticPwdErrors = reactive([]),
+        pwdChangeErrors = computed(()=> {
+            const errs = [];
+            errs.push(...staticPwdErrors);
+            if (!pwdChangeFields.current && !pwdChangeFields.new && !pwdChangeFields.confirm) return errs;
+            if (!pwdChangeFields.current) errs.push('current');
+            if (!pwdChangeFields.new || !passwordRegex.test(pwdChangeFields.new)) errs.push('new');
+            if (!pwdChangeFields.confirm || pwdChangeFields.new !== pwdChangeFields.confirm) errs.push('confirm');
+            return errs;
+        }),
         maxBirthDate = new Date();
         maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
-        async function birthCitiesSearch(searchText) {
-            savingProfileErrors.length = 0;
+
+        function fuseSearch(options, search) {
+            const fuse = new Fuse(options, {
+                keys: ['label'],
+                shouldSort: true
+            });
+            return search.trim().length ? fuse.search(search).map(({item}) => item) : fuse.list;
+        }
+        async function birthCitiesSearch(searchText, user = false) {
+            if (user) {
+                savingUserErrors.length = 0;
+            } else {
+                savingProfileErrors.length = 0;
+            }
             if (searchText.trim().length > 1) {
                 const res = await serverReq({
-                    'action': 'get_birth_cities',
-                    'mpop_birthplace': searchText.trim(),
-                    'mpop_birthdate': userInEditing.mpop_birthdate
+                    action: 'get_birth_cities',
+                    mpop_birthplace: searchText.trim(),
+                    mpop_birthdate: user ? userInEditing.mpop_birthdate : profileInEditing.mpop_birthdate
                 });
                 if (res.ok) {
                     const cities = await res.json();
@@ -72,7 +166,11 @@ createApp({
                     try {
                         const {error} = await res.json();
                         if (error) {
-                            savingProfileErrors.push(...error);
+                            if (user) {
+                                savingUserErrors.push(...error);
+                            } else {
+                                savingProfileErrors.push(...error);
+                            }
                         } else {
                             console.error('Unknown error');
                         }
@@ -86,8 +184,8 @@ createApp({
             savingProfileErrors.length = 0;
             if (searchText.trim().length > 1) {
                 const res = await serverReq({
-                    'action': 'get_billing_cities',
-                    'mpop_billing_city': searchText.trim()
+                    action: 'get_billing_cities',
+                    mpop_billing_city: searchText.trim()
                 });
                 if (res.ok) {
                     const cities = await res.json();
@@ -120,30 +218,36 @@ createApp({
             saving.value = true;
             savingProfileErrors.length = 0;
             const res = await serverReq({
-                'action': 'update_profile',
-                'email': userInEditing.email.trim(),
-                'first_name': userInEditing.first_name.trim(),
-                'last_name': userInEditing.last_name.trim(),
-                'mpop_birthdate': userInEditing.mpop_birthdate,
-                'mpop_birthplace': userInEditing.mpop_birthplace.codiceCatastale,
-                'mpop_billing_city': userInEditing.mpop_billing_city.codiceCatastale,
-                'mpop_billing_address': userInEditing.mpop_billing_address.trim(),
-                'mpop_billing_zip': userInEditing.mpop_billing_zip
+                action: 'update_profile',
+                email: profileInEditing.email.trim(),
+                first_name: profileInEditing.first_name.trim(),
+                last_name: profileInEditing.last_name.trim(),
+                mpop_birthdate: profileInEditing.mpop_birthdate,
+                mpop_birthplace: profileInEditing.mpop_birthplace.codiceCatastale,
+                mpop_billing_city: profileInEditing.mpop_billing_city.codiceCatastale,
+                mpop_billing_address: profileInEditing.mpop_billing_address.trim(),
+                mpop_billing_zip: profileInEditing.mpop_billing_zip
             });
             if (res.ok) {
                 const newUser = await res.json();
-                if (newUser.data && newUser.data.user) {
-                    Object.assign(user, newUser.data.user);
-                    profileEditing.value = false;
-                    generateNotices();
-                } else {
-                    console.error('Unknown error');
+                if (newUser.data) {
+                    if (newUser.data.user) {
+                        for (const k in profile) {
+                            delete profile[k];
+                        }
+                        Object.assign(profile, newUser.data.user);
+                        profileEditing.value = false;
+                    } else {
+                        console.error('Unknown error');
+                    }
                 }
+                generateNotices(newUser.notices || []);
             } else {
                 try {
-                    const {error} = await res.json();
+                    const {error, notices} = await res.json();
                     if (error) {
                         savingProfileErrors.push(...error);
+                        generateNotices(notices || []);
                     } else {
                         console.error('Unknown error');
                     }
@@ -153,37 +257,203 @@ createApp({
             }
             saving.value = false;
         }
-        function generateNotices() {
+        async function updateUser() {
+            saving.value = true;
+            savingUserErrors.length = 0;
+            userInEditing.email = userInEditing.email.trim().toLowerCase();
+            if (!userInView.mpop_mail_to_confirm && userInView.email == userInEditing.email) {
+                if (!confirm(`Stai eliminando settando l'e-mail principale dell'utente (${userInView.email}) come non confermata. Questo gli impedirà di effettuare un login fino a che non la confermerà nuovamente.\nSei sicuro di continuare?`)) {
+                    saving.value = false;
+                    return;
+                }
+            }
+            const res = await serverReq({
+                action: 'admin_update_user',
+                ID: userEditing.ID,
+                email: userInEditing.email,
+                mpop_mail_confirmed: userInEditing.mpop_mail_confirmed,
+                first_name: userInEditing.first_name?.trim(),
+                last_name: userInEditing.last_name?.trim(),
+                mpop_birthdate: userInEditing.mpop_birthdate,
+                mpop_birthplace: userInEditing.mpop_birthplace?.codiceCatastale,
+                mpop_billing_city: userInEditing.mpop_billing_city?.codiceCatastale,
+                mpop_billing_address: userInEditing.mpop_billing_address?.trim(),
+                mpop_billing_zip: userInEditing.mpop_billing_zip
+            });
+            if (res.ok) {
+                const newUser = await res.json();
+                if (newUser.data) {
+                    if (newUser.data.user) {
+                        for (const k in userInView) {
+                            delete userInView[k];
+                        }
+                        Object.assign(userInView, newUser.data.user);
+                        userEditing.value = false;
+                    } else {
+                        console.error('Unknown error');
+                    }
+                }
+                generateNotices(newUser.notices || []);
+            } else {
+                try {
+                    const {error, notices} = await res.json();
+                    if (error) {
+                        savingUserErrors.push(...error);
+                        generateNotices(notices || []);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } catch {
+                    console.error('Unknown error');
+                }
+            }
+            saving.value = false;
+        }
+        async function changePassword() {
+            pwdChanging.value = true;
+            const {current, new: newPassword} = pwdChangeFields;
+            const res = await serverReq({
+                action: 'password_change',
+                current: current,
+                new: newPassword
+            });
+            if (res.ok) {
+                const pwdRes = await res.json();
+                if (pwdRes.data && pwdRes.data.pwdRes) {
+                    pwdChangeFields.current = '';
+                    pwdChangeFields.new = '';
+                    pwdChangeFields.confirm = '';
+                } else {
+                    console.error('Unknown error');
+                }
+                generateNotices(pwdRes.notices || []);
+            } else {
+                try {
+                    const {error, notices} = await res.json();
+                    if (error) {
+                        staticPwdErrors.push(...error);
+                        generateNotices(notices || []);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } catch {
+                    console.error('Unknown error');
+                }
+            }
+            pwdChanging.value = false;
+        }
+        function pushQueryParams(params = {}, replace = false) {
+            const url = new URL(location);
+            for (const k in params) {
+                if (params[k] === null) {
+                    url.searchParams.delete(k);
+                    continue;
+                }
+                url.searchParams.set(k, params[k]);
+            }
+            if (replace) {
+                return history.replaceState(historyTabs, '', url.href);
+            }
+            historyTabs.unshift(selectedTab.value);
+            return history.pushState(historyTabs, '', url.href);
+        }
+        async function viewUser(ID, popstate = false) {
+            const res = await serverReq({
+               action: 'admin_view_user',
+               ID
+            });
+            if (res.ok) {
+                const user = await res.json();
+                if (user.data && user.data.user) {
+                    Object.assign(userInView, user.data.user);
+                } else {
+                    console.error('Unknown error');
+                }
+                generateNotices(user.notices || []);
+            } else {
+                try {
+                    const {error, notices} = await res.json();
+                    if (error) {
+                        staticPwdErrors.push(...error);
+                        generateNotices(notices || []);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } catch {
+                    console.error('Unknown error');
+                }
+
+            }
+            if (!popstate) {
+                selectTab('userView');
+                pushQueryParams({'view-user': ID});
+            }
+        }
+        async function searchUsers() {
+            foundUsers.length = 0;
+            const res = await serverReq({
+                action: 'admin_search_users',
+                ...userSearch
+            });
+            if (res.ok) {
+                const users = await res.json();
+                if (users.data && users.data.users) {
+                    foundUsers.push(...users.data.users);
+                    foundUsersTotal.value = users.data.total;
+                    userSearchLimit.value = users.data.limit;
+                } else {
+                    console.error('Unknown error');
+                }
+                generateNotices(users.notices || []);
+            } else {
+                try {
+                    const {error} = await res.json();
+                    if (error) {
+                        console.error(error);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } catch {
+                    console.error('Unknown error');
+                }
+            }
+        }
+        function triggerSearchUsers() {
+            clearTimeout(searchUsersTimeout);
+            searchUsersTimeout = setTimeout(searchUsers, 500);
+        }
+        function generateNotices(srvNotices = []) {
             userNotices.length = 0;
+            userNotices.push(...srvNotices);
             const missingFields = [];
-            if (user._new_email) {
+            if (profile._new_email) {
                 userNotices.push({
                     type: 'warning',
                     msg: 'La tua nuova e-mail non è confermata. Fai clic sul link che ti è stato inviato all\'indirizzo che hai indicato.'
                 });
             }
-            if (!user.first_name) {
+            if (!profile.first_name) {
                 missingFields.push('Nome');
             }
-            if (!user.last_name) {
+            if (!profile.last_name) {
                 missingFields.push('Cognome');
             }
-            if (!user.mpop_birthdate) {
+            if (!profile.mpop_birthdate) {
                 missingFields.push('Data di nascita');
             }
-            if (!user.mpop_birthplace) {
+            if (!profile.mpop_birthplace) {
                 missingFields.push('Luogo di nascita');
             }
-            if (!user.mpop_billing_address) {
+            if (!profile.mpop_billing_address) {
                 missingFields.push('Indirizzo di residenza');
             }
-            if (!user.mpop_billing_city) {
+            if (!profile.mpop_billing_city) {
                 missingFields.push('Comune di residenza');
             }
-            if (!user.mpop_billing_zip) {
+            if (!profile.mpop_billing_zip) {
                 missingFields.push('CAP');
             }
-            if (!user.mpop_billing_state) {
+            if (!profile.mpop_billing_state) {
                 missingFields.push('Provincia di residenza');
             }
             if (missingFields.length) {
@@ -201,24 +471,69 @@ createApp({
             profileEditing.value = true;
             birthCities.length = 0;
             billingCities.length = 0;
-            Object.assign(userInEditing, user);
+            for (const key in profileInEditing) {
+                delete profileInEditing[key];
+            }
+            Object.assign(profileInEditing, profile);
+            if (profileInEditing._new_email) {
+                profileInEditing.email = profileInEditing._new_email;
+            }
+            if (profileInEditing.birthplace) {
+                birthCities.push(profileInEditing.birthplace);
+            }
+            if (profileInEditing.billing_city) {
+                billingCities.push(profileInEditing.billing_city);
+            }
+        }
+        function cancelEditProfile() {
+            profileEditing.value = false;
+            for(const key in profileInEditing) {
+                delete profileInEditing[key];
+            }
+        }
+        function editUser() {
+            savingUserErrors.length = 0;
+            userEditing.value = true;
+            birthCities.length = 0;
+            billingCities.length = 0;
+            for (const key in userInEditing) {
+                delete userInEditing[key];
+            }
+            Object.assign(userInEditing, userInView);
+            if (userInEditing._new_email) {
+                userInEditing.email = userInEditing._new_email;
+            }
+            userInEditing.emailOldValue = userInEditing.email;
             if (userInEditing.birthplace) {
                 birthCities.push(userInEditing.birthplace);
             }
             if (userInEditing.billing_city) {
                 billingCities.push(userInEditing.billing_city);
             }
+            userInEditing.mpop_mail_confirmed = !userInEditing._new_email && !userInEditing.mpop_mail_to_confirm;
+            userInEditing.mail_edited = false;
         }
-        function cancelEditProfile() {
-            profileEditing.value = false;
+        function cancelEditUser() {
+            userEditing.value = false;
             for(const key in userInEditing) {
                 delete userInEditing[key];
             }
         }
-        function selectTab(tabName) {
+        function selectTab(tabName, popstate = false) {
             if (selectedTab.value != tabName) {
                 cancelEditProfile();
-                selectedTab.value = tabName;
+                cancelEditUser();
+                const url = new URL(location);
+                selectedTab.value = tabName || 'summary';
+                if (!popstate) {
+                    if (tabName != 'userView') {
+                        url.searchParams.delete('view-user');
+                        pushQueryParams({'view-user': null});
+                    }
+                } else if (url.searchParams.has('view-user')) {
+                    tabName = 'userView';
+                    viewUser(url.searchParams.get('view-user'), popstate);
+                }
             }
         }
         function displayLocalDate(dt) {
@@ -235,25 +550,79 @@ createApp({
                 body: JSON.stringify(obj)
             });
         }
-        onMounted(() => {
+        onBeforeMount(()=> {
             const {user: parsedUser} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
-            Object.assign(user, parsedUser);
+            Object.assign(profile, parsedUser);
             generateNotices();
+            searchUsers();
+            window.addEventListener('popstate', onPopState);
+            const url = new URL(location);
+            if (url.searchParams.has('view-user') && profile.role == 'administrator') {
+                selectedTab.value = 'userView';
+                viewUser(url.searchParams.get('view-user'), false, true);
+            }
+            if (!historyTabs.length) {
+                historyTabs.unshift(selectedTab.value);
+                history.replaceState(historyTabs, '', location.href);
+            }
         });
+        function onPopState(e) {
+            if (Array.isArray(e.state)){
+                selectTab(e.state[0] || 'summary', true);
+                historyTabs.length;
+                historyTabs.push(...e.state);
+            }
+        }
+        onUnmounted(()=> {
+            clearTimeout(searchUsersTimeout);
+            window.removeEventListener('popstate', onPopState);
+        });
+        function changeUserSearchPage(page) {
+            userSearch.page = page;
+            searchUsers();
+        }
+        function userSearchSortBy(k) {
+            
+            if (Object.keys(userSearch.sortBy)[0] === k) {
+                userSearch.sortBy[k] = !userSearch.sortBy[k];
+            } else {
+                userSearch.sortBy = {
+                    [k]: true,
+                    [Object.keys(userSearch.sortBy)[0]]: userSearch.sortBy[Object.keys(userSearch.sortBy)[0]]
+                };
+            }
+            searchUsers();
+        }
         function searchOpen(tag) {
             const openVar = eval(tag + 'Open');
             openVar.value = true;
             setTimeout(()=> document.querySelector('#'+tag+'-select .vs__search').select(),300);
         }
+        function showRole(role) {
+            switch(role) {
+                case 'multipopolare_resp':
+                    role = 'Responsabile';
+                    break;
+                case 'administrator':
+                    role = "Amministratore";
+                    break;
+                case 'others':
+                    role = 'Altri';
+                    break;
+                default:
+                    role = role.charAt(0).toUpperCase() + role.slice(1);
+            }
+            return role;
+        }
         return {
             selectedTab,
-            user,
+            profile,
             displayNav,
             helloName,
             userNotices,
             dismissNotice,
             profileEditing,
-            userInEditing,
+            profileInEditing,
             editProfile,
             cancelEditProfile,
             selectTab,
@@ -268,7 +637,33 @@ createApp({
             searchOpen,
             saving,
             savingProfileErrors,
+            savingUserErrors,
             validProfileForm,
+            validUserForm,
+            pwdChangeFields,
+            pwdChangeErrors,
+            pwdChanging,
+            changePassword,
+            staticPwdErrors,
+            userRoles,
+            userSearch,
+            showRole,
+            foundUsers,
+            searchUsers,
+            triggerSearchUsers,
+            foundUsersTotal,
+            userSearchSortBy,
+            foundUsersPageTotal,
+            pageButtons,
+            changeUserSearchPage,
+            viewUser,
+            userInView,
+            userInEditing,
+            userEditing,
+            editUser,
+            cancelEditUser,
+            updateUser,
+            fuseSearch,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
         };
     }

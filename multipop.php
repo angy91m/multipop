@@ -18,6 +18,6 @@ define( 'MULTIPOP_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 // REGISTER FUNCTIONS AND HOOKS
 require_once( __DIR__ . '/classes/multipop-plugin.php');
 
-new MultipopPlugin();
-
+$GLOBALS['mpop_plugin'] = new MultipopPlugin();
+save_test($GLOBALS['mpop_plugin']->discourse_group_names());
 ?>

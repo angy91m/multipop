@@ -4,9 +4,6 @@ defined( 'ABSPATH' ) || exit;
 // YOU CAN DISPOSE OF $user as WP_User Instance
 
 if ($this->current_user_is_admin()) {
-    $mail_to_confirm = get_user_meta( $user->ID, 'mpop_mail_to_confirm', true );
-    $mail_changing = get_user_meta( $user->ID, '_new_email', true );
-    $card_active = get_user_meta( $user->ID, 'mpop_card_active', true );
     ?>
         <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/main.css">
         <style type="text/css">
@@ -14,21 +11,25 @@ if ($this->current_user_is_admin()) {
             #fieldset-shipping {
                 display: none;
             }
+            #first_name,
+            #last_name {
+                text-transform: uppercase
+            }
         </style>
         <br>
         <h2>Multipopolare</h2>
         <table class="form-table">
             <tr>
                 <th><label for="mpop_mail_confirmed"></label> E-mail confermata</th>
-                <td id="mpop_mail_confirmed"><?= $mail_to_confirm ? $this->dashicon('no') : $this->dashicon('yes') ?></td>
+                <td id="mpop_mail_confirmed"><?= $user->mpop_mail_to_confirm ? $this->dashicon('no') : $this->dashicon('yes') ?></td>
             </tr>
             <tr>
                 <th>Cambio e-mail in attesa di conferma</th>
-                <td><?= $mail_changing ? $this->dashicon('yes') . 'Indirizzo precedente: ' . $mail_changing : $this->dashicon('no') ?></td>
+                <td><?= $user->_new_email ? $this->dashicon('yes') . 'Indirizzo precedente: ' . $user->user_email : $this->dashicon('no') ?></td>
             </tr>
             <tr>
                 <th>Tessera attiva</th>
-                <td><?= $card_active ? $this->dashicon('yes') : $this->dashicon('no') ?></td>
+                <td><?= $user->mpop_card_active ? $this->dashicon('yes') : $this->dashicon('no') ?></td>
             </tr>
             <?php
             if (in_array($user->roles[0], ['administrator', 'multipopolare_resp']) && $this->user_has_master_key() ) { ?>
@@ -50,11 +51,13 @@ if ($this->current_user_is_admin()) {
             }
             ?>
         </table>
+        <a href="<?=get_permalink($this->settings['myaccount_page']) . "?view-user=$user->ID"?>" target="_blank">Vedi nella gestione Multipopolare&nbsp;<?=$this::dashicon('external')?></a>
         <script id="__MULTIPOP_DATA__" type="application/json"><?=json_encode([
-            'mailConfirmed' => !($mail_to_confirm || $mail_changing),
+            'mailConfirmed' => !($user->mpop_mail_to_confirm || $user->_new_email ),
             'userRole' => $user->roles[0],
             'currentUserHasMasterKey' => $this->user_has_master_key(),
-            'userHasMasterKey' => $this->user_has_master_key($user->ID)
+            'userHasMasterKey' => $this->user_has_master_key($user->ID),
+            '_new_email' => $user->_new_email
         ])?></script>
         <script type="text/javascript" src="<?=plugins_url()?>/multipop/js/user-edit.js"></script>
     <?php
