@@ -364,6 +364,7 @@ class MultipopPlugin {
                 }
             }
         }
+        save_test($this->discourse_utilities());
     }
     
     // `admin_init` TRIGGER
@@ -1863,7 +1864,7 @@ class MultipopPlugin {
         return [$users, $total, $limit];
     }
 
-    function discourse_req_ca($verify, $url) {
+    public function discourse_req_ca($verify, $url) {
         $discourse_connect_options = get_option('discourse_connect');
         if (
             is_array($discourse_connect_options)
@@ -1874,6 +1875,12 @@ class MultipopPlugin {
             return MULTIPOP_PLUGIN_PATH . '/discourse.ca';
         }
         return $verify;
+    }
+    private function discourse_utilities() {
+        if (class_exists('WPDiscourse\Utilities\PublicUtilities')) {
+            return new WPDiscourse\Utilities\PublicUtilities();
+        }
+        return false;
     }
 }
 
