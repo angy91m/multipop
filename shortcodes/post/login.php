@@ -31,6 +31,6 @@ if (get_class($res) == 'WP_Error') {
     header('location:'.  explode('?',$this->req_path)[0] . '?' . $this->export_GET());
     exit();
 } else {
-    header('location:'.  explode('?',$this->req_path)[0]);
+    header('location:'.  explode('?',$this->req_path)[0] . (isset($_GET['redirect_to']) ? '?redirect_to=' . urlencode($_GET['redirect_to']) : ''));
     exit();
 }

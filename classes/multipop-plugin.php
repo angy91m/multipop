@@ -154,7 +154,8 @@ class MultipopPlugin {
         // ADD ELEMENTS TO LOGIN PAGE
         //add_action( 'woocommerce_login_form_start', [$this, 'html_login_mail_confirm'] );
         // CHECK AFTER LOGIN
-        add_action('wp_login', [$this,'filter_login'], 10, 2);
+        //add_action('wp_login', [$this,'filter_login'], 10, 2);
+        add_filter('authenticate', [$this, 'filter_login'], 21, 1);
 
         // SHOW USER NOTICES
         add_filter('the_content', [$this, 'show_user_notices'], 10);
@@ -920,11 +921,13 @@ class MultipopPlugin {
     }
 
     // CHECK AFTER LOGIN
-    public function filter_login($username, $user) {
-        wp_set_current_user($user->ID);
+    public function filter_login( $user ) {
+        if (is_null($user) || is_wp_error($user)) {
+            return $user;
+        }
         $roles = $user->roles;
         if (count( $roles ) == 0) {
-            $this->logout_redirect();
+            return new WP_Error(401, "No roles found");
         } else if (count( $roles ) == 1 && in_array($roles[0], ['multipopolano', 'multipopolare_resp'])) {
             if ($user->mpop_mail_to_confirm || $user->_new_email) {
                 if (
@@ -971,11 +974,12 @@ class MultipopPlugin {
                                 ]
                             ]);
                         }
-                        unset($_GET['mpop_mail_token']);
-                        unset($_GET['invalid_mpop_login']);
-                        $_GET['mpop_mail_confirmed'] = '1';
-                        wp_redirect(explode('?',$this->req_url)[0] . '?' . $this->export_GET());
-                        exit;
+                        return $user;
+                        // unset($_GET['mpop_mail_token']);
+                        // unset($_GET['invalid_mpop_login']);
+                        // $_GET['mpop_mail_confirmed'] = '1';
+                        // wp_redirect(explode('?',$this->req_url)[0] . '?' . $this->export_GET());
+                        // exit;
                     } else {
                         if ($user_id) {
                             $this->delete_temp_token($_REQUEST['mpop_mail_token']);
