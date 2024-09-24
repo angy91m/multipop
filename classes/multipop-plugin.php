@@ -1916,9 +1916,10 @@ class MultipopPlugin {
         return array_map(function($g) {return $g->name;}, $disc_user->user->groups);
     }
     public function discourse_user_params($params, $user) {
-        //$disc_utils = $this->discourse_utilities();
+        $disc_utils = $this->discourse_utilities();
         save_test($params);
         save_test($this->get_discourse_group_by_user( $this->get_discourse_user($user) ),1);
+        save_test($disc_utils->discourse_request('/groups.json'), 2);
         return $params;
     }
 }
