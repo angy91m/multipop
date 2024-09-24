@@ -364,7 +364,8 @@ class MultipopPlugin {
                 }
             }
         }
-        save_test($this->discourse_utilities());
+        $du = $this->discourse_utilities();
+        save_test($du->discourse_request('/admin/users/1.json'));
     }
     
     // `admin_init` TRIGGER
