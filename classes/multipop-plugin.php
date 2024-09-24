@@ -1866,6 +1866,7 @@ class MultipopPlugin {
     function discourse_req_ca($verify, $url) {
         save_test($verify);
         save_test($url, 1);
+        save_test(get_option('discourse_connect'), 2);
         return $verify;
     }
 }
