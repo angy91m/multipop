@@ -178,6 +178,7 @@ class MultipopPlugin {
         add_action('user_profile_update_errors', [$this, 'user_profile_update_errors'], 10, 3);
         add_action('personal_options_update', [$this, 'personal_options_update']);
         add_filter('run_wptexturize', [$this, 'run_wptexturize']);
+        add_filter( 'https_ssl_verify', [$this, 'discourse_req_ca'], 10, 2 );
     }
 
     // INITIALIZE PLUGIN
@@ -1860,6 +1861,12 @@ class MultipopPlugin {
             ];
         }
         return [$users, $total, $limit];
+    }
+
+    function discourse_req_ca($verify, $url) {
+        save_test($verify);
+        save_test($url, 1);
+        return $verify;
     }
 }
 
