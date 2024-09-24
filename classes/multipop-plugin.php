@@ -118,7 +118,7 @@ class MultipopPlugin {
     private static function export_GET() {
         $res = [];
         foreach($_GET as $k => $v) {
-            $res[] = "$k=$v";
+            $res[] = "$k=" . urlencode($v);
         }
         return implode('&', $res);
     }
