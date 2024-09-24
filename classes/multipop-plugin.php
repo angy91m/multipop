@@ -1864,9 +1864,15 @@ class MultipopPlugin {
     }
 
     function discourse_req_ca($verify, $url) {
-        save_test($verify);
-        save_test($url, 1);
-        save_test(get_option('discourse_connect'), 2);
+        $discourse_connect_options = get_option('discourse_connect');
+        if (
+            is_array($discourse_connect_options)
+            && $discourse_connect_options['url']
+            && str_starts_with($url, $discourse_connect_options['url'])
+            && file_exists( MULTIPOP_PLUGIN_PATH . '/discourse.ca' )
+        ) {
+            return MULTIPOP_PLUGIN_PATH . '/discourse.ca';
+        }
         return $verify;
     }
 }
