@@ -991,6 +991,7 @@ class MultipopPlugin {
                 }
             }
         }
+        return $user;
     }
 
 
