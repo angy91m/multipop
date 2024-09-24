@@ -179,9 +179,10 @@ class MultipopPlugin {
         add_action('user_profile_update_errors', [$this, 'user_profile_update_errors'], 10, 3);
         add_action('personal_options_update', [$this, 'personal_options_update']);
         add_filter('run_wptexturize', [$this, 'run_wptexturize']);
-        add_filter( 'https_ssl_verify', [$this, 'discourse_req_ca'], 10, 2 );
-        add_filter( 'discourse_email_verification', function() {return false;} );
-        add_action( 'wpdc_sso_provider_before_sso_redirect', [$this, 'discourse_filter_login'], 10, 2 );
+        add_filter('https_ssl_verify', [$this,'discourse_req_ca'], 10, 2 );
+        add_filter('discourse_email_verification', function() {return false;} );
+        add_action('wpdc_sso_provider_before_sso_redirect', [$this, 'discourse_filter_login'], 10, 2 );
+        add_filter('wpdc_sso_params', [$this, 'discourse_user_params'], 10, 2);
     }
 
     // INITIALIZE PLUGIN
@@ -1504,71 +1505,71 @@ class MultipopPlugin {
         }
         return $parsed_user;
     }
-    private function discourse_group_names() {
-        $sanitize_names = function($name) {
-            return preg_replace(
-                '/ |\'/',
-                '-',
-                str_replace(
-                    " - ",
-                    '-',
-                    mb_strtolower(
-                        iconv('UTF-8','ASCII//TRANSLIT', $name),
-                        'UTF-8'
-                    )
-                )
-            );
-        };
-        $group_names = ['wp_admins'];
-        $province = $this->get_province_all();
-        if ($province) {
-            foreach($province as $p) {
-                if ($p['soppressa']) {
-                    continue;
-                }
-                $r = ($sanitize_names)($p['regione']);
-                if (!in_array("wp_regione_$r", $group_names)) {
-                    $group_names[] = "wp_regione_$r";
-                }
-                $group_names[] = "wp_provincia_" . (($sanitize_names)($p['sigla']));
-            }
-        }
-        sort($group_names);
-        return $group_names;
-    }
-    public function discourse_groups($user) {
-        $sanitize_names = function($name) {
-            return preg_replace(
-                '/ |\'/',
-                '-',
-                str_replace(
-                    " - ",
-                    '-',
-                    mb_strtolower(
-                        iconv('UTF-8','ASCII//TRANSLIT', $name),
-                        'UTF-8'
-                    )
-                )
-            );
-        };
-        if (!isset($user)) {
-            return '';
-        }
-        if (is_string($user) ) {
-            $user = intval($user);
-        }
-        if (is_int($user) && $user) {
-            $user = get_user_by('ID', $user);
-        }
-        if (!is_object($user) || !isset($user->ID) || !$user->ID) {
-            return '';
-        }
+    // private function discourse_group_names() {
+    //     $sanitize_names = function($name) {
+    //         return preg_replace(
+    //             '/ |\'/',
+    //             '-',
+    //             str_replace(
+    //                 " - ",
+    //                 '-',
+    //                 mb_strtolower(
+    //                     iconv('UTF-8','ASCII//TRANSLIT', $name),
+    //                     'UTF-8'
+    //                 )
+    //             )
+    //         );
+    //     };
+    //     $group_names = ['wp_admins'];
+    //     $province = $this->get_province_all();
+    //     if ($province) {
+    //         foreach($province as $p) {
+    //             if ($p['soppressa']) {
+    //                 continue;
+    //             }
+    //             $r = ($sanitize_names)($p['regione']);
+    //             if (!in_array("wp_regione_$r", $group_names)) {
+    //                 $group_names[] = "wp_regione_$r";
+    //             }
+    //             $group_names[] = "wp_provincia_" . (($sanitize_names)($p['sigla']));
+    //         }
+    //     }
+    //     sort($group_names);
+    //     return $group_names;
+    // }
+    // public function discourse_groups($user) {
+    //     $sanitize_names = function($name) {
+    //         return preg_replace(
+    //             '/ |\'/',
+    //             '-',
+    //             str_replace(
+    //                 " - ",
+    //                 '-',
+    //                 mb_strtolower(
+    //                     iconv('UTF-8','ASCII//TRANSLIT', $name),
+    //                     'UTF-8'
+    //                 )
+    //             )
+    //         );
+    //     };
+    //     if (!isset($user)) {
+    //         return '';
+    //     }
+    //     if (is_string($user) ) {
+    //         $user = intval($user);
+    //     }
+    //     if (is_int($user) && $user) {
+    //         $user = get_user_by('ID', $user);
+    //     }
+    //     if (!is_object($user) || !isset($user->ID) || !$user->ID) {
+    //         return '';
+    //     }
         
-        $group_names = $this->discourse_group_names();
-        foreach ($group_names as $gn) {
+    //     $group_names = $this->discourse_group_names();
+    //     foreach ($group_names as $gn) {
             
-        }
-    }
+    //     }
+    // }
 
     private function pp_auth() {
         if (
@@ -1903,6 +1904,10 @@ class MultipopPlugin {
                 exit;
             }
         }
+    }
+    public function discourse_user_params($params, $user) {
+        save_test($params);
+        return $params;
     }
 }
 
