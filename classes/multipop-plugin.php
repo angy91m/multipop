@@ -1911,10 +1911,14 @@ class MultipopPlugin {
         }
         return $this->discourse_utilities()->discourse_request("/u/by-external/$user_id.json");
     }
+    private function get_discourse_group_by_user($disc_user) {
+        if (!is_object($disc_user)) {return [];}
+        return array_map(function($g) {return $g->name;}, $disc_user->user->groups);
+    }
     public function discourse_user_params($params, $user) {
         //$disc_utils = $this->discourse_utilities();
         save_test($params);
-        save_test($this->get_discourse_user($user),1);
+        save_test($this->get_discourse_group_by_user( $this->get_discourse_user($user) ),1);
         return $params;
     }
 }
