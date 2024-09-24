@@ -181,6 +181,7 @@ class MultipopPlugin {
         add_filter('run_wptexturize', [$this, 'run_wptexturize']);
         add_filter( 'https_ssl_verify', [$this, 'discourse_req_ca'], 10, 2 );
         add_filter( 'discourse_email_verification', function() {return false;} );
+        add_action( 'wpdc_sso_provider_before_sso_redirect', [$this, 'discourse_user_filter'], 10, 2 );
     }
 
     // INITIALIZE PLUGIN
@@ -1886,6 +1887,22 @@ class MultipopPlugin {
             return new WPDiscourse\Utilities\PublicUtilities();
         }
         return false;
+    }
+    public function discourse_user_filter($user_id, $user) {
+        $allowed_roles = ['administrator', 'multipopolano', 'multipopolare_resp'];
+        if (
+            !count($user->roles)
+            || !in_array( $user->roles[0], $allowed_roles )
+        ) {
+            wp_redirect(get_permalink($this->settings['myaccount_page']));
+            exit;
+        }
+        if ($user->roles[0] != 'administrator') {
+            if (!$user->mpop_card_active) {
+                wp_redirect(get_permalink($this->settings['myaccount_page']));
+                exit;
+            }
+        }
     }
 }
 
