@@ -179,6 +179,7 @@ class MultipopPlugin {
         add_action('personal_options_update', [$this, 'personal_options_update']);
         add_filter('run_wptexturize', [$this, 'run_wptexturize']);
         add_filter( 'https_ssl_verify', [$this, 'discourse_req_ca'], 10, 2 );
+        add_filter( 'discourse_email_verification', function() {return false;} );
     }
 
     // INITIALIZE PLUGIN
