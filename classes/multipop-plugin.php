@@ -762,7 +762,7 @@ class MultipopPlugin {
             $last_update->setTimestamp($this->settings['last_tempmail_update']);
             $last_update->add(new DateInterval('P30D'));
             if ($force || $last_update->getTimestamp() <= time()) {
-                $old_list = file_get_contents(MULTIPOP_PLUGIN_PATH . 'tempmail/list.txt');
+                $old_list = file_exists(MULTIPOP_PLUGIN_PATH . 'tempmail/list.txt') ? file_get_contents(MULTIPOP_PLUGIN_PATH . 'tempmail/list.txt') : "";
                 $block_list = $old_list !== false ? preg_split('/\r\n|\r|\n/', trim($old_list)) : [];
                 foreach($this->settings['tempmail_urls']['block'] as $l ) {
                     $res = $this->curl_exec($l);
