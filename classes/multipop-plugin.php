@@ -1908,7 +1908,7 @@ class MultipopPlugin {
     public function discourse_user_params($params, $user) {
         $disc_utils = $this->discourse_utilities();
         save_test($params);
-        save_test($disc_utils->get_discourse_groups(),1);
+        save_test($disc_utils->discourse_request('/groups.json'),1);
         return $params;
     }
 }
