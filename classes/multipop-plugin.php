@@ -1909,7 +1909,7 @@ class MultipopPlugin {
         if (is_object($user_id)) {
             $user_id = $user_id->ID;
         }
-        return $this->discourse_utilities()->get_discourse_user($user_id);
+        return $this->discourse_utilities()->discourse_request("/u/by-external/$user_id.json");
     }
     private function get_discourse_group_by_user($disc_user, $auto_groups = false) {
         $group_names = [];
