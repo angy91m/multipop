@@ -1909,17 +1909,25 @@ class MultipopPlugin {
         if (is_object($user_id)) {
             $user_id = $user_id->ID;
         }
-        return $this->discourse_utilities()->discourse_request("/u/by-external/$user_id.json");
+        return $this->discourse_utilities()->get_discourse_user($user_id);
     }
-    private function get_discourse_group_by_user($disc_user) {
-        if (!is_object($disc_user)) {return [];}
-        return array_map(function($g) {return $g->name;}, $disc_user->user->groups);
+    private function get_discourse_group_by_user($disc_user, $auto_groups = false) {
+        $group_names = [];
+        if (!is_object($disc_user)) {return $group_names;}
+        foreach($disc_user->user->groups as $g) {
+            if ($g->automatic && !$auto_groups) {
+                continue;
+            }
+            $group_names[] = $g->name;
+        }
+        return $group_names;
     }
     public function discourse_user_params($params, $user) {
         $disc_utils = $this->discourse_utilities();
         save_test($params);
         save_test($this->get_discourse_group_by_user( $this->get_discourse_user($user) ),1);
         save_test($disc_utils->discourse_request('/groups.json'), 2);
+        save_test($user->discourse_sso_user_id, 3);
         return $params;
     }
 }
