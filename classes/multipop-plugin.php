@@ -1907,7 +1907,7 @@ class MultipopPlugin {
     }
     private function get_discourse_user($user_id) {
         if (is_object($user_id)) {
-            $user_id = $user->ID;
+            $user_id = $user_id->ID;
         }
         return $this->discourse_utilities()->discourse_request("/u/by-external/$user_id.json");
     }
