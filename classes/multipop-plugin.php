@@ -1911,7 +1911,7 @@ class MultipopPlugin {
         }
         return $this->discourse_utilities()->discourse_request("/u/by-external/$user_id.json");
     }
-    private function get_discourse_group_by_user($disc_user, $auto_groups = false) {
+    private function get_discourse_groups_by_user($disc_user, $auto_groups = false) {
         $group_names = [];
         if (!is_object($disc_user)) {return $group_names;}
         foreach($disc_user->user->groups as $g) {
@@ -1946,13 +1946,25 @@ class MultipopPlugin {
             ]
         );
     }
+    private function get_discourse_groups($auto_groups = false) {
+        $disc_utils = $this->discourse_utilities();
+        $groups = [];
+        $page = 0;
+        $total = 0;
+        do {
+            $res = $disc_utils->discourse_request("/groups.json?page=$page");
+            $total = $res->total_rows_groups;
+            array_push($groups, ...$res->groups);
+            $page++;
+        } while($total != count($groups));
+        if ($auto_groups) { return $groups; }
+        return array_values(array_filter($groups, function($g) {return !$g->automatic;}));
+    } 
     public function discourse_user_params($params, $user) {
         $disc_utils = $this->discourse_utilities();
         save_test($params);
-        save_test($this->get_discourse_group_by_user( $this->get_discourse_user($user) ),1);
-        save_test($disc_utils->discourse_request('/groups.json'), 2);
-        save_test($user->discourse_sso_user_id, 3);
-        save_test($this->update_discourse_group(41), 4);
+        save_test($this->get_discourse_groups_by_user( $this->get_discourse_user($user) ),1);
+        save_test($this->get_discourse_groups(), 2);
         return $params;
     }
 }
