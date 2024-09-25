@@ -1982,7 +1982,7 @@ class MultipopPlugin {
         $disc_utils = $this->discourse_utilities();
         save_test($params);
         save_test($this->get_discourse_groups_by_user( $this->get_discourse_user($user) ),1);
-        save_test($disc_utils->get_discourse_groups(), 2);
+        save_test($disc_utils->get_discourse_groups(true), 2);
         $params['groups'] = 'prova_g';
         return $params;
     }
