@@ -1884,8 +1884,8 @@ class MultipopPlugin {
         return $verify;
     }
     private function discourse_utilities() {
-        if (class_exists('WPDiscourse\Utilities\PublicUtilities')) {
-            return new WPDiscourse\Utilities\PublicUtilities();
+        if (class_exists('WPDiscourse\Utilities\Utilities')) {
+            return new WPDiscourse\Utilities\Utilities();
         }
         return false;
     }
