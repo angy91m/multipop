@@ -1922,12 +1922,37 @@ class MultipopPlugin {
         }
         return $group_names;
     }
+    private function default_discourse_group_settings() {
+        return [
+            'mentionable_level' => 4,
+            'messageable_level' => 4,
+            'visibility_level' => 0,
+            'primary_group' => false,
+            'public_admission' => false,
+            'public_exit' => false,
+            'allow_membership_requests' => false,
+            'members_visibility_level' => 2
+        ];
+    }
+    private function update_discourse_group($id, $params = null) {
+        if (!$params) {
+            $params = $this->default_discourse_group_settings();
+        }
+        return $this->discourse_utilities()->discourse_request(
+            "/groups/$id.json",
+            [
+                'method' => 'PUT',
+                'body' => ['group' => $params]
+            ]
+        );
+    }
     public function discourse_user_params($params, $user) {
         $disc_utils = $this->discourse_utilities();
         save_test($params);
         save_test($this->get_discourse_group_by_user( $this->get_discourse_user($user) ),1);
         save_test($disc_utils->discourse_request('/groups.json'), 2);
         save_test($user->discourse_sso_user_id, 3);
+        save_test($this->update_discourse_group(41), 4);
         return $params;
     }
 }
