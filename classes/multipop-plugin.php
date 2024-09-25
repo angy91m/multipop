@@ -1883,13 +1883,6 @@ class MultipopPlugin {
         }
         return $verify;
     }
-    private function discourse_utilities() {
-        if (class_exists('WPDiscourse\Utilities\Utilities')) {
-            require_once(MULTIPOP_PLUGIN_PATH . '/classes/mpop-discourse-utilities.php');
-            return new MpopDiscourseUtilities();
-        }
-        return false;
-    }
     public function discourse_filter_login($user_id, $user) {
         $allowed_roles = ['administrator', 'multipopolano', 'multipopolare_resp'];
         if (
@@ -1906,82 +1899,17 @@ class MultipopPlugin {
             }
         }
     }
-    private function get_discourse_user($user_id) {
-        if (is_object($user_id)) {
-            $user_id = $user_id->ID;
+    private function discourse_utilities() {
+        if (class_exists('WPDiscourse\Utilities\Utilities')) {
+            require_once(MULTIPOP_PLUGIN_PATH . '/classes/mpop-discourse-utilities.php');
+            return new MpopDiscourseUtilities();
         }
-        return $this->discourse_utilities()->discourse_request("/u/by-external/$user_id.json");
+        return false;
     }
-    private function get_discourse_groups_by_user($disc_user, $auto_groups = false) {
-        $group_names = [];
-        if (!is_object($disc_user)) {return $group_names;}
-        foreach($disc_user->user->groups as $g) {
-            if ($g->automatic && !$auto_groups) {
-                continue;
-            }
-            $group_names[] = $g->name;
-        }
-        return $group_names;
-    }
-    private function default_discourse_group_settings() {
-        return [
-            'mentionable_level' => 4,
-            'messageable_level' => 4,
-            'visibility_level' => 0,
-            'primary_group' => false,
-            'public_admission' => false,
-            'public_exit' => false,
-            'allow_membership_requests' => false,
-            'members_visibility_level' => 2
-        ];
-    }
-    private function update_discourse_group($id, $params = null) {
-        if (!$params) {
-            $params = $this->default_discourse_group_settings();
-        }
-        return $this->discourse_utilities()->discourse_request(
-            "/groups/$id.json",
-            [
-                'method' => 'PUT',
-                'body' => ['group' => $params]
-            ]
-        );
-    }
-    private function create_discourse_group($name = '', $full_name = '', $bio = '', $params = []) {
-        if (!$name) {return false;}
-        if (!$full_name) {$full_name = $name;}
-        return $this->discourse_utilities()->discourse_request(
-            "/admin/groups.json",
-            [
-                'method' => 'POST',
-                'body' => [
-                    'group' => [
-                        'name' => $name,
-                        'full_name' => $full_name,
-                        'bio_raw' => $bio
-                    ] + $params + $this->default_discourse_group_settings()
-                ]
-            ]
-        );
-    }
-    // private function get_discourse_groups($auto_groups = false) {
-    //     $disc_utils = $this->discourse_utilities();
-    //     $groups = [];
-    //     $page = 0;
-    //     $total = 0;
-    //     do {
-    //         $res = $disc_utils->discourse_request("/groups.json?page=$page");
-    //         $total = $res->total_rows_groups;
-    //         array_push($groups, ...$res->groups);
-    //         $page++;
-    //     } while($total != count($groups));
-    //     if ($auto_groups) { return $groups; }
-    //     return array_values(array_filter($groups, function($g) {return !$g->automatic;}));
-    // }
     public function discourse_user_params($params, $user) {
         $disc_utils = $this->discourse_utilities();
         save_test($params);
-        save_test($this->get_discourse_groups_by_user( $this->get_discourse_user($user) ),1);
+        save_test($disc_utils->get_discourse_groups_by_user($user),1);
         save_test($disc_utils->get_discourse_groups(true), 2);
         $params['groups'] = 'prova_g';
         return $params;
