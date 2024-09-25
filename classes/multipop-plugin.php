@@ -1885,7 +1885,8 @@ class MultipopPlugin {
     }
     private function discourse_utilities() {
         if (class_exists('WPDiscourse\Utilities\Utilities')) {
-            return new WPDiscourse\Utilities\Utilities();
+            require_once(MULTIPOP_PLUGIN_PATH . '/classes/mpop-discourse-utilities.php');
+            return new MpopDiscourseUtilities();
         }
         return false;
     }
@@ -1946,20 +1947,37 @@ class MultipopPlugin {
             ]
         );
     }
-    private function get_discourse_groups($auto_groups = false) {
-        $disc_utils = $this->discourse_utilities();
-        $groups = [];
-        $page = 0;
-        $total = 0;
-        do {
-            $res = $disc_utils->discourse_request("/groups.json?page=$page");
-            $total = $res->total_rows_groups;
-            array_push($groups, ...$res->groups);
-            $page++;
-        } while($total != count($groups));
-        if ($auto_groups) { return $groups; }
-        return array_values(array_filter($groups, function($g) {return !$g->automatic;}));
-    } 
+    private function create_discourse_group($name = '', $full_name = '', $bio = '', $params = []) {
+        if (!$name) {return false;}
+        if (!$full_name) {$full_name = $name;}
+        return $this->discourse_utilities()->discourse_request(
+            "/admin/groups.json",
+            [
+                'method' => 'POST',
+                'body' => [
+                    'group' => [
+                        'name' => $name,
+                        'full_name' => $full_name,
+                        'bio_raw' => $bio
+                    ] + $params + $this->default_discourse_group_settings()
+                ]
+            ]
+        );
+    }
+    // private function get_discourse_groups($auto_groups = false) {
+    //     $disc_utils = $this->discourse_utilities();
+    //     $groups = [];
+    //     $page = 0;
+    //     $total = 0;
+    //     do {
+    //         $res = $disc_utils->discourse_request("/groups.json?page=$page");
+    //         $total = $res->total_rows_groups;
+    //         array_push($groups, ...$res->groups);
+    //         $page++;
+    //     } while($total != count($groups));
+    //     if ($auto_groups) { return $groups; }
+    //     return array_values(array_filter($groups, function($g) {return !$g->automatic;}));
+    // }
     public function discourse_user_params($params, $user) {
         $disc_utils = $this->discourse_utilities();
         save_test($params);
