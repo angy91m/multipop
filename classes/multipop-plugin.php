@@ -1965,6 +1965,7 @@ class MultipopPlugin {
         save_test($params);
         save_test($this->get_discourse_groups_by_user( $this->get_discourse_user($user) ),1);
         save_test($this->get_discourse_groups(), 2);
+        $params['groups'] = 'prova_g';
         return $params;
     }
 }
