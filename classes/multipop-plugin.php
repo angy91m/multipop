@@ -1860,7 +1860,7 @@ class MultipopPlugin {
         }
     }
     private function discourse_utilities() {
-        if ($this->disc_utils) {return $this->disc_utils;}
+        if (isset($this->disc_utils)) {return $this->disc_utils;}
         if (class_exists('WPDiscourse\Utilities\Utilities')) {
             require_once(MULTIPOP_PLUGIN_PATH . '/classes/mpop-discourse-utilities.php');
             $this->disc_utils = new MpopDiscourseUtilities();
