@@ -14,6 +14,19 @@ $min_birthdate->setTime(0,0,0,0);
 $max_birthdate = date_create('now', new DateTimeZone('Europe/Rome'));
 $max_birthdate->setTime(0,0,0,0);
 $max_birthdate->sub(new DateInterval('P18Y'));
+if (!isset($post_data['mpop-logged-myaccount-nonce']) || !is_string($post_data['mpop-logged-myaccount-nonce'])) {
+    $res_data['error'] = ['nonce'];
+    $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
+    http_response_code( 400 );
+    echo json_encode( $res_data );
+    exit;
+} else if (!wp_verify_nonce($post_data['mpop-logged-myaccount-nonce'], 'mpop-logged-myaccount')) {
+    $res_data['error'] = ['nonce'];
+    $res_data['notices'] = [['type'=>'error', 'msg' => 'Pagina scaduta. Ricarica la pagina e riprova']];
+    http_response_code( 401 );
+    echo json_encode( $res_data );
+    exit;
+}
 if (str_starts_with($post_data['action'], 'admin_')) {
     if ($this->current_user_is_admin()) {
         require('admin-actions.php');

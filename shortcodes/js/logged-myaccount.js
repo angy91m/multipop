@@ -39,7 +39,8 @@ userRoles = [
     'administrator',
     'others'
 ],
-historyTabs = [];
+historyTabs = [],
+loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value;
 let searchUsersTimeout;
 createApp({
     components: {
@@ -547,7 +548,10 @@ createApp({
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(obj)
+                body: JSON.stringify({
+                    ...obj,
+                    'mpop-logged-myaccount-nonce': loggedMyAccountNonce
+                })
             });
         }
         onBeforeMount(()=> {

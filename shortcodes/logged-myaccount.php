@@ -449,6 +449,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
         </tr>
     </table>
 </div>
+<?php wp_nonce_field( 'mpop-logged-myaccount', 'mpop-logged-myaccount-nonce' ); ?>
 <script type="application/json" id="__MULTIPOP_DATA__">{
     "user": <?=json_encode($parsed_user)?>
 }</script>
