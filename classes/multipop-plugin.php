@@ -1713,7 +1713,7 @@ class MultipopPlugin {
         $roles = array_unique($roles);
         if (in_array('others', $roles)) {
             array_slice($roles, array_search('others', $roles), 1);
-            array_push($roles, ...array_filter(array_keys(wp_roles()->role_names), function($r) {return !in_array($r,$allowed_roles);}));
+            array_push($roles, ...array_filter(array_keys(wp_roles()->role_names), function($r) use ($allowed_roles) {return !in_array($r,$allowed_roles);}));
         }
         global $wpdb;
         if (count($roles)) {
