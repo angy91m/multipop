@@ -32,7 +32,7 @@ if (get_class($res) == 'WP_Error') {
     exit();
 } else {
     if (isset($_GET['redirect_to'])) {
-        header('location:'. site_url() . $_GET['redirect_to']);
+        header('location:'. $_GET['redirect_to']);
     } else {
         header('location:'. explode('?',$this->req_path)[0]);
     }
