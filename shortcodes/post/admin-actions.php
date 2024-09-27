@@ -7,6 +7,13 @@ switch( $post_data['action'] ) {
         break;
     case 'admin_view_user':
         if (isset($post_data['ID']) && is_numeric($post_data['ID']) && $post_data['ID'] > 0) {
+            if ($current_user->ID == intval($post_data['ID'])) {
+                $res_data['error'] = ['ID'];
+                $res_data['notices'] = [['type'=>'error', 'msg' => 'Impossibile modificare i tuoi dati']];
+                http_response_code( 400 );
+                echo json_encode( $res_data );
+                exit;
+            }
             $res_user = $this->myaccount_get_profile($post_data['ID'], true);
             if (!$res_user) {
                 $res_data['error'] = ['ID'];
