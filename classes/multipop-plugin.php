@@ -1715,18 +1715,19 @@ class MultipopPlugin {
             array_slice($roles, array_search('others', $roles), 1);
             array_push($roles, ...array_filter(array_keys(wp_roles()->role_names), function($r) {return !in_array($r,$allowed_roles);}));
         }
+        global $wpdb;
         if (count($roles)) {
             sort($roles);
             foreach($roles as $role) {
                 $meta_q['role'][] = [
-                    'key' => 'wp_capabilities',
+                    'key' => $wpdb->prefix . 'capabilities',
                     'value' => "\"$role\"",
                     'compare' => 'LIKE'
                 ];
             }
         } else {
             $meta_q['role'][] = [
-                'key' => 'wp_capabilities',
+                'key' => $wpdb->prefix . 'capabilities',
                 'compare' => 'NOT EXISTS'
             ];
         }
@@ -1759,7 +1760,7 @@ class MultipopPlugin {
             foreach ($sort_keys as $k) {
                 if (in_array($k, $allowed_field_sorts)) {
                     if ($k == 'role') {
-                        $fsort_by['wp_usermeta'] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
+                        $fsort_by[$wpdb->prefix . 'usermeta'] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
                     } else {
                         $fsort_by[$k] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
                     }
