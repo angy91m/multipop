@@ -91,6 +91,7 @@ $user_id = wp_insert_user([
         'mpop_id_card_issuer' => false,
         'mpop_id_card_issue_date' => false,
         'mpop_id_card_expiration' => false,
+        'mpop_profile_pending_edits' => false
     ]
 ]);
 

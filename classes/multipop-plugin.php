@@ -31,6 +31,7 @@ class MultipopPlugin {
         'completed',
         'refunded'
     ];
+    public ?object $disc_utils;
 
     // FORMAT DATETIME TO LOCAL STRING YYYY-MM-DD HH:MM:SS TZ
     private static function show_date_time($date) {
@@ -813,7 +814,7 @@ class MultipopPlugin {
                     );"
                 );
                 foreach ($users_to_disable as $u) {
-                    update_user_meta(intval($u), 'mpop_card_active', false);
+                    $this->disable_user_card($u);
                 }
 
                 // SET NEW YEAR
@@ -825,6 +826,21 @@ class MultipopPlugin {
                     $id = $cu->ID;
                     wp_set_current_user(0);
                     wp_set_current_user($id);
+                }
+            }
+        }
+    }
+
+    private function disable_user_card($user) {
+        if (is_string($user) || is_int($user)) {
+            $user = get_user_by('ID', intval($user));
+        }
+        if ($user->mpop_card_active) {
+            update_user_meta($user->ID, 'mpop_card_active', false);
+            if ($user->discourse_sso_user_id && in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
+                $disc_utils = $this->discourse_utilities();
+                if ($disc_utils) {
+                    $disc_utils->logout_user_from_discourse($user);
                 }
             }
         }
@@ -1463,8 +1479,14 @@ class MultipopPlugin {
         return $zones;
     }
     private function myaccount_get_profile($user, $add_labels = false) {
-        if (is_int($user)) {
-            $user = get_user_by('ID', $user);
+        if (!$user) {
+            return false;
+        }
+        if (is_int($user) || is_string($user)) {
+            $user = get_user_by('ID', intval($user));
+        }
+        if (!$user) {
+            return false;
         }
         $parsed_user = [
             'ID' => $user->ID,
@@ -1484,6 +1506,9 @@ class MultipopPlugin {
             'mpop_billing_zip' => $user->mpop_billing_zip,
             'mpop_billing_state' => $user->mpop_billing_state
         ];
+        if ($user->mpop_profile_pending_edits) {
+            $parsed_user['mpop_profile_pending_edits'] = json_decode($user->mpop_profile_pending_edits, true);
+        }
         if ($add_labels) {
             $comuni = false;
             if ($parsed_user['mpop_birthplace']) {
@@ -1505,71 +1530,6 @@ class MultipopPlugin {
         }
         return $parsed_user;
     }
-    // private function discourse_group_names() {
-    //     $sanitize_names = function($name) {
-    //         return preg_replace(
-    //             '/ |\'/',
-    //             '-',
-    //             str_replace(
-    //                 " - ",
-    //                 '-',
-    //                 mb_strtolower(
-    //                     iconv('UTF-8','ASCII//TRANSLIT', $name),
-    //                     'UTF-8'
-    //                 )
-    //             )
-    //         );
-    //     };
-    //     $group_names = ['wp_admins'];
-    //     $province = $this->get_province_all();
-    //     if ($province) {
-    //         foreach($province as $p) {
-    //             if ($p['soppressa']) {
-    //                 continue;
-    //             }
-    //             $r = ($sanitize_names)($p['regione']);
-    //             if (!in_array("wp_regione_$r", $group_names)) {
-    //                 $group_names[] = "wp_regione_$r";
-    //             }
-    //             $group_names[] = "wp_provincia_" . (($sanitize_names)($p['sigla']));
-    //         }
-    //     }
-    //     sort($group_names);
-    //     return $group_names;
-    // }
-    // public function discourse_groups($user) {
-    //     $sanitize_names = function($name) {
-    //         return preg_replace(
-    //             '/ |\'/',
-    //             '-',
-    //             str_replace(
-    //                 " - ",
-    //                 '-',
-    //                 mb_strtolower(
-    //                     iconv('UTF-8','ASCII//TRANSLIT', $name),
-    //                     'UTF-8'
-    //                 )
-    //             )
-    //         );
-    //     };
-    //     if (!isset($user)) {
-    //         return '';
-    //     }
-    //     if (is_string($user) ) {
-    //         $user = intval($user);
-    //     }
-    //     if (is_int($user) && $user) {
-    //         $user = get_user_by('ID', $user);
-    //     }
-    //     if (!is_object($user) || !isset($user->ID) || !$user->ID) {
-    //         return '';
-    //     }
-        
-    //     $group_names = $this->discourse_group_names();
-    //     foreach ($group_names as $gn) {
-            
-    //     }
-    // }
 
     private function pp_auth() {
         if (
@@ -1900,18 +1860,56 @@ class MultipopPlugin {
         }
     }
     private function discourse_utilities() {
+        if ($this->disc_utils) {return $this->disc_utils;}
         if (class_exists('WPDiscourse\Utilities\Utilities')) {
             require_once(MULTIPOP_PLUGIN_PATH . '/classes/mpop-discourse-utilities.php');
-            return new MpopDiscourseUtilities();
+            $this->disc_utils = new MpopDiscourseUtilities();
+            return $this->disc_utils;
         }
         return false;
     }
+    private function generate_user_discourse_groups($user_id) {
+        $user = false;
+        if (is_object($user_id)) {
+            $user = $user_id;
+        } else {
+            $user = get_user_by('ID', intval($user_id));
+        }
+        if (!$user) {
+            return false;
+        }
+        $groups = [];
+        if ($user->roles[0] == 'administrator') {
+            $groups[] = ['name' => 'mpop_wp_administrator', 'full_name' => 'Amministratori Wordpress'];
+        } else if (in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
+            if ($user->mpop_billing_state) {
+                $province = $this->get_province_all();
+                if ($province) {
+                    $provincia = array_pop( array_filter($province, function($p) use ($user) { return $p['sigla'] == $user->mpop_billing_state; }) );
+                    if ($provincia) {
+                        $groups[] = ['name' => 'mpop_provincia_'.$user->mpop_billing_state, 'full_name' => 'Provincia di ' . $provincia['nome']];
+                        $groups[] = ['name' => 'mpop_regione_' . str_replace( "'", '',str_replace( ' ', '_', strtolower( iconv('UTF-8','ASCII//TRANSLIT', $provincia['regione'] ) ) ) ), 'full_name' => 'Regione ' . $provincia['regione']];
+                    }
+                }
+            }
+        }
+        return $groups;
+    }
     public function discourse_user_params($params, $user) {
-        $disc_utils = $this->discourse_utilities();
-        save_test($params);
-        save_test($disc_utils->get_discourse_groups_by_user($user),1);
-        save_test($disc_utils->get_discourse_groups(true), 2);
-        $params['groups'] = 'prova_g';
+        $groups = $this->generate_user_discourse_groups($user);
+        if (count($groups)) {
+            $disc_utils = $this->discourse_utilities();
+            if ($disc_utils) {
+                $disc_groups = $disc_utils->get_discourse_mpop_groups();
+                foreach($groups as $g) {
+                    $found = array_filter($disc_groups, function($dg) use ($g) {return $dg['name'] == $g['name'];});
+                    if (!count($found)) {
+                        $disc_utils->create_discourse_group($g['name'], $g['full_name']);
+                    }
+                }
+            }
+            $params['groups'] = implode( ',', array_map(function($g) {return $g['name'];}, $groups) );
+        }
         return $params;
     }
 }

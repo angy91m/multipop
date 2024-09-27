@@ -46,7 +46,7 @@ switch ($post_data['action']) {
             echo json_encode( $res_data );
             exit;
         }
-        $post_birthdate = date_create('now', new DateTimeZone('Europe/Rome'));
+        $post_birthdate = date_create('now', new DateTimeZone(current_time('e')));
         $post_birthdate->setDate($date_arr[0], $date_arr[1], $date_arr[2]);
         $post_birthdate->setTime(0,0,0,0);
         if (
@@ -120,7 +120,7 @@ switch ($post_data['action']) {
     case 'update_profile':
         $comuni = false;
         $found_caps = [];
-        $card_active = $this->is_card_active($current_user->ID);
+        $card_active = $current_user->mpop_card_active;
         if (!isset($post_data['email']) || !is_string($post_data['email']) || !$this::is_valid_email(trim($post_data['email']), true)) {
             $res_data['error'] = ['email'];
         } else {
@@ -179,7 +179,7 @@ switch ($post_data['action']) {
                 }
                 $res_data['error'][] = 'mpop_birthdate';
             }
-            $date_arr = array_map(function ($dt) {return intval($dt);}, explode('-', $post_data['mpop_birthdate'] ) );
+            $date_arr = array_map(function ($dt) {return intval($dt);}, explode('-', strval($post_data['mpop_birthdate'] ) ) );
             if (
                 count($date_arr) != 3
                 || !checkdate($date_arr[1], $date_arr[2], $date_arr[0])
@@ -191,7 +191,7 @@ switch ($post_data['action']) {
                 $post_data['mpop_birthdate'] = '';
                 $post_data['mpop_birthplace'] = '';
             } else {
-                $post_data['mpop_birthdate'] = date_create('now', new DateTimeZone('Europe/Rome'));
+                $post_data['mpop_birthdate'] = date_create('now', new DateTimeZone(current_time('e')));
                 $post_data['mpop_birthdate']->setDate($date_arr[0], $date_arr[1], $date_arr[2]);
                 $post_data['mpop_birthdate']->setTime(0,0,0,0);
                 if (
@@ -254,7 +254,7 @@ switch ($post_data['action']) {
         $user_edits = [];
         if (
             (!$current_user->_new_email && $current_user->user_email != $post_data['email'])
-            || ($current_user->_new_email ? $current_user->_new_email != $post_data['email'] : false)
+            || ($current_user->_new_email && $current_user->_new_email != $post_data['email'])
         ) {
             $duplicated = get_user_by('email', $post_data['email']);
             if ($duplicated) {
@@ -290,16 +290,13 @@ switch ($post_data['action']) {
                 ];
                 $res_data['notices'] = [['type'=>'info', 'msg' => 'È stata inviata un\'e-mail di conferma all\'indirizzo indicato']];
             }
-        } else {
-            if ($current_user->user_email == $post_data['email']) {
-                if (isset($user_edits['meta_input'])) {
-                    $user_edits['meta_input'] = [];
-                }
-                $user_edits['meta_input']['_new_email'] = false;
+        } else if ($current_user->user_email == $post_data['email']) {
+            if (isset($user_edits['meta_input'])) {
+                $user_edits['meta_input'] = [];
             }
+            $user_edits['meta_input']['_new_email'] = false;
         }
         if ($card_active) {
-            $curr_profile = $this->myaccount_get_profile($current_user);
             $pending_edits = [];
             foreach([
                 'first_name',
@@ -309,11 +306,11 @@ switch ($post_data['action']) {
                 'mpop_billing_zip',
                 'mpop_billing_state'
             ] as $prop) {
-                if ($curr_profile[$prop] != $post_data[$prop]) {
+                if ($current_user->$prop != $post_data[$prop]) {
                     $pending_edits[$prop] = $post_data[$prop];
                 }
             }
-            if (!empty($pending_edits)) {
+            if (count($pending_edits)) {
                 if (!isset($user_edits['meta_input'])) {
                     $user_edits['meta_input'] = [];
                 }

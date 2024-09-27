@@ -4,38 +4,14 @@ defined( 'ABSPATH' ) || exit;
 
 class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
     public static function get_discourse_groups($force = false) {
-        if (!$force) {return parent::get_discourse_groups();}
-        $path                = '/groups';
-		$response            = static::discourse_request( $path );
-		$discourse_page_size = 36;
-
-		if ( ! is_wp_error( $response ) && ! empty( $response->groups ) ) {
-			$groups         = static::extract_groups( $response->groups );
-			$total_groups   = $response->total_rows_groups;
-			$load_more_path = $response->load_more_groups;
-
-			if ( ( $total_groups > $discourse_page_size ) ) {
-				$last_page = ( ceil( $total_groups / $discourse_page_size ) ) - 1;
-
-				foreach ( range( 1, $last_page ) as $index ) {
-					if ( $load_more_path ) {
-						$response       = static::discourse_request( $load_more_path );
-						$load_more_path = $response->load_more_groups;
-
-						if ( ! is_wp_error( $response ) && ! empty( $response->groups ) ) {
-						 	$groups = array_merge( $groups, static::extract_groups( $response->groups ) );
-						}
-					}
-				}
-			}
-
-			set_transient( 'wpdc_non_automatic_groups', $groups, 10 * MINUTE_IN_SECONDS );
-
-			return $groups;
-		} else {
-			return new WP_Error( 'wpdc_response_error', 'No groups were returned from Discourse.' );
-		}
+		if ($force) {delete_transient('wpdc_non_automatic_groups');}
+		return parent::get_discourse_groups();
     }
+	public static function get_discourse_mpop_groups($force = false) {
+		$res = static::get_discourse_groups($force);
+		if (is_wp_error($res)) {return $res;}
+		return array_values(array_filter($res, function($g) { return str_starts_with($g->name, 'mpop_'); }));
+	}
 	public static function default_discourse_group_settings() {
         return [
             'mentionable_level' => 4,
@@ -48,7 +24,7 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
             'members_visibility_level' => 2
         ];
     }
-	public static function create_discourse_group($name = '', $full_name = '', $bio = '', $params = []) {
+	public static function create_discourse_group(string $name = '', string $full_name = '', string $bio = '', array $params = []) {
         if (!$name) {return false;}
         if (!$full_name) {$full_name = $name;}
         $res = static::discourse_request(
@@ -64,12 +40,12 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
                 ]
             ]
         );
-		if ($res && $res->basic_group) {
+		if (!is_wp_error($res) && !empty($res->basic_group)) {
 			delete_transient('wpdc_non_automatic_groups');
 		}
 		return $res;
     }
-	public static function update_discourse_group($id, $params = null) {
+	public static function update_discourse_group($id, array $params = []) {
         if (empty($params)) { return false; }
         return static::discourse_request(
             "/groups/$id.json",
@@ -87,8 +63,8 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
     }
 	public static function get_discourse_groups_by_user($user_id, $auto_groups = false) {
 		$disc_user = static::mpop_discourse_user($user_id);
-		if(!$disc_user || !is_object($disc_user) || !$disc_user->user) {
-			return false;
+		if(is_wp_error($disc_user) || empty($disc_user->user)) {
+			return new WP_Error( 'wpdc_response_error', 'No users were returned from Discourse.' );
 		}
 		$group_names = [];
         foreach($disc_user->user->groups as $g) {
@@ -99,4 +75,27 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
         }
         return $group_names;
     }
+    public static function get_mpop_discourse_groups_by_user($user_id) {
+        $res = static::get_discourse_groups_by_user($user_id);
+        if (is_wp_error($res)) {return false;}
+        return array_values(array_filter($res, function($g) { return str_starts_with($g, 'mpop_'); }));
+    }
+	public static function logout_user_from_discourse($user_id) {
+		$user = false;
+		if (is_object($user_id)) {
+			$user = $user_id;
+		} else {
+			$user = get_user_by('ID',intval($user_id));
+		}
+		if (!$user) {
+			return false;
+		}
+		if ($user->discourse_sso_user_id) {
+			$res = $this->discourse_request( "/admin/users/$user->discourse_sso_user_id/log_out", array( 'method' => 'POST' ) );
+			if (is_wp_error($res)) {
+				return false;
+			}
+		}
+		return true;
+	}
 }

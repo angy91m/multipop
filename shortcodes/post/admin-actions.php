@@ -7,48 +7,13 @@ switch( $post_data['action'] ) {
         break;
     case 'admin_view_user':
         if (isset($post_data['ID']) && is_numeric($post_data['ID']) && $post_data['ID'] > 0) {
-            $user = get_user_by('ID', intval($post_data['ID']));
-            if (!$user) {
-                $res_data['error'] = ['id'];
+            $res_user = $this->myaccount_get_profile($post_data['ID'], true);
+            if (!$res_user) {
+                $res_data['error'] = ['ID'];
                 $res_data['notices'] = [['type'=>'error', 'msg' => 'Utente non trovato']];
                 http_response_code( 400 );
                 echo json_encode( $res_data );
                 exit;
-            }
-            $res_user = [
-                'ID' => intval($user->ID),
-                'login' => $user->user_login,
-                'email' => $user->user_email,
-                'first_name' => $user->first_name,
-                'last_name' => $user->last_name,
-                '_new_email' => $user->_new_email ? $user->_new_email : false,
-                'role' => $user->roles[0],
-                'registered' => $user->user_registered,
-                'mpop_mail_to_confirm' => boolval( $user->mpop_mail_to_confirm ),
-                'mpop_card_active' => boolval($user->mpop_card_active ),
-                'mpop_birthdate' => $user->mpop_birthdate,
-                'mpop_birthplace' => $user->mpop_birthplace,
-                'mpop_billing_city' => $user->mpop_billing_city,
-                'mpop_billing_zip' => $user->mpop_billing_zip,
-                'mpop_billing_state' => $user->mpop_billing_state,
-                'mpop_billing_address' => $user->mpop_billing_address
-            ];
-            $comuni = false;
-            if ($res_user['mpop_birthplace']) {
-                $comuni = $this->get_comuni_all();
-                $fc = array_values(array_filter($comuni, function($c) use ($res_user) {return $c['codiceCatastale'] == $res_user['mpop_birthplace'];}));
-                if (count($fc)) {
-                    $res_user['mpop_birthplace'] = $this->add_birthplace_labels(...$fc)[0];
-                }
-            }
-            if ($res_user['mpop_billing_city']) {
-                if (!isset($comuni)) {
-                    $comuni = $this->get_comuni_all();
-                }
-                $fc = array_values(array_filter($comuni, function($c) use ($res_user) {return $c['codiceCatastale'] == $res_user['mpop_billing_city'];}));
-                if (count($fc)) {
-                    $res_user['mpop_billing_city'] = $this->add_billing_city_labels(...$fc)[0];
-                }
             }
             $res_data['data'] = ['user' => $res_user];
         }
@@ -153,7 +118,7 @@ switch( $post_data['action'] ) {
                 $post_data['mpop_birthplace'] = '';
             }
         }
-        $date_arr = array_map(function ($dt) {return intval($dt);}, explode('-', $post_data['mpop_birthdate'] ) );
+        $date_arr = array_map(function ($dt) {return intval($dt);}, explode('-', strval( $post_data['mpop_birthdate'] ) ) );
         if (
             count($date_arr) != 3
             || !checkdate($date_arr[1], $date_arr[2], $date_arr[0])
@@ -165,7 +130,7 @@ switch( $post_data['action'] ) {
                 $res_data['error'][] = 'mpop_birthdate';
             }
         } else {
-            $post_data['mpop_birthdate'] = date_create('now', new DateTimeZone('Europe/Rome'));
+            $post_data['mpop_birthdate'] = date_create('now', new DateTimeZone(current_time('e')));
             $post_data['mpop_birthdate']->setDate($date_arr[0], $date_arr[1], $date_arr[2]);
             $post_data['mpop_birthdate']->setTime(0,0,0,0);
             if (
@@ -272,66 +237,75 @@ switch( $post_data['action'] ) {
                 $user_edits['meta_input'] = ['_new_email' => false];
             }
         }
-        if ($card_active) {
-            $curr_profile = $this->myaccount_get_profile($current_user);
-            $pending_edits = [];
-            foreach([
-                'first_name',
-                'last_name',
-                'mpop_billing_address',
-                'mpop_billing_city',
-                'mpop_billing_zip',
-                'mpop_billing_state'
-            ] as $prop) {
-                if ($curr_profile[$prop] != $post_data[$prop]) {
-                    $pending_edits[$prop] = $post_data[$prop];
-                }
-            }
-            if (!empty($pending_edits)) {
-                if (!isset($user_edits['meta_input'])) {
-                    $user_edits['meta_input'] = [];
-                }
-                $user_edits['meta_input']['mpop_profile_pending_edits'] = json_encode($pending_edits);
-                if (!isset($res_data['notices'])) {
-                    $res_data['notices'] = [];
-                }
-                $res_data['notices'][] = ['type'=>'info', 'msg' => 'I dati modificati sono in attesa di revisione'];
-            }
-        } else {
-            if (!isset($user_edits['meta_input'])) {
-                $user_edits['meta_input'] = [];
-            }
-            foreach([
-                'first_name',
-                'last_name',
-                'mpop_birthdate',
-                'mpop_birthplace',
-                'mpop_billing_address',
-                'mpop_billing_city',
-                'mpop_billing_zip',
-                'mpop_billing_state'
-            ] as $prop) {
-                switch($prop) {
-                    case 'mpop_birthdate':
-                        $user_edits['meta_input'][$prop] = $post_data[$prop]->format('Y-m-d');
-                        break;
-                    default:
-                        $user_edits['meta_input'][$prop] = $post_data[$prop];
-                }
-            }
-            if (count($user_edits)) {
-                delete_user_meta( $current_user->ID, 'mpop_profile_pending_edits' );
-                if (!isset($res_data['notices'])) {
-                    $res_data['notices'] = [];
-                }
-                $res_data['notices'][] = ['type'=>'success', 'msg' => 'Dati salvati correttamente'];
+
+        if (!isset($user_edits['meta_input'])) {
+            $user_edits['meta_input'] = [];
+        }
+        foreach([
+            'first_name',
+            'last_name',
+            'mpop_birthdate',
+            'mpop_birthplace',
+            'mpop_billing_address',
+            'mpop_billing_city',
+            'mpop_billing_zip',
+            'mpop_billing_state'
+        ] as $prop) {
+            switch($prop) {
+                case 'mpop_birthdate':
+                    $user_edits['meta_input'][$prop] = $post_data[$prop]->format('Y-m-d');
+                    break;
+                default:
+                    $user_edits['meta_input'][$prop] = $post_data[$prop];
             }
         }
         if (count($user_edits)) {
-            $user_edits['ID'] = $current_user->ID;
+            $user_edits['ID'] = $user->ID;
             wp_update_user( $user_edits );
+            delete_user_meta( $user->ID, 'mpop_profile_pending_edits' );
+            if (
+                $user->discourse_sso_user_id
+                && in_array($user->roles[0],['multipopolano', 'multipopolare_resp'])
+                && strval($user->mpop_billing_city) != strval($post_data['mpop_billing_city'])
+            ) {
+                $disc_utils = $this->discourse_utilities();
+                if ($disc_utils) {
+                    $current_user_groups = $disc_utils->get_mpop_discourse_groups_by_user($user);
+                    if ($current_user_groups) {
+                        $new_user_disc_groups = $this->generate_user_discourse_groups($user);
+                        $remove_groups = [];
+                        $add_groups = [];
+                        foreach($current_user_groups as $group) {
+                            if (!array_pop(array_filter($new_user_disc_groups, function($g) use ($group) {return $g['name'] == $group;}))) {
+                                $remove_groups[] = $group;
+                            }
+                        }
+                        foreach($new_user_disc_groups as $group) {
+                            if (!in_array($group['name'], $current_user_groups)) {
+                                $add_groups[] = $group;
+                            }
+                        }
+                        if (!empty($remove_groups)) {
+                            $disc_utils->remove_user_from_discourse_group($user->ID, implode(',',$remove_groups));
+                        }
+                        if (!empty($add_groups)) {
+                            $current_groups = $disc_utils->get_mpop_discourse_groups();
+                            foreach($add_groups as $group) {
+                                if (!array_pop(array_filter($current_groups, function($g) use ($group) {return $g['name'] == $group['name'];}))) {
+                                    $disc_utils->create_discourse_group($group['name'], $group['full_name']);
+                                }
+                            }
+                            $disc_utils->add_user_to_discourse_group($user->ID, implode(',', array_map(function($g) {return $g['name'];}, $add_groups)));
+                        }
+                    }
+                }
+            }
+            if (!isset($res_data['notices'])) {
+                $res_data['notices'] = [];
+            }
+            $res_data['notices'][] = ['type'=>'success', 'msg' => 'Dati salvati correttamente'];
         }
-        $res_data['data'] = ['user' => $this->myaccount_get_profile($current_user->ID, true)];
+        $res_data['data'] = ['user' => $this->myaccount_get_profile($user->ID, true)];
         break;
     default:
         $res_data['error'] = ['action'];
