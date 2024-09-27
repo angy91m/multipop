@@ -359,6 +359,9 @@ createApp({
             return history.pushState(historyTabs, '', url.href);
         }
         async function viewUser(ID, popstate = false) {
+            if (ID == profile.ID) {
+                return selectTab('summary');
+            }
             const res = await serverReq({
                action: 'admin_view_user',
                ID
