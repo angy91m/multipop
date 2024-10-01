@@ -260,7 +260,11 @@ switch( $post_data['action'] ) {
         ] as $prop) {
             switch($prop) {
                 case 'mpop_birthdate':
-                    $user_edits['meta_input'][$prop] = $post_data[$prop]->format('Y-m-d');
+                    if (is_object($post_data[$prop])) {
+                        $user_edits['meta_input'][$prop] = $post_data[$prop]->format('Y-m-d');
+                    } else {
+                        $user_edits['meta_input'][$prop] = $post_data[$prop];
+                    }
                     break;
                 default:
                     $user_edits['meta_input'][$prop] = $post_data[$prop];
