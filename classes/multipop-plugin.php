@@ -1881,7 +1881,7 @@ class MultipopPlugin {
         }
         $groups = [];
         if ($user->roles[0] == 'administrator') {
-            $groups[] = ['name' => 'mpop_wp_administrator', 'full_name' => 'Amministratori Wordpress'];
+            $groups[] = ['name' => 'mpop_wp_administrators', 'full_name' => 'Amministratori Wordpress'];
         } else if (in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
             if ($user->mpop_billing_state) {
                 $province = $this->get_province_all();
