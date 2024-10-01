@@ -1881,20 +1881,20 @@ class MultipopPlugin {
         }
         $groups = [];
         if ($user->roles[0] == 'administrator') {
-            $groups[] = ['name' => 'mpop_wp_admins', 'full_name' => 'Amministratori Wordpress'];
+            $groups[] = ['name' => 'mp_wp_admins', 'full_name' => 'Amministratori Wordpress'];
         } else if (in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
             if ($user->mpop_billing_state) {
                 $province = $this->get_province_all();
                 if ($province) {
                     $provincia = array_pop( array_filter($province, function($p) use ($user) { return $p['sigla'] == $user->mpop_billing_state; }) );
                     if ($provincia) {
-                        $groups[] = ['name' => 'mpop_provincia_'.$user->mpop_billing_state, 'full_name' => 'Provincia di ' . $provincia['nome']];
+                        $groups[] = ['name' => 'mp_provincia_'.$user->mpop_billing_state, 'full_name' => 'Provincia di ' . $provincia['nome']];
                         $regione_name = $provincia['regione'];
                         if ($regione_name !== "Valle d'Aosta") {
                             $regione_name = explode(' ', $regione_name)[0];
                         }
                         $regione_name = preg_replace("/ |'/", '', strtolower(iconv('UTF-8','ASCII//TRANSLIT', $regione_name)));
-                        $groups[] = ['name' => "mpop_reg_$regione_name", 'full_name' => 'Regione ' . $provincia['regione']];
+                        $groups[] = ['name' => "mp_reg_$regione_name", 'full_name' => 'Regione ' . $provincia['regione']];
                     }
                 }
             }

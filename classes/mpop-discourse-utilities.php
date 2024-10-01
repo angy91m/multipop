@@ -10,7 +10,7 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
 	public static function get_discourse_mpop_groups($force = false) {
 		$res = static::get_discourse_groups($force);
 		if (is_wp_error($res)) {return $res;}
-		return array_values(array_filter($res, function($g) { return str_starts_with($g->name, 'mpop_'); }));
+		return array_values(array_filter($res, function($g) { return str_starts_with($g->name, 'mp_'); }));
 	}
 	public static function default_discourse_group_settings() {
         return [
@@ -78,7 +78,7 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
     public static function get_mpop_discourse_groups_by_user($user_id) {
         $res = static::get_discourse_groups_by_user($user_id);
         if (is_wp_error($res)) {return false;}
-        return array_values(array_filter($res, function($g) { return str_starts_with($g, 'mpop_'); }));
+        return array_values(array_filter($res, function($g) { return str_starts_with($g, 'mp_'); }));
     }
 	public static function logout_user_from_discourse($user_id) {
 		$user = false;
