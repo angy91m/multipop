@@ -1881,7 +1881,7 @@ class MultipopPlugin {
         }
         $groups = [];
         if ($user->roles[0] == 'administrator') {
-            $groups[] = ['name' => 'mpop_wp_administrators', 'full_name' => 'Amministratori Wordpress'];
+            $groups[] = ['name' => 'mpop_wp_admins', 'full_name' => 'Amministratori Wordpress'];
         } else if (in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
             if ($user->mpop_billing_state) {
                 $province = $this->get_province_all();
@@ -1889,7 +1889,12 @@ class MultipopPlugin {
                     $provincia = array_pop( array_filter($province, function($p) use ($user) { return $p['sigla'] == $user->mpop_billing_state; }) );
                     if ($provincia) {
                         $groups[] = ['name' => 'mpop_provincia_'.$user->mpop_billing_state, 'full_name' => 'Provincia di ' . $provincia['nome']];
-                        $groups[] = ['name' => 'mpop_regione_' . str_replace( "'", '',str_replace( ' ', '_', strtolower( iconv('UTF-8','ASCII//TRANSLIT', $provincia['regione'] ) ) ) ), 'full_name' => 'Regione ' . $provincia['regione']];
+                        $regione_name = $provincia['regione'];
+                        if ($regione_name !== "Valle d'Aosta") {
+                            $regione_name = explode(' ', $regione_name)[0];
+                        }
+                        $regione_name = preg_replace("/ |'/", '', strtolower(iconv('UTF-8','ASCII//TRANSLIT', $regione_name)));
+                        $groups[] = ['name' => "mpop_reg_$regione_name", 'full_name' => 'Regione ' . $provincia['regione']];
                     }
                 }
             }
@@ -1905,7 +1910,7 @@ class MultipopPlugin {
                 foreach($groups as $g) {
                     $found = array_filter($disc_groups, function($dg) use ($g) {return $dg['name'] == $g['name'];});
                     if (!count($found)) {
-                        $disc_utils->create_discourse_group($g['name'], $g['full_name']);
+                        save_test($disc_utils->create_discourse_group($g['name'], $g['full_name']));
                     }
                 }
             }
