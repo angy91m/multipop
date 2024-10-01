@@ -1680,14 +1680,27 @@ class MultipopPlugin {
         $q->query_from .= ' INNER JOIN ' . $wpdb->prefix . 'usermeta AS search_first_name ON ( ' . $wpdb->prefix . 'users.ID = search_first_name.user_id ) INNER JOIN ' . $wpdb->prefix . 'usermeta AS search_last_name ON ( ' . $wpdb->prefix . 'users.ID = search_last_name.user_id )';
         remove_action('pre_user_query', [$this, 'user_search_pre_user_query']);
     }
+    private function parse_requested_roles($roles = true) {
+        $allowed_roles = ['administrator', 'multipopolano', 'multipopolare_resp', 'others'];
+        if ($roles === true) {
+            $roles = $allowed_roles;
+        }
+        foreach ($roles as $role) {
+            if (!is_string($role) || !trim($role) || !in_array($role, $allowed_roles)) {
+                return false;
+            }
+        }
+        $roles = array_unique($roles);
+        if (in_array('others', $roles)) {
+            array_slice($roles, array_search('others', $roles), 1);
+            array_push($roles, ...array_filter(array_keys(wp_roles()->role_names), function($r) use ($allowed_roles) {return !in_array($r,$allowed_roles);}));
+        }
+        return $roles;
+    }
     private function user_search($txt= '', $roles = true, $page = 1, $sort_by = ['ID' => true], $limit = 100) {
         $res = [];
         if (!is_array($roles) && $roles !== true) {
             return $res;
-        }
-        $allowed_roles = ['administrator', 'multipopolano', 'multipopolare_resp', 'others'];
-        if ($roles === true) {
-            $roles = $allowed_roles;
         }
         if (!is_int($page) || $page < 1) {
             $page = 1;
@@ -1699,22 +1712,16 @@ class MultipopPlugin {
             'paged' => $page,
             'number' => $limit
         ];
+        $roles = $this->parse_requested_roles($roles);
+        if (!$roles) {
+            return $res;
+        }
         $meta_q = [
             'relation' => 'AND',
             'role' => [
                 'relation' => 'OR'
             ]
         ];
-        foreach ($roles as $role) {
-            if (!is_string($role) || !trim($role) || !in_array($role, $allowed_roles)) {
-                return $res;
-            }
-        }
-        $roles = array_unique($roles);
-        if (in_array('others', $roles)) {
-            array_slice($roles, array_search('others', $roles), 1);
-            array_push($roles, ...array_filter(array_keys(wp_roles()->role_names), function($r) use ($allowed_roles) {return !in_array($r,$allowed_roles);}));
-        }
         global $wpdb;
         if (count($roles)) {
             sort($roles);
