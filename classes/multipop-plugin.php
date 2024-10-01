@@ -1910,7 +1910,7 @@ class MultipopPlugin {
                 foreach($groups as $g) {
                     $found = array_filter($disc_groups, function($dg) use ($g) {return $dg['name'] == $g['name'];});
                     if (!count($found)) {
-                        save_test($disc_utils->create_discourse_group($g['name'], $g['full_name']));
+                        $disc_utils->create_discourse_group($g['name'], $g['full_name']);
                     }
                 }
             }
