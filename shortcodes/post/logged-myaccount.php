@@ -369,6 +369,9 @@ switch ($post_data['action']) {
         }
         $res_data['data'] = ['user' => $this->myaccount_get_profile($current_user->ID, true)];
         break;
+    case 'get_profile':
+        $res_data['data'] = ['user' => $this->myaccount_get_profile($current_user->ID, true)];
+        break;
     case 'password_change':
         if (
             !isset($post_data['current'])

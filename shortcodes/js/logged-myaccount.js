@@ -215,6 +215,37 @@ createApp({
             }
 
         }
+        async function getProfile() {
+            const res = await serverReq({action: 'get_profile'});
+            if (res.ok) {
+                const newUser = await res.json();
+                if (newUser.data) {
+                    if (newUser.data.user) {
+                        for (const k in profile) {
+                            delete profile[k];
+                        }
+                        Object.assign(profile, newUser.data.user);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } else {
+                    console.error('Unknown error');
+                }
+                generateNotices(newUser.notices || []);
+            } else {
+                try {
+                    const {error, notices} = await res.json();
+                    if (error) {
+                        savingProfileErrors.push(...error);
+                        generateNotices(notices || []);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } catch {
+                    console.error('Unknown error');
+                }
+            }
+        }
         async function updateProfile() {
             saving.value = true;
             savingProfileErrors.length = 0;
@@ -535,8 +566,10 @@ createApp({
                         pushQueryParams({'view-user': null});
                     }
                 } else if (url.searchParams.has('view-user')) {
-                    tabName = 'userView';
                     viewUser(url.searchParams.get('view-user'), popstate);
+                }
+                if (tabName == 'summary') {
+                    getProfile();
                 }
             }
         }
