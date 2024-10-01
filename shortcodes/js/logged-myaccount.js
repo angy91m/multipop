@@ -262,8 +262,8 @@ createApp({
             saving.value = true;
             savingUserErrors.length = 0;
             userInEditing.email = userInEditing.email.trim().toLowerCase();
-            if (!userInView.mpop_mail_to_confirm && userInView.email == userInEditing.email) {
-                if (!confirm(`Stai eliminando settando l'e-mail principale dell'utente (${userInView.email}) come non confermata. Questo gli impedirà di effettuare un login fino a che non la confermerà nuovamente.\nSei sicuro di continuare?`)) {
+            if (!userInEditing.mpop_mail_confirmed &&!userInView.mpop_mail_to_confirm && userInView.email == userInEditing.email) {
+                if (!confirm(`Stai settando l'e-mail principale dell'utente (${userInView.email}) come non confermata. Questo gli impedirà di effettuare un login fino a che non la confermerà nuovamente.\nSei sicuro di continuare?`)) {
                     saving.value = false;
                     return;
                 }
