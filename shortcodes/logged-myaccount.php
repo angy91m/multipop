@@ -26,7 +26,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                         <ul @click="selectTab('card')">Tessera</ul>
                         <template v-if="profile.role == 'administrator'">
                             <hr>
-                            <ul><strong>ADMIN</strong></ul>
+                            <ul class="mpop-menu-title"><strong>ADMIN</strong></ul>
                             <ul @click="selectTab('users')">Utenti</ul>
                             <ul @click="selectTab('subscriptions')">Tessere</ul>
                         </template>
