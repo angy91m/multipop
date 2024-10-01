@@ -24,7 +24,12 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                         <ul @click="selectTab('summary')">Riepilogo</ul>
                         <ul @click="selectTab('passwordChange')">Cambio password</ul>
                         <ul @click="selectTab('card')">Tessera</ul>
-                        <ul v-if="profile.role == 'administrator'" @click="selectTab('users')">Utenti</ul>
+                        <template v-if="profile.role == 'administrator'">
+                            <hr>
+                            <ul><strong>ADMIN</strong></ul>
+                            <ul @click="selectTab('users')">Utenti</ul>
+                            <ul @click="selectTab('subscriptions')">Tessere</ul>
+                        </template>
                     </nav>
                 </div>
             </td>
