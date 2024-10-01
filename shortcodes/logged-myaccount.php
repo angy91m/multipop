@@ -21,15 +21,17 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                 <div>
                     <label for="mpop-tabs-nav" @click="displayNav = !displayNav">Menù</label>
                     <nav id="mpop-tabs-nav" v-if="displayNav">
-                        <ul @click="selectTab('summary')">Riepilogo</ul>
-                        <ul @click="selectTab('passwordChange')">Cambio password</ul>
-                        <ul @click="selectTab('card')">Tessera</ul>
-                        <template v-if="profile.role == 'administrator'">
-                            <hr>
-                            <ul class="mpop-menu-title"><strong>ADMIN</strong></ul>
-                            <ul @click="selectTab('users')">Utenti</ul>
-                            <ul @click="selectTab('subscriptions')">Tessere</ul>
-                        </template>
+                        <ul>
+                            <li @click="selectTab('summary')">Riepilogo</li>
+                            <li @click="selectTab('passwordChange')">Cambio password</li>
+                            <li @click="selectTab('card')">Tessera</li>
+                            <template v-if="profile.role == 'administrator'">
+                                <hr>
+                                <li class="mpop-menu-title"><strong>ADMIN</strong></li>
+                                <li @click="selectTab('users')">Utenti</li>
+                                <li @click="selectTab('subscriptions')">Tessere</li>
+                            </template>
+                        </ul>
                     </nav>
                 </div>
             </td>

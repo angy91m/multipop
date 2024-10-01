@@ -11,7 +11,6 @@
     margin-bottom: 18px;
 }
 #app table#mpop-main-table > tbody > tr > td:first-child div {
-    padding-right: 15px;
     border: solid 1px #aaa;
     border-radius: 5px;
     text-transform: uppercase;
@@ -24,13 +23,14 @@
     cursor: pointer;
     display: block;
 }
-#app table#mpop-main-table > tbody > tr > td:first-child ul {
+#app table#mpop-main-table > tbody > tr > td:first-child li {
     cursor: pointer;
     padding-left: 15px;
+    padding-right: 15px;
     font-family: sans-serif;
     font-size: 14px;
 }
-#app table#mpop-main-table > tbody > tr > td:first-child ul.mpop-menu-title {
+#app table#mpop-main-table > tbody > tr > td:first-child li.mpop-menu-title {
     cursor: default;
 }
 #app table#mpop-main-table > tbody > tr > td:nth-child(2) {
