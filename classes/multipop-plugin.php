@@ -410,7 +410,6 @@ class MultipopPlugin {
             `mail_from` VARCHAR(255) NOT NULL,
             `mail_from_name` VARCHAR(255) NOT NULL,
             `mail_general_notifications` TEXT NOT NULL,
-            `subscription_storage_path` VARCHAR(255) NULL,
             `last_webcard_number` BIGINT,
             `authorized_subscription_years` VARCHAR(255) NOT NULL,
             `last_year_checked` INT NOT NULL,
@@ -731,7 +730,6 @@ class MultipopPlugin {
         } else {
             $settings['authorized_subscription_years'] = [];
         }
-        $settings['subscription_storage_path'] = $settings['subscription_storage_path'] ? explode( ',', $settings['subscription_storage_path'] ) : [];
         $settings['min_subscription_payment'] = (double) $settings['min_subscription_payment'];
         $settings['pp_token_expiration'] = intval($settings['pp_token_expiration']);
         $settings['pp_sandbox'] = intval($settings['pp_sandbox']);

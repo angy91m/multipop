@@ -87,8 +87,6 @@ do_action('mpop_settings_notices', $this->get_settings());
     <input type="text" name="authorized_subscription_years" value="<?=implode(',',$this->settings['authorized_subscription_years'])?>" />
     <h4>Quota minima d'iscrizione</h4>
     <input type="number" min="0.01" step="0.01" name="min_subscription_payment" value="<?=$this->settings['min_subscription_payment']?>" />
-    <h4>Directory per il salvataggio documenti (separate da virgola)</h4>
-    <input type="text" name="subscription_storage_path" value="<?=implode(',',$this->settings['subscription_storage_path'])?>" />
     <hr>
     <?php wp_nonce_field( 'mpop-admin-settings', 'mpop-admin-settings-nonce' ); ?>
     <button class="button button-primary" id="mpop_settings_save">Salva</button>

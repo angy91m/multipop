@@ -110,23 +110,6 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
                 $edits['authorized_subscription_years'] = implode(',', $valid_years);
             }
         }
-        if (is_string($_REQUEST['subscription_storage_path'])) {
-            $_REQUEST['subscription_storage_path'] = trim($_REQUEST['subscription_storage_path']);
-            if (empty($_REQUEST['subscription_storage_path'])) {
-                $edits['subscription_storage_path'] = '';
-            } else {
-                $_REQUEST['subscription_storage_path'] = array_unique(array_map( function($v) {return trim($v);}, explode(',',$_REQUEST['subscription_storage_path'])));
-                $valid_paths = [];
-                foreach ($_REQUEST['subscription_storage_path'] as $p) {
-                    if (!empty($p)) {
-                        if (is_dir($p)) {
-                            $valid_paths[] = realpath($p);
-                        }
-                    }
-                }
-                $edits['subscription_storage_path'] = implode(',', array_unique($valid_paths));
-            }
-        }
         if (is_string($_REQUEST['min_subscription_payment']) && is_numeric($_REQUEST['min_subscription_payment'])) {
             $min_v = (double) $_REQUEST['min_subscription_payment'];
             $min_v = round($min_v * 100) / 100;
