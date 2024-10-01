@@ -270,7 +270,7 @@ createApp({
             }
             const res = await serverReq({
                 action: 'admin_update_user',
-                ID: userEditing.ID,
+                ID: userInEditing.ID,
                 email: userInEditing.email,
                 mpop_mail_confirmed: userInEditing.mpop_mail_confirmed,
                 first_name: userInEditing.first_name?.trim(),
