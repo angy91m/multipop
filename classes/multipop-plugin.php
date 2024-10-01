@@ -1888,7 +1888,7 @@ class MultipopPlugin {
                 if ($province) {
                     $provincia = array_pop( array_filter($province, function($p) use ($user) { return $p['sigla'] == $user->mpop_billing_state; }) );
                     if ($provincia) {
-                        $groups[] = ['name' => 'mp_provincia_'.$user->mpop_billing_state, 'full_name' => 'Provincia di ' . $provincia['nome']];
+                        $groups[] = ['name' => 'mp_prov_'.$user->mpop_billing_state, 'full_name' => 'Provincia di ' . $provincia['nome']];
                         $regione_name = $provincia['regione'];
                         if ($regione_name !== "Valle d'Aosta") {
                             $regione_name = explode(' ', $regione_name)[0];
