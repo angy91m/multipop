@@ -34,6 +34,7 @@ class MultipopPlugin {
         'refunded'
     ];
     public ?object $disc_utils;
+    public array $delayed_scripts = [];
 
     // FORMAT DATETIME TO LOCAL STRING YYYY-MM-DD HH:MM:SS TZ
     private static function show_date_time($date) {
@@ -118,8 +119,8 @@ class MultipopPlugin {
         return is_plugin_active($plugin);
     }
 
-    private static function internal_script(string $script, ...$argv) {
-        return exec('php "' .MULTIPOP_PLUGIN_PATH . 'internal_scripts/' . $script . '" ' . implode(' ', $argv) . ' > ' . MULTIPOP_PLUGIN_PATH . '/test-2.txt &');
+    private static function delay_script(string $script, ...$argv) {
+        return exec('php ' .MULTIPOP_PLUGIN_PATH . 'delayed_scripts/delayed.php ' . $script . ' ' . implode(' ', $argv) . ' > ' . MULTIPOP_PLUGIN_PATH .'/test-2.txt &');
         //return exec('php "' .MULTIPOP_PLUGIN_PATH . 'internal_scripts/' . $script . '" ' . implode(' ', $argv) . ' > /dev/null &');
     }
 
@@ -198,6 +199,11 @@ class MultipopPlugin {
         add_filter('discourse_email_verification', function() {return false;} );
         add_action('wpdc_sso_provider_before_sso_redirect', [$this, 'discourse_filter_login'], 10, 2 );
         add_filter('wpdc_sso_params', [$this, 'discourse_user_params'], 10, 2);
+        $this->delayed_scripts = [
+            'getDiscourseGroups' => function() {
+                save_test($this->discourse_utilities()->get_discourse_mpop_groups());
+            }
+        ];
     }
 
     // INITIALIZE PLUGIN
@@ -2257,7 +2263,7 @@ class MultipopPlugin {
             }
             $params['groups'] = implode( ',', array_map(function($g) {return $g['name'];}, $groups) );
         }
-        $this->internal_script('test-script.php');
+        $this->delay_script('getDiscourseGroups');
         return $params;
     }
 }
