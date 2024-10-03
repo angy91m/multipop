@@ -241,6 +241,24 @@ createApp({
                 }
             }
         }
+        function reduceZones(zones, target) {
+            const added = zones[zones.length - 1];
+            if (added.type == 'comune') {
+                if (target.zones.find(z => (z.type == 'provincia' && z.codice == added.provincia.codice) || (z.type == 'regione' && z.nome == added.provincia.regione) ) ) {
+                    target.zones.pop();
+                }
+            }
+            if (added.type == 'provincia') {
+                if (target.zones.find(z => (z.type == 'regione' && z.nome == added.regione) ) ) {
+                    target.zones.pop();
+                } else {
+                    target.zones = target.zones.filter(z => z.type != 'comune' || z.provincia.codice != added.codice);
+                }
+            }
+            if (added.type == 'regione') {
+                target.zones = target.zones.filter(z => z.type == 'regione' || (z.type == 'provincia' && z.regione != added.nome) || (z.type == 'comune' && z.provincia.regione != added.nome));
+            }
+        }
         async function getProfile() {
             const res = await serverReq({action: 'get_profile'});
             if (res.ok) {
@@ -742,6 +760,7 @@ createApp({
             userSearchZoneOpen,
             zoneSearch,
             searchZones,
+            reduceZones,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
         };
     }
