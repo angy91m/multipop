@@ -198,9 +198,13 @@ label[for="mpop-tabs-nav"] {
 }
 .mpop-100-wid {
     width: 100%;
+    margin-left: 0;
+    margin-right: 0;
 }
 .mpop-50-wid {
     width: 50%;
+    margin-left: 0;
+    margin-right: 0;
 }
 @media only screen and (min-width : 1024px) {
     #mpop-profile-table tr td:first-child,
