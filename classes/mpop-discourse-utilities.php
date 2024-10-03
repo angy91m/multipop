@@ -67,7 +67,6 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
         $res = static::discourse_request("/admin/groups/$id/owners.json",
             ['method' => 'DELETE', 'body' => ['user_id' => intval($user_id)]]
         );
-        save_test([$id,$user_id,$res]);
         return $res;
     }
     public static function get_group_members($name, int $limit = 100, int $offset = 0) {
