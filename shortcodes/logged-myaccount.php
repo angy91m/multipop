@@ -210,7 +210,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                             $uu = wp_get_current_user();
                             update_user_meta($uu->ID, 'mpop_test_meta', 'ciao');
                             $uu = get_user_by('ID', $uu->ID);
-                            htmlDump($uu->mpop_test_meta);
+                            echo html_dump($uu->mpop_test_meta);
                         ?>
                         Tessera
                     </div>
