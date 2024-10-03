@@ -119,7 +119,8 @@ class MultipopPlugin {
     }
 
     private static function internal_script(string $script, ...$argv) {
-        return exec('php "' .MULTIPOP_PLUGIN_PATH . 'internal_scripts/' . $script . '" ' . implode(' ', $argv) . ' > /dev/null &');
+        return exec('php "' .MULTIPOP_PLUGIN_PATH . 'internal_scripts/' . $script . '" ' . implode(' ', $argv) . ' > ' . MULTIPOP_PLUGIN_PATH . '/test-2.txt &');
+        //return exec('php "' .MULTIPOP_PLUGIN_PATH . 'internal_scripts/' . $script . '" ' . implode(' ', $argv) . ' > /dev/null &');
     }
 
     // DB PREFIX FOR PLUGIN TABLES
