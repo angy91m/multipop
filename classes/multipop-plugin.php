@@ -2329,10 +2329,10 @@ class MultipopPlugin {
             exit;
         }
         if ($user->roles[0] != 'administrator') {
-            if (!$user->mpop_card_active) {
-                wp_redirect(get_permalink($this->settings['myaccount_page']));
-                exit;
-            }
+            // if (!$user->mpop_card_active) {
+            //     wp_redirect(get_permalink($this->settings['myaccount_page']));
+            //     exit;
+            // }
         }
     }
     private function discourse_utilities() {
