@@ -357,12 +357,14 @@ createApp({
                     let zs;
                     switch (z.type) {
                         case 'regione':
-                            console.log(z);
                             zs = 'reg_' + z.nome;
+                            break;
                         case 'provincia':
                             zs = z.sigla;
+                            break;
                         case 'comune':
                             zs = z.codiceCatastale;
+                            break;
                     }
                     respZones.push(zs);
                 });
