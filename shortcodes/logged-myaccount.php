@@ -228,7 +228,12 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                                 @open="searchOpen('userSearchZone')"
                                 :get-option-label="(option) => option.untouched_label"
                                 :filter="fuseSearch"
-                                @option:selected="zones => reduceZones(zones, userSearch)"
+                                @option:selected="zones => {
+                                    const oldLen = zones.length;
+                                    reduceZones(zones, userSearch);
+                                    if (oldLen != zones.length) triggerSearchUsers();
+                                }"
+                                @option:deselected="triggerSearchUsers"
                                 @search="(searchTxt, loading) => {
                                     if (searchTxt.trim().length < 2) return loading(false);
                                     triggerSearch(searchTxt, loading, 'searchZones', 'users', userSearch);
