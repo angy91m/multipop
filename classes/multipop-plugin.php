@@ -201,9 +201,6 @@ class MultipopPlugin {
         add_action('wpdc_sso_provider_before_sso_redirect', [$this, 'discourse_filter_login'], 10, 2 );
         add_filter('wpdc_sso_params', [$this, 'discourse_user_params'], 10, 2);
         $this->delayed_scripts = [
-            // 'getDiscourseGroups' => function() {
-            //     save_test($this->discourse_utilities()->get_discourse_mpop_groups());
-            // }
             'updateDiscourseGroupsByUser' => function($user_id) {
                 sleep(10);
                 $this->update_discourse_groups_by_user($user_id);

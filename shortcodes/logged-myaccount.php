@@ -230,6 +230,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         <div class="mpop-user-search-field">
                             <v-select
                                 multiple
+                                placeholder="Residenza"
                                 id="userSearchZone-select"
                                 v-model="userSearch.zones"
                                 :options="zoneSearch.users"
