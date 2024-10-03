@@ -118,6 +118,10 @@ class MultipopPlugin {
         return is_plugin_active($plugin);
     }
 
+    private static function internal_script(string $script, ...$argv) {
+        return exec('"' .MULTIPOP_PLUGIN_PATH . 'internal_scripts/' . $script . '" ' . implode(' ', $argv) . ' > /dev/null &');
+    }
+
     // DB PREFIX FOR PLUGIN TABLES
     private static function db_prefix( $table ) {
         global $wpdb;
@@ -2253,6 +2257,7 @@ class MultipopPlugin {
             }
             $params['groups'] = implode( ',', array_map(function($g) {return $g['name'];}, $groups) );
         }
+        $this->internal_script('test-script.php');
         return $params;
     }
 }
