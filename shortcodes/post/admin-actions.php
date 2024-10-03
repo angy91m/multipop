@@ -195,6 +195,44 @@ switch( $post_data['action'] ) {
                 }
             }
         }
+        $parsed_resp_zones = false;
+        if ($user->roles[0] == 'multipopolare_resp' && isset($post_data['mpop_resp_zones']) && is_array($post_data['mpop_resp_zones'])) {
+            $parsed_resp_zones = [];
+            $regioni = false;
+            $province = false;
+            $comuni = false;
+            foreach ($post_data['mpop_resp_zones'] as $zone) {
+                if (!is_string($zone)) continue;
+                if (str_starts_with($zone, 'reg_')) {
+                    if (!$regioni) {
+                        $regioni = $this->get_regioni_all();
+                    }
+                    $found = $regioni[substr($zone, 4)];
+                    if ($found) {
+                        $parsed_resp_zones[] = ['nome' => substr($zone, 4), 'type' => 'regione', 'province' => $found];
+                    }
+                } else if (preg_match('/^[A-Z]{2}$/')) {
+                    if (!$province) {
+                        $province = $this->get_province_all();
+                    }
+                    $found = array_pop(array_filter($province, function($p) use ($zone) { return $p['sigla'] == $zone; }));
+                    if ($found) {
+                        $parsed_resp_zones[] = $found + ['type' => 'provincia'];
+                    }
+                } else if (preg_match('/^[A-Z]\d{3}$/')) {
+                    if (!$comuni) {
+                        $comuni = $this->get_comuni_all();
+                    }
+                    $found = array_pop(array_filter($comuni, function($c) use ($zone) { return $c['codiceCatastale'] == $zone; }));
+                    if ($found) {
+                        $parsed_resp_zones[] = $found + ['type' => 'comune'];
+                    }
+                }
+            }
+            if (count($parsed_resp_zones)) {
+                $parsed_resp_zones = $this->reduce_zones($parsed_resp_zones);
+            }
+        }
         if (isset($res_data['error'])) {
             http_response_code( 400 );
             echo json_encode( $res_data );
@@ -247,6 +285,23 @@ switch( $post_data['action'] ) {
 
         if (!isset($user_edits['meta_input'])) {
             $user_edits['meta_input'] = [];
+        }
+        if ($parsed_resp_zones) {
+            $resp_zones_edits = [];
+            foreach ($parsed_resp_zones as $zone) {
+                switch($zone['type']) {
+                    case 'regione':
+                        $resp_zones_edits[] = 'reg_' . $zone['nome'];
+                        break;
+                    case 'provincia':
+                        $resp_zones_edits[] = $zone['sigla'];
+                        break;
+                    case 'comune':
+                        $resp_zones_edits[] = $zone['codiceCatastale'];
+                        break;
+                }
+            }
+            $user_edits['meta_input']['mpop_resp_zones'] = $resp_zones_edits;
         }
         foreach([
             'first_name',

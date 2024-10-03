@@ -1540,12 +1540,17 @@ class MultipopPlugin {
     }
     private function retrieve_zones_from_resp_zones($resp_zones) {
         $zones = [];
+        $regioni_all = false;
+        $province_all = false;
+        $comuni_all = false;
         foreach($resp_zones as $zone) {
             if(str_starts_with($zone, 'reg_')) {
-                $regioni = $this->get_regioni_all();
+                if (!$regioni_all) {
+                    $regioni_all = $this->get_regioni_all();
+                }
                 $reg_fullname = substr($zone, 4);
-                if (isset($regioni[$reg_fullname])) {
-                    $province = $regioni[$reg_fullname];
+                if (isset($regioni_all[$reg_fullname])) {
+                    $province = $regioni_all[$reg_fullname];
                     $zone = [
                         'nome' => $reg_fullname,
                         'type' => 'regione',
@@ -1557,7 +1562,10 @@ class MultipopPlugin {
                 }
                 
             } else if (preg_match('/^[A-Z]{2}$/')) {
-                $found = array_pop(array_filter($this->get_province_all(), function($p) use ($zone) { return !$p['soppressa'] && $p['sigla'] == $zone; }));
+                if (!$province_all) {
+                    $province_all = $this->get_province_all();
+                }
+                $found = array_pop(array_filter($province_all, function($p) use ($zone) { return $p['sigla'] == $zone; }));
                 if ($found) {
                     $zone = $found +[
                         'type' => 'provincia',
@@ -1567,7 +1575,10 @@ class MultipopPlugin {
                     $zones[] = $zone;
                 }
             } else if (preg_match('/^[A-Z]\d{3}$/')) {
-                $found = array_pop(array_filter($this->get_comuni_all(), function($c) use ($zone) { return $c['codiceCatastale'] == $zone; }));
+                if (!$comuni_all) {
+                    $comuni_all = $this->get_comuni_all();
+                }
+                $found = array_pop(array_filter($comuni_all, function($c) use ($zone) { return $c['codiceCatastale'] == $zone; }));
                 if ($found) {
                     $zone = $found +[
                         'type' => 'comune',
@@ -1580,6 +1591,55 @@ class MultipopPlugin {
             }
         }
         return $zones;
+    }
+    private function reduce_zones(array $zones = []) {
+        $res = [];
+        usort($zones, function($a, $b) {
+            if ($a['type'] == $b['type']) {
+                return 0;
+            }
+            if ($a['type'] == 'regione') {
+                return -1;
+            }
+            if ($b['type'] == 'regione') {
+                return 1;
+            }
+            if ($a['type'] == 'provincia') {
+                return -1;
+            }
+            return 1;
+        });
+        foreach($zones as $zone) {
+            if ($zone['type'] == 'regione') {
+                if (!isset($res[$zone['nome']])) {
+                    $res[$zone['nome']] = $zone;
+                }
+            }
+            if ($zone['type'] == 'provincia') {
+                if (!array_pop(array_filter($res, function($z) use ($zone) {
+                    if (
+                        ($z['type'] == 'regione' && $z['nome'] == $zone['regione'])
+                        || ($z['type'] == 'provincia' && $z['sigla'] == $zone['sigla'])
+                    ) { return true;}
+                    return false;
+                }))) {
+                    $res[] = $zone;
+                }
+            }
+            if ($zone['type'] == 'comune') {
+                if (!array_pop(array_filter($res, function($z) use ($zone) {
+                    if (
+                        ($z['type'] == 'regione' && $z['nome'] == $zone['provincia']['regione'])
+                        || ($z['type'] == 'provincia' && $z['sigla'] == $zone['provincia']['sigla'])
+                        || ($z['type'] == 'comune' && $z['codiceCatastale'] == $zone['codiceCatastale'])
+                    ) {return true;}
+                    return false;
+                }))) {
+                    $res[] = $zone;
+                }
+            }
+        }
+        return $res;
     }
     private function myaccount_get_profile($user, $add_labels = false, $retrieve_resp_zones = false) {
         if (!$user) {
@@ -2305,11 +2365,15 @@ class MultipopPlugin {
             return false;
         }
         $groups = [];
+        $province_all = false;
+        $regioni_all = false;
         if ($user->roles[0] == 'administrator') {
             $groups[] = ['name' => 'mp_wp_admins', 'full_name' => 'Amministratori Wordpress', 'owner' => false];
         } else if (in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
             if ($user->mpop_billing_state) {
-                $province_all = $this->get_province_all();
+                if (!$province_all) {
+                    $province_all = $this->get_province_all();
+                }
                 if ($province_all) {
                     $provincia = array_pop( array_filter($province_all, function($p) use ($user) { return $p['sigla'] == $user->mpop_billing_state; }) );
                     if ($provincia) {
@@ -2325,12 +2389,17 @@ class MultipopPlugin {
                         $reg_fullname = substr($zone, 4);
                         $regione_name = $this->compact_regione_name($reg_fullname);
                         $groups[$reg_fullname] = ['name' => "mp_reg_$regione_name", 'full_name' => "Regione $reg_fullname", 'owner' => true];
-                        $regioni_all = $this->get_regioni_all();
+                        if (!$regioni_all) {
+                            $regioni_all = $this->get_regioni_all();
+                        }
                         foreach($regioni_all[$reg_fullname] as $p) {
                             $groups[$p['sigla']] = ['name' => "mp_prov_$p[sigla]", 'full_name' => "Provincia di $p[nome]", 'owner' => true];
                         }
                     } else if (preg_match('/^[A-Z]{2}$/', $zone)) {
-                        $provincia = array_pop(array_filter($this->get_province_all(), function($p) use ($zone) { return $p['sigla'] == $zone; }));
+                        if (!$province_all) {
+                            $province_all = $this->get_province_all();
+                        }
+                        $provincia = array_pop(array_filter($province_all, function($p) use ($zone) { return $p['sigla'] == $zone; }));
                         if ($provincia) {
                             $groups[$provincia['sigla']] = ['name' => "mp_prov_$provincia[sigla]", 'full_name' => "Provincia di $provincia[nome]", 'owner' => true];
                         }
