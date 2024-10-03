@@ -63,6 +63,11 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
             ['method' => 'PUT', 'body' => ['usernames' => implode(',', $owners)]]
         );
     }
+    public static function delete_discourse_group_owner(int $id, $user_id) {
+        return static::discourse_request("/groups/$id/owners.json",
+            ['method' => 'DELETE', 'body' => ['user_id' => intval($user_id)]]
+        );
+    }
     public static function get_group_members($name, int $limit = 100, int $offset = 0) {
         return static::discourse_request("/groups/$name/members.json?limit=$limit&offset=$offset");
     }
@@ -146,13 +151,11 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
             if ($change['new']) {
                 static::set_discourse_group_owners($change['id'], [$user->user_login]);
             } else {
-                $curr_owners = array_map(function($o) {return $o->username;}, static::get_discourse_group_owners($change['name']));
                 if ($change['owner']) {
-                    $curr_owners[] = $user->user_login;
+                    static::set_discourse_group_owners($change['id'], [$user->user_login]);
                 } else {
-                    $curr_owners = array_filter($curr_owners, function($o) use ($user) { return $o != $user->user_login; });
+                    static::delete_discourse_group_owner($change['id'], $user->ID);
                 }
-                static::set_discourse_group_owners($change['id'], $curr_owners);
             }
         }
     }
