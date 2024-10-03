@@ -199,6 +199,9 @@ label[for="mpop-tabs-nav"] {
 .mpop-100-wid {
     width: 100%;
 }
+.mpop-50-wid {
+    width: 50%;
+}
 @media only screen and (min-width : 1024px) {
     #mpop-profile-table tr td:first-child,
     #mpop-user-table tr td:first-child {

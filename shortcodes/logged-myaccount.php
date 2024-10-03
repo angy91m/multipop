@@ -221,13 +221,13 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     <div v-if="selectedTab == 'users'" id="mpop-user-search">
                         <h3>Utenti</h3>
                         <div class="mpop-user-search-field">
-                            <input type="text" v-model="userSearch.txt" @input="triggerSearchUsers" placeholder="Cerca utente" />
+                            <input type="text" v-model="userSearch.txt" @input="triggerSearchUsers" placeholder="Nome, e-mail, username" />
                         </div>
                         <div class="mpop-user-search-field" v-for="role in userRoles">
                             <label :for="'user-search-'+role">{{showRole(role)}}</label>
                             <input :id="'user-search-'+role" type="checkbox" v-model="userSearch.roles" @change="triggerSearchUsers" :value="role"/>
                         </div>
-                        <div class="mpop-user-search-field mpop-100-wid">
+                        <div class="mpop-user-search-field mpop-50-wid">
                             <label for="userSearchZone-select">Residenza</label>
                             <v-select
                                 multiple
