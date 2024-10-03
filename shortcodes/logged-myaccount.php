@@ -208,7 +208,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                     <div v-if="selectedTab == 'card'">
                         <?php
                             $uu = wp_get_current_user();
-                            update_user_meta($uu->ID, 'mpop_test_meta', 'ciao');
+                            update_user_meta($uu->ID, 'mpop_test_meta', ['ciao', 'prova']);
                             $uu = get_user_by('ID', $uu->ID);
                             echo html_dump($uu->mpop_test_meta);
                         ?>
