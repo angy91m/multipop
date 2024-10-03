@@ -1543,12 +1543,12 @@ class MultipopPlugin {
         $regioni_all = false;
         $province_all = false;
         $comuni_all = false;
-        foreach($resp_zones as $zone) {
-            if(str_starts_with($zone, 'reg_')) {
+        foreach($resp_zones as $resp_zone) {
+            if(str_starts_with($resp_zone, 'reg_')) {
                 if (!$regioni_all) {
                     $regioni_all = $this->get_regioni_all();
                 }
-                $reg_fullname = substr($zone, 4);
+                $reg_fullname = substr($resp_zone, 4);
                 if (isset($regioni_all[$reg_fullname])) {
                     $province = $regioni_all[$reg_fullname];
                     $zone = [
@@ -1561,11 +1561,11 @@ class MultipopPlugin {
                     $zones[] = $zone;
                 }
                 
-            } else if (preg_match('/^[A-Z]{2}$/')) {
+            } else if (preg_match('/^[A-Z]{2}$/', $resp_zone)) {
                 if (!$province_all) {
                     $province_all = $this->get_province_all();
                 }
-                $found = array_pop(array_filter($province_all, function($p) use ($zone) { return $p['sigla'] == $zone; }));
+                $found = array_pop(array_filter($province_all, function($p) use ($resp_zone) { return $p['sigla'] == $resp_zone; }));
                 if ($found) {
                     $zone = $found +[
                         'type' => 'provincia',
@@ -1574,11 +1574,11 @@ class MultipopPlugin {
                     $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT', $zone['untouched_label']);
                     $zones[] = $zone;
                 }
-            } else if (preg_match('/^[A-Z]\d{3}$/')) {
+            } else if (preg_match('/^[A-Z]\d{3}$/', $resp_zone)) {
                 if (!$comuni_all) {
                     $comuni_all = $this->get_comuni_all();
                 }
-                $found = array_pop(array_filter($comuni_all, function($c) use ($zone) { return $c['codiceCatastale'] == $zone; }));
+                $found = array_pop(array_filter($comuni_all, function($c) use ($resp_zone) { return $c['codiceCatastale'] == $resp_zone; }));
                 if ($found) {
                     $zone = $found +[
                         'type' => 'comune',
