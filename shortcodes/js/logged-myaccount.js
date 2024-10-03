@@ -465,7 +465,7 @@ createApp({
                 mpop_billing_city: []
             };
             delete reqObj.zones;
-            userSearch.zones.length.forEach(z => {
+            userSearch.zones.forEach(z => {
                 if (z.type == 'regione') reqObj.mpop_billing_state.push(...z.province.map(p => p.sigla));
                 if (z.type == 'provincia') reqObj.mpop_billing_state.push(z.sigla);
                 if (z.type == 'comune') reqObj.mpop_billing_city.push(z.codiceCatastale);
