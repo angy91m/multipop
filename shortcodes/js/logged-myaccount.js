@@ -58,6 +58,7 @@ createApp({
         birthplaceOpen = ref(false),
         billingCityOpen = ref(false),
         userSearchZoneOpen = ref(false),
+        userEditingRespZoneOpen = ref(false),
         saving = ref(false),
         savingProfileErrors = reactive([]),
         savingUserErrors = reactive([]),
@@ -82,7 +83,8 @@ createApp({
         }),
         zoneSearch = reactive({
             users: [],
-            subscriptions: []
+            subscriptions: [],
+            mpop_resp: []
         }),
         userSearchLimit = ref(100),
         foundUsers = reactive([]),
@@ -221,7 +223,7 @@ createApp({
             }
 
         }
-        async function searchZones(txt, ctx, target) {
+        async function searchZones(txt, ctx, target, zonesKey = 'zones') {
             if (zoneSearch[ctx]) {
                 const res = await serverReq({
                     action: 'admin_search_zones',
@@ -231,7 +233,7 @@ createApp({
                     const zones = await res.json();
                     if (zones.data) {
                         zoneSearch[ctx].length = 0;
-                        zoneSearch[ctx].push(...target.zones);
+                        zoneSearch[ctx].push(...target[zonesKey]);
                         zoneSearch[ctx].push(...zones.data.filter(z => !zoneSearch[ctx].find(zz => z.type == zz.type && (z.type == 'regione' ? z.nome == zz.nome : z.codice == zz.codice))));
                     } else {
                         console.error('Unknown error');
@@ -247,22 +249,22 @@ createApp({
             const func = eval(callable);
             triggerSearchTimeout = setTimeout( () => func(txt, ...args).then(() => loading(false)), 500);
         }
-        function reduceZones(zones, target) {
+        function reduceZones(zones, target, zonesKey = 'zones') {
             const added = zones[zones.length - 1];
             if (added.type == 'comune') {
-                if (target.zones.find(z => (z.type == 'provincia' && z.codice == added.provincia.codice) || (z.type == 'regione' && z.nome == added.provincia.regione) ) ) {
-                    target.zones.pop();
+                if (target[zonesKey].find(z => (z.type == 'provincia' && z.codice == added.provincia.codice) || (z.type == 'regione' && z.nome == added.provincia.regione) ) ) {
+                    target[zonesKey].pop();
                 }
             }
             if (added.type == 'provincia') {
-                if (target.zones.find(z => (z.type == 'regione' && z.nome == added.regione) ) ) {
-                    target.zones.pop();
+                if (target[zonesKey].find(z => (z.type == 'regione' && z.nome == added.regione) ) ) {
+                    target[zonesKey].pop();
                 } else {
-                    target.zones = target.zones.filter(z => z.type != 'comune' || z.provincia.codice != added.codice);
+                    target[zonesKey] = target[zonesKey].filter(z => z.type != 'comune' || z.provincia.codice != added.codice);
                 }
             }
             if (added.type == 'regione') {
-                target.zones = target.zones.filter(z => z.type == 'regione' || (z.type == 'provincia' && z.regione != added.nome) || (z.type == 'comune' && z.provincia.regione != added.nome));
+                target[zonesKey] = target[zonesKey].filter(z => z.type == 'regione' || (z.type == 'provincia' && z.regione != added.nome) || (z.type == 'comune' && z.provincia.regione != added.nome));
             }
         }
         async function getProfile() {
@@ -606,6 +608,7 @@ createApp({
             }
             userInEditing.mpop_mail_confirmed = !userInEditing._new_email && !userInEditing.mpop_mail_to_confirm;
             userInEditing.mail_edited = false;
+            userInEditing.mpop_resp_zones = JSON.parse(JSON.stringify(userInEditing.mpop_resp_zones));
         }
         function cancelEditUser() {
             userEditing.value = false;
@@ -762,6 +765,7 @@ createApp({
             updateUser,
             fuseSearch,
             userSearchZoneOpen,
+            userEditingRespZoneOpen,
             zoneSearch,
             triggerSearch,
             reduceZones,

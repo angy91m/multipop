@@ -362,7 +362,53 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             </tr>
                             <tr v-if="userInView.role == 'multipopolare_resp'">
                                 <td><strong>Zone:</strong></td>
-                                <td><ul><li>voce</li><li>vocea</li></ul></td>
+                                <td v-if="!userEditing">
+                                    <template v-if="userInView.mpop_resp_zones.length">
+                                        <ul>
+                                            <li v-for="z in userInView.mpop_resp_zones">{{z.untouched_label}}</li>
+                                        </ul>
+                                    </template>
+                                    <template v-else>
+                                        Nessuna zona assegnata
+                                    </template>
+                                </td>
+                                <td v-else>
+                                    <v-select
+                                        multiple
+                                        id="userEditingRespZone-select"
+                                        v-model="userInEditing.mpop_resp_zones"
+                                        :options="zoneSearch.mpop_resp"
+                                        @close="userEditingRespZoneOpen = false"
+                                        @open="searchOpen('userEditingRespZone')"
+                                        :get-option-label="(option) => option.untouched_label"
+                                        :filter="fuseSearch"
+                                        @option:selected="zones => reduceZones(zones, userInEditing, 'mpop_resp_zones')"
+                                        @search="(searchTxt, loading) => {
+                                            if (searchTxt.trim().length < 2) return loading(false);
+                                            triggerSearch(searchTxt, loading, 'searchZones', 'mpop_resp', userInEditing, 'mpop_resp_zones');
+                                        }"
+                                    >
+                                        <template #search="{ attributes, events }">
+                                            <input
+                                                class="vs__search"
+                                                :style="'display: ' + (userEditingRespZoneOpen ? 'unset' : 'none')"
+                                                v-bind="attributes"
+                                                v-on="events"
+                                            />
+                                        </template>
+                                        <template v-slot:option="zone">
+                                            {{zone.untouched_label}}
+                                        </template>
+                                        <template v-slot:no-options="{search}">
+                                            <template v-if="search.trim().length > 1">
+                                                Nessun risultato per "{{search}}"
+                                            </template>
+                                            <template v-else>
+                                                Inserisci almeno 2 caratteri
+                                            </template>
+                                        </template>
+                                    </v-select>
+                                </td>
                             </tr>
                             <tr>
                                 <td><strong>Data di nascita:</strong></td>
