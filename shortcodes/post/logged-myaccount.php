@@ -367,10 +367,10 @@ switch ($post_data['action']) {
             $user_edits['ID'] = $current_user->ID;
             wp_update_user( $user_edits );
         }
-        $res_data['data'] = ['user' => $this->myaccount_get_profile($current_user->ID, true)];
+        $res_data['data'] = ['user' => $this->myaccount_get_profile($current_user->ID, true, true)];
         break;
     case 'get_profile':
-        $res_data['data'] = ['user' => $this->myaccount_get_profile($current_user->ID, true)];
+        $res_data['data'] = ['user' => $this->myaccount_get_profile($current_user->ID, true, true)];
         break;
     case 'password_change':
         if (

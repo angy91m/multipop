@@ -165,8 +165,18 @@ if (!$errors->has_errors()) {
                 }
                 if ($user->role == 'administrator') {
                     delete_user_meta($user->ID, '_new_email');
+                } else {
+                    $disc_utils = $this->discourse_utilities();
+                    if ($disc_utils) {
+                        $disc_utils->logout_user_from_discourse($user);
+                    }
                 }
                 delete_user_meta($user->ID, 'mpop_mail_to_confirm');
+            }
+            if ($update && $user->role != 'multipopolare_resp') {
+                if ($old_user->mpop_resp_zones) {
+                    delete_user_meta($user->ID, 'mpop_resp_zones');
+                }
             }
             if ($update && in_array($user->role, ['administrator', 'multipopolare_resp'])) {
                 // EXTRAFLOW FOR ROLES administrator & multipopolare_resp UPDATE
@@ -247,5 +257,8 @@ if (!$errors->has_errors()) {
     }
     foreach($user_meta as $k => $v) {
         update_user_meta($user->ID, $k, $v);
+    }
+    if (in_array($user->role[0], ['administrator', 'multipopolano', 'multipopolare_resp'])) {
+        $this->update_discourse_groups_by_user($user);
     }
 }

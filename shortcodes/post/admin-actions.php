@@ -14,7 +14,7 @@ switch( $post_data['action'] ) {
                 echo json_encode( $res_data );
                 exit;
             }
-            $res_user = $this->myaccount_get_profile($post_data['ID'], true);
+            $res_user = $this->myaccount_get_profile($post_data['ID'], true, true);
             if (!$res_user) {
                 $res_data['error'] = ['ID'];
                 $res_data['notices'] = [['type'=>'error', 'msg' => 'Utente non trovato']];
@@ -274,7 +274,7 @@ switch( $post_data['action'] ) {
             $user_edits['ID'] = $user->ID;
             wp_update_user( $user_edits );
             delete_user_meta( $user->ID, 'mpop_profile_pending_edits' );
-            if ($user->discourse_sso_user_id) {
+            if ($user->discourse_sso_user_id && in_array($user->roles[0], ['administrator', 'multipopolano', 'multipopolare_resp'])) {
                 $this->update_discourse_groups_by_user($user);
             }
             if (!isset($res_data['notices'])) {
@@ -282,7 +282,7 @@ switch( $post_data['action'] ) {
             }
             $res_data['notices'][] = ['type'=>'success', 'msg' => 'Dati salvati correttamente'];
         }
-        $res_data['data'] = ['user' => $this->myaccount_get_profile($user->ID, true)];
+        $res_data['data'] = ['user' => $this->myaccount_get_profile($user->ID, true, true)];
         break;
     case 'admin_search_subscriptions':
         $res = $this->search_subscriptions($post_data);

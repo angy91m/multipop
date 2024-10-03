@@ -146,7 +146,11 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
                 static::update_discourse_group($change['id'],['owner_usernames' => $user->user_login]);
             } else {
                 $curr_owners = array_map(function($o) {return $o->username;}, static::get_group_owners($change['name']));
-                $curr_owners[] = $user->user_login;
+                if ($change['owner']) {
+                    $curr_owners[] = $user->user_login;
+                } else {
+                    $curr_owners = array_filter($curr_owners, function($o) use ($user) { return $o != $user->user_login; });
+                }
                 static::update_discourse_group($change['id'],['owner_usernames' => implode(',', $curr_owners)]);
             }
         }

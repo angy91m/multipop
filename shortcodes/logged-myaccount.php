@@ -8,7 +8,7 @@ if (
     require_once('post/logged-myaccount.php');
     exit;
 }
-$parsed_user = $this->myaccount_get_profile($current_user, true);
+$parsed_user = $this->myaccount_get_profile($current_user, true, true);
 
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/logged-myaccount.css">

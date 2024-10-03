@@ -1538,7 +1538,50 @@ class MultipopPlugin {
         });
         return $zones;
     }
-    private function myaccount_get_profile($user, $add_labels = false) {
+    private function retrieve_zones_from_resp_zones($resp_zones) {
+        $zones = [];
+        foreach($resp_zones as $zone) {
+            if(str_starts_with($zone, 'reg_')) {
+                $regioni = $this->get_regioni_all();
+                $reg_fullname = substr($zone, 4);
+                if (isset($regioni[$reg_fullname])) {
+                    $province = $regioni[$reg_fullname];
+                    $zone = [
+                        'nome' => $reg_fullname,
+                        'type' => 'regione',
+                        'untouched_label' => 'Regione: ' . mb_strtoupper($reg_fullname, 'UTF-8'),
+                        'province' => $province
+                    ];
+                    $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT', $zone['untouched_label']);
+                    $zones[] = $zone;
+                }
+                
+            } else if (preg_match('/^[A-Z]{2}$/')) {
+                $found = array_pop(array_filter($this->get_province_all(), function($p) use ($zone) { return !$p['soppressa'] && $p['sigla'] == $zone; }));
+                if ($found) {
+                    $zone = $found +[
+                        'type' => 'provincia',
+                        'untouched_label' => 'Provincia: ' . mb_strtoupper($found['nome'], 'UTF-8')
+                    ];
+                    $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT', $zone['untouched_label']);
+                    $zones[] = $zone;
+                }
+            } else if (preg_match('/^[A-Z]\d{3}$/')) {
+                $found = array_pop(array_filter($this->get_comuni_all(), function($c) use ($zone) { return $c['codiceCatastale'] == $zone; }));
+                if ($found) {
+                    $zone = $found +[
+                        'type' => 'comune',
+                        'untouched_label' => 'Comune: ' . mb_strtoupper($found['nome'], 'UTF-8')
+                    ];
+                    $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT', $zone['untouched_label']);
+                    $zone['untouched_label'] .= ' (' . $found['provincia']['sigla'] . ')';
+                    $zones[] = $zone;
+                }
+            }
+        }
+        return $zones;
+    }
+    private function myaccount_get_profile($user, $add_labels = false, $retrieve_resp_zones = false) {
         if (!$user) {
             return false;
         }
@@ -1564,7 +1607,8 @@ class MultipopPlugin {
             'mpop_billing_address' => $user->mpop_billing_address,
             'mpop_billing_city' => $user->mpop_billing_city,
             'mpop_billing_zip' => $user->mpop_billing_zip,
-            'mpop_billing_state' => $user->mpop_billing_state
+            'mpop_billing_state' => $user->mpop_billing_state,
+            'mpop_resp_zones' => []
         ];
         if ($user->mpop_profile_pending_edits) {
             $parsed_user['mpop_profile_pending_edits'] = json_decode($user->mpop_profile_pending_edits, true);
@@ -1587,6 +1631,9 @@ class MultipopPlugin {
                     $parsed_user['mpop_billing_city'] = $this->add_billing_city_labels(...$fc)[0];
                 }
             }
+        }
+        if ($retrieve_resp_zones && $user->roles[0] == 'multipopolare_resp' && !empty($user->mpop_resp_zones)) {
+            $parsed_user['mpop_resp_zones'] = $this->retrieve_zones_from_resp_zones($user->mpop_resp_zones);
         }
         return $parsed_user;
     }
@@ -2179,7 +2226,7 @@ class MultipopPlugin {
         $users = [];
         foreach($res as $u) {
             $billing_city = $u->mpop_billing_city ? array_pop(array_filter($comuni_all, function($c) use ($u) {return $c['codiceCatastale'] == $u->mpop_billing_city; } )) : '';
-            $users[] = [
+            $parsed_u = [
                 'ID' => intval($u->ID),
                 'login' => $u->user_login,
                 'email' => $u->user_email,
@@ -2190,8 +2237,12 @@ class MultipopPlugin {
                 'mpop_mail_to_confirm' => boolval($u->mpop_mail_to_confirm ),
                 'mpop_billing_state' => $u->mpop_billing_state,
                 'mpop_billing_city' => $billing_city ? $billing_city['nome'] : '',
-                'zones' => []
+                'mpop_resp_zones' => []
             ];
+            if ($u->roles[0] == 'multipopolare_resp' && !empty($u->mpop_resp_zones)) {
+                $parsed_u['mpop_resp_zones'] = $this->retrieve_zones_from_resp_zones( $u->mpop_resp_zones );
+            }
+            $users[] = $parsed_u;
         }
         return [$users, $total, $limit];
     }
@@ -2247,10 +2298,9 @@ class MultipopPlugin {
     private function generate_user_discourse_groups($user_id) {
         $user = false;
         if (is_object($user_id)) {
-            $user = $user_id;
-        } else {
-            $user = get_user_by('ID', intval($user_id));
+            $user_id = $user_id->ID;
         }
+        $user = get_user_by('ID', intval($user_id));
         if (!$user) {
             return false;
         }
