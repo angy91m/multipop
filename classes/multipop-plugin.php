@@ -1979,7 +1979,7 @@ class MultipopPlugin {
         }
         return $roles;
     }
-    private function user_search($txt= '', $roles = true, $page = 1, $sort_by = ['ID' => true], $limit = 100) {
+    private function user_search($txt= '', $roles = true, array $mpop_billing_state = [], array $mpop_billing_city = [], $page = 1, $sort_by = ['ID' => true], $limit = 100) {
         $res = [];
         if (!is_array($roles) && $roles !== true) {
             return $res;
@@ -2023,6 +2023,22 @@ class MultipopPlugin {
         if (is_string($txt) && trim($txt) && !preg_match("\r|\n|\t",$txt)) {
             $query['mpop_custom_search'] = $txt;
             add_action('pre_user_query', [$this, 'user_search_pre_user_query']);
+        }
+        $mpop_billing_state = array_values(array_unique(array_filter($mpop_billing_state, function($s) { return preg_match('/^[A-Z]{2}$/', $s); })));
+        $mpop_billing_city = array_values(array_unique(array_filter($mpop_billing_city, function($s) { return preg_match('/^[A-Z]\d{3}$/', $s); })));
+        if (count($mpop_billing_state)) {
+            $meta_q['mpop_billing_state'] = [
+                'key' => 'mpop_billing_state',
+                'compare' => 'IN',
+                'value' => $mpop_billing_state
+            ];
+        }
+        if (count($mpop_billing_city)) {
+            $meta_q['mpop_billing_city'] = [
+                'key' => 'mpop_billing_city',
+                'compare' => 'IN',
+                'value' => $mpop_billing_city
+            ];
         }
         $allowed_field_sorts = [
             'ID',
@@ -2070,6 +2086,10 @@ class MultipopPlugin {
                             $fsort_by[$k] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
                             break;
                         default:
+                            if (isset($meta_q[$k])) {
+                                $fsort_by[$k] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
+                                break;
+                            }
                             $meta_q[$k] = [
                                 'relation' => 'OR',
                                 $k.'_exists' => [

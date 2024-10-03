@@ -2,7 +2,7 @@
 defined( 'ABSPATH' ) || exit;
 switch( $post_data['action'] ) {
     case 'admin_search_users':
-        [$users, $total, $limit] = $this->user_search($post_data['txt'], $post_data['roles'], $post_data['page'], $post_data['sortBy']);
+        [$users, $total, $limit] = $this->user_search($post_data['txt'], $post_data['roles'], $post_data['mpop_billing_state'], $post_data['mpop_billing_city'], $post_data['page'], $post_data['sortBy']);
         $res_data['data'] = ['users' => $users, 'total' => $total, 'limit' => $limit];
         break;
     case 'admin_view_user':
