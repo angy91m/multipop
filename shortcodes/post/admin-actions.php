@@ -286,7 +286,7 @@ switch( $post_data['action'] ) {
         if (!isset($user_edits['meta_input'])) {
             $user_edits['meta_input'] = [];
         }
-        if ($parsed_resp_zones) {
+        if (is_array($parsed_resp_zones)) {
             $resp_zones_edits = [];
             foreach ($parsed_resp_zones as $zone) {
                 switch($zone['type']) {
