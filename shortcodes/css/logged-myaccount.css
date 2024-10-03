@@ -217,3 +217,14 @@ label[for="mpop-tabs-nav"] {
         display: block;
     }
 }
+@media only screen and (max-width : 480px) {
+    #app table td {
+        display: block;
+    }
+    .mpop-user-search-field {
+        display: block;
+        margin-left: 0;
+        margin-right: 0;
+        width: 100%;
+    }
+}
