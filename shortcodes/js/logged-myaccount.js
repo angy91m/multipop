@@ -717,7 +717,7 @@ createApp({
             openVar.value = true;
             setTimeout(()=> document.querySelector('#'+tag+'-select .vs__search').select(),300);
         }
-        function showRole(role) {
+        function showRole(role = '') {
             switch(role) {
                 case 'multipopolare_resp':
                     role = 'Responsabile';
