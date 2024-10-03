@@ -59,9 +59,9 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
         );
     }
     public static function get_group_members($name, int $limit = 100, int $offset = 0) {
-        return static::discourse_request("/groups/$name/members.json&limit=$limit&offset=$offset");
+        return static::discourse_request("/groups/$name/members.json?limit=$limit&offset=$offset");
     }
-    public static function get_group_owners($name) {
+    public static function get_discourse_group_owners($name) {
         $res = static::get_group_members($name, 0, 0);
         if (is_wp_error($res)) {return $res;}
         return $res->owners;
@@ -145,7 +145,7 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
             if ($change['new']) {
                 static::update_discourse_group($change['id'],['owner_usernames' => $user->user_login]);
             } else {
-                $curr_owners = array_map(function($o) {return $o->username;}, static::get_group_owners($change['name']));
+                $curr_owners = array_map(function($o) {return $o->username;}, static::get_discourse_group_owners($change['name']));
                 if ($change['owner']) {
                     $curr_owners[] = $user->user_login;
                 } else {
