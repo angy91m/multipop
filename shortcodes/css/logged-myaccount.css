@@ -196,6 +196,9 @@ label[for="mpop-tabs-nav"] {
     min-height: 40px;
     height: fit-content;
 }
+.mpop-100-wid {
+    width: 100%;
+}
 @media only screen and (min-width : 1024px) {
     #mpop-profile-table tr td:first-child,
     #mpop-user-table tr td:first-child {

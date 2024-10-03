@@ -227,10 +227,10 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             <label :for="'user-search-'+role">{{showRole(role)}}</label>
                             <input :id="'user-search-'+role" type="checkbox" v-model="userSearch.roles" @change="triggerSearchUsers" :value="role"/>
                         </div>
-                        <div class="mpop-user-search-field">
+                        <div class="mpop-user-search-field mpop-100-wid">
+                            <label for="userSearchZone-select">Residenza</label>
                             <v-select
                                 multiple
-                                placeholder="Residenza"
                                 id="userSearchZone-select"
                                 v-model="userSearch.zones"
                                 :options="zoneSearch.users"
