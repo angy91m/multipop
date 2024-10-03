@@ -302,7 +302,7 @@ switch( $post_data['action'] ) {
                         if (!empty($add_groups)) {
                             $current_groups = $disc_utils->get_mpop_discourse_groups();
                             foreach($add_groups as $group) {
-                                if (!array_pop(array_filter($current_groups, function($g) use ($group) {return $g['name'] == $group['name'];}))) {
+                                if (!array_pop(array_filter($current_groups, function($g) use ($group) {return $g->name == $group['name'];}))) {
                                     $disc_utils->create_discourse_group($group['name'], $group['full_name']);
                                 }
                             }
