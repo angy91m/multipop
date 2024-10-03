@@ -154,7 +154,7 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
                 if ($change['owner']) {
                     static::set_discourse_group_owners($change['id'], [$user->user_login]);
                 } else {
-                    static::delete_discourse_group_owner($change['id'], $user->ID);
+                    static::delete_discourse_group_owner($change['id'], $user->discourse_sso_user_id);
                 }
             }
         }
