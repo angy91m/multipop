@@ -140,7 +140,7 @@ class MultipopPlugin {
 
     function __construct() {
 
-        $req_url = (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) ? 'https': 'http') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $req_url = (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) ? 'https': 'http') . "://" . ( isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '' ) . ( isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '' );
         $this->req_url = $req_url;
         $this->req_path = preg_replace('/^https?:\/\/[^\/]+/', '', $req_url);
         
