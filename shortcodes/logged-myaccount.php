@@ -235,13 +235,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                                 :get-option-label="(option) => option.untouched_label"
                                 :filter="fuseSearch"
                                 @option:selected="zones => reduceZones(zones, userSearch)"
-                                @search="(searchTxt, loading) => {
-                                    if (searchTxt.trim().length > 1) {
-                                        loading(true);
-                                        searchZones(searchTxt, 'users', userSearch)
-                                        .then(()=> loading(false));
-                                    }
-                                }"
+                                @search="(searchTxt, loading) => triggerSearchZones(searchTxt, loading, 'users', userSearch)"
                             >
                                 <template #search="{ attributes, events }">
                                     <input

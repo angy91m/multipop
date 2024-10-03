@@ -41,7 +41,7 @@ userRoles = [
 ],
 historyTabs = [],
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value;
-let searchUsersTimeout;
+let searchUsersTimeout, searchZonesTimeout;
 createApp({
     components: {
         'v-select': defineAsyncComponent(() => vSel)
@@ -240,6 +240,12 @@ createApp({
                     console.error('Unknown error');
                 }
             }
+        }
+        function triggerSearchZones(txt, loading, ctx, target) {
+            clearTimeout(searchZonesTimeout);
+            if (txt.trim().length < 2) return loading(false);
+            loading(true);
+            searchZonesTimeout = setTimeout( () => searchZones(txt, ctx, target).then(() => loading(false)), 500);
         }
         function reduceZones(zones, target) {
             const added = zones[zones.length - 1];
@@ -759,7 +765,7 @@ createApp({
             fuseSearch,
             userSearchZoneOpen,
             zoneSearch,
-            searchZones,
+            triggerSearchZones,
             reduceZones,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
         };
