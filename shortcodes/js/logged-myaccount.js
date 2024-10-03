@@ -609,6 +609,7 @@ createApp({
             userInEditing.mpop_mail_confirmed = !userInEditing._new_email && !userInEditing.mpop_mail_to_confirm;
             userInEditing.mail_edited = false;
             userInEditing.mpop_resp_zones = JSON.parse(JSON.stringify(userInEditing.mpop_resp_zones));
+            zoneSearch.mpop_resp = JSON.parse(JSON.stringify(userInEditing.mpop_resp_zones));
         }
         function cancelEditUser() {
             userEditing.value = false;
