@@ -421,11 +421,8 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                                             userInEditing.mpop_billing_zip = '';
                                         }"
                                         @search="(searchTxt, loading) => {
-                                            if (searchTxt.trim().length > 1) {
-                                                loading(true);
-                                                billingCitiesSearch(searchTxt)
-                                                .then(()=> loading(false));
-                                            }
+                                            if (searchTxt.trim().length < 2) return loading(false);
+                                            triggerSearch(searchTxt, loading, 'billingCitiesSearch');
                                         }"
                                     >
                                         <template #search="{ attributes, events }">
