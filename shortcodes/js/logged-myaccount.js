@@ -357,6 +357,7 @@ createApp({
                     let zs;
                     switch (z.type) {
                         case 'regione':
+                            console.log(z);
                             zs = 'reg_' + z.nome;
                         case 'provincia':
                             zs = z.sigla;
