@@ -362,7 +362,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             </tr>
                             <tr v-if="userInView.role == 'multipopolare_resp'">
                                 <td><strong>Zone:</strong></td>
-                                <td>{{userInView.mpop_resp_zones}}</td>
+                                <td><ul><li>voce</li><li>vocea</li></ul></td>
                             </tr>
                             <tr>
                                 <td><strong>Data di nascita:</strong></td>
