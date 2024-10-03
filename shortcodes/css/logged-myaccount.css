@@ -184,6 +184,13 @@ span.mpop-app-notice > span > span.dashicons-before.dashicons-no-alt {
 label[for="mpop-tabs-nav"] {
     padding-right: 7px;
 }
+#userSearchZone-select {
+    min-width: 300px;
+    width: fit-content;
+}
+#userSearchZone-select > div {
+    height: 40px;
+}
 @media only screen and (min-width : 1024px) {
     #mpop-profile-table tr td:first-child,
     #mpop-user-table tr td:first-child {
