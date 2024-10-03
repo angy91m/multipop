@@ -1431,6 +1431,7 @@ class MultipopPlugin {
                 $zone['type'] = 'comune';
                 $zone['untouched_label'] = 'Comune: ' . mb_strtoupper($c['nome'], 'UTF-8');
                 $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT', $zone['untouched_label']);
+                $zone['untouched_label'] .= ' (' . $c['provincia']['sigla'] . ')';
                 $zones[] = $zone;
             }
         }
