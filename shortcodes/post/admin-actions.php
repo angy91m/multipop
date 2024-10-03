@@ -282,22 +282,22 @@ switch( $post_data['action'] ) {
                 $disc_utils = $this->discourse_utilities();
                 if ($disc_utils) {
                     $current_user_groups = $disc_utils->get_mpop_discourse_groups_by_user($user);
-                    if ($current_user_groups) {
+                    if (!is_wp_error($current_user_groups)) {
                         $new_user_disc_groups = $this->generate_user_discourse_groups($user);
                         $remove_groups = [];
                         $add_groups = [];
                         foreach($current_user_groups as $group) {
-                            if (!array_pop(array_filter($new_user_disc_groups, function($g) use ($group) {return $g['name'] == $group;}))) {
+                            if (!array_pop(array_filter($new_user_disc_groups, function($g) use ($group) {return $g['name'] == $group['name'];}))) {
                                 $remove_groups[] = $group;
                             }
                         }
                         foreach($new_user_disc_groups as $group) {
-                            if (!in_array($group['name'], $current_user_groups)) {
-                                $add_groups[] = $group;
+                            if (!array_pop(array_filter($current_user_groups, function($g) use ($group) {return $g['name'] == $group['name'];}))) {
+                                $remove_groups[] = $group;
                             }
                         }
                         if (!empty($remove_groups)) {
-                            $disc_utils->remove_user_from_discourse_group($user->ID, implode(',',$remove_groups));
+                            $disc_utils->remove_user_from_discourse_group($user->ID, implode(',',array_map(function($g) {return $g['name'];}, $remove_groups)));
                         }
                         if (!empty($add_groups)) {
                             $current_groups = $disc_utils->get_mpop_discourse_groups();

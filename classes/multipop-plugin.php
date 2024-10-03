@@ -23,6 +23,8 @@ class MultipopPlugin {
     private string $req_url = '';
     private string $req_path = '';
     private array $user_notices = [];
+    private ?array $comuni_all;
+    private ?array $province_all;
     public const SUBS_STATUSES = [
         'tosee',
         'seen',
@@ -1361,7 +1363,24 @@ class MultipopPlugin {
         return $run_texturize;
     }
     private function get_comuni_all() {
-        return json_decode(file_get_contents(MULTIPOP_PLUGIN_PATH . '/comuni/comuni.json'), true);
+        if (!isset($this->comuni_all)) {
+            $comuni = json_decode(file_get_contents(MULTIPOP_PLUGIN_PATH . '/comuni/comuni.json'), true);
+            if (!is_array($comuni)) {
+                $comuni = [];
+            }
+            $this->comuni_all = $comuni;
+        } 
+        return $this->comuni_all;
+    }
+    private function get_province_all() {
+        if (!isset($this->province_all)) {
+            $province = json_decode(file_get_contents(MULTIPOP_PLUGIN_PATH . '/comuni/province.json'), true);
+            if (!is_array($province)) {
+                $province = [];
+            }
+            $this->province_all = $province;
+        } 
+        return $this->province_all;
     }
     private function add_birthplace_labels(...$comuni) {
         foreach($comuni as $i=>$c) {
@@ -1376,9 +1395,6 @@ class MultipopPlugin {
             $comuni[$i]['label'] = iconv('UTF-8','ASCII//TRANSLIT',  mb_strtoupper($c['nome'], 'UTF-8') . ' (' . $c['provincia']['sigla'] . ')');
         }
         return $comuni;
-    }
-    private function get_province_all() {
-        return json_decode(file_get_contents(MULTIPOP_PLUGIN_PATH . '/comuni/province.json'), true);
     }
     private function search_zones($search = '') {
         $zones = [];
@@ -2220,6 +2236,7 @@ class MultipopPlugin {
             $disc_utils = $this->discourse_utilities();
             if ($disc_utils) {
                 $disc_groups = $disc_utils->get_discourse_mpop_groups();
+                save_test($disc_groups);
                 foreach($groups as $g) {
                     $found = array_filter($disc_groups, function($dg) use ($g) {return $dg['name'] == $g['name'];});
                     if (!count($found)) {

@@ -66,19 +66,24 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
 		if(is_wp_error($disc_user) || empty($disc_user->user)) {
 			return new WP_Error( 'wpdc_response_error', 'No users were returned from Discourse.' );
 		}
-		$group_names = [];
+		$groups = [];
         foreach($disc_user->user->groups as $g) {
             if ($g->automatic && !$auto_groups) {
                 continue;
             }
-            $group_names[] = $g->name;
+            $group = ['name' => $g->name, 'owner' => false];
+            $found = array_pop(array_filter($disc_user->user->group_users, function($gu) use ($g) { return $gu->group_id == $g->id; }));
+            if ($found) {
+                $group['owner'] = $found->owner;
+            }
+            $groups[] = $group;
         }
-        return $group_names;
+        return $groups;
     }
     public static function get_mpop_discourse_groups_by_user($user_id) {
         $res = static::get_discourse_groups_by_user($user_id);
         if (is_wp_error($res)) {return false;}
-        return array_values(array_filter($res, function($g) { return str_starts_with($g, 'mp_'); }));
+        return array_values(array_filter($res, function($g) { return str_starts_with($g['name'], 'mp_'); }));
     }
 	public static function logout_user_from_discourse($user_id) {
 		$user = false;
