@@ -189,7 +189,12 @@ label[for="mpop-tabs-nav"] {
     width: fit-content;
 }
 #userSearchZone-select > div {
-    height: 40px;
+    min-height: 40px;
+    height: fit-content;
+}
+#userEditingRespZone-select > div {
+    min-height: 40px;
+    height: fit-content;
 }
 @media only screen and (min-width : 1024px) {
     #mpop-profile-table tr td:first-child,
