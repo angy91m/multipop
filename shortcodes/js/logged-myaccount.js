@@ -57,6 +57,7 @@ createApp({
         userEditing = ref(false),
         birthplaceOpen = ref(false),
         billingCityOpen = ref(false),
+        userSearchZoneOpen = ref(false),
         saving = ref(false),
         savingProfileErrors = reactive([]),
         savingUserErrors = reactive([]),
@@ -76,6 +77,17 @@ createApp({
             page: 1,
             sortBy: {
                 ID: true
+            },
+            zones: []
+        }),
+        zoneSearch = reactive({
+            users: {
+                txt: '',
+                zones: []
+            },
+            subscriptions: {
+                txt: '',
+                zones: []
             }
         }),
         userSearchLimit = ref(100),
@@ -214,6 +226,26 @@ createApp({
                 }
             }
 
+        }
+        async function searchZones(ctx, target) {
+            if (zoneSearch[ctx] && zoneSearch[ctx].txt.length > 1) {
+                const res = await serverReq({
+                    action: 'admin_search_zones',
+                    search: zoneSearch[ctx].txt
+                });
+                if (res.ok) {
+                    const zones = await res.json();
+                    if (zones.data) {
+                        zoneSearch[ctx].zones.length = 0;
+                        zoneSearch[ctx].zones.push(...target.zones);
+                        zoneSearch[ctx].zones.push(...zones.data.filter(z => !zoneSearch[ctx].zones.find(zz => z.type == zz.type && (z.type == 'regione' ? z.nome == zz.nome : z.codice == zz.codice))));
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } else {
+                    console.error('Unknown error');
+                }
+            }
         }
         async function getProfile() {
             const res = await serverReq({action: 'get_profile'});
@@ -426,10 +458,19 @@ createApp({
         }
         async function searchUsers() {
             foundUsers.length = 0;
-            const res = await serverReq({
+            const reqObj = {
                 action: 'admin_search_users',
-                ...userSearch
+                ...userSearch,
+                mpop_billing_state: [],
+                mpop_billing_city: []
+            };
+            delete reqObj.zones;
+            userSearch.zones.length.forEach(z => {
+                if (z.type == 'regione') reqObj.mpop_billing_state.push(...z.province.map(p => p.sigla));
+                if (z.type == 'provincia') reqObj.mpop_billing_state.push(z.sigla);
+                if (z.type == 'comune') reqObj.mpop_billing_city.push(z.codiceCatastale);
             });
+            const res = await serverReq(reqObj);
             if (res.ok) {
                 const users = await res.json();
                 if (users.data && users.data.users) {
@@ -704,6 +745,9 @@ createApp({
             cancelEditUser,
             updateUser,
             fuseSearch,
+            userSearchZoneOpen,
+            zoneSearch,
+            searchZones,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
         };
     }

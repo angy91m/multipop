@@ -318,6 +318,20 @@ switch( $post_data['action'] ) {
         }
         $res_data['data'] = ['user' => $this->myaccount_get_profile($user->ID, true)];
         break;
+    case 'admin_search_subscriptions':
+        $res = $this->search_subscriptions($post_data);
+        if (!$res) {
+            $res_data['error'] = ['data'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore durante la ricerca']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $res_data['data'] = $res;
+        break;
+    case 'admin_search_zones':
+        $res_data['data'] = $this->search_zones($post_data['search']);
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];

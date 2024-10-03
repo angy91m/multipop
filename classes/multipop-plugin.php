@@ -23,7 +23,7 @@ class MultipopPlugin {
     private string $req_url = '';
     private string $req_path = '';
     private array $user_notices = [];
-    private array $subs_statuses = [
+    public const SUBS_STATUSES = [
         'tosee',
         'seen',
         'refused',
@@ -448,6 +448,7 @@ class MultipopPlugin {
             `year` SMALLINT UNSIGNED NOT NULL,
             `status` VARCHAR(255) NOT NULL,
             `created_at` BIGINT UNSIGNED NOT NULL,
+            `updated_at` BIGINT UNSIGNED NOT NULL,
             `signed_at` BIGINT UNSIGNED NULL,
             `completed_at` BIGINT UNSIGNED NULL,
             `author_id` BIGINT UNSIGNED NOT NULL,
@@ -1390,29 +1391,34 @@ class MultipopPlugin {
         $province_all = $this->get_province_all();
         foreach($province_all as $p) {
             if (!$p['soppressa']) {
+
+                $pp = $p + [
+                    'type' => 'provincia',
+                    'untouched_label' => 'Provincia: ' . mb_strtoupper($p['nome'], 'UTF-8')
+                ];
+                $pp['label'] = iconv('UTF-8','ASCII//TRANSLIT', $pp['untouched_label']);
                 if (
                     strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper( $p['nome'], 'UTF-8' )),$search) !== false
                     || strpos($p['sigla'], $search) !== false
                 ) {
-                    $pp = $p + [
-                        'type' => 'provincia',
-                        'untouched_label' => 'Provincia: ' . mb_strtoupper($p['nome'], 'UTF-8')
-                    ];
-                    $pp['label'] = iconv('UTF-8','ASCII//TRANSLIT',  $pp['untouched_label']);
                     $zones[] = $pp;
                 }
-                if (!in_array($p['regione'], $regioni) && strpos(iconv('UTF-8', 'ASCII//TRANSLIT',mb_strtoupper($p['regione'], 'UTF-8')), $search) !== false) {
-                    $regioni[] = $p['regione'];
+                if (strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper($p['regione'], 'UTF-8')), $search) !== false) {
+                    if (!isset($regioni[$p['regione']])) {
+                        $regioni[$p['regione']] = [];
+                    }
+                    $regioni[$p['regione']][] = $pp;
                 }
             }
         }
-        foreach($regioni as $r) {
+        foreach($regioni as $n =>$r) {
             $zone = [
-              'nome' => $r,
+              'nome' => $n,
               'type' => 'regione',
-              'untouched_label' => 'Regione: ' . mb_strtoupper($r, 'UTF-8'),
+              'untouched_label' => 'Regione: ' . mb_strtoupper($n, 'UTF-8'),
+              'province' => $r
             ];
-            $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT',  $zone['untouched_label']);
+            $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT', $zone['untouched_label']);
             $zones[] = $zone;
         }
         $comuni_all = $this->get_comuni_all();
@@ -1424,11 +1430,11 @@ class MultipopPlugin {
                 $zone = $c;
                 $zone['type'] = 'comune';
                 $zone['untouched_label'] = 'Comune: ' . mb_strtoupper($c['nome'], 'UTF-8');
-                $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT',  $zone['untouched_label']);
+                $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT', $zone['untouched_label']);
                 $zones[] = $zone;
             }
         }
-        function cmp_comune($a, $b) {
+        $cmp_comuni = function ($a, $b) {
             if ($b['type'] == 'comune') {
                 if ($a['provincia']['regione'] == $b['provincia']['regione']) {
                     if ($a['provincia']['nome'] == $b['provincia']['nome']) {
@@ -1451,8 +1457,8 @@ class MultipopPlugin {
                 return 1;
             }
             return mb_strtoupper( $a['provincia']['regione'], 'UTF-8') < mb_strtoupper( $b['nome'], 'UTF-8') ? -1 : 1;
-        }
-        function cmp_province($a, $b) {
+        };
+        $cmp_province = function ($a, $b) {
             if ($b['type'] == 'provincia') {
                 return mb_strtoupper( $a['nome'], 'UTF-8') < mb_strtoupper( $b['nome'], 'UTF-8') ? -1 : 1;
             }
@@ -1460,16 +1466,16 @@ class MultipopPlugin {
                 return 1;
             }
             return mb_strtoupper( $a['regione'], 'UTF-8') < mb_strtoupper( $b['nome'], 'UTF-8') ? -1 : 1;
-        }
+        };
         usort($zones, function($a, $b) {
             if ($a['type'] == 'comune') {
-                return cmp_comune($a, $b);
+                return $cmp_comuni($a, $b);
             } else if ($b['type'] == 'comune') {
-                return -(cmp_comune($b, $a));
+                return -($cmp_comuni($b, $a));
             } else if ($a['type'] == 'provincia') {
-                return cmp_province($a, $b);
+                return $cmp_province($a, $b);
             } else if ($b['type'] == 'provincia') {
-                return -(cmp_province($b, $a));
+                return -($cmp_province($b, $a));
             } else {
                 return mb_strtoupper( $a['nome'], 'UTF-8') < mb_strtoupper( $b['nome'], 'UTF-8') ? -1 : 1;
             }
@@ -1664,6 +1670,283 @@ class MultipopPlugin {
     }
     private function create_subscription() {
 
+    }
+    private function db_cache(string $q, string $group_key, int $expire = 20, bool $force = false, string $method = 'get_results', ...$args) {
+        $res = false;
+        if (!$force) {
+            $res = wp_cache_get(md5($q), $group_key);
+        }
+        if ($res === false) {
+            global $wpdb;
+            $res = $wpdb->$method($q, ...$args);
+            wp_cache_add(md5($q), $res, $group_key, $expire < 0 ? 20 : $expire);
+        }
+        return $res;
+    }
+    private function search_subscriptions(array $options = [], $limit = 100, $force = false) { 
+        $options = $options + [
+            'txt' => '',
+            'user_id' => 0,
+            'year' => [], 
+            'status' => [],
+            'created_at' => ',',
+            'updated_at' => ',',
+            'signed_at' => ',',
+            'completed_at' => ',',
+            'author_id' => 0,
+            'mpop_billing_state' => [],
+            'mpop_billing_city' => [],
+            'page' => 1,
+            'order_by' => ['updated_at' => false]
+        ];
+        $time_interval_reg = '/^\d*,\d*$/';
+        $mpop_billing_state_reg = '/^[A-Z]{2}$/';
+        $mpop_billing_city_reg = '/^[A-Z]\d{3}$/';
+        $allowed_sorts = [
+            'id',
+            'card_id',
+            'user_login',
+            'login',
+            'user_email',
+            'email',
+            'first_name',
+            'last_name',
+            'year',
+            'status',
+            'created_at',
+            'updated_at',
+            'signed_at',
+            'completed_at',
+            'author',
+            'mpop_billing_state',
+            'mpop_billing_city'
+        ];
+        $res = false;
+        if (
+            !is_string($options['txt'])
+            || !is_int($options['user_id'])
+            || $options['user_id'] < 0
+            || !is_array($options['year'])
+            || !is_array($options['status'])
+            || !is_string($options['created_at'])
+            || !preg_match($time_interval_reg, $options['created_at'])
+            || !is_string($options['updated_at'])
+            || !preg_match($time_interval_reg, $options['updated_at'])
+            || !is_string($options['signed_at'])
+            || !preg_match($time_interval_reg, $options['signed_at'])
+            || !is_string($options['completed_at'])
+            || !preg_match($time_interval_reg, $options['completed_at'])
+            || !is_int($options['author_id'])
+            || $options['author_id'] < 0
+            || !is_array($options['mpop_billing_state'])
+            || !is_array($options['mpop_billing_city'])
+            || !is_int($options['page'])
+            || $options['page'] < 1
+            || !is_array($options['order_by'])
+        ) {
+            return $res;
+        }
+        $options['created_at'] = explode(',', $options['created_at']);
+        $options['updated_at'] = explode(',', $options['updated_at']);
+        $options['signed_at'] = explode(',', $options['signed_at']);
+        $options['completed_at'] = explode(',', $options['completed_at']);
+        if (
+            (
+                strlen($options['created_at'][0])
+                && strlen($options['created_at'][1])
+                && intval($options['created_at'][0]) > intval($options['created_at'][1])
+            )
+            || (
+                strlen($options['updated_at'][0])
+                && strlen( $options['updated_at'][1])
+                && intval($options['updated_at'][0]) > intval($options['updated_at'][1])
+            )
+            || (
+                strlen($options['signed_at'][0])
+                && strlen( $options['signed_at'][1])
+                && intval($options['signed_at'][0]) > intval($options['signed_at'][1])
+            )
+            || (
+                strlen($options['completed_at'][0])
+                && strlen($options['completed_at'][1])
+                && intval($options['completed_at'][0]) > intval($options['completed_at'][1])
+            )
+        ) {
+            return $res;
+        }
+        $options['year'] = array_values(array_unique(array_filter($options['year'], function($y) {return is_int($y) && $y > 0;})));
+        $options['status'] = array_values(array_unique(array_filter($options['status'], function($s) {return in_array($s, MultipopPlugin::SUBS_STATUSES);})));
+        $options['mpop_billing_state'] = array_values(array_unique(array_filter($options['mpop_billing_state'], function($s) use ($mpop_billing_state_reg) {return preg_match($mpop_billing_state_reg, $s);})));
+        $options['mpop_billing_city'] = array_values(array_unique(array_filter($options['mpop_billing_city'], function($c) use ($mpop_billing_city_reg) {return preg_match($mpop_billing_city_reg, $c);})));
+        $order_by = "";
+        foreach ($options['order_by'] as $k => $v) {
+            if (in_array($k, $allowed_sorts)) {
+                switch ($k) {
+                    case 'email':
+                        $k = 'users.user_email';
+                        break;
+                    case 'user_email':
+                        $k = 'users.user_email';
+                        break;
+                    case 'login':
+                        $k = 'users.user_login';
+                        break;
+                    case 'user_login':
+                        $k = 'users.user_login';
+                        break;
+                    case 'first_name':
+                        $k = 'fn.meta_value';
+                        break;
+                    case 'last_name':
+                        $k = 'ln.meta_value';
+                        break;
+                    case 'author':
+                        $k = 'authors.user_login';
+                        break;
+                    case 'mpop_billing_state':
+                        $k = 'prov.meta_value';
+                        break;
+                    case 'mpop_billing_city':
+                        $k = 'comune.meta_value';
+                        break;
+                    default:
+                        $k = 's.' . $k;
+                        break;
+                }
+                $order_by .= ($order_by ? ", " : "") . $k . ($v ? " ASC" : " DESC");
+            }
+        }
+        if (!$order_by) {
+            $order_by = "s.updated_at DESC";
+        }
+        $options['txt'] = trim($options['txt']);
+        global $wpdb;
+        $q_where = "";
+        $append_to_where = function($w, $or = false) use (&$q_where) {
+            if ($q_where) {$q_where .= $or ? " OR " : " AND ";}
+            $q_where .= $w;
+        };
+        $options['txt'] = trim($options['txt']);
+        if ($options['txt']) {
+            $sanitized_value = '%' . $wpdb->esc_like($options['txt']) . '%';
+            $append_to_where($wpdb->prepare(
+                "( s.card_id LIKE %s
+                OR users.user_login LIKE %s
+                OR users.user_email LIKE %s
+                OR fn.meta_value LIKE %s
+                OR ln.meta_value LIKE %s )",
+                $sanitized_value,
+                $sanitized_value,
+                $sanitized_value,
+                $sanitized_value,
+                $sanitized_value
+            ));
+        }
+        if ($options['user_id']) {
+            $append_to_where("s.user_id = $options[user_id]");
+        }
+        if (count($options['year'])) {
+            $append_to_where("s.year IN ( " . implode(',', $options['year']) . " )");
+        }
+        if (count($options['status'])) {
+            $append_to_where("s.status IN ( " . implode(',', array_map(function($s) {return "'$s'";}, $options['status'])) . " )");
+        }
+        if ($options['created_at'][0]) {
+            $append_to_where("s.created_at >= " . $options['created_at'][0]);
+        }
+        if ($options['created_at'][1]) {
+            $append_to_where("s.created_at <= " . $options['created_at'][1]);
+        }
+        if ($options['updated_at'][0]) {
+            $append_to_where("s.updated_at >= " . $options['updated_at'][0]);
+        }
+        if ($options['updated_at'][1]) {
+            $append_to_where("s.updated_at <= " . $options['updated_at'][1]);
+        }
+        if ($options['signed_at'][0]) {
+            $append_to_where("s.signed_at >= " . $options['signed_at'][0]);
+        }
+        if ($options['signed_at'][1]) {
+            $append_to_where("s.signed_at <= " . $options['signed_at'][1]);
+        }
+        if ($options['completed_at'][0]) {
+            $append_to_where("s.completed_at >= " . $options['completed_at'][0]);
+        }
+        if ($options['completed_at'][1]) {
+            $append_to_where("s.completed_at <= " . $options['completed_at'][1]);
+        }
+        if ($options['author_id']) {
+            $append_to_where("s.author_id = $options[author_id]");
+        }
+        if (count($options['mpop_billing_state'])) {
+            $append_to_where("prov.meta_value IN ( " . implode(',', array_map(function($s) {return "'$s'";},$options['mpop_billing_state'])) . " )");
+        }
+        if (count($options['mpop_billing_city'])) {
+            $append_to_where("comune.meta_value IN ( " . implode(',', array_map(function($s) {return "'$s'";}, $options['mpop_billing_city'])) . " )");
+        }
+
+        $q_from = "FROM "
+            . $this->db_prefix('subscriptions') . " s
+            LEFT JOIN " . $wpdb->prefix . "users users
+            ON s.user_id = users.ID
+            LEFT JOIN " . $wpdb->prefix . "users authors
+            ON s.author_id = authors.ID
+            LEFT JOIN " . $wpdb->prefix . "usermeta fn 
+            ON s.user_id = fn.user_id 
+            AND fn.meta_key = 'first_name'
+            LEFT JOIN " . $wpdb->prefix . "usermeta ln 
+            ON s.user_id = ln.user_id 
+            AND ln.meta_key = 'last_name'
+            LEFT JOIN " . $wpdb->prefix . "usermeta prov 
+            ON s.user_id = prov.user_id 
+            AND prov.meta_key = 'mpop_billing_state'
+            LEFT JOIN " . $wpdb->prefix . "usermeta comune 
+            ON s.user_id = comune.user_id 
+            AND comune.meta_key = 'mpop_billing_city' "
+        ;
+        $q_count = "SELECT COUNT(*) as total_count " . $q_from . $q_where . ';';
+        $total = intval($this->db_cache($q_count, 'mpop_subs_search', -1, $force, 'get_var'));
+        $pages = 1;
+        $q_limit = "";
+        if ($limit > 0) {
+            $pages = ceil($total / $limit);
+            $q_limit = " LIMIT $limit";
+            if ($options['page'] > $pages) {
+                $options['page'] = $pages;
+            }
+            if ($options['page'] > 1) {
+                $q_limit .= " OFFSET " . ($options['page'] - 1) * $limit;
+            }
+        }
+        $q = "SELECT
+            s.*,
+            users.user_login AS user_login,
+            users.user_email AS user_email,
+            authors.user_login AS author_login,
+            fn.meta_value AS first_name, 
+            ln.meta_value AS last_name,
+            prov.meta_value AS mpop_billing_state,
+            comune.meta_value AS mpop_billing_city "
+            . $q_from . $q_where . $q_limit . ';';
+        ;
+        $res = [];
+        $res['subscriptions'] = $this->db_cache($q, 'mpop_subs_search', -1, $force, 'get_results', 'ARRAY_A');
+        foreach($res['subscriptions'] as &$sub) {
+            unset($sub['filename']);
+            unset($sub['pp_order_id']);
+            $sub['id'] = intval($sub['id']);
+            $sub['user_id'] = intval($sub['user_id']);
+            $sub['year'] = intval($sub['year']);
+            $sub['created_at'] = intval($sub['created_at']);
+            $sub['updated_at'] = intval($sub['updated_at']);
+            $sub['signed_at'] = intval($sub['signed_at']);
+            $sub['completed_at'] = intval($sub['completed_at']);
+            $sub['author_id'] = intval($sub['author_id']);
+        }
+        $res['total'] = $total;
+        $res['pages'] = $pages;
+        $res['page'] = $options['page'];
+        return $res;
     }
     public function user_search_pre_user_query($q) {
         global $wpdb;

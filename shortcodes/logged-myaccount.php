@@ -224,6 +224,49 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                             <label :for="'user-search-'+role">{{showRole(role)}}</label>
                             <input :id="'user-search-'+role" type="checkbox" v-model="userSearch.roles" @change="triggerSearchUsers" :value="role"/>
                         </div>
+                        <div class="mpop-user-search-field">
+                            <v-select
+                                multiple
+                                id="userSearchZone-select"
+                                :class="savingUserErrors.includes('zones') ? 'bad-input' : ''"
+                                v-model="userSearch.zones"
+                                :options="zoneSearch.users.zones"
+                                @close="userSearchZoneOpen = false"
+                                @open="searchOpen('userSearchZone')"
+                                :get-option-label="(option) => option.untouched_label"
+                                :filter="fuseSearch"
+                                @option:selected="z => {
+                                    console.log(z);
+                                }"
+                                @search="(searchTxt, loading) => {
+                                    if (searchTxt.trim().length > 1) {
+                                        loading(true);
+                                        searchZones('users', userSearch)
+                                        .then(()=> loading(false));
+                                    }
+                                }"
+                            >
+                                <template #search="{ attributes, events }">
+                                    <input
+                                        class="vs__search"
+                                        :style="'display: ' + (userSearchZoneOpen ? 'unset' : 'none')"
+                                        v-bind="attributes"
+                                        v-on="events"
+                                    />
+                                </template>
+                                <template v-slot:option="zone">
+                                    {{zone.untouched_label}}
+                                </template>
+                                <template v-slot:no-options="{search}">
+                                    <template v-if="search.trim().length > 1">
+                                        Nessun risultato per "{{search}}"
+                                    </template>
+                                    <template v-else>
+                                        Inserisci almeno 2 caratteri
+                                    </template>
+                                </template>
+                            </v-select>
+                        </div>
                         <div>Totale: {{foundUsersTotal}}</div>
                         <div id="mpop-page-buttons">
                             <button class="mpop-button" @click="changeUserSearchPage(1)" v-if="userSearch.page != 1 && !pageButtons.includes(1) && userSearch.page -2 > 0" style="width:auto">Inizio</button>
