@@ -63,6 +63,10 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 <td v-else><input type="text" :class="savingProfileErrors.includes('last_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="profileInEditing.last_name"/></td>
                             </tr>
                             <tr>
+                                <td><strong>Ruolo:</strong></td>
+                                <td>{{showRole(profile.role)}}</td>
+                            </tr>
+                            <tr>
                                 <td><strong>Data di nascita:</strong></td>
                                 <td v-if="!profileEditing">{{displayLocalDate(profile.mpop_birthdate)}}</td>
                                 <td v-else>
@@ -351,6 +355,10 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 <td><strong>Cognome:</strong></td>
                                 <td v-if="!userEditing">{{userInView.last_name}}</td>
                                 <td v-else><input type="text" :class="savingProfileErrors.includes('last_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="userInEditing.last_name"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ruolo:</strong></td>
+                                <td>{{showRole(userInView.last_name)}}</td>
                             </tr>
                             <tr>
                                 <td><strong>Data di nascita:</strong></td>
