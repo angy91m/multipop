@@ -118,7 +118,8 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
         $remove_groups = [];
         $owner_changes = [];
         foreach($new_groups as $group) {
-            $found = array_pop(array_filter($current_groups, function($g) use ($group) {return $g['name'] == $group['name'];}));
+            $found = array_filter($current_groups, function($g) use ($group) {return $g['name'] == $group['name'];});
+            $found = array_pop($found);
             if (!$found) {
                 $add_groups[] = $group;
             } else if ($found) {
@@ -126,7 +127,8 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
             }
         }
         foreach($current_groups as $group) {
-            if (!array_pop(array_filter($new_groups, function($g) use ($group) {return $g['name'] == $group['name'];}))) {
+            $found = array_filter($new_groups, function($g) use ($group) {return $g['name'] == $group['name'];});
+            if (!array_pop($found) ) {
                 $remove_groups[] = $group;
             }
         }
@@ -136,7 +138,8 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
         if (!empty($add_groups)) {
             $disc_groups = static::get_discourse_mpop_groups();
             foreach($add_groups as $group) {
-                $found = array_pop(array_filter($disc_groups, function($g) use ($group) {return $g->name == $group['name'];}));
+                $found = array_filter($disc_groups, function($g) use ($group) {return $g->name == $group['name'];});
+                $found = array_pop($found);
                 if (!$found) {
                     $res = static::create_discourse_group($group['name'], $group['full_name']);
                     if ($group['owner']) {

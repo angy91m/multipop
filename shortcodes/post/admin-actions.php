@@ -215,7 +215,8 @@ switch( $post_data['action'] ) {
                     if (!$province) {
                         $province = $this->get_province_all();
                     }
-                    $found = array_pop(array_filter($province, function($p) use ($zone) { return $p['sigla'] == $zone; }));
+                    $found = array_filter($province, function($p) use ($zone) { return $p['sigla'] == $zone; });
+                    $found = array_pop($found);
                     if ($found) {
                         $parsed_resp_zones[] = $found + ['type' => 'provincia'];
                     }
@@ -223,7 +224,8 @@ switch( $post_data['action'] ) {
                     if (!$comuni) {
                         $comuni = $this->get_comuni_all();
                     }
-                    $found = array_pop(array_filter($comuni, function($c) use ($zone) { return $c['codiceCatastale'] == $zone; }));
+                    $found = array_filter($comuni, function($c) use ($zone) { return $c['codiceCatastale'] == $zone; });
+                    $found = array_pop($found);
                     if ($found) {
                         $parsed_resp_zones[] = $found + ['type' => 'comune'];
                     }
