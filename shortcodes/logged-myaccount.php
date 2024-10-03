@@ -228,9 +228,8 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                             <v-select
                                 multiple
                                 id="userSearchZone-select"
-                                :class="savingUserErrors.includes('zones') ? 'bad-input' : ''"
                                 v-model="userSearch.zones"
-                                :options="zoneSearch.users.zones"
+                                :options="zoneSearch.users"
                                 @close="userSearchZoneOpen = false"
                                 @open="searchOpen('userSearchZone')"
                                 :get-option-label="(option) => option.untouched_label"
@@ -241,7 +240,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                                 @search="(searchTxt, loading) => {
                                     if (searchTxt.trim().length > 1) {
                                         loading(true);
-                                        searchZones('users', userSearch)
+                                        searchZones(searchTxt, 'users', userSearch)
                                         .then(()=> loading(false));
                                     }
                                 }"

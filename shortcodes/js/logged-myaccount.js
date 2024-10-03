@@ -81,14 +81,8 @@ createApp({
             zones: []
         }),
         zoneSearch = reactive({
-            users: {
-                txt: '',
-                zones: []
-            },
-            subscriptions: {
-                txt: '',
-                zones: []
-            }
+            users: [],
+            subscriptions: []
         }),
         userSearchLimit = ref(100),
         foundUsers = reactive([]),
@@ -227,18 +221,18 @@ createApp({
             }
 
         }
-        async function searchZones(ctx, target) {
-            if (zoneSearch[ctx] && zoneSearch[ctx].txt.length > 1) {
+        async function searchZones(txt, ctx, target) {
+            if (zoneSearch[ctx]) {
                 const res = await serverReq({
                     action: 'admin_search_zones',
-                    search: zoneSearch[ctx].txt
+                    search: txt
                 });
                 if (res.ok) {
                     const zones = await res.json();
                     if (zones.data) {
-                        zoneSearch[ctx].zones.length = 0;
-                        zoneSearch[ctx].zones.push(...target.zones);
-                        zoneSearch[ctx].zones.push(...zones.data.filter(z => !zoneSearch[ctx].zones.find(zz => z.type == zz.type && (z.type == 'regione' ? z.nome == zz.nome : z.codice == zz.codice))));
+                        zoneSearch[ctx].length = 0;
+                        zoneSearch[ctx].push(...target.zones);
+                        zoneSearch[ctx].push(...zones.data.filter(z => !zoneSearch[ctx].find(zz => z.type == zz.type && (z.type == 'regione' ? z.nome == zz.nome : z.codice == zz.codice))));
                     } else {
                         console.error('Unknown error');
                     }
