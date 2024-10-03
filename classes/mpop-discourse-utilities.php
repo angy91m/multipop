@@ -87,12 +87,8 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
             if ($g->automatic && !$auto_groups) {
                 continue;
             }
-            $group = ['id' => $g->id, 'name' => $g->name, 'owner' => false];
-            $found = array_pop(array_filter($disc_user->user->group_users, function($gu) use ($g) { return $gu->group_id == $g->id; }));
-            if ($found) {
-                $group['owner'] = $found->owner;
-            }
-            $groups[] = $group;
+            $groups[] = ['id' => $g->id, 'name' => $g->name];
+
         }
         return $groups;
     }
@@ -119,7 +115,7 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
             $found = array_pop(array_filter($current_groups, function($g) use ($group) {return $g['name'] == $group['name'];}));
             if (!$found) {
                 $add_groups[] = $group;
-            } else if ($found['owner'] != $group['owner']) {
+            } else if ($found) {
                 $owner_changes[] = ['id' => $found['id'], 'name' => $group['name'], 'owner' => $group['owner']];
             }
         }
