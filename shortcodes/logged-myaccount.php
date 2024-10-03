@@ -231,7 +231,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                                 @option:selected="zones => {
                                     const oldLen = zones.length;
                                     reduceZones(zones, userSearch);
-                                    if (oldLen != zones.length) triggerSearchUsers();
+                                    if (oldLen == zones.length) triggerSearchUsers();
                                 }"
                                 @option:deselected="triggerSearchUsers"
                                 @search="(searchTxt, loading) => {
