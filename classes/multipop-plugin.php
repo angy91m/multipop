@@ -1467,7 +1467,7 @@ class MultipopPlugin {
             }
             return mb_strtoupper( $a['regione'], 'UTF-8') < mb_strtoupper( $b['nome'], 'UTF-8') ? -1 : 1;
         };
-        usort($zones, function($a, $b) {
+        usort($zones, function($a, $b) use ($cmp_comuni, $cmp_province) {
             if ($a['type'] == 'comune') {
                 return $cmp_comuni($a, $b);
             } else if ($b['type'] == 'comune') {
