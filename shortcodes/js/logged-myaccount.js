@@ -225,7 +225,7 @@ createApp({
             if (zoneSearch[ctx]) {
                 const res = await serverReq({
                     action: 'admin_search_zones',
-                    search: txt
+                    search: txt.trim()
                 });
                 if (res.ok) {
                     const zones = await res.json();
@@ -243,7 +243,6 @@ createApp({
         }
         function triggerSearch(txt, loading, callable, ...args) {
             clearTimeout(triggerSearchTimeout);
-            if (txt.trim().length < 2) return loading(false);
             loading(true);
             const func = eval(callable);
             triggerSearchTimeout = setTimeout( () => func(txt, ...args).then(() => loading(false)), 500);
@@ -728,11 +727,9 @@ createApp({
             selectTab,
             displayLocalDate,
             birthCities,
-            birthCitiesSearch,
             birthplaceOpen,
             billingCityOpen,
             billingCities,
-            billingCitiesSearch,
             updateProfile,
             searchOpen,
             saving,

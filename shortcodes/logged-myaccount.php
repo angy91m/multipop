@@ -89,11 +89,8 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                                         :get-option-label="(option) => option.untouched_label"
                                         :filter="fuseSearch"
                                         @search="(searchTxt, loading) => {
-                                            if (searchTxt.trim().length > 1) {
-                                                loading(true);
-                                                birthCitiesSearch(searchTxt)
-                                                .then(()=> loading(false));
-                                            }
+                                            if (searchTxt.trim().length < 2) return loading(false);
+                                            triggerSearch(searchTxt, loading, 'birthCitiesSearch');
                                         }"
                                     >
                                         <template #search="{ attributes, events }">
@@ -144,11 +141,8 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                                             profileInEditing.mpop_billing_zip = '';
                                         }"
                                         @search="(searchTxt, loading) => {
-                                            if (searchTxt.trim().length > 1) {
-                                                loading(true);
-                                                billingCitiesSearch(searchTxt)
-                                                .then(()=> loading(false));
-                                            }
+                                            if (searchTxt.trim().length < 2) return loading(false);
+                                            triggerSearch(searchTxt, loading, 'billingCitiesSearch');
                                         }"
                                     >
                                         <template #search="{ attributes, events }">
@@ -235,7 +229,10 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                                 :get-option-label="(option) => option.untouched_label"
                                 :filter="fuseSearch"
                                 @option:selected="zones => reduceZones(zones, userSearch)"
-                                @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'searchZones', 'users', userSearch)"
+                                @search="(searchTxt, loading) => {
+                                    if (searchTxt.trim().length < 2) return loading(false);
+                                    triggerSearch(searchTxt, loading, 'searchZones', 'users', userSearch);
+                                }"
                             >
                                 <template #search="{ attributes, events }">
                                     <input
@@ -372,11 +369,8 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                                         :get-option-label="(option) => option.untouched_label"
                                         :filter="fuseSearch"
                                         @search="(searchTxt, loading) => {
-                                            if (searchTxt.trim().length > 1) {
-                                                loading(true);
-                                                birthCitiesSearch(searchTxt, true)
-                                                .then(()=> loading(false));
-                                            }
+                                            if (searchTxt.trim().length < 2) return loading(false);
+                                            triggerSearch(searchTxt, loading, 'birthCitiesSearch', true);
                                         }"
                                     >
                                         <template #search="{ attributes, events }">
