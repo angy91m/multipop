@@ -206,7 +206,12 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                         </div>
                     </div>
                     <div v-if="selectedTab == 'card'">
-                        <?=html_dump($this->search_zones('latina'))?>
+                        <?php
+                            $uu = wp_get_current_user();
+                            update_user_meta($uu->ID, 'mpop_test_meta', 'ciao');
+                            $uu = get_user_by('ID', $uu->ID);
+                            htmlDump($uu->mpop_test_meta);
+                        ?>
                         Tessera
                     </div>
                     <div v-if="selectedTab == 'users'" id="mpop-user-search">

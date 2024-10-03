@@ -120,8 +120,7 @@ class MultipopPlugin {
     }
 
     private static function delay_script(string $script, ...$argv) {
-        return exec('php ' .MULTIPOP_PLUGIN_PATH . 'delayed_scripts/delayed.php ' . $script . ' ' . implode(' ', $argv) . ' > ' . MULTIPOP_PLUGIN_PATH .'/test-2.txt &');
-        //return exec('php "' .MULTIPOP_PLUGIN_PATH . 'internal_scripts/' . $script . '" ' . implode(' ', $argv) . ' > /dev/null &');
+        return exec('php ' .MULTIPOP_PLUGIN_PATH . 'delayed_scripts/delayed.php ' . $script . ' ' . implode(' ', $argv) . ' > /dev/null &');
     }
 
     // DB PREFIX FOR PLUGIN TABLES
@@ -200,9 +199,9 @@ class MultipopPlugin {
         add_action('wpdc_sso_provider_before_sso_redirect', [$this, 'discourse_filter_login'], 10, 2 );
         add_filter('wpdc_sso_params', [$this, 'discourse_user_params'], 10, 2);
         $this->delayed_scripts = [
-            'getDiscourseGroups' => function() {
-                save_test($this->discourse_utilities()->get_discourse_mpop_groups());
-            }
+            // 'getDiscourseGroups' => function() {
+            //     save_test($this->discourse_utilities()->get_discourse_mpop_groups());
+            // }
         ];
     }
 
@@ -2216,6 +2215,13 @@ class MultipopPlugin {
         }
         return false;
     }
+    private function compact_regione_name(string $name = '') {
+        $regione_name = $name;
+        if ($regione_name !== "Valle d'Aosta") {
+            $regione_name = explode(' ', $regione_name)[0];
+        }
+       return preg_replace("/ |'/", '', strtolower(iconv('UTF-8','ASCII//TRANSLIT', $regione_name)));
+    }
     private function generate_user_discourse_groups($user_id) {
         $user = false;
         if (is_object($user_id)) {
@@ -2235,15 +2241,13 @@ class MultipopPlugin {
                 if ($province) {
                     $provincia = array_pop( array_filter($province, function($p) use ($user) { return $p['sigla'] == $user->mpop_billing_state; }) );
                     if ($provincia) {
-                        $groups[] = ['name' => 'mp_prov_'.$user->mpop_billing_state, 'full_name' => 'Provincia di ' . $provincia['nome']];
-                        $regione_name = $provincia['regione'];
-                        if ($regione_name !== "Valle d'Aosta") {
-                            $regione_name = explode(' ', $regione_name)[0];
-                        }
-                        $regione_name = preg_replace("/ |'/", '', strtolower(iconv('UTF-8','ASCII//TRANSLIT', $regione_name)));
-                        $groups[] = ['name' => "mp_reg_$regione_name", 'full_name' => 'Regione ' . $provincia['regione']];
+                        $groups[] = ['name' => 'mp_prov_'.$user->mpop_billing_state, 'full_name' => 'Provincia di ' . $provincia['nome'], 'owner' => false];
+                        $regione_name = $this->compact_regione_name($provincia['regione']);
+                        $groups[] = ['name' => "mp_reg_$regione_name", 'full_name' => 'Regione ' . $provincia['regione'], 'owner' => false];
                     }
                 }
+            }
+            if ($user->roles[0] == 'multipopolare_resp' && $user->mpop_resp_zones) {
             }
         }
         return $groups;
@@ -2263,7 +2267,6 @@ class MultipopPlugin {
             }
             $params['groups'] = implode( ',', array_map(function($g) {return $g['name'];}, $groups) );
         }
-        $this->delay_script('getDiscourseGroups');
         return $params;
     }
 }
