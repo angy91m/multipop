@@ -2440,7 +2440,6 @@ class MultipopPlugin {
             }
             $params['groups'] = implode( ',', array_map(function($g) {return $g['name'];}, $groups) );
         }
-        save_test($params);
         $this->delay_script('updateDiscourseGroupsByUser', $user->ID);
         return $params;
     }

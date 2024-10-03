@@ -58,7 +58,7 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
             ]
         );
     }
-    public static function set_discourse_group_owners(int $id, array $owners = []) {
+    public static function add_discourse_group_owners(int $id, array $owners = []) {
         return static::discourse_request("/groups/$id/owners.json",
             ['method' => 'PUT', 'body' => ['usernames' => implode(',', $owners)]]
         );
@@ -153,10 +153,10 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
         }
         foreach($owner_changes as $change) {
             if ($change['new']) {
-                static::set_discourse_group_owners($change['id'], [$user->user_login]);
+                static::add_discourse_group_owners($change['id'], [$user->user_login]);
             } else {
                 if ($change['owner']) {
-                    static::set_discourse_group_owners($change['id'], [$user->user_login]);
+                    static::add_discourse_group_owners($change['id'], [$user->user_login]);
                 } else {
                     static::delete_discourse_group_owner($change['id'], $user->discourse_sso_user_id);
                 }
