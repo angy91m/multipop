@@ -211,7 +211,7 @@ switch( $post_data['action'] ) {
                     if ($found) {
                         $parsed_resp_zones[] = ['nome' => substr($zone, 4), 'type' => 'regione', 'province' => $found];
                     }
-                } else if (preg_match('/^[A-Z]{2}$/')) {
+                } else if (preg_match('/^[A-Z]{2}$/', $zone)) {
                     if (!$province) {
                         $province = $this->get_province_all();
                     }
@@ -219,7 +219,7 @@ switch( $post_data['action'] ) {
                     if ($found) {
                         $parsed_resp_zones[] = $found + ['type' => 'provincia'];
                     }
-                } else if (preg_match('/^[A-Z]\d{3}$/')) {
+                } else if (preg_match('/^[A-Z]\d{3}$/', $zone)) {
                     if (!$comuni) {
                         $comuni = $this->get_comuni_all();
                     }
