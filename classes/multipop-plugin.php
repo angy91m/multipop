@@ -110,6 +110,13 @@ class MultipopPlugin {
     private static function dashicon(string $icon = '', string $ba = 'before') {
         return '<span class="dashicons-'.$ba.' dashicons-'.$icon.'">&nbsp;</span>';
     }
+    
+    private static function is_plugin_active($plugin) {
+        if (!function_exists('is_plugin_active')) {
+            require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+        }
+        return is_plugin_active($plugin);
+    }
 
     // DB PREFIX FOR PLUGIN TABLES
     private static function db_prefix( $table ) {
@@ -2188,7 +2195,7 @@ class MultipopPlugin {
     private function discourse_utilities() {
         if (isset($this->disc_utils)) {return $this->disc_utils;}
         if (
-            is_plugin_active('wp-discourse/wp-discourse.php')
+            $this->is_plugin_active('wp-discourse/wp-discourse.php')
             && !empty(get_option( 'discourse_sso_provider' )['enable-sso'])
             && class_exists('WPDiscourse\Utilities\Utilities')
         ) {
