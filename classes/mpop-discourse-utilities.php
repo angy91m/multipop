@@ -64,7 +64,7 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
         );
     }
     public static function delete_discourse_group_owner(int $id, $user_id) {
-        return static::discourse_request("/groups/$id/owners.json",
+        return static::discourse_request("/admin/groups/$id/owners.json",
             ['method' => 'DELETE', 'body' => ['user_id' => intval($user_id)]]
         );
     }
