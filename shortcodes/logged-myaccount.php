@@ -234,8 +234,23 @@ $parsed_user = $this->myaccount_get_profile($current_user, true);
                                 @open="searchOpen('userSearchZone')"
                                 :get-option-label="(option) => option.untouched_label"
                                 :filter="fuseSearch"
-                                @option:selected="z => {
-                                    console.log(z);
+                                @option:selected="zones => {
+                                    const added = zones[zones.length - 1];
+                                    if (added.type == 'comune') {
+                                        if (userSearch.zones.find(z => (z.type == 'provincia' && z.codice == added.provincia.codice) || (z.type == 'regione' && z.nome == added.provincia.regione) ) ) {
+                                            userSearch.zones.pop();
+                                        }
+                                    }
+                                    if (added.type == 'provincia') {
+                                        if (userSearch.zones.find(z => (z.type == 'regione' && z.nome == added.regione) ) ) {
+                                            userSearch.zones.pop();
+                                        } else {
+                                            userSearch.zones = userSearch.zones.filter(z => z.type != 'comune' || z.provincia.codice != added.codice);
+                                        }
+                                    }
+                                    if (added.type == 'regione') {
+                                        userSearch.zones = userSearch.zones.filter(z => z.type == 'regione' || (z.type == 'provincia' && z.regione != added.nome) || (z.type == 'comune' && z.provincia.regione != added.nome));
+                                    }
                                 }"
                                 @search="(searchTxt, loading) => {
                                     if (searchTxt.trim().length > 1) {
