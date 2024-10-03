@@ -45,6 +45,9 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
 		}
 		return $res;
     }
+    public static function get_discourse_group($name) {
+        return static::discourse_request("/groups/$name.json");
+    }
 	public static function update_discourse_group($id, array $params = []) {
         if (empty($params)) { return false; }
         return static::discourse_request(
@@ -54,6 +57,14 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
                 'body' => ['group' => $params]
             ]
         );
+    }
+    public static function get_group_members($name, int $limit = 100, int $offset = 0) {
+        return static::discourse_request("/groups/$name/members.json&limit=$limit&offset=$offset");
+    }
+    public static function get_group_owners($name) {
+        $res = static::get_group_members($name, 0, 0);
+        if (is_wp_error($res)) {return $res;}
+        return $res->owners;
     }
 	public static function mpop_discourse_user($user_id) {
         if (is_object($user_id)) {
@@ -71,7 +82,7 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
             if ($g->automatic && !$auto_groups) {
                 continue;
             }
-            $group = ['name' => $g->name, 'owner' => false];
+            $group = ['id' => $g->id, 'name' => $g->name, 'owner' => false];
             $found = array_pop(array_filter($disc_user->user->group_users, function($gu) use ($g) { return $gu->group_id == $g->id; }));
             if ($found) {
                 $group['owner'] = $found->owner;
@@ -84,6 +95,61 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
         $res = static::get_discourse_groups_by_user($user_id);
         if (is_wp_error($res)) {return false;}
         return array_values(array_filter($res, function($g) { return str_starts_with($g['name'], 'mp_'); }));
+    }
+    public static function update_mpop_discourse_groups_by_user($user_id, $new_groups = []) {
+        $user = false;
+		if (is_object($user_id)) {
+			$user_id = $user_id->ID;
+		}
+        $user = get_user_by('ID',intval($user_id));
+		if (!$user || !$user->discourse_sso_user_id) {
+			return false;
+		}
+        $current_groups = static::get_mpop_discourse_groups_by_user($user);
+        if (is_wp_error($current_groups)) {return $current_groups;}
+        $add_groups = [];
+        $remove_groups = [];
+        $owner_changes = [];
+        foreach($new_groups as $group) {
+            $found = array_pop(array_filter($current_groups, function($g) use ($group) {return $g['name'] == $group['name'];}));
+            if (!$found) {
+                $add_groups[] = $group;
+            } else if ($found['owner'] != $group['owner']) {
+                $owner_changes[] = ['id' => $found['id'], 'name' => $group['name'], 'owner' => $group['owner']];
+            }
+        }
+        foreach($current_groups as $group) {
+            if (!array_pop(array_filter($new_groups, function($g) use ($group) {return $g['name'] == $group['name'];}))) {
+                $remove_groups[] = $group;
+            }
+        }
+        if (!empty($remove_groups)) {
+            static::remove_user_from_discourse_group($user->ID, implode(',',array_map(function($g) {return $g['name'];}, $remove_groups)));
+        }
+        if (!empty($add_groups)) {
+            $disc_groups = static::get_discourse_mpop_groups();
+            foreach($add_groups as $group) {
+                $found = array_pop(array_filter($disc_groups, function($g) use ($group) {return $g->name == $group['name'];}));
+                if (!$found) {
+                    $res = static::create_discourse_group($group['name'], $group['full_name']);
+                    if ($group['owner']) {
+                        $owner_changes[] = ['id' => $res->basic_group->id, 'name' => $group['name'], 'owner' => $group['owner'], 'new' => true];
+                    }
+                } else if ($group['owner']) {
+                    $owner_changes[] = ['id' => $found->id, 'owner' => $group['owner']];
+                }
+            }
+            static::add_user_to_discourse_group($user->ID, implode(',', array_map(function($g) {return $g['name'];}, $add_groups)));
+        }
+        foreach($owner_changes as $change) {
+            if ($change['new']) {
+                static::update_discourse_group($change['id'],['owner_usernames' => $user->user_login]);
+            } else {
+                $curr_owners = array_map(function($o) {return $o->username;}, static::get_group_owners($change['name']));
+                $curr_owners[] = $user->user_login;
+                static::update_discourse_group($change['id'],['owner_usernames' => implode(',', $curr_owners)]);
+            }
+        }
     }
 	public static function logout_user_from_discourse($user_id) {
 		$user = false;

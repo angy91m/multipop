@@ -9,7 +9,8 @@ usernameRegex = {
                 return username.charAt(0) !== '.'
                     && username.charAt(0) !== '-'
                     && username.charAt(username.length-1) !== '.'
-                    && username.charAt(username.length-1) !== '-';
+                    && username.charAt(username.length-1) !== '-'
+                    && !username.startsWith('mp_');
             }
         }
     ],

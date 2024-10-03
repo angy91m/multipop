@@ -274,42 +274,8 @@ switch( $post_data['action'] ) {
             $user_edits['ID'] = $user->ID;
             wp_update_user( $user_edits );
             delete_user_meta( $user->ID, 'mpop_profile_pending_edits' );
-            if (
-                $user->discourse_sso_user_id
-                && in_array($user->roles[0],['multipopolano', 'multipopolare_resp'])
-                && strval($user->mpop_billing_city) != strval($post_data['mpop_billing_city'])
-            ) {
-                $disc_utils = $this->discourse_utilities();
-                if ($disc_utils) {
-                    $current_user_groups = $disc_utils->get_mpop_discourse_groups_by_user($user);
-                    if (!is_wp_error($current_user_groups)) {
-                        $new_user_disc_groups = $this->generate_user_discourse_groups($user);
-                        $remove_groups = [];
-                        $add_groups = [];
-                        foreach($current_user_groups as $group) {
-                            if (!array_pop(array_filter($new_user_disc_groups, function($g) use ($group) {return $g['name'] == $group['name'];}))) {
-                                $remove_groups[] = $group;
-                            }
-                        }
-                        foreach($new_user_disc_groups as $group) {
-                            if (!array_pop(array_filter($current_user_groups, function($g) use ($group) {return $g['name'] == $group['name'];}))) {
-                                $remove_groups[] = $group;
-                            }
-                        }
-                        if (!empty($remove_groups)) {
-                            $disc_utils->remove_user_from_discourse_group($user->ID, implode(',',array_map(function($g) {return $g['name'];}, $remove_groups)));
-                        }
-                        if (!empty($add_groups)) {
-                            $current_groups = $disc_utils->get_mpop_discourse_groups();
-                            foreach($add_groups as $group) {
-                                if (!array_pop(array_filter($current_groups, function($g) use ($group) {return $g->name == $group['name'];}))) {
-                                    $disc_utils->create_discourse_group($group['name'], $group['full_name']);
-                                }
-                            }
-                            $disc_utils->add_user_to_discourse_group($user->ID, implode(',', array_map(function($g) {return $g['name'];}, $add_groups)));
-                        }
-                    }
-                }
+            if ($user->discourse_sso_user_id) {
+                $this->update_discourse_groups_by_user($user);
             }
             if (!isset($res_data['notices'])) {
                 $res_data['notices'] = [];

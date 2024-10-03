@@ -25,6 +25,7 @@ class MultipopPlugin {
     private array $user_notices = [];
     private ?array $comuni_all;
     private ?array $province_all;
+    private ?array $regioni_all;
     public const SUBS_STATUSES = [
         'tosee',
         'seen',
@@ -66,6 +67,7 @@ class MultipopPlugin {
             || !preg_match('/[a-z0-9]/', $username)
             || str_starts_with( $username, '.' )
             || str_starts_with( $username, '-' )
+            || str_starts_with( $username, 'mp_' )
             || str_ends_with( $username, '.' )
             || str_ends_with( $username, '-' )
         ) {return false;}
@@ -202,6 +204,10 @@ class MultipopPlugin {
             // 'getDiscourseGroups' => function() {
             //     save_test($this->discourse_utilities()->get_discourse_mpop_groups());
             // }
+            'updateDiscourseGroupsByUser' => function($user_id) {
+                sleep(10);
+                $this->update_discourse_groups_by_user($user_id);
+            }
         ];
     }
 
@@ -1399,6 +1405,22 @@ class MultipopPlugin {
         } 
         return $this->province_all;
     }
+    private function get_regioni_all() {
+        if (!isset($this->regioni_all)) {
+            $regioni = [];
+            $province = $this->get_province_all();
+            foreach($province as $p) {
+                if (!$p['soppressa']) {
+                    if (!isset($regioni[$p['regione']])) {
+                        $regioni[$p['regione']] = [];
+                    }
+                    $regioni[$p['regione']][] = $p;
+                }
+            }
+            $this->regioni_all = $regioni;
+        }
+        return $this->regioni_all;
+    }
     private function add_birthplace_labels(...$comuni) {
         foreach($comuni as $i=>$c) {
             $comuni[$i]['untouched_label'] = mb_strtoupper($c['nome'], 'UTF-8') . ' (' . $c['provincia']['sigla'] . ') - ' . $c['codiceCatastale'] . (isset($c['soppresso']) && $c['soppresso'] ? ' (soppresso)' : '');
@@ -2234,23 +2256,45 @@ class MultipopPlugin {
         }
         $groups = [];
         if ($user->roles[0] == 'administrator') {
-            $groups[] = ['name' => 'mp_wp_admins', 'full_name' => 'Amministratori Wordpress'];
+            $groups[] = ['name' => 'mp_wp_admins', 'full_name' => 'Amministratori Wordpress', 'owner' => false];
         } else if (in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
             if ($user->mpop_billing_state) {
-                $province = $this->get_province_all();
-                if ($province) {
-                    $provincia = array_pop( array_filter($province, function($p) use ($user) { return $p['sigla'] == $user->mpop_billing_state; }) );
+                $province_all = $this->get_province_all();
+                if ($province_all) {
+                    $provincia = array_pop( array_filter($province_all, function($p) use ($user) { return $p['sigla'] == $user->mpop_billing_state; }) );
                     if ($provincia) {
-                        $groups[] = ['name' => 'mp_prov_'.$user->mpop_billing_state, 'full_name' => 'Provincia di ' . $provincia['nome'], 'owner' => false];
+                        $groups[$user->mpop_billing_state] = ['name' => "mp_prov_$user->mpop_billing_state", 'full_name' => "Provincia di $provincia[nome]", 'owner' => false];
                         $regione_name = $this->compact_regione_name($provincia['regione']);
-                        $groups[] = ['name' => "mp_reg_$regione_name", 'full_name' => 'Regione ' . $provincia['regione'], 'owner' => false];
+                        $groups[$provincia['regione']] = ['name' => "mp_reg_$regione_name", 'full_name' => "Regione $provincia[regione]", 'owner' => false];
                     }
                 }
             }
-            if ($user->roles[0] == 'multipopolare_resp' && $user->mpop_resp_zones) {
+            if ($user->roles[0] == 'multipopolare_resp' && !empty($user->mpop_resp_zones)) {
+                foreach($user->mpop_resp_zones as $zone) {
+                    if (str_starts_with( $zone, 'reg_' )) {
+                        $reg_fullname = substr($zone, 4);
+                        $regione_name = $this->compact_regione_name($reg_fullname);
+                        $groups[$reg_fullname] = ['name' => "mp_reg_$regione_name", 'full_name' => "Regione $reg_fullname", 'owner' => true];
+                        $regioni_all = $this->get_regioni_all();
+                        foreach($regioni_all[$reg_fullname] as $p) {
+                            $groups[$p['sigla']] = ['name' => "mp_prov_$p[sigla]", 'full_name' => "Provincia di $p[nome]", 'owner' => true];
+                        }
+                    } else if (preg_match('/^[A-Z]{2}$/', $zone)) {
+                        $provincia = array_pop(array_filter($this->get_province_all(), function($p) use ($zone) { return $p['sigla'] == $zone; }));
+                        if ($provincia) {
+                            $groups[$provincia['sigla']] = ['name' => "mp_prov_$provincia[sigla]", 'full_name' => "Provincia di $provincia[nome]", 'owner' => true];
+                        }
+                    }
+                }
             }
         }
-        return $groups;
+        return array_values($groups);
+    }
+    private function update_discourse_groups_by_user($user) {
+        $disc_utils = $this->discourse_utilities();
+        if (!$disc_utils) { return false; }
+        $new_groups = $this->generate_user_discourse_groups($user);
+        return $disc_utils->update_mpop_discourse_groups_by_user($user, $new_groups);
     }
     public function discourse_user_params($params, $user) {
         $groups = $this->generate_user_discourse_groups($user);
@@ -2267,6 +2311,7 @@ class MultipopPlugin {
             }
             $params['groups'] = implode( ',', array_map(function($g) {return $g['name'];}, $groups) );
         }
+        $this->delay_script('updateDiscourseGroupsByUser', $user->ID);
         return $params;
     }
 }
