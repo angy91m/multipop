@@ -351,6 +351,21 @@ createApp({
                     return;
                 }
             }
+            const respZones = [];
+            if (userInEditing.role == 'multipopolare_resp') {
+                userInEditing.mpop_resp_zones.forEach(z => {
+                    let zs;
+                    switch (z.type) {
+                        case 'regione':
+                            zs = 'reg_' + z.nome;
+                        case 'provincia':
+                            zs = z.sigla;
+                        case 'comune':
+                            zs = z.codiceCatastale;
+                    }
+                    respZones.push(zs);
+                });
+            }
             const res = await serverReq({
                 action: 'admin_update_user',
                 ID: userInEditing.ID,
@@ -362,7 +377,8 @@ createApp({
                 mpop_birthplace: userInEditing.mpop_birthplace?.codiceCatastale,
                 mpop_billing_city: userInEditing.mpop_billing_city?.codiceCatastale,
                 mpop_billing_address: userInEditing.mpop_billing_address?.trim(),
-                mpop_billing_zip: userInEditing.mpop_billing_zip
+                mpop_billing_zip: userInEditing.mpop_billing_zip,
+                mpop_resp_zones: respZones
             });
             if (res.ok) {
                 const newUser = await res.json();
