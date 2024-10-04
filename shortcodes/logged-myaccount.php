@@ -279,7 +279,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             </v-select>
                         </div>
                         <div class="mpop-user-search-field mpop-50-wid">
-                            <label for="userSearchRespZone-select">Residenza</label>
+                            <label for="userSearchRespZone-select">Zone gestite</label>
                             <v-select
                                 multiple
                                 id="userSearchRespZone-select"
