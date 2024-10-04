@@ -356,7 +356,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                     <td>{{u.last_name ? u.last_name : ''}}</td>
                                     <td>{{u.mpop_billing_state ? u.mpop_billing_state : ''}}</td>
                                     <td>{{u.mpop_billing_city ? u.mpop_billing_city : ''}}</td>
-                                    <td></td>
+                                    <td v-html="showZones(u.mpop_resp_zones)"></td>
                                 </tr>
                             </tbody>
                         </table>

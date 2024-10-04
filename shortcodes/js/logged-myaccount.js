@@ -253,6 +253,24 @@ createApp({
             const func = eval(callable);
             triggerSearchTimeout = setTimeout( () => func(txt, ...args).then(() => loading(false)), 500);
         }
+        function showZones(zones) {
+            const regioni = zones.filter(z => z.type == 'regione'),
+            province = zones.filter(z => z.type == 'provincia'),
+            comuni = zones.filter(z => z.type == 'comune');
+            let res = '';
+            res += '<ul>';
+            if (regioni.length) {
+                res += '<li>Reg: ' + regioni.map(r => r.nome).join(', ') + '</li>';
+            }
+            if (province.length) {
+                res += '<li>Prov: ' + province.map(p => p.sigla).join(', ') + '</li>';
+            }
+            if (comuni.length) {
+                res += '<li>Com: ' + comuni.map(c => c.nome).join(', ') + '</li>';
+            }
+            res += '</ul>';
+            return res;
+        }
         function reduceZones(zones, target, zonesKey = 'zones') {
             const added = zones[zones.length - 1];
             if (added.type == 'comune') {
@@ -801,6 +819,7 @@ createApp({
             zoneSearch,
             triggerSearch,
             reduceZones,
+            showZones,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
         };
     }

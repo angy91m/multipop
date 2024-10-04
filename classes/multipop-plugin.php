@@ -1449,17 +1449,18 @@ class MultipopPlugin {
                     'untouched_label' => 'Provincia: ' . mb_strtoupper($p['nome'], 'UTF-8')
                 ];
                 $pp['label'] = iconv('UTF-8','ASCII//TRANSLIT', $pp['untouched_label']);
+                $pp['comuni'] = [];
                 if (
                     strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper( $p['nome'], 'UTF-8' )),$search) !== false
                     || strpos($p['sigla'], $search) !== false
                 ) {
-                    $zones[] = $pp;
+                    $zones[$p['sigla']] = $pp;
                 }
                 if (strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper($p['regione'], 'UTF-8')), $search) !== false) {
                     if (!isset($regioni[$p['regione']])) {
                         $regioni[$p['regione']] = [];
                     }
-                    $regioni[$p['regione']][] = $pp;
+                    $regioni[$p['regione']][$pp['sigla']] = $pp;
                 }
             }
         }
@@ -1471,22 +1472,34 @@ class MultipopPlugin {
               'province' => $r
             ];
             $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT', $zone['untouched_label']);
-            $zones[] = $zone;
+            $zones[$n] = $zone;
         }
         $comuni_all = $this->get_comuni_all();
         foreach($comuni_all as $c) {
+            $zone = $c;
+            $zone['type'] = 'comune';
+            $zone['untouched_label'] = 'Comune: ' . mb_strtoupper($c['nome'], 'UTF-8');
+            $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT', $zone['untouched_label']);
+            $zone['untouched_label'] .= ' (' . $c['provincia']['sigla'] . ')';
+            if ((!isset($c['soppresso']) || !$c['soppresso']) && isset($zones[$c['provincia']['sigla']])) {
+                $zones[$c['provincia']['sigla']]['comuni'][] = $zone;
+            }
+            if ((!isset($c['soppresso']) || !$c['soppresso']) && isset($zones[$c['provincia']['regione']])) {
+                $zones[$c['provincia']['regione']]['province'][$c['provincia']['sigla']]['comuni'][] = $zone;
+            }
             if (
                 (!isset($c['soppresso']) || !$c['soppresso'])
                 && strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper($c['nome'], 'UTF-8')), $search) !== false
             ) {
-                $zone = $c;
-                $zone['type'] = 'comune';
-                $zone['untouched_label'] = 'Comune: ' . mb_strtoupper($c['nome'], 'UTF-8');
-                $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT', $zone['untouched_label']);
-                $zone['untouched_label'] .= ' (' . $c['provincia']['sigla'] . ')';
                 $zones[] = $zone;
             }
         }
+        foreach($zones as &$z) {
+            if (isset($z['province'])) {
+                $z['province'] = array_values($z['province']);
+            }
+        }
+        $zones = array_values($zones);
         $cmp_comuni = function ($a, $b) {
             if ($b['type'] == 'comune') {
                 if ($a['provincia']['regione'] == $b['provincia']['regione']) {
