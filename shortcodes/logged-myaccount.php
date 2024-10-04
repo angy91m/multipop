@@ -229,7 +229,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         </div>
                         <div class="mpop-user-search-field">
                             <label for="user-seach-card-active">Tessera attiva</label>
-                            <select id="user-seach-card-active" v-model="userSearch.mpop_card_active">
+                            <select id="user-seach-card-active" v-model="userSearch.mpop_card_active" @change="triggerSearchUsers">
                                 <option :value="null"></option>
                                 <option :value="true">Sì</option>
                                 <option :value="false">No</option>
