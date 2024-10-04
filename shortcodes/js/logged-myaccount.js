@@ -260,13 +260,13 @@ createApp({
             let res = '';
             res += '<ul>';
             if (regioni.length) {
-                res += '<li>Reg: ' + regioni.map(r => r.nome).join(', ') + '</li>';
+                res += '<li class="mpop-nowrap">Reg: ' + regioni.map(r => r.nome).join(', ') + '</li>';
             }
             if (province.length) {
-                res += '<li>Prov: ' + province.map(p => p.sigla).join(', ') + '</li>';
+                res += '<li class="mpop-nowrap">Prov: ' + province.map(p => p.sigla).join(', ') + '</li>';
             }
             if (comuni.length) {
-                res += '<li>Com: ' + comuni.map(c => c.nome).join(', ') + '</li>';
+                res += '<li class="mpop-nowrap">Com: ' + comuni.map(c => c.nome).join(', ') + '</li>';
             }
             res += '</ul>';
             return res;

@@ -137,6 +137,9 @@ span.mpop-app-notice > span > span.dashicons-before.dashicons-no-alt {
     margin-right: 20px;
     margin-bottom: 10px;
 }
+.mpop-nowrap {
+    white-space: nowrap;
+}
 #mpop-user-search-table {
     border-spacing: 0;
     border-collapse: separate;
