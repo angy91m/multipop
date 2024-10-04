@@ -258,15 +258,15 @@ createApp({
             province = zones.filter(z => z.type == 'provincia'),
             comuni = zones.filter(z => z.type == 'comune');
             let res = '';
-            res += '<ul>';
+            res += '<ul class="mpop-search-results-zone">';
             if (regioni.length) {
-                res += '<li class="mpop-nowrap">Reg: ' + regioni.map(r => r.nome).join(', ') + '</li>';
+                res += '<li class="mpop-nowrap"><strong>Reg:</strong> ' + regioni.map(r => r.nome).join(', ') + '</li>';
             }
             if (province.length) {
-                res += '<li class="mpop-nowrap">Prov: ' + province.map(p => p.sigla).join(', ') + '</li>';
+                res += '<li class="mpop-nowrap"><strong>Prov:</strong> ' + province.map(p => p.sigla).join(', ') + '</li>';
             }
             if (comuni.length) {
-                res += '<li class="mpop-nowrap">Com: ' + comuni.map(c => c.nome).join(', ') + '</li>';
+                res += '<li class="mpop-nowrap"><strong>Com:</strong> ' + comuni.map(c => c.nome).join(', ') + '</li>';
             }
             res += '</ul>';
             return res;

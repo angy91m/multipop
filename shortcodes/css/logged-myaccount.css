@@ -198,6 +198,10 @@ label[for="mpop-tabs-nav"] {
     min-height: 40px;
     height: fit-content;
 }
+.mpop-search-results-zone {
+    list-style-type: none;
+    padding-left: 0;
+}
 .mpop-100-wid {
     width: 100%;
     margin-left: 0;
