@@ -529,15 +529,21 @@ createApp({
             delete reqObj.zones;
             delete reqObj.resp_zones;
             userSearch.zones.forEach(z => {
-                if (z.type == 'regione') reqObj.mpop_billing_state.push(...z.province.map(p => p.sigla));
+                if (z.type == 'regione') reqObj.mpop_billing_state.push(...Object.keys(z.province));
                 if (z.type == 'provincia') reqObj.mpop_billing_state.push(z.sigla);
                 if (z.type == 'comune') reqObj.mpop_billing_city.push(z.codiceCatastale);
             });
             userSearch.resp_zones.forEach(z => {
-                if (z.type == 'regione') reqObj.mpop_resp_zones.push('reg_' + z.nome);
-                if (z.type == 'provincia') reqObj.mpop_resp_zones.push(z.sigla);
+                if (z.type == 'regione') {
+                    reqObj.mpop_resp_zones.push('reg_' + z.nome, ...Object.keys(z.province));
+                    for (const k in z.province) {
+                        reqObj.mpop_resp_zones.push(...z.province[k]);
+                    }
+                }
+                if (z.type == 'provincia') reqObj.mpop_resp_zones.push(z.sigla, ...z.comuni);
                 if (z.type == 'comune') reqObj.mpop_resp_zones.push(z.codiceCatastale);
             });
+            reqObj.mpop_resp_zones = Array.from(new Set(reqObj.mpop_resp_zones));
             const res = await serverReq(reqObj);
             if (res.ok) {
                 const users = await res.json();

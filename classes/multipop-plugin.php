@@ -1432,7 +1432,7 @@ class MultipopPlugin {
         }
         return $comuni;
     }
-    private function search_zones($search = '') {
+    private function search_zones($search = '', $soppressi = false) {
         $zones = [];
         if (!is_string($search) || mb_strlen(trim($search), 'UTF-8') < 2) {
             return $zones;
@@ -1442,26 +1442,26 @@ class MultipopPlugin {
         $regioni = [];
         $province_all = $this->get_province_all();
         foreach($province_all as $p) {
-            if (!$p['soppressa']) {
-
-                $pp = $p + [
-                    'type' => 'provincia',
-                    'untouched_label' => 'Provincia: ' . mb_strtoupper($p['nome'], 'UTF-8')
-                ];
-                $pp['label'] = iconv('UTF-8','ASCII//TRANSLIT', $pp['untouched_label']);
-                $pp['comuni'] = [];
-                if (
-                    strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper( $p['nome'], 'UTF-8' )),$search) !== false
-                    || strpos($p['sigla'], $search) !== false
-                ) {
-                    $zones[$p['sigla']] = $pp;
+            if (!$soppressi && $p['soppressa']) {
+                continue;
+            }
+            $pp = $p + [
+                'type' => 'provincia',
+                'untouched_label' => 'Provincia: ' . mb_strtoupper($p['nome'], 'UTF-8')
+            ];
+            $pp['label'] = iconv('UTF-8','ASCII//TRANSLIT', $pp['untouched_label']);
+            $pp['comuni'] = [];
+            if (
+                strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper( $p['nome'], 'UTF-8' )),$search) !== false
+                || strpos($p['sigla'], $search) !== false
+            ) {
+                $zones[$p['sigla']] = $pp;
+            }
+            if (strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper($p['regione'], 'UTF-8')), $search) !== false) {
+                if (!isset($regioni[$p['regione']])) {
+                    $regioni[$p['regione']] = [];
                 }
-                if (strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper($p['regione'], 'UTF-8')), $search) !== false) {
-                    if (!isset($regioni[$p['regione']])) {
-                        $regioni[$p['regione']] = [];
-                    }
-                    $regioni[$p['regione']][$pp['sigla']] = $pp;
-                }
+                $regioni[$p['regione']][$pp['sigla']] = [];
             }
         }
         foreach($regioni as $n =>$r) {
@@ -1476,27 +1476,24 @@ class MultipopPlugin {
         }
         $comuni_all = $this->get_comuni_all();
         foreach($comuni_all as $c) {
+            if (!$soppressi && $c['soppresso']) {
+                continue;
+            }
             $zone = $c;
             $zone['type'] = 'comune';
             $zone['untouched_label'] = 'Comune: ' . mb_strtoupper($c['nome'], 'UTF-8');
             $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT', $zone['untouched_label']);
             $zone['untouched_label'] .= ' (' . $c['provincia']['sigla'] . ')';
-            if ((!isset($c['soppresso']) || !$c['soppresso']) && isset($zones[$c['provincia']['sigla']])) {
-                $zones[$c['provincia']['sigla']]['comuni'][] = $zone;
+            if (isset($zones[$c['provincia']['sigla']])) {
+                $zones[$c['provincia']['sigla']]['comuni'][] = $c['codiceCatastale'];
             }
-            if ((!isset($c['soppresso']) || !$c['soppresso']) && isset($zones[$c['provincia']['regione']])) {
-                $zones[$c['provincia']['regione']]['province'][$c['provincia']['sigla']]['comuni'][] = $zone;
+            if ( isset($zones[$c['provincia']['regione']])) {
+                $zones[$c['provincia']['regione']]['province'][$c['provincia']['sigla']][] = $c['codiceCatastale'];
             }
             if (
-                (!isset($c['soppresso']) || !$c['soppresso'])
-                && strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper($c['nome'], 'UTF-8')), $search) !== false
+                strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper($c['nome'], 'UTF-8')), $search) !== false
             ) {
                 $zones[] = $zone;
-            }
-        }
-        foreach($zones as &$z) {
-            if (isset($z['province'])) {
-                $z['province'] = array_values($z['province']);
             }
         }
         $zones = array_values($zones);
