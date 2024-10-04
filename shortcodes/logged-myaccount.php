@@ -227,6 +227,14 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             <label :for="'user-search-'+role">{{showRole(role)}}</label>
                             <input :id="'user-search-'+role" type="checkbox" v-model="userSearch.roles" @change="triggerSearchUsers" :value="role"/>
                         </div>
+                        <div class="mpop-user-search-field">
+                            <label for="user-seach-card-active">Tessera attiva</label>
+                            <select id="user-seach-card-active" v-model="userSearch.mpop_card_active">
+                                <option :value="null"></option>
+                                <option :value="true">Sì</option>
+                                <option :value="false">No</option>
+                            </select>
+                        </div>
                         <div class="mpop-user-search-field mpop-50-wid">
                             <label for="userSearchZone-select">Residenza</label>
                             <v-select
@@ -253,6 +261,49 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                     <input
                                         class="vs__search"
                                         :style="'display: ' + (userSearchZoneOpen ? 'unset' : 'none')"
+                                        v-bind="attributes"
+                                        v-on="events"
+                                    />
+                                </template>
+                                <template v-slot:option="zone">
+                                    {{zone.untouched_label}}
+                                </template>
+                                <template v-slot:no-options="{search}">
+                                    <template v-if="search.trim().length > 1">
+                                        Nessun risultato per "{{search}}"
+                                    </template>
+                                    <template v-else>
+                                        Inserisci almeno 2 caratteri
+                                    </template>
+                                </template>
+                            </v-select>
+                        </div>
+                        <div class="mpop-user-search-field mpop-50-wid">
+                            <label for="userSearchRespZone-select">Residenza</label>
+                            <v-select
+                                multiple
+                                id="userSearchRespZone-select"
+                                v-model="userSearch.resp_zones"
+                                :options="zoneSearch.users_resp"
+                                @close="userSearchRespZoneOpen = false"
+                                @open="searchOpen('userSearchRespZone')"
+                                :get-option-label="(option) => option.untouched_label"
+                                :filter="fuseSearch"
+                                @option:selected="zones => {
+                                    const oldLen = zones.length;
+                                    reduceZones(zones, userSearch, 'resp_zones');
+                                    if (oldLen == zones.length) triggerSearchUsers();
+                                }"
+                                @option:deselected="triggerSearchUsers"
+                                @search="(searchTxt, loading) => {
+                                    if (searchTxt.trim().length < 2) return loading(false);
+                                    triggerSearch(searchTxt, loading, 'searchZones', 'users_resp', userSearch, 'resp_zones');
+                                }"
+                            >
+                                <template #search="{ attributes, events }">
+                                    <input
+                                        class="vs__search"
+                                        :style="'display: ' + (userSearchRespZoneOpen ? 'unset' : 'none')"
                                         v-bind="attributes"
                                         v-on="events"
                                     />

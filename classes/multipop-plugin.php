@@ -2142,7 +2142,17 @@ class MultipopPlugin {
         }
         return $roles;
     }
-    private function user_search($txt= '', $roles = true, array $mpop_billing_state = [], array $mpop_billing_city = [], $page = 1, $sort_by = ['ID' => true], $limit = 100) {
+    private function user_search(
+        $txt= '',
+        $roles = true,
+        array $mpop_billing_state = [],
+        array $mpop_billing_city = [],
+        array $mpop_resp_zones = [],
+        $mpop_card_active = null,
+        $page = 1,
+        $sort_by = ['ID' => true],
+        $limit = 100
+    ) {
         $res = [];
         if (!is_array($roles) && $roles !== true) {
             return $res;
@@ -2157,7 +2167,20 @@ class MultipopPlugin {
             'paged' => $page,
             'number' => $limit
         ];
-        $roles = $this->parse_requested_roles($roles);
+        if(count($mpop_resp_zones)) {
+            $mpop_resp_zones = array_filter($mpop_resp_zones, function($z) {return is_string($z) && (str_starts_with($z, 'reg_') || preg_match('/^([A-Z]{2})|([A-Z]\d{3})$/', $z));});
+            $mpop_resp_zones = array_unique($mpop_resp_zones);
+            $mpop_resp_zones = array_values($mpop_resp_zones);
+        }
+        if(count($mpop_resp_zones)) {
+            if ($roles === true || in_array('multipopolare_resp', $roles)) {
+                $roles = ['multipopolare_resp'];
+            } else {
+                return [[], 0, $limit];
+            }
+        } else {
+            $roles = $this->parse_requested_roles($roles);
+        }
         if (!$roles) {
             return $res;
         }
@@ -2203,6 +2226,40 @@ class MultipopPlugin {
                 'value' => $mpop_billing_city
             ];
         }
+        if (count($mpop_resp_zones)) {
+            $meta_q['mpop_resp_zones'] = [
+                'relation' => 'OR'
+            ];
+            foreach($mpop_resp_zones as $zone) {
+                $meta_q['mpop_resp_zones'][] = [
+                    'key' => 'mpop_resp_zones',
+                    'value' => "\"$zone\"",
+                    'compare' => 'LIKE'
+                ];
+            }
+        }
+        if (is_bool($mpop_card_active)) {
+            if ($mpop_card_active) {
+                $meta_q['mpop_card_active'] = [
+                    'key' => 'mpop_card_active',
+                    'value' => '1',
+                    'type' => 'NUMERIC'
+                ];
+            } else {
+                $meta_q['mpop_card_active'] = [
+                    'relation' => 'OR',
+                    [
+                        'key' => 'mpop_card_active',
+                        'value' => '0',
+                        'type' => 'NUMERIC'
+                    ],
+                    [
+                        'key' => 'mpop_card_active',
+                        'compare' => 'NOT EXISTS'
+                    ]
+                ];
+            }
+        }
         $allowed_field_sorts = [
             'ID',
             'login',
@@ -2218,7 +2275,8 @@ class MultipopPlugin {
             'first_name',
             'last_name',
             'mpop_billing_state',
-            'mpop_billing_city'
+            'mpop_billing_city',
+            'mpop_card_active'
         ];
         if (!is_array($sort_by)) {
             $sort_by = ['ID' => 'ASC'];
@@ -2253,17 +2311,40 @@ class MultipopPlugin {
                                 $fsort_by[$k] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
                                 break;
                             }
-                            $meta_q[$k] = [
-                                'relation' => 'OR',
-                                $k.'_exists' => [
-                                    'key' => $k,
-                                    'compare' => 'EXISTS'
-                                ],
-                                $k.'_notexists' => [
-                                    'key' => $k,
-                                    'compare' => 'NOT EXISTS'
-                                ],
-                            ];
+                            if (in_array($k, ['mpop_mail_to_confirm', 'mpop_card_active'])) {
+                                $meta_q[$k] = [
+                                    'relation' => 'OR',
+                                    $k.'_exists' => [
+                                        'key' => $k,
+                                        'value' => '1',
+                                        'type' => 'NUMERIC'
+                                    ],
+                                    $k.'_notexists' => [
+                                        'relation' => 'OR',
+                                        [
+                                            'key' => $k,
+                                            'compare' => 'NOT EXISTS'
+                                        ],
+                                        [
+                                            'key' => $k,
+                                            'value' => '0',
+                                            'type' => 'NUMERIC'
+                                        ]
+                                    ]
+                                ];
+                            } else {
+                                $meta_q[$k] = [
+                                    'relation' => 'OR',
+                                    $k.'_exists' => [
+                                        'key' => $k,
+                                        'compare' => 'EXISTS'
+                                    ],
+                                    $k.'_notexists' => [
+                                        'key' => $k,
+                                        'compare' => 'NOT EXISTS'
+                                    ]
+                                ];
+                            }
                             $fsort_by[$k.'_exists'] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
                     }
                 } else {
@@ -2299,6 +2380,7 @@ class MultipopPlugin {
                 'registred' => $u->user_registered,
                 'first_name' => $u->first_name,
                 'last_name' => $u->last_name,
+                'mpop_card_active' => $u->mpop_card_active ? true : false,
                 'mpop_mail_to_confirm' => boolval($u->mpop_mail_to_confirm ),
                 'mpop_billing_state' => $u->mpop_billing_state,
                 'mpop_billing_city' => $billing_city ? $billing_city['nome'] : '',

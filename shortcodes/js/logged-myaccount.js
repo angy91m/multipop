@@ -58,6 +58,7 @@ createApp({
         birthplaceOpen = ref(false),
         billingCityOpen = ref(false),
         userSearchZoneOpen = ref(false),
+        userSearchRespZoneOpen = ref(false),
         userEditingRespZoneOpen = ref(false),
         saving = ref(false),
         savingProfileErrors = reactive([]),
@@ -79,10 +80,13 @@ createApp({
             sortBy: {
                 ID: true
             },
-            zones: []
+            zones: [],
+            resp_zones: [],
+            mpop_card_active: null
         }),
         zoneSearch = reactive({
             users: [],
+            users_resp: [],
             subscriptions: [],
             mpop_resp: []
         }),
@@ -501,13 +505,20 @@ createApp({
                 action: 'admin_search_users',
                 ...userSearch,
                 mpop_billing_state: [],
-                mpop_billing_city: []
+                mpop_billing_city: [],
+                mpop_resp_zones: []
             };
             delete reqObj.zones;
+            delete reqObj.resp_zones;
             userSearch.zones.forEach(z => {
                 if (z.type == 'regione') reqObj.mpop_billing_state.push(...z.province.map(p => p.sigla));
                 if (z.type == 'provincia') reqObj.mpop_billing_state.push(z.sigla);
                 if (z.type == 'comune') reqObj.mpop_billing_city.push(z.codiceCatastale);
+            });
+            userSearch.resp_zones.forEach(z => {
+                if (z.type == 'regione') reqObj.mpop_resp_zones.push('reg_' + z.nome);
+                if (z.type == 'provincia') reqObj.mpop_resp_zones.push(z.sigla);
+                if (z.type == 'comune') reqObj.mpop_resp_zones.push(z.codiceCatastale);
             });
             const res = await serverReq(reqObj);
             if (res.ok) {
@@ -785,6 +796,7 @@ createApp({
             updateUser,
             fuseSearch,
             userSearchZoneOpen,
+            userSearchRespZoneOpen,
             userEditingRespZoneOpen,
             zoneSearch,
             triggerSearch,
