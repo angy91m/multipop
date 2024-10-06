@@ -105,9 +105,9 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                                 v-on="events"
                                             />
                                         </template>
-                                        <template v-slot:option="city">
+                                        <!-- <template v-slot:option="city">
                                             {{city.untouched_label + addSuppressToLabel(city)}}
-                                        </template>
+                                        </template> -->
                                         <template v-slot:no-options="{search}">
                                             <template v-if="search.trim().length > 1">
                                                 Nessun risultato per "{{search}}"
