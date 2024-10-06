@@ -106,7 +106,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                             />
                                         </template>
                                         <template v-slot:option="city">
-                                            {{city.untouched_label + (city.soppresso ? ' (soppresso)' : '')}}
+                                            {{city.untouched_label + addSuppressToLabel(option)}}
                                         </template>
                                         <template v-slot:no-options="{search}">
                                             <template v-if="search.trim().length > 1">
@@ -158,7 +158,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                             />
                                         </template>
                                         <template v-slot:option="city">
-                                            {{city.nome}} ({{city.provincia.sigla}})
+                                            {{city.nome}} ({{city.provincia.sigla}}) + addSuppressToLabel(option)
                                         </template>
                                         <template v-slot:no-options="{search}">
                                             <template v-if="search.trim().length > 1">
