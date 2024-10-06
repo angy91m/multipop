@@ -105,9 +105,9 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                                 v-on="events"
                                             />
                                         </template>
-                                        <!-- <template v-slot:option="city">
+                                        <template v-slot:option="city">
                                             {{city.untouched_label + addSuppressToLabel(city)}}
-                                        </template> -->
+                                        </template>
                                         <template v-slot:no-options="{search}">
                                             <template v-if="search.trim().length > 1">
                                                 Nessun risultato per "{{search}}"
@@ -158,7 +158,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                             />
                                         </template>
                                         <template v-slot:option="city">
-                                            {{city.nome}} ({{city.provincia.sigla}}) + addSuppressToLabel(city)
+                                            {{city.nome}} ({{city.provincia.sigla}}){{addSuppressToLabel(city)}}
                                         </template>
                                         <template v-slot:no-options="{search}">
                                             <template v-if="search.trim().length > 1">
@@ -266,7 +266,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                     />
                                 </template>
                                 <template v-slot:option="zone">
-                                    {{zone.untouched_label}}
+                                    {{zone.untouched_label + addSuppressToLabel(zone)}}
                                 </template>
                                 <template v-slot:no-options="{search}">
                                     <template v-if="search.trim().length > 1">
@@ -309,7 +309,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                     />
                                 </template>
                                 <template v-slot:option="zone">
-                                    {{zone.untouched_label}}
+                                    {{zone.untouched_label + addSuppressToLabel(zone)}}
                                 </template>
                                 <template v-slot:no-options="{search}">
                                     <template v-if="search.trim().length > 1">
@@ -449,7 +449,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                             />
                                         </template>
                                         <template v-slot:option="zone">
-                                            {{zone.untouched_label}}
+                                            {{zone.untouched_label + addSuppressToLabel(zone)}}
                                         </template>
                                         <template v-slot:no-options="{search}">
                                             <template v-if="search.trim().length > 1">
@@ -502,7 +502,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                             />
                                         </template>
                                         <template v-slot:option="city">
-                                            {{city.untouched_label}}
+                                            {{city.untouched_label + addSuppressToLabel(city)}}
                                         </template>
                                         <template v-slot:no-options="{search}">
                                             <template v-if="search.trim().length > 1">
@@ -554,7 +554,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                             />
                                         </template>
                                         <template v-slot:option="city">
-                                            {{city.nome}} ({{city.provincia.sigla}})
+                                            {{city.nome}} ({{city.provincia.sigla}}){{addSuppressToLabel(city)}}
                                         </template>
                                         <template v-slot:no-options="{search}">
                                             <template v-if="search.trim().length > 1">
