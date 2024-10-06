@@ -90,7 +90,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                         :disabled="!profileInEditing.mpop_birthdate"
                                         @close="birthplaceOpen = false"
                                         @open="searchOpen('birthplace')"
-                                        :get-option-label="(option) => option.untouched_label"
+                                        :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
                                         :filter="fuseSearch"
                                         @search="(searchTxt, loading) => {
                                             if (searchTxt.trim().length < 2) return loading(false);
@@ -106,7 +106,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                             />
                                         </template>
                                         <template v-slot:option="city">
-                                            {{city.untouched_label}}
+                                            {{city.untouched_label + (city.soppresso ? ' (soppresso)' : '')}}
                                         </template>
                                         <template v-slot:no-options="{search}">
                                             <template v-if="search.trim().length > 1">
@@ -130,7 +130,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                         :options="billingCities"
                                         @close="billingCityOpen = false"
                                         @open="searchOpen('billingCity')"
-                                        :get-option-label="(option) => option.nome"
+                                        :get-option-label="(option) => option.nome + addSuppressToLabel(option)"
                                         :filter="fuseSearch"
                                         @option:selected="c => {
                                             profileInEditing.mpop_billing_state = c.provincia.sigla;
@@ -244,7 +244,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 :options="zoneSearch.users"
                                 @close="userSearchZoneOpen = false"
                                 @open="searchOpen('userSearchZone')"
-                                :get-option-label="(option) => option.untouched_label"
+                                :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
                                 :filter="fuseSearch"
                                 @option:selected="zones => {
                                     const oldLen = zones.length;
@@ -287,7 +287,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 :options="zoneSearch.users_resp"
                                 @close="userSearchRespZoneOpen = false"
                                 @open="searchOpen('userSearchRespZone')"
-                                :get-option-label="(option) => option.untouched_label"
+                                :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
                                 :filter="fuseSearch"
                                 @option:selected="zones => {
                                     const oldLen = zones.length;
@@ -432,7 +432,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                         :options="zoneSearch.mpop_resp"
                                         @close="userEditingRespZoneOpen = false"
                                         @open="searchOpen('userEditingRespZone')"
-                                        :get-option-label="(option) => option.untouched_label"
+                                        :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
                                         :filter="fuseSearch"
                                         @option:selected="zones => reduceZones(zones, userInEditing, 'mpop_resp_zones')"
                                         @search="(searchTxt, loading) => {
@@ -486,7 +486,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                         :disabled="!userInEditing.mpop_birthdate"
                                         @close="birthplaceOpen = false"
                                         @open="searchOpen('birthplace')"
-                                        :get-option-label="(option) => option.untouched_label"
+                                        :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
                                         :filter="fuseSearch"
                                         @search="(searchTxt, loading) => {
                                             if (searchTxt.trim().length < 2) return loading(false);
@@ -526,7 +526,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                         :options="billingCities"
                                         @close="billingCityOpen = false"
                                         @open="searchOpen('billingCity')"
-                                        :get-option-label="(option) => option.nome"
+                                        :get-option-label="(option) => option.nome + addSuppressToLabel(option)"
                                         :filter="fuseSearch"
                                         @option:selected="c => {
                                             userInEditing.mpop_billing_state = c.provincia.sigla;

@@ -320,6 +320,15 @@ createApp({
                 }
             }
         }
+        function addSuppressToLabel(option) {
+            let res = '';
+            if (option.type == 'provincia' || option.type == 'regione') {
+                if (option.soppressa) res += ' (soppressa)';
+            } else {
+                if (option.soppresso) res += ' (soppresso)';
+            }
+            return res;
+        }
         async function updateProfile() {
             saving.value = true;
             savingProfileErrors.length = 0;
@@ -826,6 +835,7 @@ createApp({
             triggerSearch,
             reduceZones,
             showZones,
+            addSuppressToLabel,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
         };
     }

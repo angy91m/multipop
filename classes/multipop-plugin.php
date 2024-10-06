@@ -1420,7 +1420,7 @@ class MultipopPlugin {
     }
     private function add_birthplace_labels(...$comuni) {
         foreach($comuni as $i=>$c) {
-            $comuni[$i]['untouched_label'] = mb_strtoupper($c['nome'], 'UTF-8') . ' (' . $c['provincia']['sigla'] . ') - ' . $c['codiceCatastale'] . (isset($c['soppresso']) && $c['soppresso'] ? ' (soppresso)' : '');
+            $comuni[$i]['untouched_label'] = mb_strtoupper($c['nome'], 'UTF-8') . ' (' . $c['provincia']['sigla'] . ') - ' . $c['codiceCatastale'];
             $comuni[$i]['label'] = iconv('UTF-8','ASCII//TRANSLIT', $comuni[$i]['untouched_label']);
         }
         return $comuni;
