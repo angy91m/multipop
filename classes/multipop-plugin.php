@@ -2200,6 +2200,10 @@ class MultipopPlugin {
                 'relation' => 'OR'
             ]
         ];
+
+        add_action('pre_user_query', function ($q) {
+            save_test($q);
+        });
         global $wpdb;
         if (count($roles)) {
             sort($roles);
