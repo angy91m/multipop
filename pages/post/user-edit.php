@@ -258,7 +258,7 @@ if (!$errors->has_errors()) {
     foreach($user_meta as $k => $v) {
         update_user_meta($user->ID, $k, $v);
     }
-    if (in_array($user->role[0], ['administrator', 'multipopolano', 'multipopolare_resp'])) {
+    if (in_array($user->role, ['administrator', 'multipopolano', 'multipopolare_resp'])) {
         $this->update_discourse_groups_by_user($user);
     }
 }
