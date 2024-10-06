@@ -2260,8 +2260,7 @@ class MultipopPlugin {
                     'relation' => 'OR',
                     [
                         'key' => 'mpop_card_active',
-                        'value' => '0',
-                        'type' => 'NUMERIC'
+                        'value' => '',
                     ],
                     [
                         'key' => 'mpop_card_active',
@@ -2337,8 +2336,7 @@ class MultipopPlugin {
                                         ],
                                         [
                                             'key' => $k,
-                                            'value' => '0',
-                                            'type' => 'NUMERIC'
+                                            'value' => '',
                                         ]
                                     ]
                                 ];
@@ -2346,12 +2344,22 @@ class MultipopPlugin {
                                 $meta_q[$k] = [
                                     'relation' => 'OR',
                                     $k.'_exists' => [
-                                        'key' => $k,
-                                        'compare' => 'EXISTS'
+                                        [
+                                            'key' => $k,
+                                            'value' => '',
+                                            'compare' => '!='
+                                        ]
                                     ],
                                     $k.'_notexists' => [
-                                        'key' => $k,
-                                        'compare' => 'NOT EXISTS'
+                                        'relation' => 'OR',
+                                        [
+                                            'key' => $k,
+                                            'compare' => 'NOT EXISTS'
+                                        ],
+                                        [
+                                            'key' => $k,
+                                            'value' => ''
+                                        ]
                                     ]
                                 ];
                             }
