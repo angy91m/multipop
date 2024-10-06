@@ -80,7 +80,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             </tr>
                             <tr>
                                 <td><strong>Luogo di nascita:</strong></td>
-                                <td v-if="!profileEditing">{{profile.mpop_birthplace ? (profile.mpop_birthplace.nome + ' (' + profile.mpop_birthplace.provincia.sigla +')' ) : ''}}</td>
+                                <td v-if="!profileEditing">{{profile.mpop_birthplace ? (profile.mpop_birthplace.nome + ' (' + profile.mpop_birthplace.provincia.sigla +')' + addSuppressToLabel(profile.mpop_birthplace) ) : ''}}</td>
                                 <td v-else>
                                     <v-select
                                         id="birthplace-select"
@@ -121,7 +121,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             </tr>
                             <tr>
                                 <td><strong>Comune di residenza:</strong></td>
-                                <td v-if="!profileEditing">{{ profile.mpop_billing_city ? profile.mpop_billing_city.nome : ''}}</td>
+                                <td v-if="!profileEditing">{{ profile.mpop_billing_city ? profile.mpop_billing_city.nome + addSuppressToLabel(profile.mpop_billing_city) : ''}}</td>
                                 <td v-else>
                                     <v-select
                                         id="billingCity-select"
@@ -417,7 +417,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 <td v-if="!userEditing">
                                     <template v-if="userInView.mpop_resp_zones.length">
                                         <ul>
-                                            <li v-for="z in userInView.mpop_resp_zones">{{z.untouched_label}}</li>
+                                            <li v-for="z in userInView.mpop_resp_zones">{{z.untouched_label + addSuppressToLabel(z)}}</li>
                                         </ul>
                                     </template>
                                     <template v-else>
@@ -476,7 +476,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             </tr>
                             <tr>
                                 <td><strong>Luogo di nascita:</strong></td>
-                                <td v-if="!userEditing">{{userInView.mpop_birthplace ? (userInView.mpop_birthplace.nome + ' (' + userInView.mpop_birthplace.provincia.sigla +')' ) : ''}}</td>
+                                <td v-if="!userEditing">{{userInView.mpop_birthplace ? (userInView.mpop_birthplace.nome + ' (' + userInView.mpop_birthplace.provincia.sigla +')' + addSuppressToLabel(userInView.mpop_birthplace) ) : ''}}</td>
                                 <td v-else>
                                     <v-select
                                         id="birthplace-select"
@@ -517,7 +517,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             </tr>
                             <tr>
                                 <td><strong>Comune di residenza:</strong></td>
-                                <td v-if="!userEditing">{{ userInView.mpop_billing_city ? userInView.mpop_billing_city.nome : ''}}</td>
+                                <td v-if="!userEditing">{{ userInView.mpop_billing_city ? userInView.mpop_billing_city.nome + addSuppressToLabel(userInView.mpop_billing_city) : ''}}</td>
                                 <td v-else>
                                     <v-select
                                         id="billingCity-select"
