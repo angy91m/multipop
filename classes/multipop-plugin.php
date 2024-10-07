@@ -2227,6 +2227,7 @@ class MultipopPlugin {
             ]
         ];
         global $wpdb;
+        save_test(count($roles), 2);
         if (count($roles)) {
             sort($roles);
             foreach($roles as $role) {
@@ -2242,7 +2243,6 @@ class MultipopPlugin {
                 'value' => 'a:0:{}'
             ];
         }
-        save_test($meta_q['role'], 2);
         if (is_string($txt) && trim($txt) && !preg_match("\r|\n|\t",$txt)) {
             $query['mpop_custom_search'] = $txt;
         }
