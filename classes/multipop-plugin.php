@@ -2237,9 +2237,10 @@ class MultipopPlugin {
                 ];
             }
         } else {
-            $meta_q['role'][] = [
+            $meta_q['role'] = [
                 'key' => $wpdb->prefix . 'capabilities',
-                'value' => 'a:0:{}'
+                'value' => 'a:0:{}',
+                'compare' => '='
             ];
         }
         if (is_string($txt) && trim($txt) && !preg_match("\r|\n|\t",$txt)) {
