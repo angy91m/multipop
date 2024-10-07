@@ -2216,7 +2216,6 @@ class MultipopPlugin {
         } else {
             $roles = $this->parse_requested_roles($roles);
         }
-        save_test($roles, 2);
         if (!$roles) {
             return $res;
         }
@@ -2243,6 +2242,7 @@ class MultipopPlugin {
                 'value' => 'a:0:{}'
             ];
         }
+        save_test($meta_q['role'], 2);
         if (is_string($txt) && trim($txt) && !preg_match("\r|\n|\t",$txt)) {
             $query['mpop_custom_search'] = $txt;
         }
