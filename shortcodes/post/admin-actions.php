@@ -288,6 +288,22 @@ switch( $post_data['action'] ) {
                     '_new_email' => $post_data['email']
                 ];
                 $res_data['notices'] = [['type'=>'info', 'msg' => 'È stata inviata un\'e-mail di conferma all\'indirizzo indicato']];
+            } else {
+                $this->delete_temp_token_by_user_id($user->ID, 'email_confirmation_link');
+                $token = $this->create_temp_token( $user->ID, 'email_confirmation_link' );
+                $res_mail = $this->send_confirmation_mail($token, $user->user_email);
+                if (!$res_mail) {
+                    $this->delete_temp_token( $token );
+                    $res_data['error'] = ['email'];
+                    http_response_code( 400 );
+                    echo json_encode( $res_data );
+                    exit;
+                }
+                $user_edits['meta_input'] = [
+                    'mpop_mail_to_confirm' => true,
+                    '_new_email' => false
+                ];
+                $res_data['notices'] = [['type'=>'info', 'msg' => 'È stata inviata un\'e-mail di conferma all\'indirizzo indicato']];
             }
         }
         if (!isset($user_edits['meta_input'])) {
