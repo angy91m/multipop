@@ -152,7 +152,7 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
             static::add_user_to_discourse_group($user->ID, implode(',', array_map(function($g) {return $g['name'];}, $add_groups)));
         }
         foreach($owner_changes as $change) {
-            if ($change['new']) {
+            if (isset($change['new']) && $change['new']) {
                 static::add_discourse_group_owners($change['id'], [$user->user_login]);
             } else {
                 if ($change['owner']) {
