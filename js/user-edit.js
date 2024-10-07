@@ -1,6 +1,6 @@
 window.onload = () => {
     document.querySelector('form').removeAttribute('action');
-    const {mailConfirmed, _new_email} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
+    let {mailConfirmed, _new_email} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
     let emailEl = document.getElementById('email');
     const emailOriginal = _new_email || emailEl.value,
     emailRow = emailEl.parentElement,
@@ -69,6 +69,9 @@ window.onload = () => {
     });
     roleSelect.addEventListener('change', () => {
         if (['multipopolano', 'multipopolare_resp'].includes(roleSelect.value)) {
+            if (_new_email) {
+                emailEl.value = _new_email;
+            }
             if (confirmedEl.disabled) {
                 customContainer.style.display = 'unset';
                 confirmedEl.disabled = mailConfirmed;
@@ -82,6 +85,10 @@ window.onload = () => {
                 revokeMailConfirmationButton.style.display = 'none';
             }
         } else {
+            if (_new_email) {
+                _new_email = emailEl.value;
+            }
+            emailEl.value = emailOriginal;
             confirmedEl.disabled = true;
             confirmedEl.checked = true;
             sendMailConfirmationEl.disabled = true;
@@ -137,7 +144,7 @@ window.onload = () => {
             currentUserMasterKey.disabled = true;
         });
     }
-    if (_new_email) {
+    if (['multipopolano', 'multipopolare_resp'].includes(roleSelect.value) && _new_email ) {
         emailEl.value = _new_email;
     }
 };
