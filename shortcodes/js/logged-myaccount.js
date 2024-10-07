@@ -142,6 +142,16 @@ createApp({
             if (!pwdChangeFields.confirm || pwdChangeFields.new !== pwdChangeFields.confirm) errs.push('confirm');
             return errs;
         }),
+        myLastActiveCard = computed(() => {
+            let res;
+            if (
+                profile.mpop_my_cards
+                && profile.mpop_my_cards.length
+            ) {
+                res = profile.mpop_my_cards.filter(c => c.status == 'completed').sort((a,b) => b-a).shift();
+            }
+            return res;
+        }),
         maxBirthDate = new Date();
         maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
 
@@ -838,6 +848,7 @@ createApp({
             reduceZones,
             showZones,
             addSuppressToLabel,
+            myLastActiveCard,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
         };
     }

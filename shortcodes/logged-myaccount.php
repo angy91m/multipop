@@ -211,7 +211,11 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     </div>
                     <div v-if="selectedTab == 'card'">
                         <template v-if="profile.mpop_my_cards">
-                        {{profile}}
+                            <h3>La tua tessera</h3>
+                            {{new Date()}}
+                            <template v-if="profile.mpop_card_active">
+                                <h4>La tua tessera è attiva</h4>
+                            </template>
                         </template>
                     </div>
                     <div v-if="selectedTab == 'users'" id="mpop-user-search">
