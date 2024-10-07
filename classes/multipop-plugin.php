@@ -2207,7 +2207,6 @@ class MultipopPlugin {
             $mpop_resp_zones = array_unique($mpop_resp_zones);
             $mpop_resp_zones = array_values($mpop_resp_zones);
         }
-        save_test($roles, 2);
         if(count($mpop_resp_zones)) {
             if ($roles === true || in_array('multipopolare_resp', $roles)) {
                 $roles = ['multipopolare_resp'];
@@ -2217,6 +2216,7 @@ class MultipopPlugin {
         } else {
             $roles = $this->parse_requested_roles($roles);
         }
+        save_test($roles, 2);
         if (!$roles) {
             return $res;
         }
