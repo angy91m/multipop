@@ -2126,9 +2126,9 @@ class MultipopPlugin {
             foreach($q->query_vars['orderby'] as $k=>$v ) {
                 if (in_array($k, ['first_name', 'last_name'])) {
                     $alias = $clauses[$k]['alias'];
-                    $order_by[$i] = "IF($alias.meta_value = '', 1, 0) ASC, $alias.meta_value $v";
+                    $order_by[$i] = "IF($alias.meta_value = '', 1, 0) $v, $alias.meta_value $v";
                 } else if (isset($extra_from[$k])) {
-                    $order_by[$i] = "IF(COALESCE(mpop_exmt_$k.meta_value, '') = '', 1, 0) ASC, mpop_exmt_$k.meta_value $v";
+                    $order_by[$i] = "IF(COALESCE(mpop_exmt_$k.meta_value, '') = '', 1, 0) $v, mpop_exmt_$k.meta_value $v";
                 }
                 $i++;
             }
