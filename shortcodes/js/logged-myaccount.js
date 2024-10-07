@@ -765,6 +765,7 @@ createApp({
             setTimeout(()=> document.querySelector('#'+tag+'-select .vs__search').select(),300);
         }
         function showRole(role = '') {
+            if (!role) return 'Nessuno';
             switch(role) {
                 case 'multipopolare_resp':
                     role = 'Responsabile';
