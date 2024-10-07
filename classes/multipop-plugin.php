@@ -2127,20 +2127,19 @@ class MultipopPlugin {
         if (isset($q->query_vars['orderby']) && is_array($q->query_vars['orderby'])) {
             $order_by = [];
             $clauses = $q->meta_query->get_clauses();
+            $i = 0;
             foreach($q->query_vars['orderby'] as $k=>$v ) {
-                if (isset($clauses[$k])) {
-                    $cl = $clauses[$k];
-                    $order_by[] = "CAST($cl[alias].meta_value AS $cl[cast]) $v";
-                } else {
+                if (!isset($clauses[$k])) {
                     if (str_ends_with($k, '_exists')) {
                         $k = substr($k,0,-7);
                     }
                     $found = array_values(array_filter($clauses, function($cl) use ($k) {return $cl['key'] == $k;}));
                     if (count($found)) {
                         $found = $found[0];
-                        $order_by[] = "CAST($found[alias].meta_value AS $found[cast]) $v";
+                        $order_by[$i] = "CAST($found[alias].meta_value AS $found[cast]) $v";
                     }
                 }
+                $i++;
             }
             save_test($order_by);
         }
