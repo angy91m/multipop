@@ -148,30 +148,16 @@ if (!$errors->has_errors()) {
                     }
                 }
             } else if ($update) {
+                delete_user_meta($user->ID, '_new_email');
                 // FLOW FOR OTHER ROLES UPDATE
-                if (
-                    (!$old_user->_new_email && $user->user_email != $old_user->user_email)
-                    || ($old_user->_new_email && $user->user_email != $old_user->_new_email)
-                ) {
-                    $duplicated = get_users([
-                        'meta_key' => '_new_email',
-                        'meta_value' => $user->user_email,
-                        'meta_compare' => '='
-                    ]);
-                    if (count($duplicated)) {
-                        $errors->add(400, $error_head . "E-mail $user->user_email già registrata. Scegline un'altra.");
-                        return;
-                    }
-                }
                 if ($user->role == 'administrator') {
-                    delete_user_meta($user->ID, '_new_email');
+                    delete_user_meta($user->ID, 'mpop_mail_to_confirm');
                 } else {
                     $disc_utils = $this->discourse_utilities();
                     if ($disc_utils) {
                         $disc_utils->logout_user_from_discourse($user);
                     }
                 }
-                delete_user_meta($user->ID, 'mpop_mail_to_confirm');
             }
             if ($update && $user->role != 'multipopolare_resp') {
                 if ($old_user->mpop_resp_zones) {
