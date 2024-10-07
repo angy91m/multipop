@@ -2217,6 +2217,7 @@ class MultipopPlugin {
             $roles = $this->parse_requested_roles($roles);
         }
         if (!$roles) {
+            save_test('PROVA', 2);
             return $res;
         }
         add_action('pre_user_query', [$this, 'user_search_pre_user_query']);
@@ -2227,7 +2228,6 @@ class MultipopPlugin {
             ]
         ];
         global $wpdb;
-        save_test(count($roles), 2);
         if (count($roles)) {
             sort($roles);
             foreach($roles as $role) {
