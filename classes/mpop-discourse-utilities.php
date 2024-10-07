@@ -173,7 +173,7 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
 			return false;
 		}
 		if (isset($user->discourse_sso_user_id)) {
-			$res = $this->discourse_request( "/admin/users/$user->discourse_sso_user_id/log_out", array( 'method' => 'POST' ) );
+			$res = static::discourse_request( "/admin/users/$user->discourse_sso_user_id/log_out", array( 'method' => 'POST' ) );
 			if (is_wp_error($res)) {
 				return false;
 			}
