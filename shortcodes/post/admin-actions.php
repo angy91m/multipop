@@ -48,6 +48,9 @@ switch( $post_data['action'] ) {
         } else {
             $post_data['email'] = mb_strtolower( trim($post_data['email']), 'UTF-8' );
         }
+        if (!isset($post_data['mpop_mail_confirmed']) || !is_bool($post_data['mpop_mail_confirmed'])) {
+            $res_data['error'] = ['email'];
+        }
         if (!isset($post_data['first_name']) || !is_string($post_data['first_name']) || mb_strlen(trim($post_data['first_name']), 'UTF-8') < 2) {
             if ($user->first_name) {
                 if (!isset($res_data['error'])) {
@@ -241,6 +244,52 @@ switch( $post_data['action'] ) {
             exit;
         }
         $user_edits = [];
+        $duplicated = get_user_by('email', $post_data['email']);
+        if ($duplicated && $duplicated->ID != $user->ID) {
+            $res_data['error'] = ['email'];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $duplicated = get_users([
+            'meta_key' => '_new_email',
+            'meta_value' => $post_data['email'],
+            'meta_compare' => '=',
+            'login__not_in' => [$user->user_login]
+        ]);
+        if (count($duplicated)) {
+            $res_data['error'] = ['email'];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        if ($post_data['mpop_mail_confirmed']) {
+            $user_edits['user_email'] = $post_data['email'];
+            $user_edits['meta_input'] = ['_new_email' => false];
+        } else {
+            if (
+                ($user->_new_email && $user->_new_email != $post_data['email'])
+                || (!$user->_new_email && $user->user_email != $post_data['email'] )
+            ) {
+                $this->delete_temp_token_by_user_id($user->ID, 'email_confirmation_link');
+                $token = $this->create_temp_token( $user->ID, 'email_confirmation_link' );
+                $res_mail = $this->send_confirmation_mail($token, $post_data['email']);
+                if (!$res_mail) {
+                    $this->delete_temp_token( $token );
+                    $res_data['error'] = ['email'];
+                    http_response_code( 400 );
+                    echo json_encode( $res_data );
+                    exit;
+                }
+                if ($user->mpop_mail_to_confirm) {
+                    $user_edits['user_email'] = $post_data['email'];
+                }
+                $user_edits['meta_input'] = [
+                    '_new_email' => $post_data['email']
+                ];
+                $res_data['notices'] = [['type'=>'info', 'msg' => 'È stata inviata un\'e-mail di conferma all\'indirizzo indicato']];
+            }
+        }
         if (
             (!$user->_new_email && $user->user_email != $post_data['email'] )
             || ($user->_new_email ? $user->_new_email != $post_data['email'] : false)
@@ -264,7 +313,7 @@ switch( $post_data['action'] ) {
                 echo json_encode( $res_data );
                 exit;
             } else {
-                $this->delete_temp_token_by_user_id($user->ID);
+                $this->delete_temp_token_by_user_id($user->ID, 'email_confirmation_link');
                 $token = $this->create_temp_token( $user->ID, 'email_confirmation_link' );
                 $res_mail = $this->send_confirmation_mail($token, $post_data['email']);
                 if (!$res_mail) {
