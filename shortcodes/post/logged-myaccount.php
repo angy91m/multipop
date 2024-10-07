@@ -288,8 +288,8 @@ switch ($post_data['action']) {
                 echo json_encode( $res_data );
                 exit;
             } else {
-                $this->delete_temp_token_by_user_id($current_user->ID);
-                $token = $this->create_temp_token( $current_user->ID, 'email_confirmation_link' );
+                $this->delete_temp_token_by_user_id($current_user->ID, 'email_confirmation_link');
+                $token = $this->create_temp_token( $current_user->ID, 'email_confirmation_link');
                 $res_mail = $this->send_confirmation_mail($token, $post_data['email']);
                 if (!$res_mail) {
                     $this->delete_temp_token( $token );
