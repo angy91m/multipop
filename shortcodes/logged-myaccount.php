@@ -210,13 +210,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         </div>
                     </div>
                     <div v-if="selectedTab == 'card'">
-                        <?php
-                            // $uu = wp_get_current_user();
-                            // delete_user_meta($uu->ID, 'mpop_test_meta');
-                            // $uu = get_user_by('ID', $uu->ID);
-                            // echo html_dump($uu->mpop_test_meta);
-                        ?>
-                        Tessera
+                        {{profile}}
                     </div>
                     <div v-if="selectedTab == 'users'" id="mpop-user-search">
                         <h3>Utenti</h3>

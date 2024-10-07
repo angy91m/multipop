@@ -2156,7 +2156,6 @@ class MultipopPlugin {
             );
             $q->query_from .= ' INNER JOIN ' . $wpdb->prefix . 'usermeta AS search_first_name ON ( ' . $wpdb->prefix . 'users.ID = search_first_name.user_id ) INNER JOIN ' . $wpdb->prefix . 'usermeta AS search_last_name ON ( ' . $wpdb->prefix . 'users.ID = search_last_name.user_id )';
         }
-        save_test($q,1);
         remove_action('pre_user_query', [$this, 'user_search_pre_user_query']);
     }
     private function parse_requested_roles($roles = true) {

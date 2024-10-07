@@ -695,7 +695,7 @@ createApp({
                 } else if (url.searchParams.has('view-user')) {
                     viewUser(url.searchParams.get('view-user'), popstate);
                 }
-                if (tabName == 'summary') {
+                if (tabName == 'summary' || tabName == 'card') {
                     getProfile();
                 }
             }
