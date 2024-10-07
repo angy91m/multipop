@@ -2141,6 +2141,18 @@ class MultipopPlugin {
                 }
                 $i++;
             }
+            if (count($order_by)) {
+                $qob_orig = substr($q->query_orderby, 9);
+                $qob_n = [];
+                for($i=0; $i<2; $i++) {
+                    if (isset($order_by[$i])) {
+                        $qob_n[] = $order_by[$i];
+                    } else {
+                        $qob_n[] = $qob_orig;
+                    }
+                }
+                $q->query_orderby = "ORDER BY " . implode(', ', $qob_n);
+            }
             save_test($order_by);
             save_test($q,1);
         }
