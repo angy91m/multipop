@@ -290,50 +290,6 @@ switch( $post_data['action'] ) {
                 $res_data['notices'] = [['type'=>'info', 'msg' => 'È stata inviata un\'e-mail di conferma all\'indirizzo indicato']];
             }
         }
-        if (
-            (!$user->_new_email && $user->user_email != $post_data['email'] )
-            || ($user->_new_email ? $user->_new_email != $post_data['email'] : false)
-        ) {
-            $duplicated = get_user_by('email', $post_data['email']);
-            if ($duplicated) {
-                $res_data['error'] = ['email'];
-                http_response_code( 400 );
-                echo json_encode( $res_data );
-                exit;
-            }
-            $duplicated = get_users([
-                'meta_key' => '_new_email',
-                'meta_value' => $post_data['email'],
-                'meta_compare' => '=',
-                'login__not_in' => [$user->user_login]
-            ]);
-            if (count($duplicated)) {
-                $res_data['error'] = ['email'];
-                http_response_code( 400 );
-                echo json_encode( $res_data );
-                exit;
-            } else {
-                $this->delete_temp_token_by_user_id($user->ID, 'email_confirmation_link');
-                $token = $this->create_temp_token( $user->ID, 'email_confirmation_link' );
-                $res_mail = $this->send_confirmation_mail($token, $post_data['email']);
-                if (!$res_mail) {
-                    $this->delete_temp_token( $token );
-                    $res_data['error'] = ['email'];
-                    http_response_code( 400 );
-                    echo json_encode( $res_data );
-                    exit;
-                }
-                $user_edits['meta_input'] = [
-                    '_new_email' => $post_data['email']
-                ];
-                $res_data['notices'] = [['type'=>'info', 'msg' => 'È stata inviata un\'e-mail di conferma all\'indirizzo indicato']];
-            }
-        } else {
-            if ($user->user_email == $post_data['email']) {
-                $user_edits['meta_input'] = ['_new_email' => false];
-            }
-        }
-
         if (!isset($user_edits['meta_input'])) {
             $user_edits['meta_input'] = [];
         }
