@@ -2275,8 +2275,8 @@ class MultipopPlugin {
         }
         $bool_vars = ['mpop_card_active', 'mpop_mail_to_confirm'];
         foreach ($bool_vars as $var_name) {
-            if (is_bool(eval('$'.$var_name))) {
-                if (eval('$'.$var_name)) {
+            if (is_bool(eval('$'.$var_name . ';'))) {
+                if (eval('$'.$var_name . ';')) {
                     $meta_q[$var_name] = [
                         'key' => $var_name,
                         'value' => '1',
