@@ -2207,6 +2207,7 @@ class MultipopPlugin {
             $mpop_resp_zones = array_unique($mpop_resp_zones);
             $mpop_resp_zones = array_values($mpop_resp_zones);
         }
+        save_test($roles, 2);
         if(count($mpop_resp_zones)) {
             if ($roles === true || in_array('multipopolare_resp', $roles)) {
                 $roles = ['multipopolare_resp'];
@@ -2237,10 +2238,9 @@ class MultipopPlugin {
                 ];
             }
         } else {
-            $meta_q['role'] = [
+            $meta_q['role'][] = [
                 'key' => $wpdb->prefix . 'capabilities',
-                'value' => 'a:0:{}',
-                'compare' => '='
+                'value' => 'a:0:{}'
             ];
         }
         if (is_string($txt) && trim($txt) && !preg_match("\r|\n|\t",$txt)) {
