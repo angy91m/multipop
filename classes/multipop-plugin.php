@@ -2144,8 +2144,6 @@ class MultipopPlugin {
                 }
                 $q->query_orderby = "ORDER BY " . implode(', ', $qob_n);
             }
-            save_test($order_by);
-            save_test($q,1);
         }
         if (isset($q->query_vars['mpop_custom_search']) && is_string($q->query_vars['mpop_custom_search'])) {
             $sanitized_value = '%' . $wpdb->esc_like($q->query_vars['mpop_custom_search']) . '%';
@@ -2158,6 +2156,7 @@ class MultipopPlugin {
             );
             $q->query_from .= ' INNER JOIN ' . $wpdb->prefix . 'usermeta AS search_first_name ON ( ' . $wpdb->prefix . 'users.ID = search_first_name.user_id ) INNER JOIN ' . $wpdb->prefix . 'usermeta AS search_last_name ON ( ' . $wpdb->prefix . 'users.ID = search_last_name.user_id )';
         }
+        save_test($q,1);
         remove_action('pre_user_query', [$this, 'user_search_pre_user_query']);
     }
     private function parse_requested_roles($roles = true) {
