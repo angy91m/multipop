@@ -265,7 +265,7 @@ switch( $post_data['action'] ) {
         }
         if ($post_data['mpop_mail_confirmed']) {
             $user_edits['user_email'] = $post_data['email'];
-            $user_edits['meta_input'] = ['_new_email' => false];
+            $user_edits['meta_input'] = ['mpop_mail_to_confirm' => false,'_new_email' => false];
         } else {
             if (
                 ($user->_new_email && $user->_new_email != $post_data['email'])
