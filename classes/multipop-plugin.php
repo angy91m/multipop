@@ -2340,14 +2340,14 @@ class MultipopPlugin {
                                 'key' => $k,
                                 'compare' => 'EXISTS'
                             ];
-                            $fsort_by[$k] = !boolval($sort_by[$k]) ? 'ASC' : 'DESC';
+                            $fsort_by[$k] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
                             break;
                         case 'last_name':
                             $meta_q[$k] = [
                                 'key' => $k,
                                 'compare' => 'EXISTS'
                             ];
-                            $fsort_by[$k] = !boolval($sort_by[$k]) ? 'ASC' : 'DESC';
+                            $fsort_by[$k] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
                             break;
                         default:
                             if (isset($meta_q[$k])) {
