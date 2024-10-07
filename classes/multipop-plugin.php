@@ -2216,8 +2216,7 @@ class MultipopPlugin {
         } else {
             $roles = $this->parse_requested_roles($roles);
         }
-        if (!$roles) {
-            save_test('PROVA', 2);
+        if (!is_array($roles)) {
             return $res;
         }
         add_action('pre_user_query', [$this, 'user_search_pre_user_query']);
