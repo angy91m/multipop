@@ -931,15 +931,6 @@ class MultipopPlugin {
         return $content;
     }
 
-    // MAIN TEMPLATE REDIRECT
-    // (USED TO HIDE SOME MY ACCOUNT SUB-PAGES)
-    // public function template_redirect() {
-    //     global $wp;
-    //     if (isset($wp->query_vars['pagename']) && $wp->query_vars['pagename'] == $this->my_account_page_slug() && isset($wp->query_vars['edit-address'])) {
-    //         $this->location_not_found();
-    //     }
-    // }
-
     // RETUTN MY ACCOUNT PAGE SLUG
     private function my_account_page_slug() {
         $my_account_addr_arr = explode('/',preg_replace('/https?:\/\//', '', get_permalink($this->settings['myaccount_page'])));
@@ -1014,11 +1005,6 @@ class MultipopPlugin {
                             ]);
                         }
                         return $user;
-                        // unset($_GET['mpop_mail_token']);
-                        // unset($_GET['invalid_mpop_login']);
-                        // $_GET['mpop_mail_confirmed'] = '1';
-                        // wp_redirect(explode('?',$this->req_url)[0] . '?' . $this->export_GET());
-                        // exit;
                     } else {
                         if ($user_id) {
                             $this->delete_temp_token($_REQUEST['mpop_mail_token']);
@@ -2228,13 +2214,13 @@ class MultipopPlugin {
         if (!$roles) {
             return $res;
         }
+        add_action('pre_user_query', [$this, 'user_search_pre_user_query']);
         $meta_q = [
             'relation' => 'AND',
             'role' => [
                 'relation' => 'OR'
             ]
         ];
-        add_action('pre_user_query', [$this, 'user_search_pre_user_query']);
         global $wpdb;
         if (count($roles)) {
             sort($roles);

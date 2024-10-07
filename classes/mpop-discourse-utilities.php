@@ -166,14 +166,13 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
 	public static function logout_user_from_discourse($user_id) {
 		$user = false;
 		if (is_object($user_id)) {
-			$user = $user_id;
-		} else {
-			$user = get_user_by('ID',intval($user_id));
+			$user_id = $user_id->ID;
 		}
+        $user = get_user_by('ID',intval($user_id));
 		if (!$user) {
 			return false;
 		}
-		if ($user->discourse_sso_user_id) {
+		if (isset($user->discourse_sso_user_id)) {
 			$res = $this->discourse_request( "/admin/users/$user->discourse_sso_user_id/log_out", array( 'method' => 'POST' ) );
 			if (is_wp_error($res)) {
 				return false;
