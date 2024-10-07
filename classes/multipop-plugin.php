@@ -2273,30 +2273,6 @@ class MultipopPlugin {
                 ];
             }
         }
-        // $bool_vars = ['mpop_card_active', 'mpop_mail_to_confirm'];
-        // foreach ($bool_vars as $var_name) {
-        //     if (is_bool(eval('$'.$var_name . ';'))) {
-        //         if (eval('$'.$var_name . ';')) {
-        //             $meta_q[$var_name] = [
-        //                 'key' => $var_name,
-        //                 'value' => '1',
-        //                 'type' => 'NUMERIC'
-        //             ];
-        //         }
-        //     } else {
-        //         $meta_q[$var_name] = [
-        //             'relation' => 'OR',
-        //             [
-        //                 'key' => $var_name,
-        //                 'value' => '',
-        //             ],
-        //             [
-        //                 'key' => $var_name,
-        //                 'compare' => 'NOT EXISTS'
-        //             ]
-        //         ];
-        //     }
-        // }
         if (is_bool($mpop_card_active)) {
             if ($mpop_card_active) {
                 $meta_q['mpop_card_active'] = [
