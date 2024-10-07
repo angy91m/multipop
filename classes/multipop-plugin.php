@@ -2183,6 +2183,7 @@ class MultipopPlugin {
         array $mpop_billing_city = [],
         array $mpop_resp_zones = [],
         $mpop_card_active = null,
+        $mpop_mail_to_confirm = null,
         $page = 1,
         $sort_by = ['ID' => true],
         $limit = 100
@@ -2272,27 +2273,51 @@ class MultipopPlugin {
                 ];
             }
         }
-        if (is_bool($mpop_card_active)) {
-            if ($mpop_card_active) {
-                $meta_q['mpop_card_active'] = [
-                    'key' => 'mpop_card_active',
-                    'value' => '1',
-                    'type' => 'NUMERIC'
-                ];
+        $bool_vars = ['mpop_card_active', 'mpop_mail_to_confirm'];
+        foreach ($bool_vars as $var_name) {
+            if (is_bool(eval('$'.$var_name))) {
+                if (eval('$'.$var_name)) {
+                    $meta_q[$var_name] = [
+                        'key' => $var_name,
+                        'value' => '1',
+                        'type' => 'NUMERIC'
+                    ];
+                }
             } else {
-                $meta_q['mpop_card_active'] = [
+                $meta_q[$var_name] = [
                     'relation' => 'OR',
                     [
-                        'key' => 'mpop_card_active',
+                        'key' => $var_name,
                         'value' => '',
                     ],
                     [
-                        'key' => 'mpop_card_active',
+                        'key' => $var_name,
                         'compare' => 'NOT EXISTS'
                     ]
                 ];
             }
         }
+        // if (is_bool($mpop_card_active)) {
+        //     if ($mpop_card_active) {
+        //         $meta_q['mpop_card_active'] = [
+        //             'key' => 'mpop_card_active',
+        //             'value' => '1',
+        //             'type' => 'NUMERIC'
+        //         ];
+        //     } else {
+        //         $meta_q['mpop_card_active'] = [
+        //             'relation' => 'OR',
+        //             [
+        //                 'key' => 'mpop_card_active',
+        //                 'value' => '',
+        //             ],
+        //             [
+        //                 'key' => 'mpop_card_active',
+        //                 'compare' => 'NOT EXISTS'
+        //             ]
+        //         ];
+        //     }
+        // }
         $allowed_field_sorts = [
             'ID',
             'login',
