@@ -228,6 +228,14 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             <input :id="'user-search-'+role" type="checkbox" v-model="userSearch.roles" @change="triggerSearchUsers" :value="role"/>
                         </div>
                         <div class="mpop-user-search-field">
+                            <label for="user-seach-card-active">Email da confermare</label>
+                            <select id="user-seach-card-active" v-model="userSearch.mpop_mail_to_confirm" @change="triggerSearchUsers">
+                                <option :value="null"></option>
+                                <option :value="true">Sì</option>
+                                <option :value="false">No</option>
+                            </select>
+                        </div>
+                        <div class="mpop-user-search-field">
                             <label for="user-seach-card-active">Tessera attiva</label>
                             <select id="user-seach-card-active" v-model="userSearch.mpop_card_active" @change="triggerSearchUsers">
                                 <option :value="null"></option>
@@ -336,7 +344,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                     <th class="mpop-click" @click="userSearchSortBy('ID')"><div class="th-inner"><span>ID</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'ID'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['ID']">▲</span><span v-else>▼</span></span></div></th>
                                     <th class="mpop-click" @click="userSearchSortBy('login')"><div class="th-inner"><span>Nome utente</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'login'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['login']">▲</span><span v-else>▼</span></span></div></th>
                                     <th class="mpop-click" @click="userSearchSortBy('email')"><div class="th-inner"><span>E&#8209;mail</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'email'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['email']">▲</span><span v-else>▼</span></span></div></th>
-                                    <th class="mpop-click" @click="userSearchSortBy('mpop_mail_to_confirm')"><div class="th-inner"><span>E&#8209;mail confermata</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'mpop_mail_to_confirm'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['mpop_mail_to_confirm']">▲</span><span v-else>▼</span></span></div></th>
+                                    <th class="mpop-click" @click="userSearchSortBy('mpop_mail_to_confirm')"><div class="th-inner"><span>E&#8209;mail da confermare</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'mpop_mail_to_confirm'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['mpop_mail_to_confirm']">▲</span><span v-else>▼</span></span></div></th>
                                     <th class="mpop-click" @click="userSearchSortBy('role')"><div class="th-inner"><span>Ruolo</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'role'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['role']">▲</span><span v-else>▼</span></span></div></th>
                                     <th class="mpop-click" @click="userSearchSortBy('first_name')"><div class="th-inner"><span>Nome</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'first_name'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['first_name']">▲</span><span v-else>▼</span></span></div></th>
                                     <th class="mpop-click" @click="userSearchSortBy('last_name')"><div class="th-inner"><span>Cognome</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'last_name'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['last_name']">▲</span><span v-else>▼</span></span></div></th>
@@ -350,7 +358,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                     <td>{{u.ID}}</td>
                                     <td>{{u.login}}</td>
                                     <td>{{u.email}}</td>
-                                    <td>{{u.mpop_mail_to_confirm ? 'No' : 'Sì'}}</td>
+                                    <td>{{u.mpop_mail_to_confirm ? 'Sì' : 'No'}}</td>
                                     <td>{{showRole(u.role)}}</td>
                                     <td>{{u.first_name ? u.first_name : ''}}</td>
                                     <td>{{u.last_name ? u.last_name : ''}}</td>

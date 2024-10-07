@@ -82,7 +82,8 @@ createApp({
             },
             zones: [],
             resp_zones: [],
-            mpop_card_active: null
+            mpop_card_active: null,
+            mpop_mail_to_confirm: null
         }),
         zoneSearch = reactive({
             users: [],
