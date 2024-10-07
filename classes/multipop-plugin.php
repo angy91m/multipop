@@ -1665,7 +1665,8 @@ class MultipopPlugin {
             'mpop_billing_city' => $user->mpop_billing_city,
             'mpop_billing_zip' => $user->mpop_billing_zip,
             'mpop_billing_state' => $user->mpop_billing_state,
-            'mpop_resp_zones' => []
+            'mpop_resp_zones' => [],
+            'mpop_my_cards' => []
         ];
         if ($user->mpop_profile_pending_edits) {
             $parsed_user['mpop_profile_pending_edits'] = json_decode($user->mpop_profile_pending_edits, true);
