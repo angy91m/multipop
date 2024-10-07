@@ -345,6 +345,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                     <th class="mpop-click" @click="userSearchSortBy('login')"><div class="th-inner"><span>Nome utente</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'login'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['login']">▲</span><span v-else>▼</span></span></div></th>
                                     <th class="mpop-click" @click="userSearchSortBy('email')"><div class="th-inner"><span>E&#8209;mail</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'email'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['email']">▲</span><span v-else>▼</span></span></div></th>
                                     <th class="mpop-click" @click="userSearchSortBy('mpop_mail_to_confirm')"><div class="th-inner"><span>E&#8209;mail da confermare</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'mpop_mail_to_confirm'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['mpop_mail_to_confirm']">▲</span><span v-else>▼</span></span></div></th>
+                                    <th class="mpop-click" @click="userSearchSortBy('mpop_card_active')"><div class="th-inner"><span>Card attiva</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'mpop_card_active'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['mpop_card_active']">▲</span><span v-else>▼</span></span></div></th>
                                     <th class="mpop-click" @click="userSearchSortBy('role')"><div class="th-inner"><span>Ruolo</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'role'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['role']">▲</span><span v-else>▼</span></span></div></th>
                                     <th class="mpop-click" @click="userSearchSortBy('first_name')"><div class="th-inner"><span>Nome</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'first_name'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['first_name']">▲</span><span v-else>▼</span></span></div></th>
                                     <th class="mpop-click" @click="userSearchSortBy('last_name')"><div class="th-inner"><span>Cognome</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'last_name'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['last_name']">▲</span><span v-else>▼</span></span></div></th>
@@ -359,6 +360,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                     <td>{{u.login}}</td>
                                     <td>{{u.email}}</td>
                                     <td>{{u.mpop_mail_to_confirm ? 'Sì' : 'No'}}</td>
+                                    <td>{{u.mpop_card_active ? 'Sì' : 'No'}}</td>
                                     <td>{{showRole(u.role)}}</td>
                                     <td>{{u.first_name ? u.first_name : ''}}</td>
                                     <td>{{u.last_name ? u.last_name : ''}}</td>

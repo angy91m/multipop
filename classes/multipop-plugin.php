@@ -2377,49 +2377,6 @@ class MultipopPlugin {
                                 default:
                                     $extra_meta[$k] = 'CHAR';
                             }
-                            // if (in_array($k, ['mpop_mail_to_confirm', 'mpop_card_active'])) {
-                            //     $meta_q[$k] = [
-                            //         'relation' => 'OR',
-                            //         $k.'_exists' => [
-                            //             'key' => $k,
-                            //             'value' => '1',
-                            //             'type' => 'NUMERIC'
-                            //         ],
-                            //         $k.'_notexists' => [
-                            //             'relation' => 'OR',
-                            //             [
-                            //                 'key' => $k,
-                            //                 'compare' => 'NOT EXISTS'
-                            //             ],
-                            //             [
-                            //                 'key' => $k,
-                            //                 'value' => '',
-                            //             ]
-                            //         ]
-                            //     ];
-                            // } else {
-                            //     $meta_q[$k] = [
-                            //         'relation' => 'OR',
-                            //         $k.'_exists' => [
-                            //             [
-                            //                 'key' => $k,
-                            //                 'value' => '',
-                            //                 'compare' => '!='
-                            //             ]
-                            //         ],
-                            //         $k.'_notexists' => [
-                            //             'relation' => 'OR',
-                            //             [
-                            //                 'key' => $k,
-                            //                 'compare' => 'NOT EXISTS'
-                            //             ],
-                            //             [
-                            //                 'key' => $k,
-                            //                 'value' => ''
-                            //             ]
-                            //         ]
-                            //     ];
-                            // }
                             $fsort_by[$k] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
                     }
                 } else {
