@@ -2,7 +2,8 @@ window.onload = () => {
     document.querySelector('form').removeAttribute('action');
     let {mailConfirmed, _new_email} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
     let emailEl = document.getElementById('email');
-    const emailOriginal = _new_email || emailEl.value,
+    const primaryEmail =  emailEl.value,
+    emailOriginal = _new_email || emailEl.value,
     emailRow = emailEl.parentElement,
     roleSelect = document.querySelector('select[name="role"]'),
     roleMultipop = ['multipopolano', 'multipopolare_resp'].includes(roleSelect.value),
@@ -87,8 +88,8 @@ window.onload = () => {
         } else {
             if (_new_email) {
                 _new_email = emailEl.value;
+                emailEl.value = primaryEmail;
             }
-            emailEl.value = emailOriginal;
             confirmedEl.disabled = true;
             confirmedEl.checked = true;
             sendMailConfirmationEl.disabled = true;
