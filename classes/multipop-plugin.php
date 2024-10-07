@@ -858,7 +858,7 @@ class MultipopPlugin {
         }
         if ($user->mpop_card_active) {
             update_user_meta($user->ID, 'mpop_card_active', false);
-            if ($user->discourse_sso_user_id && in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
+            if ($user->discourse_sso_user_id && isset($user->roles[0]) && in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
                 $disc_utils = $this->discourse_utilities();
                 if ($disc_utils) {
                     $disc_utils->logout_user_from_discourse($user);
@@ -1653,7 +1653,7 @@ class MultipopPlugin {
             'login' => $user->user_login,
             'email' => $user->user_email,
             'registered' => $user->user_registered,
-            'role' => $user->roles[0],
+            'role' => isset($user->roles[0]) ? $user->roles[0] : '',
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
             '_new_email' => $user->_new_email ? $user->_new_email : false,
@@ -1689,7 +1689,7 @@ class MultipopPlugin {
                 }
             }
         }
-        if ($retrieve_resp_zones && $user->roles[0] == 'multipopolare_resp' && !empty($user->mpop_resp_zones)) {
+        if ($retrieve_resp_zones && isset($user->roles[0]) && $user->roles[0] == 'multipopolare_resp' && !empty($user->mpop_resp_zones)) {
             $parsed_user['mpop_resp_zones'] = $this->retrieve_zones_from_resp_zones($user->mpop_resp_zones);
         }
         return $parsed_user;
@@ -2431,7 +2431,7 @@ class MultipopPlugin {
                 'ID' => intval($u->ID),
                 'login' => $u->user_login,
                 'email' => $u->user_email,
-                'role' => $u->roles[0],
+                'role' => isset($u->roles[0]) ? $u->roles[0] : '',
                 'registred' => $u->user_registered,
                 'first_name' => $u->first_name,
                 'last_name' => $u->last_name,
@@ -2441,7 +2441,7 @@ class MultipopPlugin {
                 'mpop_billing_city' => $billing_city ? $billing_city['nome'] : '',
                 'mpop_resp_zones' => []
             ];
-            if ($u->roles[0] == 'multipopolare_resp' && !empty($u->mpop_resp_zones)) {
+            if (isset($u->roles[0]) && $u->roles[0] == 'multipopolare_resp' && !empty($u->mpop_resp_zones)) {
                 $parsed_u['mpop_resp_zones'] = $this->retrieve_zones_from_resp_zones( $u->mpop_resp_zones );
             }
             $users[] = $parsed_u;
@@ -2509,43 +2509,45 @@ class MultipopPlugin {
         $groups = [];
         $province_all = false;
         $regioni_all = false;
-        if ($user->roles[0] == 'administrator') {
-            $groups[] = ['name' => 'mp_wp_admins', 'full_name' => 'Amministratori Wordpress', 'owner' => false];
-        } else if (in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
-            if ($user->mpop_billing_state) {
-                if (!$province_all) {
-                    $province_all = $this->get_province_all();
-                }
-                if ($province_all) {
-                    $provincia = array_filter($province_all, function($p) use ($user) { return $p['sigla'] == $user->mpop_billing_state; });
-                    $provincia = array_pop( $provincia );
-                    if ($provincia) {
-                        $groups[$user->mpop_billing_state] = ['name' => "mp_prov_$user->mpop_billing_state", 'full_name' => "Provincia di $provincia[nome]", 'owner' => false];
-                        $regione_name = $this->compact_regione_name($provincia['regione']);
-                        $groups[$provincia['regione']] = ['name' => "mp_reg_$regione_name", 'full_name' => "Regione $provincia[regione]", 'owner' => false];
+        if (isset($user->roles[0])) {
+            if ($user->roles[0] == 'administrator') {
+                $groups[] = ['name' => 'mp_wp_admins', 'full_name' => 'Amministratori Wordpress', 'owner' => false];
+            } else if (in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
+                if ($user->mpop_billing_state) {
+                    if (!$province_all) {
+                        $province_all = $this->get_province_all();
+                    }
+                    if ($province_all) {
+                        $provincia = array_filter($province_all, function($p) use ($user) { return $p['sigla'] == $user->mpop_billing_state; });
+                        $provincia = array_pop( $provincia );
+                        if ($provincia) {
+                            $groups[$user->mpop_billing_state] = ['name' => "mp_prov_$user->mpop_billing_state", 'full_name' => "Provincia di $provincia[nome]", 'owner' => false];
+                            $regione_name = $this->compact_regione_name($provincia['regione']);
+                            $groups[$provincia['regione']] = ['name' => "mp_reg_$regione_name", 'full_name' => "Regione $provincia[regione]", 'owner' => false];
+                        }
                     }
                 }
-            }
-            if ($user->roles[0] == 'multipopolare_resp' && !empty($user->mpop_resp_zones)) {
-                foreach($user->mpop_resp_zones as $zone) {
-                    if (str_starts_with( $zone, 'reg_' )) {
-                        $reg_fullname = substr($zone, 4);
-                        $regione_name = $this->compact_regione_name($reg_fullname);
-                        $groups[$reg_fullname] = ['name' => "mp_reg_$regione_name", 'full_name' => "Regione $reg_fullname", 'owner' => true];
-                        if (!$regioni_all) {
-                            $regioni_all = $this->get_regioni_all();
-                        }
-                        foreach($regioni_all[$reg_fullname] as $p) {
-                            $groups[$p['sigla']] = ['name' => "mp_prov_$p[sigla]", 'full_name' => "Provincia di $p[nome]", 'owner' => true];
-                        }
-                    } else if (preg_match('/^[A-Z]{2}$/', $zone)) {
-                        if (!$province_all) {
-                            $province_all = $this->get_province_all();
-                        }
-                        $provincia = array_filter($province_all, function($p) use ($zone) { return $p['sigla'] == $zone; });
-                        $provincia = array_pop( $provincia);
-                        if ($provincia) {
-                            $groups[$provincia['sigla']] = ['name' => "mp_prov_$provincia[sigla]", 'full_name' => "Provincia di $provincia[nome]", 'owner' => true];
+                if ($user->roles[0] == 'multipopolare_resp' && !empty($user->mpop_resp_zones)) {
+                    foreach($user->mpop_resp_zones as $zone) {
+                        if (str_starts_with( $zone, 'reg_' )) {
+                            $reg_fullname = substr($zone, 4);
+                            $regione_name = $this->compact_regione_name($reg_fullname);
+                            $groups[$reg_fullname] = ['name' => "mp_reg_$regione_name", 'full_name' => "Regione $reg_fullname", 'owner' => true];
+                            if (!$regioni_all) {
+                                $regioni_all = $this->get_regioni_all();
+                            }
+                            foreach($regioni_all[$reg_fullname] as $p) {
+                                $groups[$p['sigla']] = ['name' => "mp_prov_$p[sigla]", 'full_name' => "Provincia di $p[nome]", 'owner' => true];
+                            }
+                        } else if (preg_match('/^[A-Z]{2}$/', $zone)) {
+                            if (!$province_all) {
+                                $province_all = $this->get_province_all();
+                            }
+                            $provincia = array_filter($province_all, function($p) use ($zone) { return $p['sigla'] == $zone; });
+                            $provincia = array_pop( $provincia);
+                            if ($provincia) {
+                                $groups[$provincia['sigla']] = ['name' => "mp_prov_$provincia[sigla]", 'full_name' => "Provincia di $provincia[nome]", 'owner' => true];
+                            }
                         }
                     }
                 }

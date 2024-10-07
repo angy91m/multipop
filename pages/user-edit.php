@@ -32,7 +32,7 @@ if ($this->current_user_is_admin()) {
                 <td><?= $user->mpop_card_active ? $this->dashicon('yes') : $this->dashicon('no') ?></td>
             </tr>
             <?php
-            if (in_array($user->roles[0], ['administrator', 'multipopolare_resp']) && $this->user_has_master_key() ) { ?>
+            if (isset($user->roles[0]) && in_array($user->roles[0], ['administrator', 'multipopolare_resp']) && $this->user_has_master_key() ) { ?>
                 <tr>
                     <th>Master key</th>
                     <td><?=$this->user_has_master_key($user->ID) ? $this->dashicon('yes') . '<br><button class="button" id="revoke_master_key_button" name="revoke_master_key" value="1">Revoca master key</button>' : $this->dashicon('no') . '<br><button class="button" id="set_master_key_button">Imposta master key</button>
@@ -54,7 +54,7 @@ if ($this->current_user_is_admin()) {
         <a href="<?=get_permalink($this->settings['myaccount_page']) . "?view-user=$user->ID"?>" target="_blank">Vedi nella gestione Multipopolare&nbsp;<?=$this::dashicon('external')?></a>
         <script id="__MULTIPOP_DATA__" type="application/json"><?=json_encode([
             'mailConfirmed' => !($user->mpop_mail_to_confirm || $user->_new_email ),
-            'userRole' => $user->roles[0],
+            'userRole' => isset($user->roles[0]) ? $user->roles[0] : '',
             'currentUserHasMasterKey' => $this->user_has_master_key(),
             'userHasMasterKey' => $this->user_has_master_key($user->ID),
             '_new_email' => $user->_new_email

@@ -196,7 +196,7 @@ switch( $post_data['action'] ) {
             }
         }
         $parsed_resp_zones = false;
-        if ($user->roles[0] == 'multipopolare_resp' && isset($post_data['mpop_resp_zones']) && is_array($post_data['mpop_resp_zones'])) {
+        if (isset($user->roles[0]) && $user->roles[0] == 'multipopolare_resp' && isset($post_data['mpop_resp_zones']) && is_array($post_data['mpop_resp_zones'])) {
             $parsed_resp_zones = [];
             $regioni = false;
             $province = false;
@@ -331,7 +331,7 @@ switch( $post_data['action'] ) {
             $user_edits['ID'] = $user->ID;
             wp_update_user( $user_edits );
             delete_user_meta( $user->ID, 'mpop_profile_pending_edits' );
-            if ($user->discourse_sso_user_id && in_array($user->roles[0], ['administrator', 'multipopolano', 'multipopolare_resp'])) {
+            if ($user->discourse_sso_user_id && isset($user->roles[0]) && in_array($user->roles[0], ['administrator', 'multipopolano', 'multipopolare_resp'])) {
                 $this->update_discourse_groups_by_user($user);
             }
             if (!isset($res_data['notices'])) {
