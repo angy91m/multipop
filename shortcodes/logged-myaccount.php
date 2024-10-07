@@ -215,6 +215,9 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             {{new Date()}}
                             <template v-if="profile.mpop_card_active">
                                 <h4>La tua tessera è attiva</h4>
+                                <template v-if="myLastActiveCard && myLastActiveCard.year == (new Date()).getFullYear()">
+
+                                </template>
                             </template>
                         </template>
                     </div>

@@ -475,6 +475,8 @@ class MultipopPlugin {
             `completed_at` BIGINT UNSIGNED NULL,
             `author_id` BIGINT UNSIGNED NOT NULL,
             `pp_order_id` VARCHAR(255) NULL,
+            `completed_by` BIGINT UNSIGNED NULL,
+            `signed_from` VARCHAR(255) NULL,
             PRIMARY KEY (`id`)
         ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
         dbDelta( $q );
@@ -1666,7 +1668,7 @@ class MultipopPlugin {
             'mpop_billing_zip' => $user->mpop_billing_zip,
             'mpop_billing_state' => $user->mpop_billing_state,
             'mpop_resp_zones' => [],
-            'mpop_my_cards' => []
+            'mpop_my_cards' => $this->get_my_subscriptions($user->ID)
         ];
         if ($user->mpop_profile_pending_edits) {
             $parsed_user['mpop_profile_pending_edits'] = json_decode($user->mpop_profile_pending_edits, true);
@@ -1841,6 +1843,36 @@ class MultipopPlugin {
             global $wpdb;
             $res = $wpdb->$method($q, ...$args);
             wp_cache_add(md5($q), $res, $group_key, $expire < 0 ? 20 : $expire);
+        }
+        return $res;
+    }
+    private function get_my_subscriptions($user_id) {
+        if (is_object($user_id)) {
+            $user_id = $user_id->ID;
+        }
+        if (!is_int($user_id)) {
+            return [];
+        }
+        global $wpdb;
+        $res = $wpdb->get_results("SELECT * FROM " . $this->db_prefix('subscriptions') . " WHERE user_id = $user_id ORDER BY updated_at DESC;");
+        foreach ($res as $k => &$v) {
+            if (in_array($k, [
+                'id',
+                'user_id',
+                'year',
+                'created_at',
+                'updated_at',
+                'signed_at',
+                'completed_at',
+                'author_id',
+                'completed_by'
+            ])) {
+                if ($v !== '') {
+                    $v = intval($v);
+                } else {
+                    $v = null;
+                }
+            }
         }
         return $res;
     }
