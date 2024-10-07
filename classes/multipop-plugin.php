@@ -2142,6 +2142,7 @@ class MultipopPlugin {
                 $i++;
             }
             save_test($order_by);
+            save_test($q,1);
         }
         if (isset($q->query_vars['mpop_custom_search']) && is_string($q->query_vars['mpop_custom_search'])) {
             $sanitized_value = '%' . $wpdb->esc_like($q->query_vars['mpop_custom_search']) . '%';
