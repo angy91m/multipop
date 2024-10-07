@@ -2129,7 +2129,8 @@ class MultipopPlugin {
             $clauses = $q->meta_query->get_clauses();
             foreach($q->query_vars['orderby'] as $k=>$v ) {
                 if (isset($clauses[$k])) {
-                    $order_by[] = "CAST($clauses[$k][alias].meta_value AS $clauses[$k][cast]) $v";
+                    $cl = $clauses[$k];
+                    $order_by[] = "CAST($cl[alias].meta_value AS $cl[cast]) $v";
                 } else {
                     if (str_ends_with($k, '_exists')) {
                         $k = substr($k,0,-7);
