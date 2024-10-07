@@ -475,7 +475,7 @@ class MultipopPlugin {
             `completed_at` BIGINT UNSIGNED NULL,
             `author_id` BIGINT UNSIGNED NOT NULL,
             `pp_order_id` VARCHAR(255) NULL,
-            `completed_by` BIGINT UNSIGNED NULL,
+            `completer_id` BIGINT UNSIGNED NULL,
             `signed_from` VARCHAR(255) NULL,
             PRIMARY KEY (`id`)
         ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
@@ -1865,7 +1865,7 @@ class MultipopPlugin {
                 'signed_at',
                 'completed_at',
                 'author_id',
-                'completed_by'
+                'completer_id'
             ])) {
                 if ($v !== '') {
                     $v = intval($v);
@@ -1887,6 +1887,7 @@ class MultipopPlugin {
             'signed_at' => ',',
             'completed_at' => ',',
             'author_id' => 0,
+            'completer_id' => 0,
             'mpop_billing_state' => [],
             'mpop_billing_city' => [],
             'page' => 1,
@@ -1911,6 +1912,7 @@ class MultipopPlugin {
             'signed_at',
             'completed_at',
             'author',
+            'completer_id',
             'mpop_billing_state',
             'mpop_billing_city'
         ];
@@ -1931,6 +1933,8 @@ class MultipopPlugin {
             || !preg_match($time_interval_reg, $options['completed_at'])
             || !is_int($options['author_id'])
             || $options['author_id'] < 0
+            || !is_int($options['completer_id'])
+            || $options['completer_id'] < 0
             || !is_array($options['mpop_billing_state'])
             || !is_array($options['mpop_billing_city'])
             || !is_int($options['page'])
@@ -1995,6 +1999,9 @@ class MultipopPlugin {
                         break;
                     case 'author':
                         $k = 'authors.user_login';
+                        break;
+                    case 'completer_id':
+                        $k = 'completers.user_login';
                         break;
                     case 'mpop_billing_state':
                         $k = 'prov.meta_value';
@@ -2071,6 +2078,9 @@ class MultipopPlugin {
         if ($options['author_id']) {
             $append_to_where("s.author_id = $options[author_id]");
         }
+        if ($options['completer_id']) {
+            $append_to_where("s.completer_id = $options[completer_id]");
+        }
         if (count($options['mpop_billing_state'])) {
             $append_to_where("prov.meta_value IN ( " . implode(',', array_map(function($s) {return "'$s'";},$options['mpop_billing_state'])) . " )");
         }
@@ -2084,6 +2094,8 @@ class MultipopPlugin {
             ON s.user_id = users.ID
             LEFT JOIN " . $wpdb->prefix . "users authors
             ON s.author_id = authors.ID
+            LEFT JOIN " . $wpdb->prefix . "users completers
+            ON s.completer_id = completers.ID
             LEFT JOIN " . $wpdb->prefix . "usermeta fn 
             ON s.user_id = fn.user_id 
             AND fn.meta_key = 'first_name'
@@ -2116,6 +2128,7 @@ class MultipopPlugin {
             users.user_login AS user_login,
             users.user_email AS user_email,
             authors.user_login AS author_login,
+            completers.user_login AS completer_login,
             fn.meta_value AS first_name, 
             ln.meta_value AS last_name,
             prov.meta_value AS mpop_billing_state,
