@@ -2110,20 +2110,25 @@ class MultipopPlugin {
     }
     public function user_search_pre_user_query($q) {
         global $wpdb;
+        $extra_from = [];
+        if (!empty($q->query_vars['mpop_extra_meta'])) {
+            foreach($q->query_vars['mpop_extra_meta'] as $m_key => $m_type) {
+                $extra_from[$m_key] = "LEFT JOIN " . $wpdb->prefix . "usermeta mpop_exmt_$m_key ON (mp_users.ID = mpop_exmt_$m_key.user_id AND mpop_exmt_$m_key.meta_key = '$m_key')";
+            }
+        }
+        if (!empty($extra_from)) {
+            $q->query_from .= " " . implode(' ', $extra_from);
+        }
         if (isset($q->query_vars['orderby']) && is_array($q->query_vars['orderby'])) {
             $order_by = [];
             $clauses = $q->meta_query->get_clauses();
             $i = 0;
             foreach($q->query_vars['orderby'] as $k=>$v ) {
-                if (!isset($clauses[$k])) {
-                    if (str_ends_with($k, '_exists')) {
-                        $k = substr($k,0,-7);
-                    }
-                    $found = array_values(array_filter($clauses, function($cl) use ($k) {return $cl['key'] == $k;}));
-                    if (count($found)) {
-                        $found = $found[0];
-                        $order_by[$i] = "CAST($found[alias].meta_value AS $found[cast]) $v";
-                    }
+                if (in_array($k, ['first_name', 'last_name'])) {
+                    $alias = $clauses[$k]['alias'];
+                    $order_by[$i] = "IF($alias.meta_value = '', 1, 0) ASC, $alias.meta_value $v";
+                } else if (isset($extra_from[$k])) {
+                    $order_by[$i] = "IF(COALESCE(mpop_exmt_$k.meta_value, '') = '', 1, 0) ASC, mpop_exmt_$k.meta_value $v";
                 }
                 $i++;
             }
@@ -2234,7 +2239,7 @@ class MultipopPlugin {
         } else {
             $meta_q['role'][] = [
                 'key' => $wpdb->prefix . 'capabilities',
-                'compare' => 'NOT EXISTS'
+                'value' => 'a:0:{}'
             ];
         }
         if (is_string($txt) && trim($txt) && !preg_match("\r|\n|\t",$txt)) {
@@ -2307,6 +2312,7 @@ class MultipopPlugin {
             'mpop_billing_city',
             'mpop_card_active'
         ];
+        $extra_meta = [];
         if (!is_array($sort_by)) {
             $sort_by = ['ID' => 'ASC'];
         } else {
@@ -2340,50 +2346,60 @@ class MultipopPlugin {
                                 $fsort_by[$k] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
                                 break;
                             }
-                            if (in_array($k, ['mpop_mail_to_confirm', 'mpop_card_active'])) {
-                                $meta_q[$k] = [
-                                    'relation' => 'OR',
-                                    $k.'_exists' => [
-                                        'key' => $k,
-                                        'value' => '1',
-                                        'type' => 'NUMERIC'
-                                    ],
-                                    $k.'_notexists' => [
-                                        'relation' => 'OR',
-                                        [
-                                            'key' => $k,
-                                            'compare' => 'NOT EXISTS'
-                                        ],
-                                        [
-                                            'key' => $k,
-                                            'value' => '',
-                                        ]
-                                    ]
-                                ];
-                            } else {
-                                $meta_q[$k] = [
-                                    'relation' => 'OR',
-                                    $k.'_exists' => [
-                                        [
-                                            'key' => $k,
-                                            'value' => '',
-                                            'compare' => '!='
-                                        ]
-                                    ],
-                                    $k.'_notexists' => [
-                                        'relation' => 'OR',
-                                        [
-                                            'key' => $k,
-                                            'compare' => 'NOT EXISTS'
-                                        ],
-                                        [
-                                            'key' => $k,
-                                            'value' => ''
-                                        ]
-                                    ]
-                                ];
+                            switch ($k) {
+                                case 'mpop_mail_to_confirm':
+                                    $extra_meta[$k] = 'BOOL';
+                                    break;
+                                case 'mpop_card_active':
+                                    $extra_meta[$k] = 'BOOL';
+                                    break;
+                                default:
+                                    $extra_meta[$k] = 'CHAR';
                             }
-                            $fsort_by[$k.'_exists'] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
+                            // if (in_array($k, ['mpop_mail_to_confirm', 'mpop_card_active'])) {
+                            //     $meta_q[$k] = [
+                            //         'relation' => 'OR',
+                            //         $k.'_exists' => [
+                            //             'key' => $k,
+                            //             'value' => '1',
+                            //             'type' => 'NUMERIC'
+                            //         ],
+                            //         $k.'_notexists' => [
+                            //             'relation' => 'OR',
+                            //             [
+                            //                 'key' => $k,
+                            //                 'compare' => 'NOT EXISTS'
+                            //             ],
+                            //             [
+                            //                 'key' => $k,
+                            //                 'value' => '',
+                            //             ]
+                            //         ]
+                            //     ];
+                            // } else {
+                            //     $meta_q[$k] = [
+                            //         'relation' => 'OR',
+                            //         $k.'_exists' => [
+                            //             [
+                            //                 'key' => $k,
+                            //                 'value' => '',
+                            //                 'compare' => '!='
+                            //             ]
+                            //         ],
+                            //         $k.'_notexists' => [
+                            //             'relation' => 'OR',
+                            //             [
+                            //                 'key' => $k,
+                            //                 'compare' => 'NOT EXISTS'
+                            //             ],
+                            //             [
+                            //                 'key' => $k,
+                            //                 'value' => ''
+                            //             ]
+                            //         ]
+                            //     ];
+                            // }
+                            $fsort_by[$k] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
                     }
                 } else {
                     unset($sort_by[$k]);
@@ -2396,6 +2412,7 @@ class MultipopPlugin {
         }
         $query['meta_query'] = $meta_q;
         $query['orderby'] = $sort_by;
+        $query['mpop_extra_meta'] = $extra_meta;
         $user_query = new WP_User_Query($query);
         $total = $user_query->get_total();
         $res = $user_query->get_results();
