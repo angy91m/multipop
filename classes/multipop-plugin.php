@@ -2124,15 +2124,36 @@ class MultipopPlugin {
     }
     public function user_search_pre_user_query($q) {
         global $wpdb;
-        $sanitized_value = '%' . $wpdb->esc_like($q->query_vars['mpop_custom_search']) . '%';
-        $q->query_where .= $wpdb->prepare(
-            " AND (user_login LIKE %s OR user_email LIKE %s OR (search_first_name.meta_key = 'first_name' AND search_first_name.meta_value LIKE %s) OR (search_last_name.meta_key = 'last_name' AND search_last_name.meta_value LIKE %s))",
-            $sanitized_value,
-            $sanitized_value,
-            $sanitized_value,
-            $sanitized_value
-        );
-        $q->query_from .= ' INNER JOIN ' . $wpdb->prefix . 'usermeta AS search_first_name ON ( ' . $wpdb->prefix . 'users.ID = search_first_name.user_id ) INNER JOIN ' . $wpdb->prefix . 'usermeta AS search_last_name ON ( ' . $wpdb->prefix . 'users.ID = search_last_name.user_id )';
+        if (isset($q->query_vars['orderby']) && is_array($q->query_vars['orderby'])) {
+            $order_by = [];
+            $clauses = $q->meta_query->get_clauses();
+            foreach($q->query_vars['orderby'] as $k=>$v ) {
+                if (isset($clauses[$k])) {
+                    $order_by[] = "CAST($clauses[$k][alias].meta_value AS $clauses[$k][cast]) $v";
+                } else {
+                    if (str_ends_with($k, '_exists')) {
+                        $k = substr($k,0,-7);
+                    }
+                    $found = array_values(array_filter($clauses, function($cl) use ($k) {return $cl['key'] == $k;}));
+                    if (count($found)) {
+                        $found = $found[0];
+                        $order_by[] = "CAST($found[alias].meta_value AS $found[cast]) $v";
+                    }
+                }
+            }
+            save_test($order_by);
+        }
+        if (isset($q->query_vars['mpop_custom_search']) && is_string($q->query_vars['mpop_custom_search'])) {
+            $sanitized_value = '%' . $wpdb->esc_like($q->query_vars['mpop_custom_search']) . '%';
+            $q->query_where .= $wpdb->prepare(
+                " AND (user_login LIKE %s OR user_email LIKE %s OR (search_first_name.meta_key = 'first_name' AND search_first_name.meta_value LIKE %s) OR (search_last_name.meta_key = 'last_name' AND search_last_name.meta_value LIKE %s))",
+                $sanitized_value,
+                $sanitized_value,
+                $sanitized_value,
+                $sanitized_value
+            );
+            $q->query_from .= ' INNER JOIN ' . $wpdb->prefix . 'usermeta AS search_first_name ON ( ' . $wpdb->prefix . 'users.ID = search_first_name.user_id ) INNER JOIN ' . $wpdb->prefix . 'usermeta AS search_last_name ON ( ' . $wpdb->prefix . 'users.ID = search_last_name.user_id )';
+        }
         remove_action('pre_user_query', [$this, 'user_search_pre_user_query']);
     }
     private function parse_requested_roles($roles = true) {
@@ -2200,10 +2221,7 @@ class MultipopPlugin {
                 'relation' => 'OR'
             ]
         ];
-
-        add_action('pre_user_query', function ($q) {
-            save_test($q);
-        });
+        add_action('pre_user_query', [$this, 'user_search_pre_user_query']);
         global $wpdb;
         if (count($roles)) {
             sort($roles);
@@ -2222,7 +2240,6 @@ class MultipopPlugin {
         }
         if (is_string($txt) && trim($txt) && !preg_match("\r|\n|\t",$txt)) {
             $query['mpop_custom_search'] = $txt;
-            add_action('pre_user_query', [$this, 'user_search_pre_user_query']);
         }
         $mpop_billing_state = array_values(array_unique(array_filter($mpop_billing_state, function($s) { return preg_match('/^[A-Z]{2}$/', $s); })));
         $mpop_billing_city = array_values(array_unique(array_filter($mpop_billing_city, function($s) { return preg_match('/^[A-Z]\d{3}$/', $s); })));
@@ -2310,14 +2327,14 @@ class MultipopPlugin {
                                 'key' => $k,
                                 'compare' => 'EXISTS'
                             ];
-                            $fsort_by[$k] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
+                            $fsort_by[$k] = !boolval($sort_by[$k]) ? 'ASC' : 'DESC';
                             break;
                         case 'last_name':
                             $meta_q[$k] = [
                                 'key' => $k,
                                 'compare' => 'EXISTS'
                             ];
-                            $fsort_by[$k] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
+                            $fsort_by[$k] = !boolval($sort_by[$k]) ? 'ASC' : 'DESC';
                             break;
                         default:
                             if (isset($meta_q[$k])) {
