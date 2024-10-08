@@ -36,13 +36,13 @@ window.onload = () => {
                     sendMailConfirmationEl.disabled = true;
                     sendMailConfirmationContEl.style.display = 'none';
                     confirmedEl.disabled = mailConfirmed || (_new_email && emailEl.value == primaryEmail);
-                    if (mailConfirmed) {
+                    if (mailConfirmed || (_new_email && emailEl.value == primaryEmail)) {
                         confirmedEl.checked = true;
                     }
                     sendMailConfirmationButton.disabled = mailConfirmed || (_new_email && emailEl.value == primaryEmail) || confirmedEl.checked;
                 } else if (confirmedEl.disabled) {
-                    confirmedEl.disabled = mailConfirmed;
-                    confirmedEl.checked = mailConfirmed;
+                    confirmedEl.disabled = mailConfirmed || (_new_email && emailEl.value == primaryEmail);
+                    confirmedEl.checked = mailConfirmed || (_new_email && emailEl.value == primaryEmail);
                 }
             } else {
                 revokeMailConfirmationButton.style.display = 'none';
