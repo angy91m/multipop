@@ -31,6 +31,7 @@ window.onload = () => {
             if (emailEl.value == emailOriginal || (_new_email && emailEl.value == primaryEmail)) {
                 console.log(emailEl.value);
                 console.log(primaryEmail);
+                console.log(_new_email && emailEl.value === primaryEmail);
                 sendMailConfirmationButton.style.display = mailConfirmed || (_new_email && emailEl.value === primaryEmail) ? 'none' : 'unset';
                 revokeMailConfirmationButton.style.display = mailConfirmed || (_new_email && emailEl.value === primaryEmail) ? 'unset' : 'none';
                 if (sendMailConfirmationContEl.style.display != 'none') {
