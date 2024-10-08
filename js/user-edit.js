@@ -27,11 +27,10 @@ window.onload = () => {
     revokeMailConfirmationButton = document.getElementById('revoke_mail_confirmation_button');
     emailEl = document.getElementById('email');
     emailEl.addEventListener('input', () => {
-        console.log(emailEl.value);
         if (customContainer.style.display !== 'none') {
             if (emailEl.value == emailOriginal) {
-                sendMailConfirmationButton.style.display = mailConfirmed ? 'none' : 'unset';
-                revokeMailConfirmationButton.style.display = mailConfirmed ? 'unset' : 'none';
+                sendMailConfirmationButton.style.display = mailConfirmed || (_new_email && emailEl.value == primaryEmail) ? 'none' : 'unset';
+                revokeMailConfirmationButton.style.display = mailConfirmed || (_new_email && emailEl.value == primaryEmail) ? 'unset' : 'none';
                 if (sendMailConfirmationContEl.style.display != 'none') {
                     sendMailConfirmationEl.checked = false;
                     sendMailConfirmationEl.disabled = true;
