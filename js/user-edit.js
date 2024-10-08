@@ -28,7 +28,7 @@ window.onload = () => {
     emailEl = document.getElementById('email');
     emailEl.addEventListener('input', () => {
         if (customContainer.style.display !== 'none') {
-            if (emailEl.value == emailOriginal) {
+            if (emailEl.value == emailOriginal || (_new_email && emailEl.value == primaryEmail)) {
                 sendMailConfirmationButton.style.display = mailConfirmed || (_new_email && emailEl.value == primaryEmail) ? 'none' : 'unset';
                 revokeMailConfirmationButton.style.display = mailConfirmed || (_new_email && emailEl.value == primaryEmail) ? 'unset' : 'none';
                 if (sendMailConfirmationContEl.style.display != 'none') {
