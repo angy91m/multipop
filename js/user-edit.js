@@ -1,7 +1,7 @@
 window.onload = () => {
     document.querySelector('form').removeAttribute('action');
-    let {mailConfirmed, _new_email} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
-    let emailEl = document.getElementById('email');
+    const {mailConfirmed, _new_email} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
+    let emailEl = document.getElementById('email'), _new_email_edit = _new_email;
     const primaryEmail =  emailEl.value,
     emailOriginal = _new_email || emailEl.value,
     emailRow = emailEl.parentElement,
@@ -28,18 +28,18 @@ window.onload = () => {
     emailEl = document.getElementById('email');
     emailEl.addEventListener('input', () => {
         if (customContainer.style.display !== 'none') {
-            if (emailEl.value == emailOriginal) {
-                sendMailConfirmationButton.style.display = mailConfirmed ? 'none' : 'unset';
-                revokeMailConfirmationButton.style.display = mailConfirmed ? 'unset' : 'none';
+            if (emailEl.value == emailOriginal || (_new_email && emailEl.value == primaryEmail)) {
+                sendMailConfirmationButton.style.display = mailConfirmed || (_new_email && emailEl.value == primaryEmail) ? 'none' : 'unset';
+                revokeMailConfirmationButton.style.display = mailConfirmed || (_new_email && emailEl.value == primaryEmail) ? 'unset' : 'none';
                 if (sendMailConfirmationContEl.style.display != 'none') {
                     sendMailConfirmationEl.checked = false;
                     sendMailConfirmationEl.disabled = true;
                     sendMailConfirmationContEl.style.display = 'none';
-                    confirmedEl.disabled = mailConfirmed;
+                    confirmedEl.disabled = mailConfirmed || (_new_email && emailEl.value == primaryEmail);
                     if (mailConfirmed) {
                         confirmedEl.checked = true;
                     }
-                    sendMailConfirmationButton.disabled = mailConfirmed || confirmedEl.checked;
+                    sendMailConfirmationButton.disabled = mailConfirmed || (_new_email && emailEl.value == primaryEmail) || confirmedEl.checked;
                 } else if (confirmedEl.disabled) {
                     confirmedEl.disabled = mailConfirmed;
                     confirmedEl.checked = mailConfirmed;
@@ -71,23 +71,23 @@ window.onload = () => {
     roleSelect.addEventListener('change', () => {
         if (['multipopolano', 'multipopolare_resp'].includes(roleSelect.value)) {
             if (_new_email) {
-                emailEl.value = _new_email;
+                emailEl.value = _new_email_edit;
             }
             if (confirmedEl.disabled) {
                 customContainer.style.display = 'unset';
-                confirmedEl.disabled = mailConfirmed;
-                confirmedEl.checked = mailConfirmed;
+                confirmedEl.disabled = mailConfirmed || (_new_email && emailEl.value == primaryEmail);
+                confirmedEl.checked = mailConfirmed || (_new_email && emailEl.value == primaryEmail);
                 confirmedEl.dispatchEvent(new Event('change'));
                 emailEl.dispatchEvent(new Event('input'));
             }
-            if (mailConfirmed) {
+            if (mailConfirmed || (_new_email && emailEl.value == primaryEmail)) {
                 revokeMailConfirmationButton.style.display = 'unset';
             } else {
                 revokeMailConfirmationButton.style.display = 'none';
             }
         } else {
             if (_new_email) {
-                _new_email = emailEl.value;
+                _new_email_edit = emailEl.value;
                 emailEl.value = primaryEmail;
             }
             confirmedEl.disabled = true;
