@@ -210,7 +210,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         </div>
                     </div>
                     <div v-if="selectedTab == 'card'">
-                        <template v-if="Array.isArray(profile.mpop_my_subscritions)">
+                        <template v-if="profile.mpop_my_subscritions">
                             <h3>Tessera</h3>
                             <h4 v-if="profile.mpop_card_active">La tua tessera è attiva</h4>
                             <div>
