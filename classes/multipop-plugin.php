@@ -63,7 +63,7 @@ class MultipopPlugin {
     // USERNAME VALIDATION
     private static function is_valid_username( $username ) {
         if (
-            !preg_match('/^[a-z0-9._-]{3,24}$/', $username)
+            !preg_match('/^[a-z0-9._-]{3,20}$/', $username)
             || !preg_match('/[a-z0-9]/', $username)
             || str_starts_with( $username, '.' )
             || str_starts_with( $username, '-' )
@@ -1879,14 +1879,14 @@ class MultipopPlugin {
     private function search_subscriptions(array $options = [], $limit = 100, $force = false) { 
         $options = $options + [
             'txt' => '',
-            'user_id' => 0,
+            'user_id' => [],
             'year' => [], 
             'status' => [],
             'created_at' => ',',
             'updated_at' => ',',
             'signed_at' => ',',
             'completed_at' => ',',
-            'author_id' => 0,
+            'author_id' => [],
             'completer_id' => 0,
             'mpop_billing_state' => [],
             'mpop_billing_city' => [],
@@ -1919,8 +1919,7 @@ class MultipopPlugin {
         $res = false;
         if (
             !is_string($options['txt'])
-            || !is_int($options['user_id'])
-            || $options['user_id'] < 0
+            || !is_array($options['user_id'])
             || !is_array($options['year'])
             || !is_array($options['status'])
             || !is_string($options['created_at'])
@@ -1931,10 +1930,8 @@ class MultipopPlugin {
             || !preg_match($time_interval_reg, $options['signed_at'])
             || !is_string($options['completed_at'])
             || !preg_match($time_interval_reg, $options['completed_at'])
-            || !is_int($options['author_id'])
-            || $options['author_id'] < 0
-            || !is_int($options['completer_id'])
-            || $options['completer_id'] < 0
+            || !is_array($options['author_id'])
+            || !is_array($options['completer_id'])
             || !is_array($options['mpop_billing_state'])
             || !is_array($options['mpop_billing_city'])
             || !is_int($options['page'])
@@ -1971,6 +1968,9 @@ class MultipopPlugin {
         ) {
             return $res;
         }
+        $options['user_id'] = array_values(array_unique(array_filter($options['user_id'], function($y) {return is_int($y) && $y > 0;})));
+        $options['author_id'] = array_values(array_unique(array_filter($options['author_id'], function($id) {return is_int($id) && $id > 0;})));
+        $options['completer_id'] = array_values(array_unique(array_filter($options['completer_id'], function($id) {return is_int($id) && $id > 0;})));
         $options['year'] = array_values(array_unique(array_filter($options['year'], function($y) {return is_int($y) && $y > 0;})));
         $options['status'] = array_values(array_unique(array_filter($options['status'], function($s) {return in_array($s, MultipopPlugin::SUBS_STATUSES);})));
         $options['mpop_billing_state'] = array_values(array_unique(array_filter($options['mpop_billing_state'], function($s) use ($mpop_billing_state_reg) {return preg_match($mpop_billing_state_reg, $s);})));
@@ -2042,8 +2042,8 @@ class MultipopPlugin {
                 $sanitized_value
             ));
         }
-        if ($options['user_id']) {
-            $append_to_where("s.user_id = $options[user_id]");
+        if (count($options['user_id'])) {
+            $append_to_where("s.user_id IN ( " . implode(',',$options['user_id']) . " )");
         }
         if (count($options['year'])) {
             $append_to_where("s.year IN ( " . implode(',', $options['year']) . " )");
@@ -2075,11 +2075,11 @@ class MultipopPlugin {
         if ($options['completed_at'][1]) {
             $append_to_where("s.completed_at <= " . $options['completed_at'][1]);
         }
-        if ($options['author_id']) {
-            $append_to_where("s.author_id = $options[author_id]");
+        if (count($options['author_id'])) {
+            $append_to_where("s.author_id IN ( " . implode(',',$options['author_id']) . " )");
         }
-        if ($options['completer_id']) {
-            $append_to_where("s.completer_id = $options[completer_id]");
+        if (count($options['completer_id'])) {
+            $append_to_where("s.completer_id IN ( " . implode(',',$options['completer_id']) . " )");
         }
         if (count($options['mpop_billing_state'])) {
             $append_to_where("prov.meta_value IN ( " . implode(',', array_map(function($s) {return "'$s'";},$options['mpop_billing_state'])) . " )");
@@ -2148,6 +2148,7 @@ class MultipopPlugin {
             $sub['signed_at'] = intval($sub['signed_at']);
             $sub['completed_at'] = intval($sub['completed_at']);
             $sub['author_id'] = intval($sub['author_id']);
+            $sub['completer_id'] = intval($sub['completer_id']);
         }
         $res['total'] = $total;
         $res['pages'] = $pages;

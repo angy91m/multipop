@@ -36,6 +36,12 @@ if (str_starts_with($post_data['action'], 'admin_')) {
     exit;
 }
 switch ($post_data['action']) {
+    case 'get_authorized_subscription_years':
+        $years = [];
+        if ( isset($this->settings['master_doc_key']) && $this->settings['master_doc_key'] && isset($this->settings['authorized_subscription_years'])) {
+            $years = $this->settings['authorized_subscription_years'];
+        }
+        $res_data['data'] = ['years' => $years];
     case 'get_birth_cities':
         if (!isset($post_data['mpop_birthplace']) || !is_string($post_data['mpop_birthplace']) || mb_strlen(trim($post_data['mpop_birthplace']), 'UTF-8') < 2) {
             $res_data['error'] = ['mpop_birthplace'];

@@ -2,7 +2,7 @@ import { createApp, ref, computed, reactive, onMounted, onUnmounted } from '/wp-
 const mailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/s,
 usernameRegex = {
     rr: [
-        /^[a-z0-9._-]{3,24}$/s,
+        /^[a-z0-9._-]{3,20}$/s,
         /[a-z0-9]/s,
         {
             test(username) {

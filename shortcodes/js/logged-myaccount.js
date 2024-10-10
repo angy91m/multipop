@@ -47,6 +47,9 @@ createApp({
         'v-select': defineAsyncComponent(() => vSel)
     },
     setup() {
+        function activeCardForYear(cards = [], year) {
+            return cards.filter(c => c.year == year && ['completed', 'tosee', 'seen'].includes(c.status)).sort((a,b) => a.status == b.status ? (a.status == 'completed' ? b.completed_at-a.completed_at : b.updated_at_at-a.updated_at_at) : (a.status == 'completed' ? -1 : (b.status == 'completed' ? 1 : b.updated_at_at-a.updated_at_at) ) ).shift();
+        }
         const selectedTab = ref('summary'),
         displayNav = ref(false),
         profile = reactive({}),
@@ -60,6 +63,7 @@ createApp({
         userSearchZoneOpen = ref(false),
         userSearchRespZoneOpen = ref(false),
         userEditingRespZoneOpen = ref(false),
+        authorizedSubscriptionYears = reactive([]),
         saving = ref(false),
         savingProfileErrors = reactive([]),
         savingUserErrors = reactive([]),
@@ -142,19 +146,20 @@ createApp({
             if (!pwdChangeFields.confirm || pwdChangeFields.new !== pwdChangeFields.confirm) errs.push('confirm');
             return errs;
         }),
-        myLastActiveCard = computed(() => {
-            let res;
-            if (
-                profile.mpop_my_cards
-                && profile.mpop_my_cards.length
-            ) {
-                res = profile.mpop_my_cards.filter(c => c.status == 'completed').sort((a,b) => b-a).shift();
-            }
-            return res;
-        }),
+        thisYearActiveCard = computed(() => activeCardForYear(profile.mpop_my_cards || [], (new Date()).getFullYear())),
+        isProfileCompleted = computed(() => profile.first_name
+                && profile.last_name
+                && profile.mpop_birthdate
+                && profile.mpop_birthplace
+                && profile.mpop_billing_city
+                && profile.mpop_billing_state
+                && profile.mpop_billing_zip
+                && profile.mpop_billing_address
+        ? true : false ),
+        availableYearsToOrder = computed(() => profile.mpop_card_active && !thisYearActiveCard.value ? [] : authorizedSubscriptionYears.filter(y => y >= (new Date()).getFullYear() && !activeCardForYear(profile.mpop_my_cards || [], y))),
+        otherCards = computed(() => (profile.mpop_my_cards || []).filter(c => thisYearActiveCard.value ? thisYearActiveCard.value.id !== c : true)),
         maxBirthDate = new Date();
         maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
-
         function fuseSearch(options, search) {
             const fuse = new Fuse(options, {
                 keys: ['label'],
@@ -263,6 +268,37 @@ createApp({
             loading(true);
             const func = eval(callable);
             triggerSearchTimeout = setTimeout( () => func(txt, ...args).then(() => loading(false)), 500);
+        }
+        function showSubscriptionStatus(card) {
+            let status = '';
+            const thisYear = (new Date()).getFullYear();
+            switch(card) {
+                case 'completed':
+                    status = 'Attiva';
+                    if (card.year < thisYear) status = 'Scaduta';
+                    if (card.year > thisYear) status = 'In attivazione';
+                    break;
+                case 'tosee':
+                    status = 'In attesa di approvazione';
+                    break;
+                case 'seen':
+                    if (card.pp_order_id) {
+                        status = 'In attesa di pagamento';
+                    } else {
+                        status = 'In attesa di approvazione';
+                    }
+                    break;
+                case 'refused':
+                    status = 'Rifiutata';
+                    break;
+                case 'canceled':
+                    status = 'Annullata';
+                    break;
+                case 'refunded':
+                    status = 'Rimborsata';
+                    break;
+            }
+            return status;
         }
         function showZones(zones) {
             const regioni = zones.filter(z => z.type == 'regione'),
@@ -537,6 +573,32 @@ createApp({
                 pushQueryParams({'view-user': ID});
             }
         }
+        async function getAuthorizedSubscriptionYears() {
+            const res = await serverReq({
+                action: 'get_authorized_subscription_years'
+            });
+            if (res.ok) {
+                const resData = await res.json();
+                if (resData.data && resData.data.years) {
+                    authorizedSubscriptionYears.length = 0;
+                    authorizedSubscriptionYears.push(...resData.data.years);
+                } else {
+                    console.error('Unknown error');
+                }
+                generateNotices(resData.notices || []);
+            } else {
+                try {
+                    const {error} = await res.json();
+                    if (error) {
+                        console.error(error);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } catch {
+                    console.error('Unknown error');
+                }
+            }
+        }
         async function searchUsers() {
             foundUsers.length = 0;
             const reqObj = {
@@ -705,7 +767,10 @@ createApp({
                 } else if (url.searchParams.has('view-user')) {
                     viewUser(url.searchParams.get('view-user'), popstate);
                 }
-                if (tabName == 'summary' || tabName == 'card') {
+                if (tabName == 'card') {
+                    getAuthorizedSubscriptionYears();
+                    getProfile();
+                } else if(tabName == 'summary') {
                     getProfile();
                 }
             }
@@ -848,7 +913,11 @@ createApp({
             reduceZones,
             showZones,
             addSuppressToLabel,
-            myLastActiveCard,
+            showSubscriptionStatus,
+            otherCards,
+            thisYearActiveCard,
+            availableYearsToOrder,
+            isProfileCompleted,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
         };
     }

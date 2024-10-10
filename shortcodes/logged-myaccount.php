@@ -211,14 +211,40 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     </div>
                     <div v-if="selectedTab == 'card'">
                         <template v-if="profile.mpop_my_cards">
-                            <h3>La tua tessera</h3>
-                            {{new Date()}}
-                            <template v-if="profile.mpop_card_active">
-                                <h4>La tua tessera è attiva</h4>
-                                <template v-if="myLastActiveCard && myLastActiveCard.year == (new Date()).getFullYear()">
-
-                                </template>
-                            </template>
+                            <h3>Tessera</h3>
+                            <h4 v-if="profile.mpop_card_active">La tua tessera è attiva</h4>
+                            <div>
+                                <ul v-if="thisYearActiveCard">
+                                    <li>Codice tessera: {{thisYearActiveCard.card_id ? thisYearActiveCard.card_id : 'Da assegnare'}}</li>
+                                    <li>Stato attivazione: {{showSubscriptionStatus(thisYearActiveCard)}}</li>
+                                    <li>Anno: {{thisYearActiveCard.year}}</li>
+                                    <template v-if="thisYearActiveCard.pp_order_id">
+                                        <li>PayPal ID: {{thisYearActiveCard.pp_order_id}}</li>
+                                        <li v-if="thisYearActiveCard.status == 'seen'">Paga</li>
+                                    </template>
+                                </ul>
+                                <div v-if="availableYearsToOrder.length" id="mpop-avail-years-to-order">
+                                    <p v-if="isProfileCompleted">
+                                        Ordina per i seguenti anni: {{availableYearsToOrder}}
+                                    </p>
+                                    <p v-else>Per richiedere una nuova tessera è necessario completare i tuoi dati del profilo</p>
+                                </div>
+                                <div v-if="!profile.mpop_card_active && !availableYearsToOrder.length" id="mpop-avail-years-to-order">
+                                    <p>Al momento non è possibile richiedere nuove tessere</p>
+                                </div>
+                                <table id="mpop-other-cards">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="card in otherCards">
+                                            <td>{{card.id}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </template>
                     </div>
                     <div v-if="selectedTab == 'users'" id="mpop-user-search">
