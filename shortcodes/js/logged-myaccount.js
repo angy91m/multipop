@@ -146,7 +146,7 @@ createApp({
             if (!pwdChangeFields.confirm || pwdChangeFields.new !== pwdChangeFields.confirm) errs.push('confirm');
             return errs;
         }),
-        thisYearActiveCard = computed(() => activeCardForYear(profile.mpop_my_cards || [], (new Date()).getFullYear())),
+        thisYearActiveSub = computed(() => activeCardForYear(profile.mpop_my_subscritions || [], (new Date()).getFullYear())),
         isProfileCompleted = computed(() => profile.first_name
                 && profile.last_name
                 && profile.mpop_birthdate
@@ -156,8 +156,8 @@ createApp({
                 && profile.mpop_billing_zip
                 && profile.mpop_billing_address
         ? true : false ),
-        availableYearsToOrder = computed(() => profile.mpop_card_active && !thisYearActiveCard.value ? [] : authorizedSubscriptionYears.filter(y => y >= (new Date()).getFullYear() && !activeCardForYear(profile.mpop_my_cards || [], y))),
-        otherCards = computed(() => (profile.mpop_my_cards || []).filter(c => thisYearActiveCard.value ? thisYearActiveCard.value.id !== c : true)),
+        availableYearsToOrder = computed(() => profile.mpop_card_active && !thisYearActiveSub.value ? [] : authorizedSubscriptionYears.filter(y => y >= (new Date()).getFullYear() && !activeCardForYear(profile.mpop_my_subscritions || [], y))),
+        otherSubscriptions = computed(() => (profile.mpop_my_subscritions || []).filter(c => thisYearActiveSub.value ? thisYearActiveSub.value.id !== c : true)),
         maxBirthDate = new Date();
         maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
         function fuseSearch(options, search) {
@@ -914,8 +914,8 @@ createApp({
             showZones,
             addSuppressToLabel,
             showSubscriptionStatus,
-            otherCards,
-            thisYearActiveCard,
+            otherSubscriptions,
+            thisYearActiveSub,
             availableYearsToOrder,
             isProfileCompleted,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
