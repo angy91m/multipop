@@ -42,6 +42,7 @@ switch ($post_data['action']) {
             $years = $this->settings['authorized_subscription_years'];
         }
         $res_data['data'] = ['years' => $years];
+        break;
     case 'get_birth_cities':
         if (!isset($post_data['mpop_birthplace']) || !is_string($post_data['mpop_birthplace']) || mb_strlen(trim($post_data['mpop_birthplace']), 'UTF-8') < 2) {
             $res_data['error'] = ['mpop_birthplace'];
