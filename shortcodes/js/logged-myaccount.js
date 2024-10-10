@@ -769,7 +769,7 @@ createApp({
                 }
                 if (tabName == 'card') {
                     getAuthorizedSubscriptionYears();
-                    getProfile().then(()=>console.log(profile));
+                    getProfile();
                 } else if(tabName == 'summary') {
                     getProfile();
                 }
