@@ -751,7 +751,7 @@ class MultipopPlugin {
         }
         if ($settings['authorized_subscription_years']) {
             $this_year = intval(current_time('Y'));
-            $settings['authorized_subscription_years'] = array_values(array_filter(array_map(function($v) {return intval($v);},explode(',', $settings['authorized_subscription_years'])), function($v) {return $v >= $this_year;}));
+            $settings['authorized_subscription_years'] = array_values(array_filter(array_map(function($v) use ($this_year) {return intval($v);},explode(',', $settings['authorized_subscription_years'])), function($v) {return $v >= $this_year;}));
         } else {
             $settings['authorized_subscription_years'] = [];
         }
