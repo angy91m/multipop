@@ -184,6 +184,10 @@ createApp({
             cachedProps[propName] = (new Date()).getTime() + expiry;
         }
         function isCachedProp(propName) {
+            console.log(propName)
+            console.log(cachedProps)
+            console.log(cachedProps[propName])
+            console.log(cachedProps[propName] > (new Date()).getTime())
             return cachedProps[propName] ? cachedProps[propName] > (new Date()).getTime() : false;
         }
         async function birthCitiesSearch(searchText, user = false) {
