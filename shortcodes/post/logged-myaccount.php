@@ -35,6 +35,15 @@ if (str_starts_with($post_data['action'], 'admin_')) {
     }
     exit;
 }
+if (str_starts_with($post_data['action'], 'resp_')) {
+    $current_user = wp_get_current_user();
+    if (isset($current_user->roles[0]) && in_array($current_user->roles[0], ['administrator', 'multipopolare_resp']) ) {
+        require('resp-actions.php');
+    } else {
+        http_response_code( 401 );
+    }
+    exit;
+}
 switch ($post_data['action']) {
     case 'get_authorized_subscription_years':
         $years = [];

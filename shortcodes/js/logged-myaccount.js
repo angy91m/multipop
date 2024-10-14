@@ -40,6 +40,7 @@ userRoles = [
     'others'
 ],
 historyTabs = [],
+cachedProps = {},
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value;
 let searchUsersTimeout, triggerSearchTimeout;
 createApp({
@@ -146,18 +147,29 @@ createApp({
             if (!pwdChangeFields.confirm || pwdChangeFields.new !== pwdChangeFields.confirm) errs.push('confirm');
             return errs;
         }),
-        thisYearActiveSub = computed(() => activeCardForYear(profile.mpop_my_subscritions || [], (new Date()).getFullYear())),
+        nearActiveSub = computed(() => {
+            let res, i = 0;
+            const thisYear = (new Date()).getFullYear();
+            while(!res && i < authorizedSubscriptionYears.length) {
+                if (authorizedSubscriptionYears[i] >= thisYear) res = activeCardForYear(profile.mpop_my_subscritions || [], authorizedSubscriptionYears[i]);
+                i++;
+            }
+            return res;
+        }),
         isProfileCompleted = computed(() => profile.first_name
-                && profile.last_name
-                && profile.mpop_birthdate
-                && profile.mpop_birthplace
-                && profile.mpop_billing_city
-                && profile.mpop_billing_state
-                && profile.mpop_billing_zip
-                && profile.mpop_billing_address
+            && profile.last_name
+            && profile.mpop_birthdate
+            && profile.mpop_birthplace
+            && profile.mpop_billing_city
+            && profile.mpop_billing_state
+            && profile.mpop_billing_zip
+            && profile.mpop_billing_address
         ? true : false ),
-        availableYearsToOrder = computed(() => profile.mpop_card_active && !thisYearActiveSub.value ? [] : authorizedSubscriptionYears.filter(y => y >= (new Date()).getFullYear() && !activeCardForYear(profile.mpop_my_subscritions || [], y))),
-        otherSubscriptions = computed(() => (profile.mpop_my_subscritions || []).filter(c => thisYearActiveSub.value ? thisYearActiveSub.value.id !== c : true)),
+        availableYearsToOrder = computed(() => {
+            const thisYear = (new Date()).getFullYear();
+            return profile.mpop_card_active && (!nearActiveSub.value || nearActiveSub.value.year != thisYear) ? [] : authorizedSubscriptionYears.filter(y => y >= thisYear && !activeCardForYear(profile.mpop_my_subscritions || [], y));
+        }),
+        otherSubscriptions = computed(() => (profile.mpop_my_subscritions || []).filter(c => nearActiveSub.value ? nearActiveSub.value.id !== c : true)),
         maxBirthDate = new Date();
         maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
         function fuseSearch(options, search) {
@@ -166,6 +178,13 @@ createApp({
                 shouldSort: true
             });
             return search.trim().length ? fuse.search(search).map(({item}) => item) : fuse.list;
+        }
+        function saveCachedProp(propName = '', expiry = 3 * 60 * 1000) {
+            if (!propName) throw new Error('Empty property');
+            cachedProps[propName] = (new Date()).getTime() + expiry;
+        }
+        function isCachedProp(propName) {
+            return cachedProps[propName] ? cachedProps[propName] > (new Date()).getTime() : false;
         }
         async function birthCitiesSearch(searchText, user = false) {
             if (user) {
@@ -574,6 +593,7 @@ createApp({
             }
         }
         async function getAuthorizedSubscriptionYears() {
+            if ( isCachedProp('authorizedSubscriptionYears') ) return authorizedSubscriptionYears;
             const res = await serverReq({
                 action: 'get_authorized_subscription_years'
             });
@@ -581,7 +601,8 @@ createApp({
                 const resData = await res.json();
                 if (resData.data && resData.data.years) {
                     authorizedSubscriptionYears.length = 0;
-                    authorizedSubscriptionYears.push(...resData.data.years);
+                    authorizedSubscriptionYears.push(...resData.data.years.sort());
+                    saveCachedProp('authorizedSubscriptionYears');
                 } else {
                     console.error('Unknown error');
                 }
@@ -915,7 +936,7 @@ createApp({
             addSuppressToLabel,
             showSubscriptionStatus,
             otherSubscriptions,
-            thisYearActiveSub,
+            nearActiveSub,
             availableYearsToOrder,
             isProfileCompleted,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)

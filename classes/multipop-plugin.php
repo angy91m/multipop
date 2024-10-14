@@ -1670,6 +1670,12 @@ class MultipopPlugin {
             'mpop_resp_zones' => [],
             'mpop_my_subscriptions' => $this->get_my_subscriptions($user->ID)
         ];
+        if (in_array($parsed_user['role'], ['administrator', 'multipopolare_resp'])) {
+            $parsed_user['mpop_has_master_key'] = false;
+            if (isset($this->settings['master_doc_key']) && $this->settings['master_doc_key']) {
+                $parsed_user['mpop_has_master_key'] = !!$user->mpop_personal_master_key;
+            }
+        }
         if ($user->mpop_profile_pending_edits) {
             $parsed_user['mpop_profile_pending_edits'] = json_decode($user->mpop_profile_pending_edits, true);
         }

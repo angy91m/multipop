@@ -214,13 +214,14 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             <h3>Tessera</h3>
                             <h4 v-if="profile.mpop_card_active">La tua tessera è attiva</h4>
                             <div>
-                                <ul v-if="thisYearActiveSub">
-                                    <li>Codice tessera: {{thisYearActiveSub.card_id ? thisYearActiveSub.card_id : 'Da assegnare'}}</li>
-                                    <li>Stato attivazione: {{showSubscriptionStatus(thisYearActiveSub)}}</li>
-                                    <li>Anno: {{thisYearActiveSub.year}}</li>
-                                    <template v-if="thisYearActiveSub.pp_order_id">
-                                        <li>PayPal ID: {{thisYearActiveSub.pp_order_id}}</li>
-                                        <li v-if="thisYearActiveSub.status == 'seen'">Paga</li>
+                                <ul v-if="nearActiveSub">
+                                    <li>Codice tessera: {{nearActiveSub.card_id ? nearActiveSub.card_id : 'Da assegnare'}}</li>
+                                    <li>Stato attivazione: {{showSubscriptionStatus(nearActiveSub)}}</li>
+                                    <li>Anno: {{nearActiveSub.year}}</li>
+                                    <li>ID richiesta: {{nearActiveSub.id}}</li>
+                                    <template v-if="nearActiveSub.pp_order_id">
+                                        <li>PayPal ID: {{nearActiveSub.pp_order_id}}</li>
+                                        <li v-if="nearActiveSub.status == 'seen'">Paga</li>
                                     </template>
                                 </ul>
                                 <div v-if="availableYearsToOrder.length" id="mpop-avail-years-to-order">
@@ -457,7 +458,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             </tr>
                             <tr v-if="userInView.role == 'multipopolare_resp'">
                                 <td><strong>Zone:</strong></td>
-                                <td v-if="!userEditing">
+                                <td v-if="!userEditing || profile.role != 'administrator'">
                                     <template v-if="userInView.mpop_resp_zones.length">
                                         <ul>
                                             <li v-for="z in userInView.mpop_resp_zones">{{z.untouched_label + addSuppressToLabel(z)}}</li>
@@ -636,6 +637,10 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 <td><strong>Indirizzo di residenza:</strong></td>
                                 <td v-if="!userEditing">{{userInView.mpop_billing_address}}</td>
                                 <td v-else><textarea v-model="userInEditing.mpop_billing_address" :class="savingUserErrors.includes('mpop_billing_address') ? 'bad-input' : ''" :disabled="!userInEditing.mpop_billing_zip"></textarea></td>
+                            </tr>
+                            <tr v-if="profile.role == 'administrator' && profile.mpop_has_master_key && ['administrator', 'multipopolare_resp'].includes(userInView.role)">
+                                <td><strong>Master key:</strong></td>
+                                <td>{{userInView.mpop_has_master_key ? 'Impostata': 'Non impostata'}}</td>
                             </tr>
                         </table>
                     </template></div>
