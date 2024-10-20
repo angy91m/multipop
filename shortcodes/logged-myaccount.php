@@ -212,6 +212,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                         :value="profile.mpop_phone || ''"
                                         @change-number="(num)=>console.log(num)"
                                         @change-country="(c)=>console.log(c)"
+                                        @change-validity="(v)=>console.log(v)"
                                     />
                                 </td>
                             </tr>
