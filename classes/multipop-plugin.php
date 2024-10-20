@@ -2085,7 +2085,7 @@ class MultipopPlugin {
             array_map(function($v) {return $v[2];}, $insert_data)
         );
     }
-    private function get_subscription_by($getby = 'id', $sub_id, ?int $year) {
+    private function get_subscription_by($getby, $sub_id, $year = 0) {
         $search_format = '%d';
         if ($getby == 'id') {
             if (is_array($sub_id) && isset($sub_id['id'])) {
