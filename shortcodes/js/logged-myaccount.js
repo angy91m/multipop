@@ -195,7 +195,7 @@ createApp({
                         reader.onload = () => {
                             r(reader.result);
                         }
-                        reader.readAsArrayBuffer(csvFile);
+                        reader.readAsText(csvFile);
                     });
                     const workbook = XLSX.read(csvBuff, {raw: true}),
                     sheet = workbook.Sheets[workbook.SheetNames[0]],
