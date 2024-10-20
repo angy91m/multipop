@@ -197,8 +197,10 @@ createApp({
                         }
                         reader.readAsArrayBuffer(csvFile);
                     });
-                    const workbook = XLSX.read(csvBuff, {raw: true});
-                    console.log(workbook);
+                    const workbook = XLSX.read(csvBuff, {raw: true}),
+                    sheet = workbook.Sheets[workbook.SheetNames[0]],
+                    jsonValues = XLSX.utils.sheet_to_json(sheet, {header:1});
+                    console.log(jsonValues);
                 }
             }
         }
