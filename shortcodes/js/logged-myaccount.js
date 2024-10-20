@@ -76,7 +76,8 @@ loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').va
 let searchUsersTimeout, triggerSearchTimeout;
 createApp({
     components: {
-        'v-select': defineAsyncComponent(() => vSel)
+        'v-select': defineAsyncComponent(() => vSel),
+        'v-tel-input': defineAsyncComponent(()=>vTel)
     },
     setup() {
         function activeCardForYear(cards = [], year) {
