@@ -648,13 +648,18 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     </template></div>
                     <div v-if="selectedTab == 'uploadUserCsv'">
                         <input type="file" @change="loadUsersFromCsv">
-                        <!-- <table>
+                        <table>
                             <thead>
                                 <th>
-                                    <td></td>
+                                    <td v-for="f in userCsvFields">{{f}}</td>
                                 </th>
                             </thead>
-                        </table> -->
+                            <tbody>
+                                <tr v-for="u in csvUsers">
+                                    <td v-for="f in userCsvFields">{{u[f]}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </td>

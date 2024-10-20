@@ -40,6 +40,26 @@ userRoles = [
 ],
 historyTabs = [],
 cachedProps = {},
+userCsvFields = [
+    'login',
+    'email',
+    'first_name',
+    'last_name',
+    'mpop_birthplace',
+    'mpop_birthdate',
+    'mpop_billing_city',
+    'mpop_billing_address',
+    'mpop_billing_zip',
+    'mpop_phone',
+    'mpop_subscription_quote',
+    'mpop_subscription_date',
+    'mpop_subscription_card_id',
+    'mpop_subscription_marketing_agree',
+    'mpop_subscription_newsletter_agree',
+    'mpop_subscription_publish_agree',
+    'mpop_org_role',
+    'mpop_subscription_notes'
+],
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value;
 let searchUsersTimeout, triggerSearchTimeout;
 createApp({
@@ -201,6 +221,13 @@ createApp({
                     const workbook = XLSX.read(csvContent, {raw: true, type: 'string'}),
                     sheet = workbook.Sheets[workbook.SheetNames[0]];
                     csvUsers.push(...XLSX.utils.sheet_to_json(sheet));
+                    csvUsers.forEach(u => {
+                        for (const k in u) {
+                            if (typeof u[k] == 'string') {
+                                u[k] = u[k].trim();
+                            }
+                        }
+                    });
                 }
             }
         }
@@ -969,7 +996,8 @@ createApp({
             isProfileCompleted,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2),
             csvUsers,
-            loadUsersFromCsv
+            loadUsersFromCsv,
+            userCsvFields
         };
     }
 })
