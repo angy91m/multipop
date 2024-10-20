@@ -195,10 +195,10 @@ createApp({
                         reader.onload = () => {
                             r(reader.result);
                         }
-                        reader.readAsText(csvFile);
+                        reader.readAsArrayBuffer(csvFile);
                     });
                     console.log(csvBuff);
-                    const workbook = XLSX.read(csvBuff, {raw: true}),
+                    const workbook = XLSX.read(csvBuff, {raw: true, type: 'string'}),
                     sheet = workbook.Sheets[workbook.SheetNames[0]],
                     jsonValues = XLSX.utils.sheet_to_json(sheet);
                     console.log(jsonValues);
