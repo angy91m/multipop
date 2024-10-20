@@ -211,18 +211,8 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                         :options="{initialCountry: 'it'}"
                                         :value="profile.mpop_phone || ''"
                                         :class="savingProfileErrors.includes('mpop_phone') ? 'bad-input' : ''"
-                                        @change-number="()=>{
-                                            if (profilePhoneInput.instance.isValidNumber()) {
-                                                profileInEditing.mpop_phone = profilePhoneInput.instance.getNumber(1);
-                                                console.log(profileInEditing.mpop_phone);
-                                            } else profileInEditing.mpop_phone = '';
-                                        }"
-                                        @change-country="()=>{
-                                            if (profilePhoneInput.instance.isValidNumber()) {
-                                                profileInEditing.mpop_phone = profilePhoneInput.instance.getNumber(1);
-                                                console.log(profileInEditing.mpop_phone);
-                                            } else profileInEditing.mpop_phone = '';
-                                        }"
+                                        @change-number="()=>profileInEditing.mpop_phone = parsePhone(profilePhoneInput)"
+                                        @change-country="()=>profileInEditing.mpop_phone = parsePhone(profilePhoneInput)"
                                     />
                                 </td>
                             </tr>

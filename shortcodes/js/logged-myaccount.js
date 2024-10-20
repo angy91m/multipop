@@ -446,6 +446,9 @@ createApp({
             }
             return res;
         }
+        function parsePhone(input) {
+            return input.instance.isValidNumber() ? input.instance.getNumber(1).replace(' ', '-').replaceAll(' ', '') : '';
+        }
         async function updateProfile() {
             saving.value = true;
             savingProfileErrors.length = 0;
@@ -1005,7 +1008,8 @@ createApp({
             csvUsers,
             loadUsersFromCsv,
             userCsvFields,
-            profilePhoneInput
+            profilePhoneInput,
+            parsePhone
         };
     }
 })
