@@ -647,7 +647,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         </table>
                     </template></div>
                     <div v-if="selectedTab == 'uploadUserCsv'">
-                        
+                        <input type="file" @change="loadUsersFromCsv">
                     </div>
                 </div>
             </td>

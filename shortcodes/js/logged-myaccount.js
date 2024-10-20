@@ -73,6 +73,7 @@ createApp({
         billingCities = reactive([]),
         pwdChangeFields = reactive({}),
         pwdChanging = ref(false),
+        csvUsers = reactive([]),
         userSearch = reactive({
             txt: '',
             roles: [
@@ -184,6 +185,14 @@ createApp({
         }
         function isCachedProp(propName) {
             return cachedProps[propName] ? cachedProps[propName] > (new Date()).getTime() : false;
+        }
+        function loadUsersFromCsv(e) {
+            if (e.target.files.length) {
+                const csvFile = e.target.files[0];
+                if (csvFile.type == 'text/csv') {
+                    console.log(XLSX);
+                }
+            }
         }
         async function birthCitiesSearch(searchText, user = false) {
             if (user) {
@@ -948,7 +957,8 @@ createApp({
             nearActiveSub,
             availableYearsToOrder,
             isProfileCompleted,
-            maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
+            maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2),
+            csvUsers
         };
     }
 })
