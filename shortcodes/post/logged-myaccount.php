@@ -202,76 +202,30 @@ switch ($post_data['action']) {
             $res_data['error'][] = 'mpop_billing_zip';
         }
         if (!$card_active) {
-            if (!isset($post_data['mpop_birthdate']) || !is_string($post_data['mpop_birthdate']) || strlen(trim($post_data['mpop_birthdate'])) != 10) {
+            if (!isset($post_data['mpop_birthdate'])) {
                 if (!isset($res_data['error'])) {
                     $res_data['error'] = [];
                 }
                 $res_data['error'][] = 'mpop_birthdate';
             }
-            $date_arr = array_map(function ($dt) {return intval($dt);}, explode('-', strval($post_data['mpop_birthdate'] ) ) );
-            if (
-                count($date_arr) != 3
-                || !checkdate($date_arr[1], $date_arr[2], $date_arr[0])
-            ) {
-                if (!isset($res_data['error'])) {
-                    $res_data['error'] = [];
-                }
-                $res_data['error'][] = 'mpop_birthdate';
-                $post_data['mpop_birthdate'] = '';
-                $post_data['mpop_birthplace'] = '';
-            } else {
-                $post_data['mpop_birthdate'] = date_create('now', new DateTimeZone(current_time('e')));
-                $post_data['mpop_birthdate']->setDate($date_arr[0], $date_arr[1], $date_arr[2]);
-                $post_data['mpop_birthdate']->setTime(0,0,0,0);
-                if (
-                    $post_data['mpop_birthdate']->getTimestamp() < $min_birthdate->getTimestamp()
-                    || $post_data['mpop_birthdate']->getTimestamp() > $max_birthdate->getTimestamp()
-                ) {
-                    if (!isset($res_data['error'])) {
-                        $res_data['error'] = [];
-                    }
-                    $res_data['error'][] = 'mpop_birthdate';
-                }
-            }
-            if (!isset($post_data['mpop_birthplace']) || !preg_match('/^[A-Z]\d{3}$/', $post_data['mpop_birthplace'])) {
+            if (!isset($post_data['mpop_birthplace'])) {
                 if (!isset($res_data['error'])) {
                     $res_data['error'] = [];
                 }
                 $res_data['error'][] = 'mpop_birthplace';
-            } else {
+            }
+            if (!isset($res_data['error'])) {
                 if (!$comuni) {
                     $comuni = $this->get_comuni_all();
                 }
-                $found_bp = array_values(array_filter($comuni, function($c) use ($post_data) {return $c['codiceCatastale'] == $post_data['mpop_birthplace'];}));
-                if (!count($found_bp)) {
+                try {
+                    $post_data['mpop_birthdate'] = $this->validate_birthplace($post_data['mpop_birthdate'], $post_data['mpop_birthplace'], $comuni);
+                } catch(Exception $e) {
                     if (!isset($res_data['error'])) {
                         $res_data['error'] = [];
                     }
-                    $res_data['error'][] = 'mpop_birthplace';
-                } else {
-                    if (isset($found_bp[0]['soppresso']) && $found_bp[0]['soppresso']) {
-                        if (!isset($found_bp[0]['dataSoppressione'])) {
-                            if (!isset($res_data['error'])) {
-                                $res_data['error'] = [];
-                            }
-                            $res_data['error'][] = 'mpop_birthdate';
-                            $res_data['error'][] = 'mpop_birthplace';
-                        } else {
-                            $soppressione_dt = date_create('now', new DateTimeZone('UTC'));
-                            $soppr_arr = explode('T', $found_bp[0]['dataSoppressione']);
-                            $soppr_arr_dt = array_map( function($v) {return intval($v);}, explode('-', $soppr_arr[0]));
-                            $soppr_arr_tm = array_map( function($v) {return intval(substr( $v, 0, 2));}, explode(':', $soppr_arr[1]));
-                            $soppressione_dt->setDate($soppr_arr_dt[0], $soppr_arr_dt[1], $soppr_arr_dt[2]);
-                            $soppressione_dt->setTime($soppr_arr_tm[0], $soppr_arr_tm[1], $soppr_arr_tm[2]);
-                            if ($post_data['mpop_birthdate']->getTimestamp() >= $soppressione_dt->getTimestamp()) {
-                                if (!isset($res_data['error'])) {
-                                    $res_data['error'] = [];
-                                }
-                                $res_data['error'][] = 'mpop_birthdate';
-                                $res_data['error'][] = 'mpop_birthplace';
-                            }
-                        }
-                    }
+                    $errors = explode(',',$e->getMessage());
+                    $res_data['error'] = $errors;
                 }
             }
         }
@@ -363,13 +317,7 @@ switch ($post_data['action']) {
                 'mpop_billing_zip',
                 'mpop_billing_state'
             ] as $prop) {
-                switch($prop) {
-                    case 'mpop_birthdate':
-                        $user_edits['meta_input'][$prop] = $post_data[$prop]->format('Y-m-d');
-                        break;
-                    default:
-                        $user_edits['meta_input'][$prop] = $post_data[$prop];
-                }
+                $user_edits['meta_input'][$prop] = $post_data[$prop];
             }
             if (count($user_edits)) {
                 delete_user_meta( $current_user->ID, 'mpop_profile_pending_edits' );

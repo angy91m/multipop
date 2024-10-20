@@ -39,8 +39,10 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
             </td>
             <td>
                 <div id="mpop-tabs">
+                    <!--SUMMARY-->
                     <div v-if="selectedTab == 'summary'">
                         <h3>Ciao {{helloName}}</h3>
+                        <IntlTelInput :options="{initialCountry: 'it'}"/>
                         <template v-if="!profileEditing">
                             <button class="mpop-button" @click="editProfile">Modifica profilo</button>
                         </template>
@@ -211,6 +213,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             <input v-model="pwdChangeFields.confirm" @input="staticPwdErrors.length = 0" :class="pwdChangeErrors.includes('confirm') ? 'bad-input' : ''" type="password" placeholder="Conferma"/>
                         </div>
                     </div>
+                    <!--CARD-->
                     <div v-if="selectedTab == 'card'">
                         <template v-if="profile.mpop_my_subscriptions">
                             <h3>Tessera</h3>
@@ -254,6 +257,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             </div>
                         </template>
                     </div>
+                    <!--USER_SEARCH-->
                     <div v-if="selectedTab == 'users'" id="mpop-user-search">
                         <h3>Utenti</h3>
                         <div class="mpop-user-search-field">
@@ -407,6 +411,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             </tbody>
                         </table>
                     </div>
+                    <!--USER_VIEW-->
                     <div v-if="selectedTab == 'userView'" id="mpop-user-view"><template v-if="userInView">
                         <h3>{{userInView.ID}} - {{userInView.login}}</h3>
                         <template v-if="profile.role == 'administrator'">
@@ -646,6 +651,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             </tr>
                         </table>
                     </template></div>
+                    <!--UPLOAD_USER_CSV-->
                     <div v-if="selectedTab == 'uploadUserCsv'">
                         <input type="file" @change="loadUsersFromCsv">
                         <table class="mpop-import-csv-table">

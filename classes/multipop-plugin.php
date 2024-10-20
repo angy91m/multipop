@@ -1755,6 +1755,7 @@ class MultipopPlugin {
             'mpop_billing_city' => $user->mpop_billing_city,
             'mpop_billing_zip' => $user->mpop_billing_zip,
             'mpop_billing_state' => $user->mpop_billing_state,
+            'mpop_phone' => $user->mpop_phone,
             'mpop_resp_zones' => [],
             'mpop_my_subscriptions' => $this->get_my_subscriptions($user->ID)
         ];
@@ -2149,6 +2150,7 @@ class MultipopPlugin {
         $res['completed_at'] = intval($res['completed_at']);
         $res['author_id'] = intval($res['author_id']);
         $res['completer_id'] = intval($res['completer_id']);
+        unset($res['completer_ip']);
         return $res;
     }
 
@@ -2231,6 +2233,64 @@ class MultipopPlugin {
             $this->update_discourse_groups_by_user($sub['user_id']);
         }
     }
+    private function validate_birthdate($birth_date) {
+        if ( !is_string($birth_date) || strlen(trim($birth_date)) != 10) {
+            throw new Exception('mpop_birthdate');
+        }
+        $date_arr = array_map(function ($dt) {return intval($dt);}, explode('-', strval($birth_date ) ) );
+        if (
+            count($date_arr) != 3
+            || !checkdate($date_arr[1], $date_arr[2], $date_arr[0])
+        ) {
+            throw new Exception('mpop_birthdate');
+        }
+        $birth_date = date_create('now', new DateTimeZone(current_time('e')));
+        $birth_date->setDate($date_arr[0], $date_arr[1], $date_arr[2]);
+        $birth_date->setTime(0,0,0,0);
+        $min_birthdate = date_create('1910-10-13', new DateTimeZone('Europe/Rome'));
+        $min_birthdate->setTime(0,0,0,0);
+        $max_birthdate = date_create('now', new DateTimeZone('Europe/Rome'));
+        $max_birthdate->setTime(0,0,0,0);
+        $max_birthdate->sub(new DateInterval('P18Y'));
+        if (
+            $birth_date->getTimestamp() < $min_birthdate->getTimestamp()
+            || $birth_date->getTimestamp() > $max_birthdate->getTimestamp()
+        ) {
+            throw new Exception('mpop_birthdate');
+        }
+        return $birth_date;
+    }
+    private function validate_birthplace($birth_date, $birth_place, &$comuni = []) {
+        if (!preg_match('/^[A-Z]\d{3}$/', $mpop_birthplace)) {
+            throw new Exception('mpop_birthplace');
+        }
+        if (is_string($birth_date)) {
+            $birth_date = $this->validate_birthdate($birth_date);
+        }
+        if (empty($comuni)) {
+            $comuni = $this->get_comuni_all();
+        }
+        $found_bp = array_values(array_filter($comuni, function($c) use ($birthplace) {return $c['codiceCatastale'] == $birthplace;}));
+        if (!count($found_bp)) {
+            throw new Exception('mpop_birthplace');
+        }
+        if (isset($found_bp[0]['soppresso']) && $found_bp[0]['soppresso']) {
+            if (!isset($found_bp[0]['dataSoppressione'])) {
+                throw new Exception('mpop_birthplace,mpop_birthplace');
+            } else {
+                $soppressione_dt = date_create('now', new DateTimeZone('UTC'));
+                $soppr_arr = explode('T', $found_bp[0]['dataSoppressione']);
+                $soppr_arr_dt = array_map( function($v) {return intval($v);}, explode('-', $soppr_arr[0]));
+                $soppr_arr_tm = array_map( function($v) {return intval(substr( $v, 0, 2));}, explode(':', $soppr_arr[1]));
+                $soppressione_dt->setDate($soppr_arr_dt[0], $soppr_arr_dt[1], $soppr_arr_dt[2]);
+                $soppressione_dt->setTime($soppr_arr_tm[0], $soppr_arr_tm[1], $soppr_arr_tm[2]);
+                if ($birthdate->getTimestamp() >= $soppressione_dt->getTimestamp()) {
+                    throw new Exception('mpop_birthplace,mpop_birthplace');
+                }
+            }
+        }
+        return $birthdate->format('Y-m-d');
+    }
     private function db_cache(string $q, string $group_key, int $expire = -1, bool $force = false, string $method = 'get_results', ...$args) {
         $res = false;
         if (!$force) {
@@ -2275,6 +2335,7 @@ class MultipopPlugin {
                 $v = (double) $v;
             }
         }
+        unset($res['completer_ip']);
         return $res;
     }
     private function search_subscriptions(array $options = [], $limit = 100, $force = false) { 
@@ -2594,6 +2655,7 @@ class MultipopPlugin {
             $sub['completed_at'] = intval($sub['completed_at']);
             $sub['author_id'] = intval($sub['author_id']);
             $sub['completer_id'] = intval($sub['completer_id']);
+            unset($sub['completer_ip']);
         }
         $res['total'] = $total;
         $res['pages'] = $pages;
@@ -2908,6 +2970,7 @@ class MultipopPlugin {
                 'mpop_mail_to_confirm' => boolval($u->mpop_mail_to_confirm ),
                 'mpop_billing_state' => $u->mpop_billing_state,
                 'mpop_billing_city' => $billing_city ? $billing_city['nome'] : '',
+                'mpop_phone' => $u->mpop_phone,
                 'mpop_resp_zones' => []
             ];
             if (isset($u->roles[0]) && $u->roles[0] == 'multipopolare_resp' && !empty($u->mpop_resp_zones)) {
@@ -2940,10 +3003,10 @@ class MultipopPlugin {
             exit;
         }
         if ($user->roles[0] != 'administrator') {
-            // if (!$user->mpop_card_active) {
-            //     wp_redirect(get_permalink($this->settings['myaccount_page']));
-            //     exit;
-            // }
+            if (!$user->mpop_card_active) {
+                wp_redirect(get_permalink($this->settings['myaccount_page']));
+                exit;
+            }
         }
     }
     private function discourse_utilities() {
