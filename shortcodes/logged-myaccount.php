@@ -209,7 +209,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                     <v-intl-phone
                                         v-model="testPhone" 
                                         :options="{initialCountry: 'it'}"
-                                        :value="profile.mpop_phone : ''"
+                                        :value="profile.mpop_phone || ''"
                                         @change="()=>console.log(testPhone)"
                                     />
                                 </td>
