@@ -659,6 +659,20 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 <td v-if="!userEditing">{{userInView.mpop_billing_address}}</td>
                                 <td v-else><textarea v-model="userInEditing.mpop_billing_address" :class="savingUserErrors.includes('mpop_billing_address') ? 'bad-input' : ''" :disabled="!userInEditing.mpop_billing_zip"></textarea></td>
                             </tr>
+                            <tr>
+                                <td><strong>Telefono:</strong></td>
+                                <td v-if="!userEditing">{{userInView.mpop_phone}}</td>
+                                <td v-else>
+                                    <v-intl-phone
+                                        ref="userEditPhoneInput"
+                                        :options="{initialCountry: 'it'}"
+                                        :value="userInView.mpop_phone || ''"
+                                        :class="savingUserErrors.includes('mpop_phone') ? 'bad-input' : ''"
+                                        @change-number="()=>userInEditing.mpop_phone = parsePhone(userEditPhoneInput)"
+                                        @change-country="()=>userInEditing.mpop_phone = parsePhone(userEditPhoneInput)"
+                                    />
+                                </td>
+                            </tr>
                             <tr v-if="profile.role == 'administrator' && profile.mpop_has_master_key && ['administrator', 'multipopolare_resp'].includes(userInView.role)">
                                 <td><strong>Master key:</strong></td>
                                 <td>{{userInView.mpop_has_master_key ? 'Impostata': 'Non impostata'}}</td>

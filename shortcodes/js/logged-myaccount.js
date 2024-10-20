@@ -97,6 +97,7 @@ createApp({
         pwdChanging = ref(false),
         csvUsers = reactive([]),
         profilePhoneInput = ref('profilePhoneInput'),
+        userEditPhoneInput = ref('userEditPhoneInput'),
         userSearch = reactive({
             txt: '',
             roles: [
@@ -533,6 +534,7 @@ createApp({
                 mpop_billing_city: userInEditing.mpop_billing_city?.codiceCatastale,
                 mpop_billing_address: userInEditing.mpop_billing_address?.trim(),
                 mpop_billing_zip: userInEditing.mpop_billing_zip,
+                mpop_phone: userInEditing.mpop_phone,
                 mpop_resp_zones: respZones
             });
             if (res.ok) {
@@ -1009,6 +1011,7 @@ createApp({
             loadUsersFromCsv,
             userCsvFields,
             profilePhoneInput,
+            userEditPhoneInput,
             parsePhone
         };
     }
