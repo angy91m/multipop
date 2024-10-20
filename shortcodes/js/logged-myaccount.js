@@ -191,14 +191,13 @@ createApp({
                 const csvFile = e.target.files[0];
                 if (csvFile.type == 'text/csv') {
                     const reader = new FileReader();
-                    const csvBuff = await new Promise(r => {
+                    const csvContent = await new Promise(r => {
                         reader.onload = () => {
                             r(reader.result);
                         }
-                        reader.readAsArrayBuffer(csvFile);
+                        reader.readAsText(csvFile);
                     });
-                    console.log(csvBuff);
-                    const workbook = XLSX.read(csvBuff, {raw: true, type: 'string'}),
+                    const workbook = XLSX.read(csvContent, {raw: true, type: 'string'}),
                     sheet = workbook.Sheets[workbook.SheetNames[0]],
                     jsonValues = XLSX.utils.sheet_to_json(sheet);
                     console.log(jsonValues);
