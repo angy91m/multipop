@@ -208,7 +208,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 <td v-else>
                                     <v-intl-phone
                                         ref="profilePhoneInput"
-                                        :options="{initialCountry: initialPhoneInput}"
+                                        :options="{initialCountry: 'us'}"
                                         :value="profile.mpop_phone || '+39-3288290498'"
                                         @change-number="()=>console.log(profilePhoneInput.instance)"
                                     />
