@@ -130,6 +130,7 @@ switch( $post_data['action'] ) {
         } else {
             try {
                 $post_data['mpop_birthdate'] = $this->validate_birthdate($post_data['mpop_birthdate']);
+                save_test($post_data['mpop_birthdate']);
             } catch (Exception $e) {
                 if (!isset($res_data['error'])) {
                     $res_data['error'] = [];
