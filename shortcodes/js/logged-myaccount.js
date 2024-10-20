@@ -958,7 +958,8 @@ createApp({
             availableYearsToOrder,
             isProfileCompleted,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2),
-            csvUsers
+            csvUsers,
+            loadUsersFromCsv
         };
     }
 })
