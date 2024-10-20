@@ -140,24 +140,31 @@ span.mpop-app-notice > span > span.dashicons-before.dashicons-no-alt {
 .mpop-nowrap {
     white-space: nowrap;
 }
-#mpop-user-search-table {
+#mpop-user-search-table,
+.mpop-import-csv-table {
     border-spacing: 0;
     border-collapse: separate;
     cursor: default;
 }
 #mpop-user-search-table th,
-#mpop-user-search-table td {
+#mpop-user-search-table td,
+.mpop-import-csv-table td,
+.mpop-import-csv-table th {
     border: solid 1px #aaa;
     padding: 5px 20px;
 }
-#mpop-user-search-table th {
+#mpop-user-search-table th,
+.mpop-import-csv-table th {
     text-align: center;
 }
 #mpop-user-search-table th:not(:last-child),
-#mpop-user-search-table td:not(:last-child) {
+#mpop-user-search-table td:not(:last-child),
+.mpop-import-csv-table th:not(:last-child),
+.mpop-import-csv-table td:not(:last-child) {
     border-right: none;
 }
-#mpop-user-search-table tr:not(:first-child) td {
+#mpop-user-search-table tr:not(:first-child) td,
+.mpop-import-csv-table tr:not(:first-child) td {
     border-top: none;
 }
 #mpop-user-search-table th:first-child {

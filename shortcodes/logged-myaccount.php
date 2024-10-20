@@ -648,7 +648,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     </template></div>
                     <div v-if="selectedTab == 'uploadUserCsv'">
                         <input type="file" @change="loadUsersFromCsv">
-                        <table>
+                        <table class="mpop-import-csv-table">
                             <thead>
                                 <tr>
                                     <th v-for="f in userCsvFields">{{f}}</th>
