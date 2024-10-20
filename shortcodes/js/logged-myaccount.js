@@ -199,7 +199,7 @@ createApp({
                     });
                     const workbook = XLSX.read(csvBuff, {raw: true}),
                     sheet = workbook.Sheets[workbook.SheetNames[0]],
-                    jsonValues = XLSX.utils.sheet_to_json(sheet, {header:1});
+                    jsonValues = XLSX.utils.sheet_to_json(sheet);
                     console.log(jsonValues);
                 }
             }
