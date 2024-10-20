@@ -1,22 +1,12 @@
 import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import * as Vue from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
+import * as prova from '/wp-content/plugins/multipop/js/vue-tel-input.js';
+console.log(prova);
 const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent } = Vue,
 { loadModule } = window['vue3-sfc-loader'];
 
 const vSel = loadModule(`/wp-content/plugins/multipop/js/vue-select.js`, {
-    moduleCache: { vue: Vue },
-    async getFile(url) {
-        const response = await fetch(url);
-        if ( !response.ok ){
-            console.error({message:'Import failed ' + url, response})
-            throw new Error('Import failed ' + url)
-        }
-        return { getContentData: asBinary => asBinary ? response.arrayBuffer() : response.text()};
-    },
-    addStyle() {}
-}),
-vTel = loadModule(`/wp-content/plugins/multipop/js/vue-tel-input.js`, {
     moduleCache: { vue: Vue },
     async getFile(url) {
         const response = await fetch(url);
@@ -76,8 +66,7 @@ loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').va
 let searchUsersTimeout, triggerSearchTimeout;
 createApp({
     components: {
-        'v-select': defineAsyncComponent(() => vSel),
-        'v-tel-input': defineAsyncComponent(()=>vTel)
+        'v-select': defineAsyncComponent(() => vSel)
     },
     setup() {
         function activeCardForYear(cards = [], year) {
