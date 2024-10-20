@@ -67,7 +67,7 @@ let searchUsersTimeout, triggerSearchTimeout;
 createApp({
     components: {
         'v-select': defineAsyncComponent(() => vSel),
-        'v-intl-phone': defineAsyncComponent(() => IntlTelInput)
+        'v-intl-phone': IntlTelInput
     },
     setup() {
         function activeCardForYear(cards = [], year) {
