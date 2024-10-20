@@ -206,8 +206,11 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 <td><strong>Telefono:</strong></td>
                                 <td v-if="!profileEditing">{{profile.mpop_phone}}</td>
                                 <td v-else>
-                                    <v-intl-phone 
+                                    <v-intl-phone
+                                        v-model="testPhone" 
                                         :options="{initialCountry: 'it'}"
+                                        :value="profile.mpop_phone : ''"
+                                        @change="()=>console.log(testPhone)"
                                     />
                                 </td>
                             </tr>

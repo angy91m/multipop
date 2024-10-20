@@ -96,6 +96,7 @@ createApp({
         pwdChangeFields = reactive({}),
         pwdChanging = ref(false),
         csvUsers = reactive([]),
+        testPhone = ref(''),
         userSearch = reactive({
             txt: '',
             roles: [
@@ -999,7 +1000,8 @@ createApp({
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2),
             csvUsers,
             loadUsersFromCsv,
-            userCsvFields
+            userCsvFields,
+            testPhone
         };
     }
 })
