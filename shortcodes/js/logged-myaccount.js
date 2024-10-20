@@ -2,9 +2,7 @@ import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import * as Vue from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
-import {intlTelInput} from '/wp-content/plugins/multipop/js/vue-tel-input.js';
-console.log(intlTelInput);
-const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent } = Vue,
+const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, useTemplateRef } = Vue,
 { loadModule } = window['vue3-sfc-loader'];
 
 const vSel = loadModule(`/wp-content/plugins/multipop/js/vue-select.js`, {
@@ -99,6 +97,7 @@ createApp({
         pwdChanging = ref(false),
         csvUsers = reactive([]),
         testPhone = ref(''),
+        profilePhoneInput = useTemplateRef('profilePhoneInput'),
         userSearch = reactive({
             txt: '',
             roles: [
@@ -1003,7 +1002,7 @@ createApp({
             csvUsers,
             loadUsersFromCsv,
             userCsvFields,
-            testPhone
+            profilePhoneInput
         };
     }
 })
