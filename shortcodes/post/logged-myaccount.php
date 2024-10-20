@@ -201,6 +201,28 @@ switch ($post_data['action']) {
             }
             $res_data['error'][] = 'mpop_billing_zip';
         }
+        if (!isset($post_data['mpop_billing_zip']) || !in_array($post_data['mpop_billing_zip'], $found_caps)) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'mpop_billing_zip';
+        }
+        if (!isset($post_data['mpop_phone']) || !$this::is_valid_phone($post_data['mpop_phone']) ) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'mpop_phone';
+        } else if (!empty(get_users([
+                'meta_key' => 'mpop_phone',
+                'meta_value' => $post_data['mpop_phone'],
+                'meta_compare' => '=',
+                'login__not_in' => [$current_user->user_login]
+        ]))) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'mpop_phone';
+        }
         if (!$card_active) {
             if (!isset($post_data['mpop_birthdate'])) {
                 if (!isset($res_data['error'])) {
@@ -287,7 +309,8 @@ switch ($post_data['action']) {
                 'mpop_billing_address',
                 'mpop_billing_city',
                 'mpop_billing_zip',
-                'mpop_billing_state'
+                'mpop_billing_state',
+                'mpop_phone'
             ] as $prop) {
                 if ($current_user->$prop != $post_data[$prop]) {
                     $pending_edits[$prop] = $post_data[$prop];
@@ -315,7 +338,8 @@ switch ($post_data['action']) {
                 'mpop_billing_address',
                 'mpop_billing_city',
                 'mpop_billing_zip',
-                'mpop_billing_state'
+                'mpop_billing_state',
+                'mpop_phone'
             ] as $prop) {
                 $user_edits['meta_input'][$prop] = $post_data[$prop];
             }

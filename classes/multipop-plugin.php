@@ -123,6 +123,12 @@ class MultipopPlugin {
         }
         return true;
     }
+    private static function is_valid_phone($phone) {
+        if (isset($phone) && is_string($phone) && strlen($phone) >= 13 && preg_match('/^\+\d+ \d+$/', $phone)) {
+            return true;
+        }
+        return false;
+    }
 
     private static function dashicon(string $icon = '', string $ba = 'before') {
         return '<span class="dashicons-'.$ba.' dashicons-'.$icon.'">&nbsp;</span>';

@@ -164,6 +164,26 @@ switch( $post_data['action'] ) {
         if (is_object($post_data['mpop_birthdate'])) {
             $post_data['mpop_birthdate'] = $post_data['mpop_birthdate']->getTimestamp();
         }
+        if (!isset($post_data['mpop_phone']) || !$this::is_valid_phone($post_data['mpop_phone']) ) {
+            if ($user->mpop_phone) {
+                if (!isset($res_data['error'])) {
+                    $res_data['error'] = [];
+                }
+                $res_data['error'][] = 'mpop_phone';
+            } else {
+                $post_data['mpop_phone'] = '';
+            }
+        } else if (!empty(get_users([
+            'meta_key' => 'mpop_phone',
+            'meta_value' => $post_data['mpop_phone'],
+            'meta_compare' => '=',
+            'login__not_in' => [$current_user->user_login]
+        ]))) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'mpop_phone';
+        }
         $parsed_resp_zones = false;
         if (isset($user->roles[0]) && $user->roles[0] == 'multipopolare_resp' && isset($post_data['mpop_resp_zones']) && is_array($post_data['mpop_resp_zones'])) {
             $parsed_resp_zones = [];
@@ -299,7 +319,8 @@ switch( $post_data['action'] ) {
             'mpop_billing_address',
             'mpop_billing_city',
             'mpop_billing_zip',
-            'mpop_billing_state'
+            'mpop_billing_state',
+            'mpop_phone'
         ] as $prop) {
             $user_edits['meta_input'][$prop] = $post_data[$prop];
         }

@@ -448,7 +448,7 @@ createApp({
             return res;
         }
         function parsePhone(input) {
-            return input.instance.isValidNumber() ? input.instance.getNumber(1).replace(' ', '-').replaceAll(' ', '') : '';
+            return input.instance.isValidNumber() ? input.instance.getNumber(1).replace(' ', '-').replaceAll(' ', '').replace('-', ' ') : '';
         }
         async function updateProfile() {
             saving.value = true;
