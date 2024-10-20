@@ -187,6 +187,7 @@ createApp({
             return cachedProps[propName] ? cachedProps[propName] > (new Date()).getTime() : false;
         }
         async function loadUsersFromCsv(e) {
+            csvUsers.length = 0;
             if (e.target.files.length) {
                 const csvFile = e.target.files[0];
                 if (csvFile.type == 'text/csv') {
@@ -198,9 +199,8 @@ createApp({
                         reader.readAsText(csvFile);
                     });
                     const workbook = XLSX.read(csvContent, {raw: true, type: 'string'}),
-                    sheet = workbook.Sheets[workbook.SheetNames[0]],
-                    jsonValues = XLSX.utils.sheet_to_json(sheet);
-                    console.log(jsonValues);
+                    sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    csvUsers.push(...XLSX.utils.sheet_to_json(sheet));
                 }
             }
         }
