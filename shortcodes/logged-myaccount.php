@@ -207,7 +207,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 <td v-if="!profileEditing">{{profile.mpop_phone}}</td>
                                 <td v-else>
                                     <v-intl-phone 
-                                        :options="{searchPlaceholder: 'Cerca'}"
+                                        :options="{initialCountry: 'it'}"
                                     />
                                 </td>
                             </tr>
