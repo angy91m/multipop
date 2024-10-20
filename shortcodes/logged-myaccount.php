@@ -43,7 +43,6 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     <!--SUMMARY-->
                     <div v-if="selectedTab == 'summary'">
                         <h3>Ciao {{helloName}}</h3>
-                        <div><v-intl-phone :options="{initialCountry: 'it'}"/></div>
                         <template v-if="!profileEditing">
                             <button class="mpop-button" @click="editProfile">Modifica profilo</button>
                         </template>
@@ -202,6 +201,15 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 <td><strong>Indirizzo di residenza:</strong></td>
                                 <td v-if="!profileEditing">{{profile.mpop_billing_address}}</td>
                                 <td v-else><textarea v-model="profileInEditing.mpop_billing_address" :class="savingProfileErrors.includes('mpop_billing_address') ? 'bad-input' : ''" :disabled="!profileInEditing.mpop_billing_zip"></textarea></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Telefono:</strong></td>
+                                <td v-if="!profileEditing">{{profile.mpop_phone}}</td>
+                                <td v-else>
+                                    <v-intl-phone 
+                                        :options="{searchPlaceholder: 'Cerca'}"
+                                    />
+                                </td>
                             </tr>
                         </table>
                     </div>
