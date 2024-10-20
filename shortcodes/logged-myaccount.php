@@ -210,17 +210,18 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                         ref="profilePhoneInput"
                                         :options="{initialCountry: 'it'}"
                                         :value="profile.mpop_phone || ''"
-                                        @change-number="(v)=>{
-                                            console.log(v);
-                                            console.log(profilePhoneInput.instance);
+                                        :class="savingProfileErrors.includes('mpop_phone') ? 'bad-input' : ''"
+                                        @change-number="()=>{
+                                            if (profilePhoneInput.instance.isValidNumber()) {
+                                                profileInEditing.mpop_phone = profilePhoneInput.instance.getNumber(1);
+                                                console.log(profileInEditing.mpop_phone);
+                                            } else profileInEditing.mpop_phone = '';
                                         }"
-                                        @change-country="(v)=>{
-                                            console.log(v);
-                                            console.log(profilePhoneInput.instance);
-                                        }"
-                                        @change-validity="(v)=>{
-                                            console.log(v);
-                                            console.log(profilePhoneInput.instance);
+                                        @change-country="()=>{
+                                            if (profilePhoneInput.instance.isValidNumber()) {
+                                                profileInEditing.mpop_phone = profilePhoneInput.instance.getNumber(1);
+                                                console.log(profileInEditing.mpop_phone);
+                                            } else profileInEditing.mpop_phone = '';
                                         }"
                                     />
                                 </td>

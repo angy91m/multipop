@@ -96,7 +96,6 @@ createApp({
         pwdChangeFields = reactive({}),
         pwdChanging = ref(false),
         csvUsers = reactive([]),
-        testPhone = ref(''),
         profilePhoneInput = ref('profilePhoneInput'),
         userSearch = reactive({
             txt: '',
@@ -149,6 +148,7 @@ createApp({
             && profileInEditing.mpop_billing_state
             && profileInEditing.mpop_billing_address.trim()
             && profileInEditing.mpop_billing_zip
+            && profileInEditing.mpop_phone
         ),
         validUserForm = computed(()=>
             mailRegex.test(userInEditing.email.trim())
@@ -160,6 +160,7 @@ createApp({
             && ( !userInView.mpop_billing_state || userInEditing.mpop_billing_state )
             && ( !userInView.mpop_billing_address || userInEditing.mpop_billing_address.trim() )
             && ( !userInView.mpop_billing_zip || userInEditing.mpop_billing_zip )
+            && ( !userInView.mpop_phone || userInEditing.mpop_phone )
         ),
         staticPwdErrors = reactive([]),
         pwdChangeErrors = computed(()=> {
@@ -188,6 +189,7 @@ createApp({
             && profile.mpop_billing_state
             && profile.mpop_billing_zip
             && profile.mpop_billing_address
+            && profile.mpop_phone
         ? true : false ),
         availableYearsToOrder = computed(() => {
             const thisYear = (new Date()).getFullYear();
@@ -456,7 +458,8 @@ createApp({
                 mpop_birthplace: profileInEditing.mpop_birthplace.codiceCatastale,
                 mpop_billing_city: profileInEditing.mpop_billing_city.codiceCatastale,
                 mpop_billing_address: profileInEditing.mpop_billing_address.trim(),
-                mpop_billing_zip: profileInEditing.mpop_billing_zip
+                mpop_billing_zip: profileInEditing.mpop_billing_zip,
+                mpop_phone: profileInEditing.mpop_phone
             });
             if (res.ok) {
                 const newUser = await res.json();
