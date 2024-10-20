@@ -98,6 +98,9 @@ createApp({
         csvUsers = reactive([]),
         testPhone = ref(''),
         profilePhoneInput = ref('profilePhoneInput'),
+        // initialPhoneInput = computed(() => {
+        //     if (profile.mpop_phone && profilePhoneInput.instance) 
+        // }),
         userSearch = reactive({
             txt: '',
             roles: [
