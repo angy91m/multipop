@@ -1,4 +1,4 @@
-import { mergeModels as i2, useModel as T2, ref as I1, onMounted as N2, watch as A2, onUnmounted as E2, withDirectives as D2, openBlock as M2, createElementBlock as P2, mergeProps as x2, vModelText as R2 } from "vue";
+import { mergeModels as i2, useModel as T2, ref as I1, onMounted as N2, watch as A2, onUnmounted as E2, withDirectives as D2, openBlock as M2, createElementBlock as P2, mergeProps as x2, vModelText as R2 } from Vue;
 const n2 = [
   [
     "af",

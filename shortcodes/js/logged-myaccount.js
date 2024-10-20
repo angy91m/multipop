@@ -1,8 +1,8 @@
 import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import * as Vue from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
-import * as prova from '/wp-content/plugins/multipop/js/vue-tel-input.js';
-console.log(prova);
+import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
+console.log(IntlTelInput);
 const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent } = Vue,
 { loadModule } = window['vue3-sfc-loader'];
 
