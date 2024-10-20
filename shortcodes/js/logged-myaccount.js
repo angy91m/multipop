@@ -1,7 +1,6 @@
 import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import * as Vue from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
-//import * as s from '/wp-content/plugins/multipop/js/vue-select.js';
 const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent } = Vue,
 { loadModule } = window['vue3-sfc-loader'];
 
@@ -795,6 +794,14 @@ createApp({
                     getProfile();
                 } else if(tabName == 'summary') {
                     getProfile();
+                } else if (tabName == 'uploadUserCsv') {
+                    if(!document.getElementById('xlsx-loader')){
+                        const xlsxLoader = document.createElement('script'),
+                        loadedScripts = document.getElementById('loaded-scripts');
+                        xlsxLoader.id = 'xlsx-loader';
+                        xlsxLoader.src = '/wp-content/plugins/multipop/js/xlsx.full.min.js';
+                        loadedScripts.appendChild(xlsxLoader);
+                    }
                 }
             }
         }

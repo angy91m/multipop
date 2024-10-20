@@ -162,6 +162,12 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
                 }
             }
         }
+        if ($new_groups[0]['name'] == 'mp_disabled_users') {
+            $res = static::discourse_request( "/admin/users/$user->discourse_sso_user_id/log_out", array( 'method' => 'POST' ) );
+			if (is_wp_error($res)) {
+				return false;
+			}
+        }
     }
 	public static function logout_user_from_discourse($user_id) {
 		$user = false;

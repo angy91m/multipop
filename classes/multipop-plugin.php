@@ -23,6 +23,16 @@ class MultipopPlugin {
     private string $req_url = '';
     private string $req_path = '';
     private array $user_notices = [];
+    private array $mime2ext = [
+        'application/pdf' => '.pdf',
+        'image/jpeg' => '.jpg',
+        'image/png' => '.png'
+    ];
+    private array $id_card_types = [
+        "Carta d'identità",
+        "Patente di guida",
+        "Passaporto"
+    ];
     private ?array $comuni_all;
     private ?array $province_all;
     private ?array $regioni_all;
@@ -33,6 +43,10 @@ class MultipopPlugin {
         'canceled',
         'completed',
         'refunded'
+    ];
+    public const SINGLE_ORG_ROLES = [
+        'Presidente',
+        'Vicepresidente'
     ];
     public ?object $disc_utils;
     public array $delayed_scripts = [];
@@ -119,6 +133,23 @@ class MultipopPlugin {
             require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
         }
         return is_plugin_active($plugin);
+    }
+
+    private static function zerofill($num, $len = 8) {
+        return str_pad($num,8,0,STR_PAD_LEFT);
+    }
+
+    public static function get_client_ip() {
+        if (file_exists(MULTIPOP_PLUGIN_PATH . '/private/proxy')) {
+            $fcontent = file_get_contents(MULTIPOP_PLUGIN_PATH . '/private/proxy');
+            if ($fcontent) {
+                require_once(MULTIPOP_PLUGIN_PATH . '/classes/client-ip-getter.php');
+                $ip_getter = new ClientIPGetter($fcontent);
+                return $ip_getter->get_client_ip();
+            }
+        } else {
+            return $_SERVER['REMOTE_ADDR'];
+        }
     }
 
     private static function delay_script(string $script, ...$argv) {
@@ -432,7 +463,6 @@ class MultipopPlugin {
             `mail_from` VARCHAR(255) NOT NULL,
             `mail_from_name` VARCHAR(255) NOT NULL,
             `mail_general_notifications` TEXT NOT NULL,
-            `last_webcard_number` BIGINT,
             `authorized_subscription_years` VARCHAR(255) NOT NULL,
             `last_year_checked` INT NOT NULL,
             `min_subscription_payment` DOUBLE NOT NULL,
@@ -450,7 +480,15 @@ class MultipopPlugin {
             PRIMARY KEY (`id`)
         ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
         dbDelta( $q );
-    
+
+        // WEBCARD NUMBERS TABLE
+        $q = "CREATE TABLE IF NOT EXISTS " . $this::db_prefix('webcard_numbers') . " (
+            `year` SMALLINT UNSIGNED NOT NULL,
+            `last` BIGINT UNSIGNED NOT NULL,
+            PRIMARY KEY (`year`)
+        )";
+        dbDelta( $q );
+
         // TOKEN TABLE
         $q = "CREATE TABLE IF NOT EXISTS " . $this::db_prefix('temp_tokens') . " (
             `id` CHAR(32) NOT NULL,
@@ -464,10 +502,14 @@ class MultipopPlugin {
         // SUBSCRIPTIONS TABLE
         $q = "CREATE TABLE IF NOT EXISTS " . $this::db_prefix('subscriptions') . " (
             `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-            `card_id` VARCHAR(255) NULL UNIQUE,
+            `card_number` VARCHAR(255) NULL,
             `filename` VARCHAR(255) NULL,
             `user_id` BIGINT UNSIGNED NOT NULL,
             `year` SMALLINT UNSIGNED NOT NULL,
+            `quote` DOUBLE UNSIGNED NOT NULL,
+            `marketing_agree` TINYINT UNSIGNED NOT NULL,
+            `newsletter_agree` TINYINT UNSIGNED NOT NULL,
+            `publish_agree` TINYINT UNSIGNED NOT NULL,
             `status` VARCHAR(255) NOT NULL,
             `created_at` BIGINT UNSIGNED NOT NULL,
             `updated_at` BIGINT UNSIGNED NOT NULL,
@@ -476,8 +518,12 @@ class MultipopPlugin {
             `author_id` BIGINT UNSIGNED NOT NULL,
             `pp_order_id` VARCHAR(255) NULL,
             `completer_id` BIGINT UNSIGNED NULL,
-            `signed_from` VARCHAR(255) NULL,
-            PRIMARY KEY (`id`)
+            `completer_ip` VARCHAR(255) NULL,
+            `notes` TEXT NULL,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY unique_card_year (`card_number`, `year`),
+            CONSTRAINT unique_card_year_conditional UNIQUE (`card_number`, `year`) 
+                WHERE card_number IS NOT NULL
         ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
         dbDelta( $q );
     
@@ -496,7 +542,6 @@ class MultipopPlugin {
                     `mail_from`,
                     `mail_from_name`,
                     `mail_general_notifications`,
-                    `last_webcard_number`,
                     `authorized_subscription_years`,
                     `last_year_checked`,
                     `min_subscription_payment`,
@@ -515,7 +560,6 @@ class MultipopPlugin {
                     '" . get_bloginfo('admin_email') . "',
                     '" . get_bloginfo('name') . "',
                     '" . get_bloginfo('admin_email') . "',
-                    0,
                     '',
                     0,
                     15,
@@ -652,6 +696,16 @@ class MultipopPlugin {
             'subject' =>'Conferma email',
             'body' => 'Clicca sul link per confermare la tua email: <a href="'. $confirmation_link . '?mpop_mail_token=' . $token . '" target="_blank">'. $confirmation_link . '?mpop_mail_token=' . $token . '</a>'
         ]);
+    }
+
+    private function get_last_webcard_number(int $year) {
+        global $wpdb;
+        return intval($wpdb->get_var("SELECT `last` FROM " . $this::db_prefix('webcard_numbers') . " WHERE `year` = $year LIMIT 1;"));
+    }
+
+    private function increment_last_webcard_number(int $year) {
+        global $wpdb;
+        $wpdb->query("UPDATE " . $this::db_prefix('webcard_numbers') . " SET `last` = `last` + 1 WHERE `year` = $year;");
     }
 
     // CREATE PDF
@@ -831,14 +885,19 @@ class MultipopPlugin {
             $this_year = intval(current_time('Y'));
             if ( $this_year > $this->settings['last_year_checked'] ) {
                 global $wpdb;
+                $users_to_enable = $wpdb->get_results("SELECT `user_id`, `marketing_agree`, `newsletter_agree`, `publish_agree` FROM " . $this::db_prefix('subscriptions') . " WHERE `status` = 'completed' AND `year` = $this_year;", 'ARRAY_A');
+                $users_enabled = [];
+                foreach($users_to_enable as $u) {
+                    $this->enable_user_card($u['user_id'], $u['marketing_agree'], $u['newsletter_agree'], $u['publish_agree']);
+                    $users_enabled[] = $u['user_id'];
+                }
                 $users_to_disable = $wpdb->get_col(
-                    "SELECT `user_id` FROM " . $this::db_prefix('subscriptions') . " WHERE `status` = 'completed' AND `year` < $this_year AND `user_id` NOT IN (
-                        SELECT `user_id` FROM " . $this::db_prefix('subscriptions') . " WHERE `status` = 'completed' AND `year` = $this_year
-                    );"
+                    "SELECT `user_id` FROM " . $this::db_prefix('subscriptions') . " WHERE `status` = 'completed' AND `year` < $this_year AND `user_id` NOT IN ( " . implode(',' ,$users_enabled) . " );"
                 );
                 foreach ($users_to_disable as $u) {
                     $this->disable_user_card($u);
                 }
+                $wpdb->query("UPDATE " . $this::db_prefix('subscriptions') . " SET `status` = 'canceled' WHERE `year` < $this_year AND `status` IN ('tosee','seen');");
 
                 // SET NEW YEAR
                 $wpdb->query("UPDATE " . $this::db_prefix('plugin_settings') . " SET `last_year_checked` = $this_year WHERE `id` = 1 ;");
@@ -854,17 +913,48 @@ class MultipopPlugin {
         }
     }
 
+    private function enable_user_card($user, $marketing_agree = false, $newsletter_agree = false, $publish_agree = false) {
+        if (is_string($user) || is_int($user)) {
+            $user = get_user_by('ID', intval($user));
+        }
+        if (!$user) {
+            return false;
+        }
+        $marketing_agree = boolval($marketing_agree);
+        $newsletter_agree = boolval($newsletter_agree);
+        $publish_agree = boolval($publish_agree);
+        if (
+            !$user->mpop_card_active
+            || boolval($user->mpop_marketing_agree) != $marketing_agree
+            || boolval($user->mpop_newsletter_agree) != $newsletter_agree
+            || boolval($user->mpop_publish_agree) != $publish_agree
+        ) {
+            wp_update_user([
+                'ID' => $user->ID,
+                'meta_input' => [
+                    'mpop_card_active' => true,
+                    'mpop_marketing_agree' => $marketing_agree,
+                    'mpop_newsletter_agree' => $newsletter_agree,
+                    'mpop_publish_agree' => $publish_agree
+                ]
+            ]);
+            if ($user->discourse_sso_user_id && isset($user->roles[0]) && in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
+                $this->update_discourse_groups_by_user($user);
+            }
+        }
+    }
+
     private function disable_user_card($user) {
         if (is_string($user) || is_int($user)) {
             $user = get_user_by('ID', intval($user));
         }
+        if (!$user) {
+            return false;
+        }
         if ($user->mpop_card_active) {
             update_user_meta($user->ID, 'mpop_card_active', false);
             if ($user->discourse_sso_user_id && isset($user->roles[0]) && in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
-                $disc_utils = $this->discourse_utilities();
-                if ($disc_utils) {
-                    $disc_utils->logout_user_from_discourse($user);
-                }
+                $this->update_discourse_groups_by_user($user);
             }
         }
     }
@@ -1837,10 +1927,313 @@ class MultipopPlugin {
             ]]
         ]);
     }
-    private function create_subscription() {
-
+    private function check_mime_type(string $file_conten, $accepted = true) {
+        $f_info = new finfo(FILEINFO_MIME_TYPE);
+        $mime = $f_info->buffer($file_content);
+        if (is_string($accepted)) {
+            if ($mime != $accepted) {
+                return false;
+            }
+        } else if (is_array($accepted)) {
+            if (!in_array($mime, $accepted)) {
+                return false;
+            }
+        }
+        return $mime;
     }
-    private function db_cache(string $q, string $group_key, int $expire = 20, bool $force = false, string $method = 'get_results', ...$args) {
+    private function create_subscription(
+        int $user_id,
+        int $year,
+        float $quote,
+        $marketing_agree = null,
+        $newsletter_agree = null,
+        $publish_agree = null,
+        string $pdf_b64 = '',
+        string $id_card_b64 = '',
+        int $id_card_type = 0,
+        string $id_card_number = '',
+        string $id_card_expiration = '',
+        string $notes = '',
+        $force_year = false,
+        $force_quote = false,
+        $ignore_others = false
+    ) {
+        if (
+            is_null($marketing_agree)
+            || is_null($newsletter_agree)
+            || is_null($publish_agree)
+        ) {
+            throw new Exception('Empty agrees');
+        }
+        if ($quote < 0 || (!$force_quote && $quote < $this->settings['min_subscription_payment'])) {
+            throw new Exception('Invalid year');
+        }
+        $quote = round($quote, 2);
+        if (
+            $year < 1
+            || (
+                !$force_year
+                && !in_array($year, $this->settings['authorized_subscription_years'])
+            )
+        ) {
+            throw new Exception('Invalid year');
+        }
+        if (!$ignore_others) {
+            $others = $this->search_subscriptions([
+                'user_id' => [$user_id],
+                'year' => [$year],
+                'status' => [
+                    'tosee',
+                    'seen',
+                    'completed'
+                ]
+            ]);
+            if (count($others)) {
+                throw new Exception('User has got open subscription(s) yet: ' . implode( ',', array_map(function($o) {return $o['id'];}, $others)));
+            }
+        }
+        if (is_object($user_id)) {
+            $user_id = $user_id->ID;
+        }
+        $user = get_user_by('ID', $user_id);
+        if (!$user) {
+            throw new Exception('Invalid user');
+        }
+        $date_now = date_create('now', new DateTimeZone(current_time('e')));
+        $rand_file_name = $date_now->format('YmdHis');
+        $from_user_web_form = false;
+        if ($pdf_b64) {
+            $from_user_web_form = true;
+            if (!$this->settings['master_doc_pubkey']) {
+                throw new Exception('Server not ready to get subscriptions');
+            }
+            if (!trim($id_card_b64)) {
+                throw new Exception('Empty ID card content');
+            }
+            if ($id_card_type < 0 || !isset($this->id_card_types[$id_card_type])) {
+                throw new Exception('Invalid ID card type');
+            }
+            if (!preg_match('/^[A-Z0-9]{7,}$/', $id_card_number)) {
+                throw new Exception('Invalid ID card number');
+            }
+            if (count(get_users([
+                'meta_key' => 'mpop_id_card_number',
+                'meta_value' => $id_card_number,
+                'meta_compare' => '=',
+                'login__not_in' => [$user->user_login]
+            ]))) {
+                throw new Exception('Duplicated ID card number');
+            }
+            if (
+                !preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $id_card_expiration, $expiration_capture)
+                || !checkdate(intval($expiration_capture[2]), intval($expiration_capture[3]), intval($expiration_capture[1]))
+            ) {
+                throw new Exception('Invalid ID card number');
+            }
+            $expiration_date = clone $date_now;
+            $expiration_date->setDate(intval($expiration_capture[1]),intval($expiration_capture[2]), intval($expiration_capture[3]));
+            $expiration_date->setTime(0,0);
+            if ($expiration_date->getTimestamp() < $date_now->getTimestamp()) {
+                throw new Exception('ID card expired');
+            }
+            $pdf_content = base64_decode($pdf_b64, true);
+            if (!$pdf_content || !$this->check_mime_type($pdf_content, 'application/pdf')) {
+                throw new Exception('Invalid pdf content');
+            }
+            $id_card_content = base64_decode($id_card_b64, true);
+            $id_card_mime = $this->check_mime_type($id_card_content, ['application/pdf', 'image/jpeg', 'image/png']);
+            if (!$id_card_content || !$id_card_mime) {
+                throw new Exception('Invalid ID card content');
+            }
+            $pdf_content = $this->encrypt_asym($pdf_content, base64_decode( $this->settings['master_doc_pubkey'], true ) );
+            $id_card_content = $this->encrypt_asym($id_card_content, base64_decode( $this->settings['master_doc_pubkey'], true ) );
+            $pdf_file_name = $rand_file_name . '-sub-' . $user_id . '.pdf.enc';
+            $id_card_file_name = $rand_file_name . '-idcard-' . $user_id . $this->mime2ext[$id_card_mime] . '.enc';
+            file_put_contents(MULTIPOP_PLUGIN_PATH . "/privatedocs/$pdf_file_name", $pdf_content);
+            file_put_contents(MULTIPOP_PLUGIN_PATH . "/privatedocs/$id_card_file_name", $id_card_content);
+            update_user([
+                'ID' => $user_id,
+                'meta_input' => [
+                    'mpop_id_card_type' => $id_card_type,
+                    'mpop_id_card_number' => $id_card_number,
+                    'mpop_id_card_expiration' => $expiration_date->getTimestamp()
+                ]
+            ]);
+        }
+        $insert_data = [
+            ['user_id', $user_id, '%d'],
+            ['year', $year, '%d'],
+            ['quote', $quote, '%f'],
+            ['marketing_agree', intval(!!$marketing_agree), '%d'],
+            ['newsletter_agree', intval(!!$newsletter_agree), '%d'],
+            ['publish_agree', intval(!!$publish_agree), '%d'],
+            ['status', $from_user_web_form ? 'tosee' : 'seen','%s'],
+            ['created_at', $date_now->getTimestamp(), '%d'],
+            ['updated_at', $date_now->getTimestamp(), '%d'],
+            ['author_id', get_current_user_id(), '%d']
+        ];
+        $notes = trim($notes);
+        if ($notes) {
+            $insert_data[] = ['notes', $notes, '%s'];
+        }
+        if ($from_user_web_form) {
+            $insert_data[] = ['filename', $rand_file_name, '%s'];
+        }
+        global $wpdb;
+        return $wpdb->insert(
+            $this::db_prefix('subscriptions'),
+            array_reduce($insert_data, function($arr, $v){$arr[$v[0]] = $v[1]; return $arr;}, []),
+            array_map(function($v) {return $v[2];}, $insert_data)
+        );
+    }
+    private function get_subscription_by($getby = 'id', $sub_id, ?int $year) {
+        $search_format = '%d';
+        if ($getby == 'id') {
+            if (is_array($sub_id) && isset($sub_id['id'])) {
+                $sub_id = $sub_id['id'];
+            }
+            $sub_id = intval($sub_id);
+            if ($sub_id) {
+                return false;
+            }
+        } else if ($getby == 'card_number') {
+            $sub_id = trim($sub_id);
+            if (!$sub_id || !$year) {
+                return false;
+            }
+            $search_format = '%s';
+        } else {
+            return false;
+        }
+        global $wpdb;
+        $q_from = "FROM "
+            . $this->db_prefix('subscriptions') . " s
+            LEFT JOIN " . $wpdb->prefix . "users users
+            ON s.user_id = users.ID
+            LEFT JOIN " . $wpdb->prefix . "users authors
+            ON s.author_id = authors.ID
+            LEFT JOIN " . $wpdb->prefix . "users completers
+            ON s.completer_id = completers.ID
+            LEFT JOIN " . $wpdb->prefix . "usermeta fn 
+            ON s.user_id = fn.user_id 
+            AND fn.meta_key = 'first_name'
+            LEFT JOIN " . $wpdb->prefix . "usermeta ln 
+            ON s.user_id = ln.user_id 
+            AND ln.meta_key = 'last_name' "
+        ;
+        $res = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT s.*,
+                users.user_login AS user_login,
+                users.user_email AS user_email,
+                authors.user_login AS author_login,
+                completers.user_login AS completer_login,
+                fn.meta_value AS first_name, 
+                ln.meta_value AS last_name
+                $q_from WHERE s.$getby = $search_format ". ($getby == 'card_number' ? "AND s.year = $year" : '') ." LIMIT 1;",
+                [$sub_id]
+            ),
+            'ARRAY_A'
+        );
+        if (!$res) {
+            return false;
+        }
+        $res['id'] = intval($res['id']);
+        $res['user_id'] = intval($res['user_id']);
+        $res['year'] = intval($res['year']);
+        $res['quote'] = (double) $res['quote'];
+        $res['marketing_agree'] = boolval($res['marketing_agree']);
+        $res['newsletter_agree'] = boolval($res['newsletter_agree']);
+        $res['publish_agree'] = boolval($res['publish_agree']);
+        $res['created_at'] = intval($res['created_at']);
+        $res['updated_at'] = intval($res['updated_at']);
+        $res['signed_at'] = intval($res['signed_at']);
+        $res['completed_at'] = intval($res['completed_at']);
+        $res['author_id'] = intval($res['author_id']);
+        $res['completer_id'] = intval($res['completer_id']);
+        return $res;
+    }
+
+
+    private function complete_subscription(
+        $sub_id,
+        string $card_number = '',
+        $signed_at = 0,
+        $paypal = false
+    ) {
+        $webcard = false;
+        $sub = $this->get_subscription_by('id', $sub_id);
+        if (!$sub) {
+            throw new Exception('Invalid subscrition');
+        }
+        if ($sub['status'] != 'seen') {
+            throw new Exception("Invalid subscrition status: $sub[status]");
+        }
+        if ($card_number) {
+            $card_number = trim($card_number);
+            if ($this->get_subscription_by('card_number', $card_number, $sub['year'])) {
+                throw new Exception("Duplicated card_number");
+            }
+        } else {
+            $webcard = true;
+            $card_number = 'W'. $this->zerofill($this->get_last_webcard_number($sub['year'])+1);
+        }
+        $date_now = date_create('now', current_time('e'));
+        $now_ts = $date_now->getTimestamp();
+        if ($signed_at) {
+            if (is_string($signed_at)) {
+                if (
+                    !preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $signed_at, $signed_at_capture)
+                    || !checkdate(intval($signed_at_capture[2]), intval($signed_at_capture[3]), intval($signed_at_capture[1]))
+                ) {
+                    throw new Exception('Invalid ID card number');
+                }
+                $signed_at = $date_now;
+                $signed_at->setDate(intval($signed_at_capture[1]),intval($signed_at_capture[2]), intval($signed_at_capture[3]));
+                $signed_at->setTime(0,0);
+                $signed_at = $signed_at->getTimestamp();
+            } else if (!is_int($signed_at) || $signed_at > 0) {
+                throw new Exception("Invalid signed_at");
+            }
+        } else {
+            $signed_at = $now_ts;
+        }
+        global $wpdb;
+        $wpdb->query($wpdb->prepare(
+            "UPDATE " . $this::db_prefix('subscription') . " SET 
+                card_number = %s,
+                status = 'completed',
+                updated_at = $now_ts,
+                completed_at = $now_ts,
+                completer_id = %d,
+                completer_ip = %s
+                ".($paypal ? '' : ", pp_order_id = NULL")."
+            WHERE id = $sub_id;"
+        ), [
+            $card_number,
+            get_current_user_id(),
+            $this::get_client_ip()
+        ]);
+        if ($webcard) {
+            $this->increment_last_webcard_number();
+        }
+        if (intval(current_time('Y')) <= $sub['year']){
+            $meta_input = [
+                'mpop_marketing_agree' => $sub['marketing_agree'],
+                'mpop_newsletter_agree' => $sub['newsletter_agree'],
+                'mpop_publish_agree' => $sub['publish_agree']
+            ];
+            if (current_time('Y') == $sub['year']) {
+                $meta_input['mpop_card_active'] = true;
+            }
+            wp_update_user([
+                'ID' => $sub['user_id'],
+                'meta_input' => $meta_input
+            ]);
+            $this->update_discourse_groups_by_user($sub['user_id']);
+        }
+    }
+    private function db_cache(string $q, string $group_key, int $expire = -1, bool $force = false, string $method = 'get_results', ...$args) {
         $res = false;
         if (!$force) {
             $res = wp_cache_get(md5($q), $group_key);
@@ -1873,11 +2266,15 @@ class MultipopPlugin {
                 'author_id',
                 'completer_id'
             ])) {
-                if ($v !== '') {
-                    $v = intval($v);
-                } else {
-                    $v = null;
-                }
+                $v = intval($v);
+            } else if (in_array($k, [
+                'marketing_agree',
+                'newsletter_agree',
+                'publish_agree',
+            ])) {
+                $v = boolval($v);
+            } else if ($k == 'quote') {
+                $v = (double) $v;
             }
         }
         return $res;
@@ -1887,24 +2284,29 @@ class MultipopPlugin {
             'txt' => '',
             'user_id' => [],
             'year' => [], 
+            'quote' => ',',
+            'marketing_agree' => null,
+            'newsletter_agree' => null,
+            'publish_agree' => null,
             'status' => [],
             'created_at' => ',',
             'updated_at' => ',',
             'signed_at' => ',',
             'completed_at' => ',',
             'author_id' => [],
-            'completer_id' => 0,
+            'completer_id' => [],
             'mpop_billing_state' => [],
             'mpop_billing_city' => [],
             'page' => 1,
-            'order_by' => ['updated_at' => false]
+            'order_by' => ['s.updated_at' => false]
         ];
         $time_interval_reg = '/^\d*,\d*$/';
+        $quote_interval_reg = '/^(\d+(\.\d{1,2})?)?,(\d+(\.\d{1,2})?)?$/';
         $mpop_billing_state_reg = '/^[A-Z]{2}$/';
         $mpop_billing_city_reg = '/^[A-Z]\d{3}$/';
         $allowed_sorts = [
             'id',
-            'card_id',
+            'card_number',
             'user_login',
             'login',
             'user_email',
@@ -1912,6 +2314,10 @@ class MultipopPlugin {
             'first_name',
             'last_name',
             'year',
+            'quote',
+            'marketing_agree',
+            'newsletter_agree',
+            'publish_agree',
             'status',
             'created_at',
             'updated_at',
@@ -1927,6 +2333,8 @@ class MultipopPlugin {
             !is_string($options['txt'])
             || !is_array($options['user_id'])
             || !is_array($options['year'])
+            || !is_string($options['quote'])
+            || !preg_match($quote_interval_reg, $options['quote'])
             || !is_array($options['status'])
             || !is_string($options['created_at'])
             || !preg_match($time_interval_reg, $options['created_at'])
@@ -1946,12 +2354,18 @@ class MultipopPlugin {
         ) {
             return $res;
         }
+        $options['quote'] = explode(',', $options['quote']);
         $options['created_at'] = explode(',', $options['created_at']);
         $options['updated_at'] = explode(',', $options['updated_at']);
         $options['signed_at'] = explode(',', $options['signed_at']);
         $options['completed_at'] = explode(',', $options['completed_at']);
         if (
             (
+                strlen($options['quote'][0])
+                && strlen($options['quote'][1])
+                && ((double) $options['quote'][0]) > ((double) $options['quote'][1])
+            )
+            || (
                 strlen($options['created_at'][0])
                 && strlen($options['created_at'][1])
                 && intval($options['created_at'][0]) > intval($options['created_at'][1])
@@ -2016,8 +2430,18 @@ class MultipopPlugin {
                         $k = 'comune.meta_value';
                         break;
                     default:
+                        switch($k) {
+                            case 'marketing_agree':
+                                $v = !$v;
+                                break;
+                            case 'newsletter_agree':
+                                $v = !$v;
+                                break;
+                            case 'publish_agree':
+                                $v = !$v;
+                                break;
+                        }
                         $k = 's.' . $k;
-                        break;
                 }
                 $order_by .= ($order_by ? ", " : "") . $k . ($v ? " ASC" : " DESC");
             }
@@ -2036,7 +2460,7 @@ class MultipopPlugin {
         if ($options['txt']) {
             $sanitized_value = '%' . $wpdb->esc_like($options['txt']) . '%';
             $append_to_where($wpdb->prepare(
-                "( s.card_id LIKE %s
+                "( s.card_number LIKE %s
                 OR users.user_login LIKE %s
                 OR users.user_email LIKE %s
                 OR fn.meta_value LIKE %s
@@ -2053,6 +2477,21 @@ class MultipopPlugin {
         }
         if (count($options['year'])) {
             $append_to_where("s.year IN ( " . implode(',', $options['year']) . " )");
+        }
+        if ($options['quote'][0]) {
+            $append_to_where("s.quote >= " . $options['quote'][0]);
+        }
+        if ($options['quote'][1]) {
+            $append_to_where("s.quote <= " . $options['quote'][1]);
+        }
+        if (!is_null($options['marketing_agree'])) {
+            $append_to_where("s.marketing_agree = " . ($options['marketing_agree'] ? '1' : '0'));
+        }
+        if (!is_null($options['newsletter_agree'])) {
+            $append_to_where("s.newsletter_agree = " . ($options['newsletter_agree'] ? '1' : '0'));
+        }
+        if (!is_null($options['publish_agree'])) {
+            $append_to_where("s.publish_agree = " . ($options['publish_agree'] ? '1' : '0'));
         }
         if (count($options['status'])) {
             $append_to_where("s.status IN ( " . implode(',', array_map(function($s) {return "'$s'";}, $options['status'])) . " )");
@@ -2115,7 +2554,7 @@ class MultipopPlugin {
             ON s.user_id = comune.user_id 
             AND comune.meta_key = 'mpop_billing_city' "
         ;
-        $q_count = "SELECT COUNT(*) as total_count " . $q_from . $q_where . ';';
+        $q_count = "SELECT COUNT(DISTINCT s.id) as total_count " . $q_from . $q_where . ';';
         $total = intval($this->db_cache($q_count, 'mpop_subs_search', -1, $force, 'get_var'));
         $pages = 1;
         $q_limit = "";
@@ -2129,8 +2568,7 @@ class MultipopPlugin {
                 $q_limit .= " OFFSET " . ($options['page'] - 1) * $limit;
             }
         }
-        $q = "SELECT
-            s.*,
+        $q = "SELECT DISTINCT s.*,
             users.user_login AS user_login,
             users.user_email AS user_email,
             authors.user_login AS author_login,
@@ -2139,16 +2577,19 @@ class MultipopPlugin {
             ln.meta_value AS last_name,
             prov.meta_value AS mpop_billing_state,
             comune.meta_value AS mpop_billing_city "
-            . $q_from . $q_where . $q_limit . ';';
+            . $q_from . $q_from . $q_limit . ';';
         ;
         $res = [];
         $res['subscriptions'] = $this->db_cache($q, 'mpop_subs_search', -1, $force, 'get_results', 'ARRAY_A');
         foreach($res['subscriptions'] as &$sub) {
             unset($sub['filename']);
-            unset($sub['pp_order_id']);
             $sub['id'] = intval($sub['id']);
             $sub['user_id'] = intval($sub['user_id']);
             $sub['year'] = intval($sub['year']);
+            $sub['quote'] = (double) $sub['quote'];
+            $sub['marketing_agree'] = boolval($sub['marketing_agree']);
+            $sub['newsletter_agree'] = boolval($sub['newsletter_agree']);
+            $sub['publish_agree'] = boolval($sub['publish_agree']);
             $sub['created_at'] = intval($sub['created_at']);
             $sub['updated_at'] = intval($sub['updated_at']);
             $sub['signed_at'] = intval($sub['signed_at']);
@@ -2542,7 +2983,7 @@ class MultipopPlugin {
         if (isset($user->roles[0])) {
             if ($user->roles[0] == 'administrator') {
                 $groups[] = ['name' => 'mp_wp_admins', 'full_name' => 'Amministratori Wordpress', 'owner' => false];
-            } else if (in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
+            } else if ($user->mpop_card_active && in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
                 if ($user->mpop_billing_state) {
                     if (!$province_all) {
                         $province_all = $this->get_province_all();
@@ -2557,7 +2998,7 @@ class MultipopPlugin {
                         }
                     }
                 }
-                if ($user->roles[0] == 'multipopolare_resp' && !empty($user->mpop_resp_zones)) {
+                if ($user->mpop_card_active && $user->roles[0] == 'multipopolare_resp' && !empty($user->mpop_resp_zones)) {
                     foreach($user->mpop_resp_zones as $zone) {
                         if (str_starts_with( $zone, 'reg_' )) {
                             $reg_fullname = substr($zone, 4);
@@ -2582,6 +3023,9 @@ class MultipopPlugin {
                     }
                 }
             }
+        }
+        if(empty($groups)) {
+            $groups[] = ['name' => 'mp_disabled_users', 'full_name' => 'Utenti WP disabilitati', 'owner' => false];
         }
         return array_values($groups);
     }

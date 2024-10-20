@@ -77,19 +77,24 @@ $user_id = wp_insert_user([
     'role' => 'multipopolano',
     'locale' => 'it_IT',
     'meta_input' => [
-        'mpop_mail_to_confirm' => true,
-        '_new_email' => false,
-        'mpop_card_active' => false,
-        'mpop_birthdate' => false,
-        'mpop_birthplace' => false,
-        'mpop_billing_address' => false,
-        'mpop_billing_city' => false,
-        'mpop_billing_state' => false,
-        'mpop_billing_zip' => false,
-        'mpop_id_card_type' => false,
-        'mpop_id_card_id' => false,
-        'mpop_id_card_expiration' => false,
-        'mpop_profile_pending_edits' => false
+        'mpop_mail_to_confirm' => true
+        // '_new_email' => false,
+        // 'mpop_card_active' => false,
+        // 'mpop_birthdate' => false,
+        // 'mpop_birthplace' => false,
+        // 'mpop_billing_address' => false,
+        // 'mpop_billing_city' => false,
+        // 'mpop_billing_state' => false,
+        // 'mpop_billing_zip' => false,
+        // 'mpop_phone' => false,
+        // 'mpop_id_card_type' => false,
+        // 'mpop_id_card_number' => false,
+        // 'mpop_id_card_expiration' => false,
+        // 'mpop_profile_pending_edits' => false,
+        // 'mpop_marketing_agree' => false,
+        // 'mpop_newsletter_agree' => false,
+        // 'mpop_publish_agree' => false,
+        // 'mpop_org_role' => false
     ]
 ]);
 

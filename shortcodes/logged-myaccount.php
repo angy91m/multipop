@@ -13,6 +13,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/logged-myaccount.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
+<div id="loaded-scripts" style="display:none"></div>
 <div id="app">
     <span v-for="(notice, noticeInd) in userNotices" :class="'mpop-app-notice' + ' notice-' + notice.type"><span @click="dismissNotice(noticeInd)"><?=$this::dashicon('no-alt')?></span><span v-html="notice.msg"></span></span>
     <table id="mpop-main-table">
@@ -30,6 +31,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 <li class="mpop-menu-title"><strong>ADMIN</strong></li>
                                 <li @click="selectTab('users')">Utenti</li>
                                 <li @click="selectTab('subscriptions')">Tessere</li>
+                                <li @click="selectTab('uploadUserCsv')">Carica CSV Utenti</li>
                             </template>
                         </ul>
                     </nav>
@@ -215,7 +217,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             <h4 v-if="profile.mpop_card_active">La tua tessera è attiva</h4>
                             <div>
                                 <ul v-if="nearActiveSub">
-                                    <li>Codice tessera: {{nearActiveSub.card_id ? nearActiveSub.card_id : 'Da assegnare'}}</li>
+                                    <li>Codice tessera: {{nearActiveSub.card_number ? nearActiveSub.card_number : 'Da assegnare'}}</li>
                                     <li>Stato attivazione: {{showSubscriptionStatus(nearActiveSub)}}</li>
                                     <li>Anno: {{nearActiveSub.year}}</li>
                                     <li>ID richiesta: {{nearActiveSub.id}}</li>
@@ -644,6 +646,9 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             </tr>
                         </table>
                     </template></div>
+                    <div v-if="selectedTab == 'uploadUserCsv'">
+                        
+                    </div>
                 </div>
             </td>
         </tr>
