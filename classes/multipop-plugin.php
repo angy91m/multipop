@@ -2237,7 +2237,7 @@ class MultipopPlugin {
         if ( !is_string($birth_date) || strlen(trim($birth_date)) != 10) {
             throw new Exception('mpop_birthdate');
         }
-        $date_arr = array_map(function ($dt) {return intval($dt);}, explode('-', strval($birth_date ) ) );
+        $date_arr = array_map(function ($dt) {return intval($dt);}, explode('-', strval($birth_date) ) );
         if (
             count($date_arr) != 3
             || !checkdate($date_arr[1], $date_arr[2], $date_arr[0])
@@ -2261,7 +2261,7 @@ class MultipopPlugin {
         return $birth_date;
     }
     private function validate_birthplace($birth_date, $birth_place, &$comuni = []) {
-        if (!preg_match('/^[A-Z]\d{3}$/', $mpop_birthplace)) {
+        if (!preg_match('/^[A-Z]\d{3}$/', $birth_place)) {
             throw new Exception('mpop_birthplace');
         }
         if (is_string($birth_date)) {
@@ -2270,7 +2270,7 @@ class MultipopPlugin {
         if (empty($comuni)) {
             $comuni = $this->get_comuni_all();
         }
-        $found_bp = array_values(array_filter($comuni, function($c) use ($birthplace) {return $c['codiceCatastale'] == $birthplace;}));
+        $found_bp = array_values(array_filter($comuni, function($c) use ($birth_place) {return $c['codiceCatastale'] == $birth_place;}));
         if (!count($found_bp)) {
             throw new Exception('mpop_birthplace');
         }
@@ -2284,12 +2284,12 @@ class MultipopPlugin {
                 $soppr_arr_tm = array_map( function($v) {return intval(substr( $v, 0, 2));}, explode(':', $soppr_arr[1]));
                 $soppressione_dt->setDate($soppr_arr_dt[0], $soppr_arr_dt[1], $soppr_arr_dt[2]);
                 $soppressione_dt->setTime($soppr_arr_tm[0], $soppr_arr_tm[1], $soppr_arr_tm[2]);
-                if ($birthdate->getTimestamp() >= $soppressione_dt->getTimestamp()) {
+                if ($birth_date->getTimestamp() >= $soppressione_dt->getTimestamp()) {
                     throw new Exception('mpop_birthplace,mpop_birthplace');
                 }
             }
         }
-        return $birthdate->format('Y-m-d');
+        return $birth_date->format('Y-m-d');
     }
     private function db_cache(string $q, string $group_key, int $expire = -1, bool $force = false, string $method = 'get_results', ...$args) {
         $res = false;
