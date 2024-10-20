@@ -98,9 +98,13 @@ createApp({
         csvUsers = reactive([]),
         testPhone = ref(''),
         profilePhoneInput = ref('profilePhoneInput'),
-        // initialPhoneInput = computed(() => {
-        //     if (profile.mpop_phone && profilePhoneInput.instance) 
-        // }),
+        initialPhoneCountry = computed(() => {
+            if (typeof profile.mpop_phone == 'string' && profile.mpop_phone.startsWith('+') && profilePhoneInput.instance) {
+                const found = profilePhoneInput.instance.countries.find(c => c.dialCode == profile.mpop_phone.split('-')[0].slice(1));
+                if (found) return found.dialCode;
+            }
+            return 'it';
+        }),
         userSearch = reactive({
             txt: '',
             roles: [
@@ -1005,7 +1009,8 @@ createApp({
             csvUsers,
             loadUsersFromCsv,
             userCsvFields,
-            profilePhoneInput
+            profilePhoneInput,
+            initialPhoneCountry
         };
     }
 })
