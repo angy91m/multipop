@@ -197,6 +197,7 @@ createApp({
                         }
                         reader.readAsText(csvFile);
                     });
+                    console.log(csvBuff);
                     const workbook = XLSX.read(csvBuff, {raw: true}),
                     sheet = workbook.Sheets[workbook.SheetNames[0]],
                     jsonValues = XLSX.utils.sheet_to_json(sheet);
