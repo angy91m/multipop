@@ -145,6 +145,8 @@ span.mpop-app-notice > span > span.dashicons-before.dashicons-no-alt {
     border-spacing: 0;
     border-collapse: separate;
     cursor: default;
+    white-space: nowrap;
+    overflow-x: auto;
 }
 #mpop-user-search-table th,
 #mpop-user-search-table td,
