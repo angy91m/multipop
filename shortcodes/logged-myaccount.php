@@ -650,9 +650,9 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         <input type="file" @change="loadUsersFromCsv">
                         <table>
                             <thead>
-                                <th>
-                                    <td v-for="f in userCsvFields">{{f}}</td>
-                                </th>
+                                <tr>
+                                    <th v-for="f in userCsvFields">{{f}}</th>
+                                </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="u in csvUsers">
