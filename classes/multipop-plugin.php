@@ -890,7 +890,7 @@ class MultipopPlugin {
                     $users_enabled[] = $u['user_id'];
                 }
                 $users_to_disable = $wpdb->get_col(
-                    "SELECT `user_id` FROM " . $this::db_prefix('subscriptions') . " WHERE `status` = 'completed' AND `year` < $this_year AND `user_id` NOT IN ( " . implode(',' ,$users_enabled) . " );"
+                    "SELECT `user_id` FROM " . $this::db_prefix('subscriptions') . " WHERE `status` = 'completed' AND `year` < $this_year" . (!empty($users_enabled) ? " AND `user_id` NOT IN ( " . implode(',' ,$users_enabled) . " )" : '') . ";"
                 );
                 foreach ($users_to_disable as $u) {
                     $this->disable_user_card($u);
