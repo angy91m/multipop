@@ -8568,5 +8568,6 @@ const j2 = {
   }
 };
 export {
-  j2 as default
+  j2 as default,
+  K2 as intlTelInput
 };
