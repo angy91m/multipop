@@ -13,6 +13,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/logged-myaccount.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
+<link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-tel-input.css">
 <div id="loaded-scripts" style="display:none"></div>
 <div id="app">
     <span v-for="(notice, noticeInd) in userNotices" :class="'mpop-app-notice' + ' notice-' + notice.type"><span @click="dismissNotice(noticeInd)"><?=$this::dashicon('no-alt')?></span><span v-html="notice.msg"></span></span>
