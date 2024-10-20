@@ -186,11 +186,19 @@ createApp({
         function isCachedProp(propName) {
             return cachedProps[propName] ? cachedProps[propName] > (new Date()).getTime() : false;
         }
-        function loadUsersFromCsv(e) {
+        async function loadUsersFromCsv(e) {
             if (e.target.files.length) {
                 const csvFile = e.target.files[0];
                 if (csvFile.type == 'text/csv') {
-                    console.log(XLSX);
+                    const reader = new FileReader();
+                    const csvBuff = await new Promise(r => {
+                        reader.onload = () => {
+                            r(reader.result);
+                        }
+                        reader.readAsArrayBuffer(csvFile);
+                    });
+                    const workbook = XLSX.read(csvBuff, {raw: true});
+                    console.log(workbook);
                 }
             }
         }
