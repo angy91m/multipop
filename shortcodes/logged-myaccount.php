@@ -43,7 +43,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     <!--SUMMARY-->
                     <div v-if="selectedTab == 'summary'">
                         <h3>Ciao {{helloName}}</h3>
-                        <v-intl-phone :options="{initialCountry: 'it'}"/>
+                        <div><v-intl-phone :options="{initialCountry: 'it'}"/></div>
                         <template v-if="!profileEditing">
                             <button class="mpop-button" @click="editProfile">Modifica profilo</button>
                         </template>
