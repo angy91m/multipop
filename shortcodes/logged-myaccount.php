@@ -210,8 +210,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                         ref="profilePhoneInput"
                                         :options="{initialCountry: 'it'}"
                                         :value="profile.mpop_phone || ''"
-                                        @changeCountry="console.log(profilePhoneInput)"
-                                        @changeNumber="console.log(profilePhoneInput)"
+                                        @change="console.log(profilePhoneInput)"
                                     />
                                 </td>
                             </tr>
