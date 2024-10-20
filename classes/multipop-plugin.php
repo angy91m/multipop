@@ -521,9 +521,7 @@ class MultipopPlugin {
             `completer_ip` VARCHAR(255) NULL,
             `notes` TEXT NULL,
             PRIMARY KEY (`id`),
-            UNIQUE KEY unique_card_year (`card_number`, `year`),
-            CONSTRAINT unique_card_year_conditional UNIQUE (`card_number`, `year`) 
-                WHERE card_number IS NOT NULL
+            UNIQUE (`card_number`, `year`)
         ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
         dbDelta( $q );
     
