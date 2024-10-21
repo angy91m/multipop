@@ -21,7 +21,7 @@ loadVueModule = (...modules) => {
     })));
     return loaded;
 },
-[vSel,IntlTelInput] = loadVueModule('vue-select.js', 'vue-tel-input.js'),
+[vSel] = loadVueModule('vue-select.js'),
 mailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/s,
 passwordRegex = {
     rr: [
