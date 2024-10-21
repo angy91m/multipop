@@ -2,11 +2,22 @@ import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import * as Vue from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
-import * as ElementPlus from '/wp-content/plugins/multipop/js/element-plus.js';
-console.log(ElementPlus);
 const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick } = Vue,
 { loadModule } = window['vue3-sfc-loader'];
 
+const elemPlus = loadModule(`/wp-content/plugins/multipop/js/element-plus.js`, {
+    moduleCache: { vue: Vue },
+    async getFile(url) {
+        const response = await fetch(url);
+        if ( !response.ok ){
+            console.error({message:'Import failed ' + url, response})
+            throw new Error('Import failed ' + url)
+        }
+        return { getContentData: asBinary => asBinary ? response.arrayBuffer() : response.text()};
+    },
+    addStyle() {}
+});
+console.log(elemPlus);
 const vSel = loadModule(`/wp-content/plugins/multipop/js/vue-select.js`, {
     moduleCache: { vue: Vue },
     async getFile(url) {
