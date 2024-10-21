@@ -76,6 +76,7 @@ loadModule(`https://unpkg.com/primevue/umd/primevue.min.js`, {
     },
     addStyle() {}
 }).then((PrimeVue)=>{
+    console.log(PrimeVue);
     createApp({
         components: {
             'v-select': defineAsyncComponent(() => vSel),
