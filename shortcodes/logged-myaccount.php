@@ -396,9 +396,9 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         </div>
                         <br>
                         <el-table :data="foundUsers" style="width: 100%">
-                            <el-table-column prop="ID" label="ID" />
-                            <el-table-column prop="login" label="Login" />
-                            <el-table-column prop="email" label="E-mail" />
+                            <el-table-column prop="ID" label="ID" width="100" />
+                            <el-table-column prop="login" label="Login" width="100" />
+                            <el-table-column prop="email" label="E-mail" width="100" />
                             <!-- <el-table-column label="E-mail da confermare">
                                 <template #default="scope">
                                     <span>{{ scope.row.mpop_mail_to_confirm ? 'Sì' : 'No' }}</span>
