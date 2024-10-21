@@ -896,7 +896,8 @@ createApp({
                 cancelEditProfile();
                 cancelEditUser();
                 const url = new URL(location);
-                selectedTab.value = tab || {name: 'summary', label: 'Riepilogo'};
+                tab = tab || {name: 'summary', label: 'Riepilogo'};
+                selectedTab.value = tab;
                 if (!popstate) {
                     if (tab.name != 'userView') {
                         url.searchParams.delete('view-user');
