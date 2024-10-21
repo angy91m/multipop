@@ -2,8 +2,8 @@
 defined( 'ABSPATH' ) || exit;
 switch( $post_data['action'] ) {
     case 'admin_search_users':
-        [$users, $total, $limit] = $this->user_search($post_data['txt'], $post_data['roles'], $post_data['mpop_billing_state'], $post_data['mpop_billing_city'], $post_data['mpop_resp_zones'], $post_data['mpop_card_active'], $post_data['mpop_mail_to_confirm'], $post_data['page'], $post_data['sortBy']);
-        $res_data['data'] = ['users' => $users, 'total' => $total, 'limit' => $limit];
+        [$users, $total, $limit, $sort_by] = $this->user_search($post_data['txt'], $post_data['roles'], $post_data['mpop_billing_state'], $post_data['mpop_billing_city'], $post_data['mpop_resp_zones'], $post_data['mpop_card_active'], $post_data['mpop_mail_to_confirm'], $post_data['page'], $post_data['sortBy']);
+        $res_data['data'] = ['users' => $users, 'total' => $total, 'limit' => $limit, 'sortBy' => $sort_by];
         break;
     case 'admin_view_user':
         if (isset($post_data['ID']) && is_numeric($post_data['ID']) && $post_data['ID'] > 0) {

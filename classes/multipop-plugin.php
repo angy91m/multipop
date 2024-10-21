@@ -2984,7 +2984,11 @@ class MultipopPlugin {
             }
             $users[] = $parsed_u;
         }
-        return [$users, $total, $limit];
+        array_pop($sort_by);
+        foreach($sort_by as $k=>$v) {
+            $sort_by[$k] = $v == 'ASC' ? true : false;
+        }
+        return [$users, $total, $limit, $sort_by];
     }
 
     public function discourse_req_ca($verify, $url) {
