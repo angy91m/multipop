@@ -65,6 +65,29 @@ userCsvFields = [
     'mpop_org_role',
     'mpop_subscription_notes'
 ],
+menuItems = [{
+    name: 'summary',
+    label: 'Riepilogo'
+}, {
+    name: 'passwordChange',
+    label: 'Cambio password'
+}, {
+    name: 'card',
+    label: 'Tessera'
+}, {
+    separator: true,
+    name: 'users',
+    label: 'Utenti',
+    admin: true
+}, {
+    name: 'subscriptions',
+    label: 'Tessere',
+    admin: true
+}, {
+    name: 'uploadUserCsv',
+    label: 'Carica CSV Utenti',
+    admin: true
+}],
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value;
 let searchUsersTimeout, triggerSearchTimeout;
 createApp({
@@ -105,29 +128,6 @@ createApp({
         csvUsers = reactive([]),
         profilePhoneInput = ref('profilePhoneInput'),
         userEditPhoneInput = ref('userEditPhoneInput'),
-        menuItems = ref([{
-            name: 'summary',
-            label: 'Riepilogo'
-        }, {
-            name: 'passwordChange',
-            label: 'Cambio password'
-        }, {
-            name: 'card',
-            label: 'Tessera'
-        }, {
-            separator: true,
-            name: 'users',
-            label: 'Utenti',
-            admin: true
-        }, {
-            name: 'subscriptions',
-            label: 'Tessere',
-            admin: true
-        }, {
-            name: 'uploadUserCsv',
-            label: 'Carica CSV Utenti',
-            admin: true
-        }]),
         userSearchTablePagination = ref({
             sortBy: 'ID',
             descending: false,
