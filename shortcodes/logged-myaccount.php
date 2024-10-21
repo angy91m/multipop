@@ -18,8 +18,8 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 <div id="app">
     <span v-for="(notice, noticeInd) in userNotices" :class="'mpop-app-notice' + ' notice-' + notice.type"><span @click="dismissNotice(noticeInd)"><?=$this::dashicon('no-alt')?></span><span v-html="notice.msg"></span></span>
     <table id="mpop-main-table">
-        <tr>
-            <td>
+        <tr style="display:flex; width:100vw;">
+            <td style="flex-shrink: 0;">
                 <div>
                     <label for="mpop-tabs-nav" @click="displayNav = !displayNav">Menù</label>
                     <nav id="mpop-tabs-nav" v-if="displayNav">
@@ -38,7 +38,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     </nav>
                 </div>
             </td>
-            <td>
+            <td style="flex-grow: 1; overflow-x: auto;">
                 <div id="mpop-tabs">
                     <!--SUMMARY-->
                     <div v-if="selectedTab == 'summary'">
