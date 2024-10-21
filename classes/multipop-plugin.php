@@ -2984,7 +2984,9 @@ class MultipopPlugin {
             }
             $users[] = $parsed_u;
         }
-        array_pop($sort_by);
+        while(count($sort_by) > 1) {
+            array_pop($sort_by);
+        }
         foreach($sort_by as $k=>$v) {
             $sort_by[$k] = $v == 'ASC' ? true : false;
         }
