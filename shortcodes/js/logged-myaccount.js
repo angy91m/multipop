@@ -1018,7 +1018,6 @@ createApp({
             searchUsers,
             triggerSearchUsers,
             foundUsersTotal,
-            userSearchSortBy,
             foundUsersPageTotal,
             pageButtons,
             changeUserSearchPage,
