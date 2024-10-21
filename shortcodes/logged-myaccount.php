@@ -39,18 +39,8 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                 <q-list>
 
                     <template v-for="(menuItem, index) in menuItems" :key="index">
-                        <q-item v-if="!menuItem.admin" clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
-                            <q-item-section avatar>
-                            <!-- <q-icon :name="menuItem.icon" /> -->
-                            </q-item-section>
-                            <q-item-section>
-                            {{ menuItem.label }}
-                            </q-item-section>
-                        </q-item>
-                    </template>
-                    <template><q-separator /></template>
-                    <template v-for="(menuItem, index) in menuItems" :key="index">
-                        <q-item v-if="menuItem.admin" clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
+                        <q-separator v-if="menuItem.separator" />
+                        <q-item v-if="!menuItem.admin || profile.role == 'administrator'" clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
                             <q-item-section avatar>
                             <!-- <q-icon :name="menuItem.icon" /> -->
                             </q-item-section>
