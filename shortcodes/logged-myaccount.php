@@ -406,7 +406,13 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             :rows="foundUsers || []"
                             :columns="foundUsersColumns"
                             hide-bottom
-                        />
+                        >
+                            <template #body="props">
+                            <q-td key="mpop_resp_zones" :props="props">
+                                <span v-html="props.row.mpop_resp_zones"></span>
+                            </q-td>
+                            </template>
+                        </q-table>
                         <!-- <el-table :data="foundUsers" style="width: 100%">
                             <el-table-column prop="ID" label="ID" />
                             <el-table-column prop="login" label="Login" />
