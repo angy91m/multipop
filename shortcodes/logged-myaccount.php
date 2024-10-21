@@ -406,7 +406,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             :rows="foundUsers || []"
                             :columns="foundUsersColumns"
                             no-data-label="Nessun utente trovato"
-                            :sort-method="(rows,sortBy,desc)=>{console.log(sortBy);console.log(desc);return rows;}"
+                            :sort-method="(rows,sortBy,desc)=>userSearchSortBy(sortBy, !desc)"
                             hide-bottom
                             :loading="userSearching"
                             binary-state-sort

@@ -728,6 +728,7 @@ createApp({
                         userSearchLimit.value = users.data.limit;
                         userSearchTableOrder.value.sortBy = Object.keys(users.data.sortBy)[0];
                         userSearchTableOrder.value.descending = !Object.values(users.data.sortBy)[0];
+                        userSearch.sortBy = users.data.sortBy;
                     } else {
                         console.error('Unknown error');
                     }
@@ -929,13 +930,12 @@ createApp({
             userSearch.page = page;
             searchUsers();
         }
-        function userSearchSortBy(k) {
-            
+        function userSearchSortBy(k, asc) {
             if (Object.keys(userSearch.sortBy)[0] === k) {
-                userSearch.sortBy[k] = !userSearch.sortBy[k];
+                userSearch.sortBy[k] = asc;
             } else {
                 userSearch.sortBy = {
-                    [k]: true,
+                    [k]: asc,
                     [Object.keys(userSearch.sortBy)[0]]: userSearch.sortBy[Object.keys(userSearch.sortBy)[0]]
                 };
             }
