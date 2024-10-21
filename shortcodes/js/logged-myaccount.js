@@ -1021,5 +1021,5 @@ createApp({
         };
     }
 })
-//.use(PrimeVue.Config)
+.use(PrimeVue.Config)
 .mount('#app');
