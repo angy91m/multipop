@@ -395,7 +395,10 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             <button class="mpop-button" @click="changeUserSearchPage(foundUsersPageTotal)" v-if="userSearch.page != foundUsersPageTotal && !pageButtons.includes(foundUsersPageTotal) && userSearch.page +2 <= foundUsersPageTotal" style="width:auto">Fine</button>
                         </div>
                         <br>
-                        <div class="mpop-table-container">
+                        <el-table :data="foundUsers" style="width: 100%">
+                            <el-table-column prop="ID" label="ID" />
+                        </el-table>
+                        <!-- <div class="mpop-table-container">
                             <table id="mpop-user-search-table">
                                 <thead>
                                     <tr>
@@ -428,7 +431,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>
+                        </div> -->
                     </div>
                     <!--USER_VIEW-->
                     <div v-if="selectedTab == 'userView'" id="mpop-user-view"><template v-if="userInView">
