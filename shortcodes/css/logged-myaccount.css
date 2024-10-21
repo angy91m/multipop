@@ -174,7 +174,7 @@ span.mpop-app-notice > span > span.dashicons-before.dashicons-no-alt {
 #mpop-user-search-table th:first-child {
     border-radius: 5px 0 0 0;
 }
-#mpop-user-search-table .mpop-click {
+.mpop-click {
     cursor: pointer;
 }
 #mpop-user-search-table th:last-child {
