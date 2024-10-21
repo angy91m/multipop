@@ -648,12 +648,12 @@ createApp({
             if (replace) {
                 return history.replaceState(historyTabs, '', url.href);
             }
-            historyTabs.unshift(selectedTab.value.name);
+            historyTabs.unshift(selectedTab.value);
             return history.pushState(historyTabs, '', url.href);
         }
         async function viewUser(ID, popstate = false) {
             if (ID == profile.ID) {
-                return selectTab('summary');
+                return selectTab();
             }
             const res = await serverReq({
                action: 'admin_view_user',
@@ -682,7 +682,7 @@ createApp({
 
             }
             if (!popstate) {
-                selectTab('userView');
+                selectTab({name:'userView', label: 'Modifica utente'});
                 pushQueryParams({'view-user': ID});
             }
         }
@@ -891,7 +891,7 @@ createApp({
                 delete userInEditing[key];
             }
         }
-        function selectTab(tab, popstate = false) {
+        function selectTab(tab = {name: ''}, popstate = false) {
             if (selectedTab.value.name != tab.name) {
                 cancelEditProfile();
                 cancelEditUser();
@@ -950,13 +950,13 @@ createApp({
                 viewUser(url.searchParams.get('view-user'), false, true);
             }
             if (!historyTabs.length) {
-                historyTabs.unshift(selectedTab.value.name);
+                historyTabs.unshift(selectedTab.value);
                 history.replaceState(historyTabs, '', location.href);
             }
         });
         function onPopState(e) {
             if (Array.isArray(e.state)){
-                selectTab(e.state[0] || 'summary', true);
+                selectTab(e.state[0], true);
                 historyTabs.length;
                 historyTabs.push(...e.state);
             }
