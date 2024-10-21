@@ -67,6 +67,7 @@ userCsvFields = [
 ],
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value;
 let searchUsersTimeout, triggerSearchTimeout;
+console.log(MdTable);
 createApp({
     components: {
         'v-select': defineAsyncComponent(() => vSel),
@@ -1022,5 +1023,4 @@ createApp({
         };
     }
 })
-.use(defineAsyncComponent(()=> MdTable))
 .mount('#app');
