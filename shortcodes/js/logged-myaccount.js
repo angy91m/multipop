@@ -67,11 +67,10 @@ userCsvFields = [
 ],
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value;
 let searchUsersTimeout, triggerSearchTimeout;
-console.log(IntlTelInput);
 createApp({
     components: {
         'v-select': defineAsyncComponent(() => vSel),
-        // 'v-intl-phone': IntlTelInput
+        'v-intl-phone': IntlTelInput
     },
     setup() {
         function activeCardForYear(cards = [], year) {
