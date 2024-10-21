@@ -33,8 +33,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                 :width="200"
                 :breakpoint="500"
                 bordered
-                overlay
-                :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-3'"
+                :class="($q.dark.isActive ? 'bg-grey-9' : 'bg-grey-3') + ' relative-position'"
             >
                 <q-scroll-area class="fit">
                 <q-list>
