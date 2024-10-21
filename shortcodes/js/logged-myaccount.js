@@ -726,6 +726,7 @@ createApp({
                         foundUsers.push(...users.data.users);
                         foundUsersTotal.value = users.data.total;
                         userSearchLimit.value = users.data.limit;
+                        console.log(users.data);
                         console.log(userSearchTableOrder);
                     } else {
                         console.error('Unknown error');
