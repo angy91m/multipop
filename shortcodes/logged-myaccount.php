@@ -405,11 +405,10 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             :rows-per-page-options="[0]"
                             :rows="foundUsers || []"
                             :columns="foundUsersColumns"
-                            @row-click="(_,row) =>viewUser(row.ID)"
                             hide-bottom
                         >
                             <template #body="props">
-                                <q-tr :props="props">
+                                <q-tr :props="props" @click="()=>viewUser(props.row.ID)">
                                     <q-td v-for="prop in foundUsersColumns" :key="prop.name">
                                         <template v-if="prop.name == 'mpop_resp_zones'">
                                             <span v-html="showZones(props.row.mpop_resp_zones)"></span>
