@@ -693,6 +693,7 @@ createApp({
         }
         async function searchUsers(...args) {
             console.log(args);
+            console.log(userSearchTableOrder.value);
             try {
                 userSearching.value = true;
                 foundUsers.length = 0;
