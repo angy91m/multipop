@@ -1022,5 +1022,4 @@ createApp({
         };
     }
 })
-.use(Qasar)
 .mount('#app');
