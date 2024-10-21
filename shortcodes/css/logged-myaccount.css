@@ -57,6 +57,12 @@
 #app > div {
     padding: 16px 0;
 }
+.q-page-container {
+    padding-top: 0 !important;
+}
+h3 {
+    margin: 20px 0;
+}
 span.mpop-app-notice {
     border: solid 1px #aaa;
     display: block;
