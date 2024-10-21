@@ -16,8 +16,7 @@ const elemPlus = loadModule(`/wp-content/plugins/multipop/js/element-plus.js`, {
         return { getContentData: asBinary => asBinary ? response.arrayBuffer() : response.text()};
     },
     addStyle() {}
-});
-console.log(elemPlus);
+}).then(console.log);
 const vSel = loadModule(`/wp-content/plugins/multipop/js/vue-select.js`, {
     moduleCache: { vue: Vue },
     async getFile(url) {
