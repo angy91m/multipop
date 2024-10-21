@@ -646,10 +646,10 @@ createApp({
                 url.searchParams.set(k, params[k]);
             }
             if (replace) {
-                return history.replaceState(JSON.stringify(historyTabs), '', url.href);
+                return history.replaceState(JSON.parse(JSON.stringify(historyTabs)), '', url.href);
             }
             historyTabs.unshift(selectedTab.value);
-            return history.pushState(JSON.stringify(historyTabs), '', url.href);
+            return history.pushState(JSON.parse(JSON.stringify(historyTabs)), '', url.href);
         }
         async function viewUser(ID, popstate = false) {
             if (ID == profile.ID) {
@@ -952,18 +952,15 @@ createApp({
             }
             if (!historyTabs.length) {
                 historyTabs.unshift(selectedTab.value);
-                history.replaceState(JSON.stringify(historyTabs), '', location.href);
+                history.replaceState(JSON.parse(JSON.stringify(historyTabs)), '', location.href);
             }
         });
         function onPopState(e) {
-            try {
-                const state = JSON.parse(e.state);
-                if (Array.isArray(state)){
-                    selectTab(state[0], true);
-                    historyTabs.length;
-                    historyTabs.push(...state);
-                }
-            } catch {}
+            if (Array.isArray(e.state)){
+                selectTab(e.state[0], true);
+                historyTabs.length;
+                historyTabs.push(...e.state);
+            }
         }
         onUnmounted(()=> {
             clearTimeout(searchUsersTimeout);
