@@ -420,7 +420,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             <el-table-column prop="mpop_billing_city" label="Comune" />
                             <el-table-column label="Zone">
                                 <template #default="scope">
-                                    <span v-html="showZones(u.mpop_resp_zones)"></span>
+                                    <span v-html="showZones(scope.row.mpop_resp_zones)"></span>
                                 </template>
                             </el-table-column>
                         </el-table>
