@@ -140,6 +140,9 @@ span.mpop-app-notice > span > span.dashicons-before.dashicons-no-alt {
 .mpop-nowrap {
     white-space: nowrap;
 }
+.mpop-table-container {
+    overflow-x: auto;
+}
 #mpop-user-search-table,
 .mpop-import-csv-table {
     border-spacing: 0;
