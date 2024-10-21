@@ -410,6 +410,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             :loading="userSearching"
                             binary-state-sort
                             :pagination.sync="userSearchTableOrder"
+                            @request="searchUsers"
                         >
                             <template #body="props">
                                 <q-tr :props="props" @click="()=>viewUser(props.row.ID)" class="mpop-click">
