@@ -230,14 +230,8 @@ label[for="mpop-tabs-nav"] {
     }
 }
 @media only screen and (max-width : 1023px) {
-    #app table td {
-        display: block;
-    }
 }
 @media only screen and (max-width : 480px) {
-    #app table td {
-        display: block;
-    }
     .mpop-user-search-field {
         display: block;
         margin-left: 0;

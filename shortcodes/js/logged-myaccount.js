@@ -706,10 +706,6 @@ createApp({
                         [newPagination.sortBy]: !newPagination.descending
                     }
                 };
-                console.log(newPagination.sortBy);
-                console.log(newPagination.descending);
-                console.log(userSearchTablePagination.value.sortBy);
-                console.log(userSearchTablePagination.value.descending);
                 if (userSearchTablePagination.value.sortBy != newPagination.sortBy) {
                     userSearchTablePagination.value.secondSortBy = {[userSearchTablePagination.value.sortBy]: !userSearchTablePagination.value.descending};
                 }
@@ -946,17 +942,6 @@ createApp({
         });
         function changeUserSearchPage(page) {
             userSearch.page = page;
-            searchUsers();
-        }
-        function userSearchSortBy(k, asc) {
-            if (Object.keys(userSearch.sortBy)[0] === k) {
-                userSearch.sortBy[k] = asc;
-            } else {
-                userSearch.sortBy = {
-                    [k]: asc,
-                    [Object.keys(userSearch.sortBy)[0]]: userSearch.sortBy[Object.keys(userSearch.sortBy)[0]]
-                };
-            }
             searchUsers();
         }
         function searchOpen(tag) {
