@@ -223,6 +223,9 @@ label[for="mpop-tabs-nav"] {
     margin-left: 0;
     margin-right: 0;
 }
+main > div.entry-content.wp-block-post-content {
+    padding: 0;
+}
 @media only screen and (min-width : 1024px) {
     #mpop-profile-table tr td:first-child,
     #mpop-user-table tr td:first-child {
