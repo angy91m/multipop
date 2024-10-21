@@ -1032,6 +1032,6 @@ loadModule(`https://unpkg.com/primevue/umd/primevue.min.js`, {
             };
         }
     })
-    .use(PrimeVue)
+    .use(PrimeVue.Config)
     .mount('#app');
 });
