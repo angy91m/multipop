@@ -108,7 +108,7 @@ createApp({
             rowsPerPage: 1000,
             rowsNumber: 0,
             page: 1,
-            secondSortBy: []
+            secondSortBy: null
         }),
         userSearch = reactive({
             txt: '',
@@ -693,7 +693,6 @@ createApp({
         }
         async function searchUsers(options) {
             const newPagination = options ? options.pagination : userSearchTablePagination.value;
-            console.log(newPagination);
             try {
                 userSearching.value = true;
                 foundUsers.length = 0;
@@ -707,12 +706,15 @@ createApp({
                         [newPagination.sortBy]: !newPagination.descending
                     }
                 };
+                // console.log(newPagination.sortBy);
+                // console.log(newPagination.descending);
+                // console.log(userSearchTablePagination.value.sortBy);
+                // console.log(userSearchTablePagination.value.descending);
                 if (userSearchTablePagination.value.sortBy != newPagination.sortBy && userSearchTablePagination.value.descending != newPagination.descending) {
-                    userSearchTablePagination.value.secondSortBy.length = 0
-                    userSearchTablePagination.value.secondSortBy.push({[userSearchTablePagination.value.sortBy]: !userSearchTablePagination.value.descending});
+                    userSearchTablePagination.value.secondSortBy = {[userSearchTablePagination.value.sortBy]: !userSearchTablePagination.value.descending};
                 }
-                if (userSearchTablePagination.value.secondSortBy.length) {
-                    reqObj.sortBy = {...reqObj.sortBy, ...userSearchTablePagination.value.secondSortBy[0]};
+                if (userSearchTablePagination.value.secondSortBy) {
+                    reqObj.sortBy = {...reqObj.sortBy, ...userSearchTablePagination.value.secondSortBy};
                 }
                 delete reqObj.zones;
                 delete reqObj.resp_zones;
@@ -743,10 +745,8 @@ createApp({
                         userSearchTablePagination.value.sortBy = Object.keys(users.data.sortBy[0])[0];
                         userSearchTablePagination.value.descending = !Object.values(users.data.sortBy[0])[0];
                         if (users.data.sortBy[1]) {
-                            userSearchTablePagination.value.secondSortBy.length = 0;
-                            userSearchTablePagination.value.secondSortBy.push(users.data.sortBy[1]);
+                            userSearchTablePagination.value.secondSortBy = users.data.sortBy[1]
                         }
-                        console.log(userSearchTablePagination);
                     } else {
                         console.error('Unknown error');
                     }

@@ -2986,7 +2986,7 @@ class MultipopPlugin {
         }
         $arr_sort_by = [];
         foreach ($sort_by as $k =>$v) {
-            $arr_sort_by[] = [$k=>$v];
+            $arr_sort_by[] = [$k=>$v == 'ASC' ? true : false];
         }
         return [$users, $total, $limit, $arr_sort_by];
     }
