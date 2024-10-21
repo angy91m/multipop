@@ -20,7 +20,7 @@ loadVueModule = (...modules) => {
     })));
     return loaded;
 },
-[vSel, MdTable] = loadVueModule('vue-select.js', 'vue-material/dist/components/MdTable/index.js'),
+[vSel, MdTable] = loadVueModule('vue-select.js', 'vue-material/dist/components/MdTable'),
 mailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/s,
 passwordRegex = {
     rr: [
