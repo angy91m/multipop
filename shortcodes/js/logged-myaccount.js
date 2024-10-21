@@ -3,7 +3,7 @@ import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import * as Vue from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
 window.Vue = Vue;
-import { MdTable } from '/wp-content/plugins/multipop/js/vue-material/dist/components/index.js';
+import * as MdTable from '/wp-content/plugins/multipop/js/vue-material/dist/components/index.js';
 const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
