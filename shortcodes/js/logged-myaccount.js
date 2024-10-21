@@ -102,7 +102,7 @@ createApp({
         csvUsers = reactive([]),
         profilePhoneInput = ref('profilePhoneInput'),
         userEditPhoneInput = ref('userEditPhoneInput'),
-        userSearchTableOrder = ref({
+        userSearchTablePagination = ref({
             sortBy: 'ID',
             descending: false,
             rowsPerPage: 1000,
@@ -691,7 +691,8 @@ createApp({
             }
             return authorizedSubscriptionYears;
         }
-        async function searchUsers({pagination: newPagination}) {
+        async function searchUsers(options) {
+            const newPagination = options ? options.pagination : userSearchTablePagination.value;
             try {
                 userSearching.value = true;
                 foundUsers.length = 0;
@@ -705,11 +706,11 @@ createApp({
                         [newPagination.sortBy]: !newPagination.descending
                     }
                 };
-                if (userSearchTableOrder.value.sortBy != newPagination.sortBy) {
-                    userSearchTableOrder.value.secondSortBy = {[userSearchTableOrder.value.sortBy]: !userSearchTableOrder.value.descending};
+                if (userSearchTablePagination.value.sortBy != newPagination.sortBy && userSearchTablePagination.value.descending != newPagination.descending) {
+                    userSearchTablePagination.value.secondSortBy = {[userSearchTablePagination.value.sortBy]: !userSearchTablePagination.value.descending};
                 }
-                if (userSearchTableOrder.value.secondSortBy) {
-                    reqObj.sortBy = {...reqObj.sortBy, ...userSearchTableOrder.value.secondSortBy};
+                if (userSearchTablePagination.value.secondSortBy) {
+                    reqObj.sortBy = {...reqObj.sortBy, ...userSearchTablePagination.value.secondSortBy};
                 }
                 delete reqObj.zones;
                 delete reqObj.resp_zones;
@@ -736,11 +737,11 @@ createApp({
                         foundUsers.push(...users.data.users);
                         foundUsersTotal.value = users.data.total;
                         userSearchLimit.value = users.data.limit;
-                        userSearchTableOrder.value.rowsNumber = users.data.total;
-                        userSearchTableOrder.value.sortBy = Object.keys(users.data.sortBy[0])[0];
-                        userSearchTableOrder.value.descending = !Object.values(users.data.sortBy[0])[0];
+                        userSearchTablePagination.value.rowsNumber = users.data.total;
+                        userSearchTablePagination.value.sortBy = Object.keys(users.data.sortBy[0])[0];
+                        userSearchTablePagination.value.descending = !Object.values(users.data.sortBy[0])[0];
                         if (users.data.sortBy[1]) {
-                            userSearchTableOrder.value.secondSortBy = users.data.sortBy[1]
+                            userSearchTablePagination.value.secondSortBy = users.data.sortBy[1]
                         }
                     } else {
                         console.error('Unknown error');
@@ -1062,7 +1063,7 @@ createApp({
             parsePhone,
             foundUsersColumns,
             userSearching,
-            userSearchTableOrder
+            userSearchTablePagination
         };
     }
 })
