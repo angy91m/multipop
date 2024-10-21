@@ -39,7 +39,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                 <q-list>
 
                     <template v-for="(menuItem, index) in menuItems" :key="index">
-                        <q-separator v-if="menuItem.separator" />
+                        <q-separator v-if="menuItem.separator"></q-separator>
                         <q-item clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
                             <q-item-section avatar>
                             <!-- <q-icon :name="menuItem.icon" /> -->
