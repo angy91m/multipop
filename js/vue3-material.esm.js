@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, pushScopeId, popScopeId, openBlock, createBlock, Fragment, createVNode, renderSlot, withScopeId, resolveComponent, toDisplayString, createCommentVNode, resolveDynamicComponent, renderList, onMounted, Teleport } from 'vue';
+import { defineComponent, ref, computed, pushScopeId, popScopeId, openBlock, createBlock, Fragment, createVNode, renderSlot, withScopeId, resolveComponent, toDisplayString, createCommentVNode, resolveDynamicComponent, renderList, onMounted, Teleport } from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
 
 // vue
 var script = defineComponent({
