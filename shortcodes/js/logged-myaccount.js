@@ -948,7 +948,7 @@ createApp({
             const url = new URL(location);
             if (url.searchParams.has('view-user') && profile.role == 'administrator') {
                 selectedTab.value.name = 'userView';
-                viewUser(url.searchParams.get('view-user'), false, true);
+                viewUser(url.searchParams.get('view-user'), true);
             }
             if (!historyTabs.length) {
                 historyTabs.unshift(selectedTab.value);
