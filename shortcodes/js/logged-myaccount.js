@@ -743,6 +743,7 @@ createApp({
                         if (users.data.sortBy[1]) {
                             userSearchTablePagination.value.secondSortBy = users.data.sortBy[1]
                         }
+                        console.log(userSearchTablePagination);
                     } else {
                         console.error('Unknown error');
                     }
