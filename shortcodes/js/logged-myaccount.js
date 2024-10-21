@@ -2,8 +2,8 @@ import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import * as Vue from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
-import { MdTable } from '/wp-content/plugins/multipop/js/vue-material/dist/components/index.js';
-console.log(MdTable);
+import * as Mod from '/wp-content/plugins/multipop/js/vue-material/dist/components/index.js';
+console.log(Mod);
 const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
