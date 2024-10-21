@@ -397,6 +397,32 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         <br>
                         <el-table :data="foundUsers" style="width: 100%">
                             <el-table-column prop="ID" label="ID" />
+                            <el-table-column prop="login" label="Login" />
+                            <el-table-column prop="email" label="E-mail" />
+                            <el-table-column label="E-mail da confermare">
+                                <template #default="scope">
+                                    <span>{{ scope.row.mpop_mail_to_confirm ? 'Sì' : 'No' }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="Tessera attiva">
+                                <template #default="scope">
+                                    <span>{{ scope.row.mpop_card_active ? 'Sì' : 'No' }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="Ruolo">
+                                <template #default="scope">
+                                    <span>{{ showRole(scope.row.role) }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="first_name" label="Nome" />
+                            <el-table-column prop="last_name" label="Cognome" />
+                            <el-table-column prop="mpop_billing_state" label="Provincia" />
+                            <el-table-column prop="mpop_billing_city" label="Comune" />
+                            <el-table-column label="Zone">
+                                <template #default="scope">
+                                    <span v-html="showZones(u.mpop_resp_zones)"></span>
+                                </template>
+                            </el-table-column>
                         </el-table>
                         <!-- <div class="mpop-table-container">
                             <table id="mpop-user-search-table">
