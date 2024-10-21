@@ -54,6 +54,9 @@
     top: 50px;
     position: absolute;
 }
+#app > div {
+    padding: 16px 0;
+}
 span.mpop-app-notice {
     border: solid 1px #aaa;
     display: block;
