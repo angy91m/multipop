@@ -405,6 +405,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             :rows-per-page-options="[0]"
                             :rows="foundUsers || []"
                             :columns="foundUsersColumns"
+                            @row-click="(_,row) =>viewUser(row.ID)"
                             hide-bottom
                         >
                             <template #body="props">
