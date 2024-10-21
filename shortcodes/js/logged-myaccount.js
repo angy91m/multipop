@@ -64,7 +64,7 @@ userCsvFields = [
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value;
 let searchUsersTimeout, triggerSearchTimeout;
 
-loadModule(`/wp-content/plugins/multipop/js/element-plus.js`, {
+loadModule(`https://unpkg.com/primevue@3.15.0/primevue.min.js`, {
     moduleCache: { vue: Vue },
     async getFile(url) {
         const response = await fetch(url);
@@ -75,7 +75,7 @@ loadModule(`/wp-content/plugins/multipop/js/element-plus.js`, {
         return { getContentData: asBinary => asBinary ? response.arrayBuffer() : response.text()};
     },
     addStyle() {}
-}).then((elemPlus)=>{
+}).then((PrimeVue)=>{
     createApp({
         components: {
             'v-select': defineAsyncComponent(() => vSel),
@@ -1031,6 +1031,6 @@ loadModule(`/wp-content/plugins/multipop/js/element-plus.js`, {
             };
         }
     })
-    .use(elemPlus)
+    .use(PrimeVue)
     .mount('#app');
 });
