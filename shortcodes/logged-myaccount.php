@@ -406,6 +406,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             :rows="foundUsers || []"
                             :columns="foundUsersColumns"
                             no-data-label="Nessun utente trovato"
+                            @sort="col=>console.log(col)"
                             hide-bottom
                         >
                             <template #body="props">
