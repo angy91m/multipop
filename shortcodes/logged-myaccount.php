@@ -67,7 +67,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 
         <q-page-container>
             <q-page padding>
-            <div v-if="selectedTab == 'summary'">
+            <div v-if="selectedTab.name == 'summary'">
                 <h3>Ciao {{helloName}}</h3>
                 <template v-if="!profileEditing">
                     <button class="mpop-button" @click="editProfile">Modifica profilo</button>
@@ -244,7 +244,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     </tr>
                 </table>
             </div>
-            <div v-if="selectedTab == 'passwordChange'">
+            <div v-if="selectedTab.name == 'passwordChange'">
                 <h3>Cambio password</h3>
                 <button class="mpop-button" :disabled="pwdChanging ||pwdChangeErrors.length || !pwdChangeFields.current" @click="changePassword">Cambia password</button>
                 <div id="mpop-passwordChange">
@@ -254,7 +254,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                 </div>
             </div>
             <!--CARD-->
-            <div v-if="selectedTab == 'card'">
+            <div v-if="selectedTab.name == 'card'">
                 <template v-if="profile.mpop_my_subscriptions">
                     <h3>Tessera</h3>
                     <h4 v-if="profile.mpop_card_active">La tua tessera è attiva</h4>
@@ -298,7 +298,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                 </template>
             </div>
             <!--USER_SEARCH-->
-            <div v-if="selectedTab == 'users'" id="mpop-user-search">
+            <div v-if="selectedTab.name == 'users'" id="mpop-user-search">
                 <h3>Utenti</h3>
                 <div class="mpop-user-search-field">
                     <input type="text" v-model="userSearch.txt" @input="triggerSearchUsers" placeholder="Nome, e-mail, username" />
@@ -449,7 +449,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                 </q-table>
             </div>
             <!--USER_VIEW-->
-            <div v-if="selectedTab == 'userView'" id="mpop-user-view"><template v-if="userInView">
+            <div v-if="selectedTab.name == 'userView'" id="mpop-user-view"><template v-if="userInView">
                 <h3>{{userInView.ID}} - {{userInView.login}}</h3>
                 <template v-if="profile.role == 'administrator'">
                     <a :href="'/wp-admin/user-edit.php?user_id='+userInView.ID" target="_blank">Vedi in dashboard&nbsp;<?=$this::dashicon('external')?></a>
@@ -703,7 +703,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                 </table>
             </template></div>
             <!--UPLOAD_USER_CSV-->
-            <div v-if="selectedTab == 'uploadUserCsv'">
+            <div v-if="selectedTab.name == 'uploadUserCsv'">
                 <input type="file" @change="loadUsersFromCsv">
                 <table class="mpop-import-csv-table">
                     <thead>
