@@ -77,13 +77,16 @@ menuItems = [{
 }, {
     separator: true,
     name: 'users',
-    label: 'Utenti'
+    label: 'Utenti',
+    admin: true
 }, {
     name: 'subscriptions',
-    label: 'Tessere'
+    label: 'Tessere',
+    admin: true
 }, {
     name: 'uploadUserCsv',
-    label: 'Carica CSV Utenti'
+    label: 'Carica CSV Utenti',
+    admin: true
 }],
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value;
 let searchUsersTimeout, triggerSearchTimeout;
