@@ -693,6 +693,7 @@ createApp({
         }
         async function searchUsers(options) {
             const newPagination = options ? options.pagination : userSearchTablePagination.value;
+            console.log(newPagination);
             try {
                 userSearching.value = true;
                 foundUsers.length = 0;
