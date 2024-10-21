@@ -413,7 +413,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                         <span v-html="props.row.mpop_resp_zones"></span>
                                     </template>
                                     <template v-else>
-                                        {{ props.row[prop] }}
+                                        {{ props.row[prop.name] }}
                                     </template>
                                 </q-td>
                             </template>
