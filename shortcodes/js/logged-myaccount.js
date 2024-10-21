@@ -102,7 +102,7 @@ createApp({
         pageTitle = computed(() => {
             return selectedTab.value.name == 'summary' ? 'Ciao' + (profile? (' ' + (profile.first_name ||profile.login)) : '') : selectedTab.value.label;
         }),
-        displayNav = ref(false),
+        displayNav = ref(true),
         profile = reactive({}),
         profileInEditing = reactive({}),
         userInEditing = reactive({}),
