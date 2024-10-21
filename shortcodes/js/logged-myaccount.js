@@ -744,6 +744,8 @@ createApp({
                         userSearchTablePagination.value.rowsNumber = users.data.total;
                         userSearchTablePagination.value.sortBy = Object.keys(users.data.sortBy[0])[0];
                         userSearchTablePagination.value.descending = !Object.values(users.data.sortBy[0])[0];
+                        newPagination.sortBy = userSearchTablePagination.value.sortBy;
+                        newPagination.descending = userSearchTablePagination.value.descending;
                         if (users.data.sortBy[1]) {
                             userSearchTablePagination.value.secondSortBy = users.data.sortBy[1]
                         }
