@@ -1,4 +1,4 @@
-console.log(window);console.log(Vue);
+const { mergeModels: i2, useModel: T2, ref: I1, onMounted: N2, watch: A2, onUnmounted: E2, withDirectives: D2, openBlock: M2, createElementBlock: P2, mergeProps: x2, vModelText: R2 } = Vue;
 const n2 = [
   [
     "af",
