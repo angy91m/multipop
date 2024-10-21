@@ -66,7 +66,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
             </q-drawer>
 
         <q-page-container>
-            <q-page padding>
+            <q-page>
             <div v-if="selectedTab.name == 'summary'">
                 <h3>Ciao {{helloName}}</h3>
                 <template v-if="!profileEditing">
