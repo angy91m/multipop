@@ -710,7 +710,7 @@ createApp({
                 console.log(newPagination.descending);
                 console.log(userSearchTablePagination.value.sortBy);
                 console.log(userSearchTablePagination.value.descending);
-                if (userSearchTablePagination.value.sortBy != newPagination.sortBy && userSearchTablePagination.value.descending != newPagination.descending) {
+                if (userSearchTablePagination.value.sortBy != newPagination.sortBy) {
                     userSearchTablePagination.value.secondSortBy = {[userSearchTablePagination.value.sortBy]: !userSearchTablePagination.value.descending};
                 }
                 if (userSearchTablePagination.value.secondSortBy) {
