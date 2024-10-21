@@ -67,7 +67,7 @@ userCsvFields = [
 ],
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value;
 let searchUsersTimeout, triggerSearchTimeout;
-console.log(Quasar);
+console.log(IntlTelInput);
 createApp({
     components: {
         'v-select': defineAsyncComponent(() => vSel),
