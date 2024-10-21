@@ -727,7 +727,7 @@ createApp({
                         foundUsersTotal.value = users.data.total;
                         userSearchLimit.value = users.data.limit;
                         userSearchTableOrder.sortBy = Object.keys(users.data.sortBy)[0];
-                        userSearchTableOrder.sortBy = Object.values(users.data.sortBy)[0];
+                        userSearchTableOrder.descending = !Object.values(users.data.sortBy)[0];
                     } else {
                         console.error('Unknown error');
                     }
