@@ -20,48 +20,48 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 <div id="app">
     <span v-for="(notice, noticeInd) in userNotices" :class="'mpop-app-notice' + ' notice-' + notice.type"><span @click="dismissNotice(noticeInd)"><?=$this::dashicon('no-alt')?></span><span v-html="notice.msg"></span></span>
     <div class="q-pa-md">
-        <q-layout view="hHh Lpr lff" style="height: 300px" class="shadow-2 rounded-borders">
-            <q-header elevated :class="$q.dark.isActive ? 'bg-secondary' : 'bg-black'">
+        <q-layout view="hHh Lpr lff" class="shadow-2 rounded-borders">
+            <q-header elevated :class="$q.dark.isActive ? 'bg-secondary' : 'bg-black'" style="position: relative">
                 <q-toolbar>
                 <q-btn flat @click="displayNav = !displayNav" round dense icon="menu" />
                 <q-toolbar-title>{{selectedTab.label}}</q-toolbar-title>
                 </q-toolbar>
             </q-header>
 
-        <q-drawer
-            v-model="displayNav"
-            :width="200"
-            :breakpoint="500"
-            bordered
-            :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-3'"
-        >
-            <q-scroll-area class="fit">
-            <q-list>
+            <q-drawer
+                v-model="displayNav"
+                :width="200"
+                :breakpoint="500"
+                bordered
+                :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-3'"
+            >
+                <q-scroll-area class="fit">
+                <q-list>
 
-                <template v-for="(menuItem, index) in menuItems" :key="index">
-                    <q-item v-if="!menuItem.admin" clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
-                        <q-item-section avatar>
-                        <!-- <q-icon :name="menuItem.icon" /> -->
-                        </q-item-section>
-                        <q-item-section>
-                        {{ menuItem.label }}
-                        </q-item-section>
-                    </q-item>
-                </template>
-                <q-separator/>
-                <template v-for="(menuItem, index) in menuItems" :key="index">
-                    <q-item v-if="menuItem.admin" clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
-                        <q-item-section avatar>
-                        <!-- <q-icon :name="menuItem.icon" /> -->
-                        </q-item-section>
-                        <q-item-section>
-                        {{ menuItem.label }}
-                        </q-item-section>
-                    </q-item>
-                </template>
-            </q-list>
-            </q-scroll-area>
-        </q-drawer>
+                    <template v-for="(menuItem, index) in menuItems" :key="index">
+                        <q-item v-if="!menuItem.admin" clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
+                            <q-item-section avatar>
+                            <!-- <q-icon :name="menuItem.icon" /> -->
+                            </q-item-section>
+                            <q-item-section>
+                            {{ menuItem.label }}
+                            </q-item-section>
+                        </q-item>
+                    </template>
+                    <q-separator/>
+                    <template v-for="(menuItem, index) in menuItems" :key="index">
+                        <q-item v-if="menuItem.admin" clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
+                            <q-item-section avatar>
+                            <!-- <q-icon :name="menuItem.icon" /> -->
+                            </q-item-section>
+                            <q-item-section>
+                            {{ menuItem.label }}
+                            </q-item-section>
+                        </q-item>
+                    </template>
+                </q-list>
+                </q-scroll-area>
+            </q-drawer>
 
         <q-page-container>
             <q-page padding>
