@@ -952,17 +952,21 @@ createApp({
             return role;
         }
         const foundUsersColumns = reactive([
-            {name: 'ID', align: 'left', label: 'ID', field: 'ID'},
-            {name: 'login', align: 'left', label: 'Login', field: 'login'},
-            {name: 'email', align: 'left', label: 'E-mail', field: 'email'},
-            {name: 'mpop_mail_to_confirm', align: 'left', label: 'E-mail da confermare', field: 'mpop_mail_to_confirm', format: val => val ? 'Sì': 'No'},
-            {name: 'mpop_card_active', align: 'left', label: 'Tessera attiva', field: 'mpop_card_active', format: val => val ? 'Sì': 'No'},
-            {name: 'first_name', align: 'left', label: 'Nome', field: 'first_name'},
-            {name: 'last_name', align: 'left', label: 'Cognome', field: 'last_name'},
-            {name: 'mpop_billing_state', align: 'left', label: 'Provincia', field: 'mpop_billing_state'},
-            {name: 'mpop_billing_city', align: 'left', label: 'Comune', field: 'mpop_billing_city'},
-            {name: 'mpop_resp_zones', align: 'left', label: 'Zone', field: 'mpop_resp_zones'},
-        ]);
+            {name: 'ID', label: 'ID'},
+            {name: 'login', label: 'Login'},
+            {name: 'email', label: 'E-mail'},
+            {name: 'mpop_mail_to_confirm', label: 'E-mail da confermare', format: val => val ? 'Sì': 'No'},
+            {name: 'mpop_card_active', label: 'Tessera attiva', format: val => val ? 'Sì': 'No'},
+            {name: 'first_name', label: 'Nome'},
+            {name: 'last_name', label: 'Cognome'},
+            {name: 'mpop_billing_state', label: 'Provincia'},
+            {name: 'mpop_billing_city', label: 'Comune'},
+            {name: 'mpop_resp_zones', label: 'Zone'},
+        ].map(col => {
+            col.align = 'left';
+            col.field = col.name;
+            return col;
+        }));
         return {
             selectedTab,
             profile,
