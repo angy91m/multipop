@@ -3,8 +3,8 @@ import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import * as Vue from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
 window.Vue = Vue;
-import '/wp-content/plugins/multipop/js/vue-material/dist/vue-material.min.js';
-console.log(VueMaterial.default);
+import * as VueMaterial from '/wp-content/plugins/multipop/js/vue-material/dist/vue-material.min.js';
+console.log(VueMaterial);
 const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
