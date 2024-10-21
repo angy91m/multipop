@@ -19,12 +19,6 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 <div id="loaded-scripts" style="display:none"></div>
 <div id="app">
     <span v-for="(notice, noticeInd) in userNotices" :class="'mpop-app-notice' + ' notice-' + notice.type"><span @click="dismissNotice(noticeInd)"><?=$this::dashicon('no-alt')?></span><span v-html="notice.msg"></span></span>
-    <q-table
-        :rows-per-page-options="[0]"
-        :rows="foundUsers || []"
-        :columns="foundUsersColumns"
-        hide-bottom
-    />
     <table id="mpop-main-table">
         <tr>
             <td>
@@ -407,6 +401,12 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             <button class="mpop-button" @click="changeUserSearchPage(foundUsersPageTotal)" v-if="userSearch.page != foundUsersPageTotal && !pageButtons.includes(foundUsersPageTotal) && userSearch.page +2 <= foundUsersPageTotal" style="width:auto">Fine</button>
                         </div>
                         <br>
+                        <q-table
+                            :rows-per-page-options="[0]"
+                            :rows="foundUsers || []"
+                            :columns="foundUsersColumns"
+                            hide-bottom
+                        />
                         <!-- <el-table :data="foundUsers" style="width: 100%">
                             <el-table-column prop="ID" label="ID" />
                             <el-table-column prop="login" label="Login" />
