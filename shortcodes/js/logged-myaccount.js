@@ -108,7 +108,7 @@ createApp({
             rowsPerPage: 1000,
             rowsNumber: 0,
             page: 1,
-            lastSortBy: []
+            secondSortBy: null
         }),
         userSearch = reactive({
             txt: '',
@@ -691,9 +691,7 @@ createApp({
             }
             return authorizedSubscriptionYears;
         }
-        async function searchUsers(...args) {
-            console.log(args);
-            console.log(userSearchTableOrder.value);
+        async function searchUsers({pagination: newPagination}) {
             try {
                 userSearching.value = true;
                 foundUsers.length = 0;
@@ -704,17 +702,14 @@ createApp({
                     mpop_billing_city: [],
                     mpop_resp_zones: [],
                     sortBy: {
-                        [userSearchTableOrder.value.sortBy]: !userSearchTableOrder.value.descending
+                        [newPagination.sortBy]: !newPagination.descending
                     }
                 };
-                if(userSearchTableOrder.value.lastSortBy.length) {
-                    if (Object.keys(userSearchTableOrder.value.lastSortBy[0])[0] == userSearchTableOrder.value.lastSortBy) {
-                        if (userSearchTableOrder.value.lastSortBy[1]) {
-                            reqObj.sortBy = {...reqObj.sortBy, ...userSearchTableOrder.value.lastSortBy[1]};
-                        }
-                    } else {
-                        reqObj.sortBy = {...reqObj.sortBy, ...userSearchTableOrder.value.lastSortBy[0]};
-                    }
+                if (userSearchTableOrder.value.sortBy != newPagination.sortBy) {
+                    userSearchTableOrder.value.secondSortBy = {[userSearchTableOrder.value.sortBy]: !userSearchTableOrder.value.descending};
+                }
+                if (userSearchTableOrder.value.secondSortBy) {
+                    reqObj.sortBy = {...reqObj.sortBy, ...userSearchTableOrder.value.secondSortBy};
                 }
                 delete reqObj.zones;
                 delete reqObj.resp_zones;
@@ -744,7 +739,9 @@ createApp({
                         userSearchTableOrder.value.rowsNumber = users.data.total;
                         userSearchTableOrder.value.sortBy = Object.keys(users.data.sortBy[0])[0];
                         userSearchTableOrder.value.descending = !Object.values(users.data.sortBy[0])[0];
-                        userSearchTableOrder.value.lastSortBy = users.data.sortBy;
+                        if (users.data.sortBy[1]) {
+                            userSearchTableOrder.value.secondSortBy = users.data.sortBy[1]
+                        }
                     } else {
                         console.error('Unknown error');
                     }
