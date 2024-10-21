@@ -706,10 +706,10 @@ createApp({
                         [newPagination.sortBy]: !newPagination.descending
                     }
                 };
-                // console.log(newPagination.sortBy);
-                // console.log(newPagination.descending);
-                // console.log(userSearchTablePagination.value.sortBy);
-                // console.log(userSearchTablePagination.value.descending);
+                console.log(newPagination.sortBy);
+                console.log(newPagination.descending);
+                console.log(userSearchTablePagination.value.sortBy);
+                console.log(userSearchTablePagination.value.descending);
                 if (userSearchTablePagination.value.sortBy != newPagination.sortBy && userSearchTablePagination.value.descending != newPagination.descending) {
                     userSearchTablePagination.value.secondSortBy = {[userSearchTablePagination.value.sortBy]: !userSearchTablePagination.value.descending};
                 }
