@@ -51,7 +51,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     <template v-if="profile.role == 'administrator'">
                         <q-separator />
                         <template v-for="(menuItem, index) in menuItems" :key="index">
-                            <q-item v-if="menuItem.admin " clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
+                            <q-item v-if="menuItem.admin" clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
                                 <q-item-section avatar>
                                 <!-- <q-icon :name="menuItem.icon" /> -->
                                 </q-item-section>
