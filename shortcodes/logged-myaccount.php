@@ -14,6 +14,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/logged-myaccount.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-tel-input.css">
+<link href="https://cdn.jsdelivr.net/npm/quasar@2.17.1/dist/quasar.prod.css" rel="stylesheet" type="text/css">
 <div id="loaded-scripts" style="display:none"></div>
 <div id="app">
     <span v-for="(notice, noticeInd) in userNotices" :class="'mpop-app-notice' + ' notice-' + notice.type"><span @click="dismissNotice(noticeInd)"><?=$this::dashicon('no-alt')?></span><span v-html="notice.msg"></span></span>
@@ -742,5 +743,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 <script type="application/json" id="__MULTIPOP_DATA__">{
     "user": <?=json_encode($parsed_user)?>
 }</script>
+<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quasar@2.17.1/dist/quasar.umd.prod.js"></script>
 <script type="module" src="<?=plugins_url()?>/multipop/shortcodes/js/logged-myaccount.js"></script>
 <?php
