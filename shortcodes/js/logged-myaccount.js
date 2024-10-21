@@ -961,7 +961,7 @@ createApp({
             {name: 'last_name', label: 'Cognome', field: 'last_name'},
             {name: 'mpop_billing_state', label: 'Provincia', field: 'mpop_billing_state'},
             {name: 'mpop_billing_city', label: 'Comune', field: 'mpop_billing_city'},
-            {name: 'mpop_resp_zones', label: 'Zone', field: 'mpop_resp_zones', format: val => showZones(val)},
+            {name: 'mpop_resp_zones', label: 'Zone', field: 'mpop_resp_zones'},
         ]);
         return {
             selectedTab,
