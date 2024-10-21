@@ -75,7 +75,6 @@ menuItems = [{
     name: 'card',
     label: 'Tessera'
 }, {
-    separator: true,
     name: 'users',
     label: 'Utenti',
     admin: true
