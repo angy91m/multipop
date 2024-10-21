@@ -891,8 +891,8 @@ createApp({
                 delete userInEditing[key];
             }
         }
-        function selectTab(tab = {name: ''}, popstate = false) {
-            if (selectedTab.value.name != tab.name) {
+        function selectTab(tab, popstate = false) {
+            if (!tab || selectedTab.value.name != tab.name) {
                 cancelEditProfile();
                 cancelEditUser();
                 const url = new URL(location);
