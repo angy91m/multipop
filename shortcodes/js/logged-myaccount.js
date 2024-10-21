@@ -2,7 +2,8 @@ import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import * as Vue from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
-import Vue3Material from '/wp-content/plugins/multipop/js/vue3-material.esm.js';
+window.Vue = Vue;
+import 'https://cdn.jsdelivr.net/npm/quasar@2.17.1/dist/quasar.umd.prod.js';
 const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
@@ -68,7 +69,7 @@ userCsvFields = [
 ],
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value;
 let searchUsersTimeout, triggerSearchTimeout;
-console.log(Vue3Material);
+console.log(Quasar);
 createApp({
     components: {
         'v-select': defineAsyncComponent(() => vSel),
