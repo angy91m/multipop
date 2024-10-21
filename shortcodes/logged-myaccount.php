@@ -245,7 +245,6 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                 </table>
             </div>
             <div v-if="selectedTab.name == 'passwordChange'">
-                <h3>Cambio password</h3>
                 <button class="mpop-button" :disabled="pwdChanging ||pwdChangeErrors.length || !pwdChangeFields.current" @click="changePassword">Cambia password</button>
                 <div id="mpop-passwordChange">
                     <input v-model="pwdChangeFields.current" @input="staticPwdErrors.length = 0" :class="pwdChangeErrors.includes('current') ? 'bad-input' : ''" type="password" placeholder="Password attuale"/>
@@ -256,7 +255,6 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
             <!--CARD-->
             <div v-if="selectedTab.name == 'card'">
                 <template v-if="profile.mpop_my_subscriptions">
-                    <h3>Tessera</h3>
                     <h4 v-if="profile.mpop_card_active">La tua tessera è attiva</h4>
                     <div>
                         <ul v-if="nearActiveSub">
@@ -299,7 +297,6 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
             </div>
             <!--USER_SEARCH-->
             <div v-if="selectedTab.name == 'users'" id="mpop-user-search">
-                <h3>Utenti</h3>
                 <div class="mpop-user-search-field">
                     <input type="text" v-model="userSearch.txt" @input="triggerSearchUsers" placeholder="Nome, e-mail, username" />
                 </div>
