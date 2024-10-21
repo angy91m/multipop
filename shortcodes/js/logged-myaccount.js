@@ -4,7 +4,6 @@ import * as Vue from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
 const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
-loadedComponents = {},
 loadVueModule = (...modules) => {
     const loaded = [];
     modules.forEach(path => loaded.push(loadModule('/wp-content/plugins/multipop/js/'+ path, {
@@ -21,7 +20,7 @@ loadVueModule = (...modules) => {
     })));
     return loaded;
 },
-[vSel] = loadVueModule('vue-select.js'),
+[vSel, MdTable] = loadVueModule('vue-select.js', 'vue-material/dist/components/MdTable/index.js'),
 mailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/s,
 passwordRegex = {
     rr: [
@@ -1023,4 +1022,5 @@ createApp({
         };
     }
 })
+.use(defineAsyncComponent(()=> MdTable))
 .mount('#app');
