@@ -406,9 +406,11 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             :rows="foundUsers || []"
                             :columns="foundUsersColumns"
                             no-data-label="Nessun utente trovato"
-                            :sort-method="(rows,sortBy,desc)=>{console.log(sortBy);console.log(desc);}"
+                            :sort-method="(rows,sortBy,desc)=>{console.log(sortBy);console.log(desc);return rows;}"
                             hide-bottom
                             :loading="userSearching"
+                            binary-state-sort
+                            column-sort-order="ad"
                         >
                             <template #body="props">
                                 <q-tr :props="props" @click="()=>viewUser(props.row.ID)" class="mpop-click">
