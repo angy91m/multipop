@@ -102,6 +102,10 @@ createApp({
         csvUsers = reactive([]),
         profilePhoneInput = ref('profilePhoneInput'),
         userEditPhoneInput = ref('userEditPhoneInput'),
+        userSearchTableOrder = ref({
+            sortBy: 'desc',
+            descending: false
+        }),
         userSearch = reactive({
             txt: '',
             roles: [
@@ -722,7 +726,8 @@ createApp({
                         foundUsers.push(...users.data.users);
                         foundUsersTotal.value = users.data.total;
                         userSearchLimit.value = users.data.limit;
-                        userSearch.sortBy = users.data.sortBy;
+                        userSearchTableOrder.sortBy = Object.keys(users.data.sortBy)[0];
+                        userSearchTableOrder.sortBy = Object.values(users.data.sortBy)[0];
                     } else {
                         console.error('Unknown error');
                     }
@@ -959,7 +964,7 @@ createApp({
             return role;
         }
         const foundUsersColumns = reactive([
-            {name: 'ID', label: 'ID', sortable: true, sorted: true},
+            {name: 'ID', label: 'ID', sortable: true},
             {name: 'login', label: 'Login', sortable: true},
             {name: 'email', label: 'E-mail', sortable: true},
             {name: 'mpop_mail_to_confirm', label: 'E-mail da confermare', sortable: true, format: val => val ? 'Sì': 'No'},
@@ -1043,7 +1048,8 @@ createApp({
             userEditPhoneInput,
             parsePhone,
             foundUsersColumns,
-            userSearching
+            userSearching,
+            userSearchTableOrder
         };
     }
 })
