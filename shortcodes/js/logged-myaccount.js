@@ -104,7 +104,11 @@ createApp({
         userEditPhoneInput = ref('userEditPhoneInput'),
         userSearchTableOrder = ref({
             sortBy: 'ID',
-            descending: false
+            descending: false,
+            rowsPerPage: 1000,
+            rowsNumber: 0,
+            page: 1,
+            lastSortBy: []
         }),
         userSearch = reactive({
             txt: '',
@@ -114,9 +118,6 @@ createApp({
                 'administrator'
             ],
             page: 1,
-            sortBy: {
-                ID: true
-            },
             zones: [],
             resp_zones: [],
             mpop_card_active: null,
@@ -699,8 +700,20 @@ createApp({
                     ...userSearch,
                     mpop_billing_state: [],
                     mpop_billing_city: [],
-                    mpop_resp_zones: []
+                    mpop_resp_zones: [],
+                    sortBy: {
+                        [userSearchTableOrder.sortBy]: !userSearchTableOrder.descending
+                    }
                 };
+                if(userSearchTableOrder.lastSortBy.length) {
+                    if (Object.keys(userSearchTableOrder.lastSortBy[0])[0] == userSearchTableOrder.lastSortBy) {
+                        if (userSearchTableOrder.lastSortBy[1]) {
+                            reqObj.sortBy = {...reqObj.sortBy, ...userSearchTableOrder.lastSortBy[1]};
+                        }
+                    } else {
+                        reqObj.sortBy = {...reqObj.sortBy, ...userSearchTableOrder.lastSortBy[0]};
+                    }
+                }
                 delete reqObj.zones;
                 delete reqObj.resp_zones;
                 userSearch.zones.forEach(z => {
@@ -726,9 +739,9 @@ createApp({
                         foundUsers.push(...users.data.users);
                         foundUsersTotal.value = users.data.total;
                         userSearchLimit.value = users.data.limit;
-                        userSearchTableOrder.value.sortBy = Object.keys(users.data.sortBy)[0];
-                        userSearchTableOrder.value.descending = !Object.values(users.data.sortBy)[0];
-                        userSearch.sortBy = users.data.sortBy;
+                        userSearchTableOrder.value.sortBy = Object.keys(users.data.sortBy[0])[0];
+                        userSearchTableOrder.value.descending = !Object.values(users.data.sortBy[0])[0];
+                        userSearchTableOrder.lastSortBy = users.data.sortBy;
                     } else {
                         console.error('Unknown error');
                     }
