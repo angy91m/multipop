@@ -405,6 +405,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             :rows-per-page-options="[0]"
                             :rows="foundUsers || []"
                             :columns="foundUsersColumns"
+                            no-data-label="Nessun utente trovato"
                             hide-bottom
                         >
                             <template #body="props">
