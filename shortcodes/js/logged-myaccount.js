@@ -118,6 +118,7 @@ createApp({
             mpop_card_active: null,
             mpop_mail_to_confirm: null
         }),
+        userSearching = ref(false),
         zoneSearch = reactive({
             users: [],
             users_resp: [],
@@ -686,54 +687,59 @@ createApp({
             return authorizedSubscriptionYears;
         }
         async function searchUsers() {
-            foundUsers.length = 0;
-            const reqObj = {
-                action: 'admin_search_users',
-                ...userSearch,
-                mpop_billing_state: [],
-                mpop_billing_city: [],
-                mpop_resp_zones: []
-            };
-            delete reqObj.zones;
-            delete reqObj.resp_zones;
-            userSearch.zones.forEach(z => {
-                if (z.type == 'regione') reqObj.mpop_billing_state.push(...Object.keys(z.province));
-                if (z.type == 'provincia') reqObj.mpop_billing_state.push(z.sigla);
-                if (z.type == 'comune') reqObj.mpop_billing_city.push(z.codiceCatastale);
-            });
-            userSearch.resp_zones.forEach(z => {
-                if (z.type == 'regione') {
-                    reqObj.mpop_resp_zones.push('reg_' + z.nome, ...Object.keys(z.province));
-                    for (const k in z.province) {
-                        reqObj.mpop_resp_zones.push(...z.province[k]);
+            try {
+                userSearching.value = true;
+                foundUsers.length = 0;
+                const reqObj = {
+                    action: 'admin_search_users',
+                    ...userSearch,
+                    mpop_billing_state: [],
+                    mpop_billing_city: [],
+                    mpop_resp_zones: []
+                };
+                delete reqObj.zones;
+                delete reqObj.resp_zones;
+                userSearch.zones.forEach(z => {
+                    if (z.type == 'regione') reqObj.mpop_billing_state.push(...Object.keys(z.province));
+                    if (z.type == 'provincia') reqObj.mpop_billing_state.push(z.sigla);
+                    if (z.type == 'comune') reqObj.mpop_billing_city.push(z.codiceCatastale);
+                });
+                userSearch.resp_zones.forEach(z => {
+                    if (z.type == 'regione') {
+                        reqObj.mpop_resp_zones.push('reg_' + z.nome, ...Object.keys(z.province));
+                        for (const k in z.province) {
+                            reqObj.mpop_resp_zones.push(...z.province[k]);
+                        }
                     }
-                }
-                if (z.type == 'provincia') reqObj.mpop_resp_zones.push(z.sigla, ...z.comuni);
-                if (z.type == 'comune') reqObj.mpop_resp_zones.push(z.codiceCatastale);
-            });
-            reqObj.mpop_resp_zones = Array.from(new Set(reqObj.mpop_resp_zones));
-            const res = await serverReq(reqObj);
-            if (res.ok) {
-                const users = await res.json();
-                if (users.data && users.data.users) {
-                    foundUsers.push(...users.data.users);
-                    foundUsersTotal.value = users.data.total;
-                    userSearchLimit.value = users.data.limit;
-                } else {
-                    console.error('Unknown error');
-                }
-                generateNotices(users.notices || []);
-            } else {
-                try {
-                    const {error} = await res.json();
-                    if (error) {
-                        console.error(error);
+                    if (z.type == 'provincia') reqObj.mpop_resp_zones.push(z.sigla, ...z.comuni);
+                    if (z.type == 'comune') reqObj.mpop_resp_zones.push(z.codiceCatastale);
+                });
+                reqObj.mpop_resp_zones = Array.from(new Set(reqObj.mpop_resp_zones));
+                const res = await serverReq(reqObj);
+                if (res.ok) {
+                    const users = await res.json();
+                    if (users.data && users.data.users) {
+                        foundUsers.push(...users.data.users);
+                        foundUsersTotal.value = users.data.total;
+                        userSearchLimit.value = users.data.limit;
                     } else {
                         console.error('Unknown error');
                     }
-                } catch {
-                    console.error('Unknown error');
+                    generateNotices(users.notices || []);
+                } else {
+                    try {
+                        const {error} = await res.json();
+                        if (error) {
+                            console.error(error);
+                        } else {
+                            console.error('Unknown error');
+                        }
+                    } catch {
+                        console.error('Unknown error');
+                    }
                 }
+            } finally {
+                userSearching.value = false;
             }
         }
         function triggerSearchUsers() {
@@ -952,15 +958,15 @@ createApp({
             return role;
         }
         const foundUsersColumns = reactive([
-            {name: 'ID', label: 'ID'},
-            {name: 'login', label: 'Login'},
-            {name: 'email', label: 'E-mail'},
-            {name: 'mpop_mail_to_confirm', label: 'E-mail da confermare', format: val => val ? 'Sì': 'No'},
-            {name: 'mpop_card_active', label: 'Tessera attiva', format: val => val ? 'Sì': 'No'},
-            {name: 'first_name', label: 'Nome'},
-            {name: 'last_name', label: 'Cognome'},
-            {name: 'mpop_billing_state', label: 'Provincia'},
-            {name: 'mpop_billing_city', label: 'Comune'},
+            {name: 'ID', label: 'ID', sortable: true},
+            {name: 'login', label: 'Login', sortable: true},
+            {name: 'email', label: 'E-mail', sortable: true},
+            {name: 'mpop_mail_to_confirm', label: 'E-mail da confermare', sortable: true, format: val => val ? 'Sì': 'No'},
+            {name: 'mpop_card_active', label: 'Tessera attiva', sortable: true, format: val => val ? 'Sì': 'No'},
+            {name: 'first_name', label: 'Nome', sortable: true},
+            {name: 'last_name', label: 'Cognome', sortable: true},
+            {name: 'mpop_billing_state', label: 'Provincia', sortable: true},
+            {name: 'mpop_billing_city', label: 'Comune', sortable: true},
             {name: 'mpop_resp_zones', label: 'Zone'},
         ].map(col => {
             col.align = 'left';
@@ -1035,7 +1041,8 @@ createApp({
             profilePhoneInput,
             userEditPhoneInput,
             parsePhone,
-            foundUsersColumns
+            foundUsersColumns,
+            userSearching
         };
     }
 })
