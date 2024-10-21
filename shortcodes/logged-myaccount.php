@@ -21,7 +21,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
     <span v-for="(notice, noticeInd) in userNotices" :class="'mpop-app-notice' + ' notice-' + notice.type"><span @click="dismissNotice(noticeInd)"><?=$this::dashicon('no-alt')?></span><span v-html="notice.msg"></span></span>
     <div class="q-pa-md">
         <q-layout view="hHh Lpr lff" class="shadow-2 rounded-borders">
-            <q-header elevated :class="bg-red-9" style="position: relative">
+            <q-header elevated class="bg-red-9" style="position: relative">
                 <q-toolbar>
                 <q-btn flat @click="displayNav = !displayNav" round dense icon="menu" />
                 <q-toolbar-title>{{selectedTab.label}}</q-toolbar-title>
@@ -48,7 +48,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             </q-item-section>
                         </q-item>
                     </template>
-                    <template v-if="profile.role=='administrator'">
+                    <template v-if="profile.role == 'administrator'">
                         <q-separator />
                         <template v-for="(menuItem, index) in menuItems" :key="index">
                             <q-item v-if="menuItem.admin " clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
