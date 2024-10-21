@@ -18,7 +18,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 <div id="loaded-scripts" style="display:none"></div>
 <div id="app">
     <span v-for="(notice, noticeInd) in userNotices" :class="'mpop-app-notice' + ' notice-' + notice.type"><span @click="dismissNotice(noticeInd)"><?=$this::dashicon('no-alt')?></span><span v-html="notice.msg"></span></span>
-    <el-table :data="foundUsers ? []" style="width: 100%">
+    <el-table :data="foundUsers || []" style="width: 100%">
         <el-table-column prop="ID" label="ID" />
         <el-table-column prop="login" label="Login" />
         <!-- <el-table-column prop="email" label="E-mail" />
