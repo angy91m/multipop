@@ -30,7 +30,6 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 
         <q-drawer
             v-model="displayNav"
-            show-if-above
             :width="200"
             :breakpoint="500"
             bordered
