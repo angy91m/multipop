@@ -17,10 +17,10 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 <div id="loaded-scripts" style="display:none"></div>
 <div id="app">
     <span v-for="(notice, noticeInd) in userNotices" :class="'mpop-app-notice' + ' notice-' + notice.type"><span @click="dismissNotice(noticeInd)"><?=$this::dashicon('no-alt')?></span><span v-html="notice.msg"></span></span>
-    <DataTable :data="foundUsers || []" style="width: 100%">
-        <Column prop="ID" label="ID" />
-        <Column prop="login" label="Login" />
-        <Column prop="email" label="E-mail" />
+    <DataTable :value="foundUsers || []" style="width: 100%">
+        <Column field="ID" header="ID" />
+        <Column field="login" header="Login" />
+        <Column field="email" header="E-mail" />
     </DataTable>
     <table id="mpop-main-table">
         <tr>
