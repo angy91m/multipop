@@ -2,6 +2,8 @@ import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import * as Vue from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
+import { MdTable } from '/wp-content/plugins/multipop/js/vue-material/components/index.js';
+console.log(MdTable);
 const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
@@ -20,7 +22,7 @@ loadVueModule = (...modules) => {
     })));
     return loaded;
 },
-[vSel, MdTable] = loadVueModule('vue-select.js', 'vue-material/dist/components/MdTable/index.js'),
+[vSel] = loadVueModule('vue-select.js'),
 mailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/s,
 passwordRegex = {
     rr: [
