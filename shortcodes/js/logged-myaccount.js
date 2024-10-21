@@ -65,6 +65,25 @@ userCsvFields = [
     'mpop_org_role',
     'mpop_subscription_notes'
 ],
+menuItems = [{
+    name: 'summary',
+    label: 'Riepilogo'
+}, {
+    name: 'passwordChange',
+    label: 'Cambio password'
+}, {
+    name: 'card',
+    label: 'Tessera'
+}, {
+    name: 'users',
+    label: 'Utenti'
+}, {
+    name: 'subscriptions',
+    label: 'Tessere'
+}, {
+    name: 'uploadUserCsv',
+    label: 'Carica CSV Utenti'
+}],
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value;
 let searchUsersTimeout, triggerSearchTimeout;
 createApp({
@@ -76,7 +95,13 @@ createApp({
         function activeCardForYear(cards = [], year) {
             return cards.filter(c => c.year == year && ['completed', 'tosee', 'seen'].includes(c.status)).sort((a,b) => a.status == b.status ? (a.status == 'completed' ? b.completed_at-a.completed_at : b.updated_at_at-a.updated_at_at) : (a.status == 'completed' ? -1 : (b.status == 'completed' ? 1 : b.updated_at_at-a.updated_at_at) ) ).shift();
         }
-        const selectedTab = ref('summary'),
+        const selectedTab = ref({
+            name: 'summary',
+            label: 'Riepilogo'
+        }),
+        pageTitle = computed(() => {
+            return selectedTab.value.name == 'summary' ? 'Ciao' + (profile? (' ' + (profile.first_name ||profile.login)) : '') : selectedTab.value.label;
+        }),
         displayNav = ref(false),
         profile = reactive({}),
         profileInEditing = reactive({}),
@@ -623,7 +648,7 @@ createApp({
             if (replace) {
                 return history.replaceState(historyTabs, '', url.href);
             }
-            historyTabs.unshift(selectedTab.value);
+            historyTabs.unshift(selectedTab.value.name);
             return history.pushState(historyTabs, '', url.href);
         }
         async function viewUser(ID, popstate = false) {
@@ -866,26 +891,26 @@ createApp({
                 delete userInEditing[key];
             }
         }
-        function selectTab(tabName, popstate = false) {
-            if (selectedTab.value != tabName) {
+        function selectTab(tab, popstate = false) {
+            if (selectedTab.value.name != tab.name) {
                 cancelEditProfile();
                 cancelEditUser();
                 const url = new URL(location);
-                selectedTab.value = tabName || 'summary';
+                selectedTab.value = tab || {name: 'summary', label: 'Riepilogo'};
                 if (!popstate) {
-                    if (tabName != 'userView') {
+                    if (tab.name != 'userView') {
                         url.searchParams.delete('view-user');
                         pushQueryParams({'view-user': null});
                     }
                 } else if (url.searchParams.has('view-user')) {
                     viewUser(url.searchParams.get('view-user'), popstate);
                 }
-                if (tabName == 'card') {
+                if (tab.name == 'card') {
                     getAuthorizedSubscriptionYears();
                     getProfile();
-                } else if(tabName == 'summary') {
+                } else if(tab.name == 'summary') {
                     getProfile();
-                } else if (tabName == 'uploadUserCsv') {
+                } else if (tab.name == 'uploadUserCsv') {
                     if(!document.getElementById('xlsx-loader')){
                         const xlsxLoader = document.createElement('script'),
                         loadedScripts = document.getElementById('loaded-scripts');
@@ -921,11 +946,11 @@ createApp({
             window.addEventListener('popstate', onPopState);
             const url = new URL(location);
             if (url.searchParams.has('view-user') && profile.role == 'administrator') {
-                selectedTab.value = 'userView';
+                selectedTab.value.name = 'userView';
                 viewUser(url.searchParams.get('view-user'), false, true);
             }
             if (!historyTabs.length) {
-                historyTabs.unshift(selectedTab.value);
+                historyTabs.unshift(selectedTab.value.name);
                 history.replaceState(historyTabs, '', location.href);
             }
         });
@@ -1051,7 +1076,9 @@ createApp({
             parsePhone,
             foundUsersColumns,
             userSearching,
-            userSearchTablePagination
+            userSearchTablePagination,
+            pageTitle,
+            menuItems
         };
     }
 })

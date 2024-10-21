@@ -19,9 +19,63 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 <div id="loaded-scripts" style="display:none"></div>
 <div id="app">
     <span v-for="(notice, noticeInd) in userNotices" :class="'mpop-app-notice' + ' notice-' + notice.type"><span @click="dismissNotice(noticeInd)"><?=$this::dashicon('no-alt')?></span><span v-html="notice.msg"></span></span>
+    <div class="q-pa-md">
+        <q-layout view="hHh Lpr lff" container style="height: 300px" class="shadow-2 rounded-borders">
+            <q-header elevated :class="$q.dark.isActive ? 'bg-secondary' : 'bg-black'">
+                <q-toolbar>
+                <q-btn flat @click="displayNav = !displayNav" round dense icon="menu" />
+                <q-toolbar-title>{{pageTitle}}</q-toolbar-title>
+                </q-toolbar>
+            </q-header>
+
+        <q-drawer
+            v-model="displayNav"
+            show-if-above
+            :width="200"
+            :breakpoint="500"
+            bordered
+            :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-3'"
+        >
+            <q-scroll-area class="fit">
+            <q-list>
+
+                <template v-for="(menuItem, index) in menuItems" :key="index">
+                    <q-item v-if="!menuItem.admin" clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
+                        <q-item-section avatar>
+                        <!-- <q-icon :name="menuItem.icon" /> -->
+                        </q-item-section>
+                        <q-item-section>
+                        {{ menuItem.label }}
+                        </q-item-section>
+                    </q-item>
+                </template>
+                <q-separator :key="'sep' + index"  v-if="menuItem.separator" />
+                <template v-for="(menuItem, index) in menuItems" :key="index">
+                    <q-item v-if="menuItem.admin" clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
+                        <q-item-section avatar>
+                        <!-- <q-icon :name="menuItem.icon" /> -->
+                        </q-item-section>
+                        <q-item-section>
+                        {{ menuItem.label }}
+                        </q-item-section>
+                    </q-item>
+                </template>
+            </q-list>
+            </q-scroll-area>
+        </q-drawer>
+
+        <q-page-container>
+            <q-page padding>
+            <p v-for="n in 15" :key="n">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit nihil praesentium molestias a adipisci, dolore vitae odit, quidem consequatur optio voluptates asperiores pariatur eos numquam rerum delectus commodi perferendis voluptate?
+            </p>
+            </q-page>
+        </q-page-container>
+        </q-layout>
+    </div>
     <table id="mpop-main-table">
         <tr>
-            <td>
+            <!-- <td>
                 <div>
                     <label for="mpop-tabs-nav" @click="displayNav = !displayNav">Menù</label>
                     <nav id="mpop-tabs-nav" v-if="displayNav">
@@ -39,7 +93,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         </ul>
                     </nav>
                 </div>
-            </td>
+            </td> -->
             <td>
                 <div id="mpop-tabs">
                     <!--SUMMARY-->
@@ -423,69 +477,6 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 </q-tr>
                             </template>
                         </q-table>
-                        <!-- <el-table :data="foundUsers" style="width: 100%">
-                            <el-table-column prop="ID" label="ID" />
-                            <el-table-column prop="login" label="Login" />
-                            <el-table-column prop="email" label="E-mail" />
-                            <el-table-column label="E-mail da confermare">
-                                <template #default="scope">
-                                    <span>{{ scope.row.mpop_mail_to_confirm ? 'Sì' : 'No' }}</span>
-                                </template>
-                            </el-table-column>
-                            <el-table-column label="Tessera attiva">
-                                <template #default="scope">
-                                    <span>{{ scope.row.mpop_card_active ? 'Sì' : 'No' }}</span>
-                                </template>
-                            </el-table-column>
-                            <el-table-column label="Ruolo">
-                                <template #default="scope">
-                                    <span>{{ showRole(scope.row.role) }}</span>
-                                </template>
-                            </el-table-column>
-                            <el-table-column prop="first_name" label="Nome" />
-                            <el-table-column prop="last_name" label="Cognome" />
-                            <el-table-column prop="mpop_billing_state" label="Provincia" />
-                            <el-table-column prop="mpop_billing_city" label="Comune" />
-                            <el-table-column label="Zone">
-                                <template #default="scope">
-                                    <span v-html="showZones(scope.row.mpop_resp_zones)"></span>
-                                </template>
-                            </el-table-column>
-                        </el-table> -->
-                        <!-- <div class="mpop-table-container">
-                            <table id="mpop-user-search-table">
-                                <thead>
-                                    <tr>
-                                        <th class="mpop-click" @click="userSearchSortBy('ID')"><div class="th-inner"><span>ID</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'ID'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['ID']">▲</span><span v-else>▼</span></span></div></th>
-                                        <th class="mpop-click" @click="userSearchSortBy('login')"><div class="th-inner"><span>Nome utente</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'login'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['login']">▲</span><span v-else>▼</span></span></div></th>
-                                        <th class="mpop-click" @click="userSearchSortBy('email')"><div class="th-inner"><span>E&#8209;mail</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'email'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['email']">▲</span><span v-else>▼</span></span></div></th>
-                                        <th class="mpop-click" @click="userSearchSortBy('mpop_mail_to_confirm')"><div class="th-inner"><span>E&#8209;mail da confermare</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'mpop_mail_to_confirm'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['mpop_mail_to_confirm']">▲</span><span v-else>▼</span></span></div></th>
-                                        <th class="mpop-click" @click="userSearchSortBy('mpop_card_active')"><div class="th-inner"><span>Card attiva</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'mpop_card_active'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['mpop_card_active']">▲</span><span v-else>▼</span></span></div></th>
-                                        <th class="mpop-click" @click="userSearchSortBy('role')"><div class="th-inner"><span>Ruolo</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'role'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['role']">▲</span><span v-else>▼</span></span></div></th>
-                                        <th class="mpop-click" @click="userSearchSortBy('first_name')"><div class="th-inner"><span>Nome</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'first_name'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['first_name']">▲</span><span v-else>▼</span></span></div></th>
-                                        <th class="mpop-click" @click="userSearchSortBy('last_name')"><div class="th-inner"><span>Cognome</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'last_name'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['last_name']">▲</span><span v-else>▼</span></span></div></th>
-                                        <th class="mpop-click" @click="userSearchSortBy('mpop_billing_state')"><div class="th-inner"><span>Provincia</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'mpop_billing_state'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['mpop_billing_state']">▲</span><span v-else>▼</span></span></div></th>
-                                        <th class="mpop-click" @click="userSearchSortBy('mpop_billing_city')"><div class="th-inner"><span>Comune</span><span v-if="Object.keys(userSearch.sortBy)[0] == 'mpop_billing_city'">&nbsp;&nbsp;<span v-if="userSearch.sortBy['mpop_billing_city']">▲</span><span v-else>▼</span></span></div></th>
-                                        <th>Zone</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="u in foundUsers" class="mpop-click" @click="viewUser(u.ID)">
-                                        <td>{{u.ID}}</td>
-                                        <td>{{u.login}}</td>
-                                        <td>{{u.email}}</td>
-                                        <td>{{u.mpop_mail_to_confirm ? 'Sì' : 'No'}}</td>
-                                        <td>{{u.mpop_card_active ? 'Sì' : 'No'}}</td>
-                                        <td>{{showRole(u.role)}}</td>
-                                        <td>{{u.first_name ? u.first_name : ''}}</td>
-                                        <td>{{u.last_name ? u.last_name : ''}}</td>
-                                        <td>{{u.mpop_billing_state ? u.mpop_billing_state : ''}}</td>
-                                        <td>{{u.mpop_billing_city ? u.mpop_billing_city : ''}}</td>
-                                        <td v-html="showZones(u.mpop_resp_zones)"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div> -->
                     </div>
                     <!--USER_VIEW-->
                     <div v-if="selectedTab == 'userView'" id="mpop-user-view"><template v-if="userInView">
