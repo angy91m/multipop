@@ -76,11 +76,12 @@ loadModule(`https://unpkg.com/primevue/umd/primevue.min.js`, {
     },
     addStyle() {}
 }).then((PrimeVue)=>{
-    console.log(PrimeVue);
     createApp({
         components: {
             'v-select': defineAsyncComponent(() => vSel),
-            'v-intl-phone': IntlTelInput
+            'v-intl-phone': IntlTelInput,
+            'DataTable': PrimeVue.DataTable,
+            'Column': PrimeVue.Column
         },
         setup() {
             function activeCardForYear(cards = [], year) {
