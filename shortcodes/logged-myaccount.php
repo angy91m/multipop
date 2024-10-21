@@ -38,7 +38,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     </nav>
                 </div>
             </td>
-            <td style="flex-grow: 1; overflow-x: auto;">
+            <td style="flex-grow: 1; overflow-x: hidden;">
                 <div id="mpop-tabs">
                     <!--SUMMARY-->
                     <div v-if="selectedTab == 'summary'">
