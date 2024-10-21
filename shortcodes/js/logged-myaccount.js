@@ -2,22 +2,26 @@ import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import * as Vue from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
-import 'https://unpkg.com/primevue/umd/primevue.min.js';
-import 'https://unpkg.com/@primevue/themes/umd/aura.min.js';
 const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick } = Vue,
-{ loadModule } = window['vue3-sfc-loader'];
-const vSel = loadModule(`/wp-content/plugins/multipop/js/vue-select.js`, {
-    moduleCache: { vue: Vue },
-    async getFile(url) {
-        const response = await fetch(url);
-        if ( !response.ok ){
-            console.error({message:'Import failed ' + url, response})
-            throw new Error('Import failed ' + url)
-        }
-        return { getContentData: asBinary => asBinary ? response.arrayBuffer() : response.text()};
-    },
-    addStyle() {}
-}),
+{ loadModule } = window['vue3-sfc-loader'],
+loadedComponents = {},
+loadVueModule = (...modules) => {
+    const loaded = [];
+    modules.forEach(path => loaded.push(loadModule('/wp-content/plugins/multipop/js/'+ path, {
+        moduleCache: { vue: Vue },
+        async getFile(url) {
+            const response = await fetch(url);
+            if ( !response.ok ){
+                console.error({message:'Import failed ' + url, response})
+                throw new Error('Import failed ' + url)
+            }
+            return { getContentData: asBinary => asBinary ? response.arrayBuffer() : response.text()};
+        },
+        addStyle() {}
+    })));
+    return loaded;
+},
+[vSel] = loadVueModule('vue-select.js'),
 mailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/s,
 passwordRegex = {
     rr: [
@@ -67,9 +71,7 @@ let searchUsersTimeout, triggerSearchTimeout;
 createApp({
     components: {
         'v-select': defineAsyncComponent(() => vSel),
-        'v-intl-phone': IntlTelInput,
-        // 'DataTable': PrimeVue.DataTable,
-        // 'Column': PrimeVue.Column
+        'v-intl-phone': IntlTelInput
     },
     setup() {
         function activeCardForYear(cards = [], year) {
@@ -1021,11 +1023,4 @@ createApp({
         };
     }
 })
-.use(PrimeVue.Config, {
-    theme: {
-        preset: PrimeVue.Themes.Aura
-    }
-})
-.component('p-datatable', PrimeVue.DataTable)
-.component('p-column', PrimeVue.Column)
 .mount('#app');
