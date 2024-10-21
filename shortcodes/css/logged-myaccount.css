@@ -48,6 +48,12 @@
 #mpop-tabs > div > *:first-child {
     margin-top: 0;
 }
+#app > div > div > div.q-drawer-container > aside {
+    width: 200px;
+    transform: translateX(-200px);
+    top: 50px;
+    position: absolute;
+}
 span.mpop-app-notice {
     border: solid 1px #aaa;
     display: block;
