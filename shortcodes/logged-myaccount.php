@@ -410,11 +410,10 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             <template #body="props">
                                 <q-tr :props="props">
                                     <q-td v-for="prop in foundUsersColumns" :key="prop.name">
-                                        {{ props.row[prop.name] }}
                                         <template v-if="prop.name == mpop_resp_zones">
                                             <span v-html="prop.format(props.row.mpop_resp_zones)"></span>
                                         </template>
-                                        <template v-else>{{prop}}</template>
+                                        <template v-else>{{prop.format ? prop.format(props.row[prop.name]) : props.row[prop.name]}}</template>
                                     </q-td>
                                 </q-tr>
                             </template>
