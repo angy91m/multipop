@@ -2,10 +2,10 @@ import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import * as Vue from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
-import PrimeVue from 'https://unpkg.com/primevue/umd/primevue.min.js';
+import * as PrimeVue from 'https://unpkg.com/primevue/umd/primevue.min.js';
 const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick } = Vue,
 { loadModule } = window['vue3-sfc-loader'];
-console.log(PrimeVue);
+console.log(PrimeVue.Config);
 const vSel = loadModule(`/wp-content/plugins/multipop/js/vue-select.js`, {
     moduleCache: { vue: Vue },
     async getFile(url) {
