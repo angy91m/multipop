@@ -284,111 +284,116 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             <input type="text" v-model="userSearch.txt" @input="triggerSearchUsers" placeholder="Nome, e-mail, username" />
                         </div>
                         <div class="mpop-user-search-field" v-for="role in userRoles">
-                            <label :for="'user-search-'+role">{{showRole(role)}}</label>
-                            <input :id="'user-search-'+role" type="checkbox" v-model="userSearch.roles" @change="triggerSearchUsers" :value="role"/>
+                            <label :for="'user-search-'+role">{{showRole(role)}}&nbsp;
+                                <input :id="'user-search-'+role" type="checkbox" v-model="userSearch.roles" @change="triggerSearchUsers" :value="role"/>
+                            </label>
                         </div>
                         <div class="mpop-user-search-field">
-                            <label for="user-seach-card-active">Email da confermare</label>
-                            <select id="user-seach-card-active" v-model="userSearch.mpop_mail_to_confirm" @change="triggerSearchUsers">
-                                <option :value="null"></option>
-                                <option :value="true">Sì</option>
-                                <option :value="false">No</option>
-                            </select>
+                            <label for="user-seach-card-active">Email da confermare&nbsp;
+                                <select id="user-seach-card-active" v-model="userSearch.mpop_mail_to_confirm" @change="triggerSearchUsers">
+                                    <option :value="null"></option>
+                                    <option :value="true">Sì</option>
+                                    <option :value="false">No</option>
+                                </select>
+                            </label>
                         </div>
                         <div class="mpop-user-search-field">
-                            <label for="user-seach-card-active">Tessera attiva</label>
-                            <select id="user-seach-card-active" v-model="userSearch.mpop_card_active" @change="triggerSearchUsers">
-                                <option :value="null"></option>
-                                <option :value="true">Sì</option>
-                                <option :value="false">No</option>
-                            </select>
+                            <label for="user-seach-card-active">Tessera attivae&nbsp;
+                                <select id="user-seach-card-active" v-model="userSearch.mpop_card_active" @change="triggerSearchUsers">
+                                    <option :value="null"></option>
+                                    <option :value="true">Sì</option>
+                                    <option :value="false">No</option>
+                                </select>
+                            </label>
                         </div>
                         <div>
                             <div class="mpop-user-search-field mpop-50-wid">
-                                <label for="userSearchZone-select">Residenza</label>
-                                <v-select
-                                    multiple
-                                    id="userSearchZone-select"
-                                    v-model="userSearch.zones"
-                                    :options="zoneSearch.users"
-                                    @close="userSearchZoneOpen = false"
-                                    @open="searchOpen('userSearchZone')"
-                                    :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
-                                    :filter="fuseSearch"
-                                    @option:selected="zones => {
-                                        const oldLen = zones.length;
-                                        reduceZones(zones, userSearch);
-                                        if (oldLen == zones.length) triggerSearchUsers();
-                                    }"
-                                    @option:deselected="triggerSearchUsers"
-                                    @search="(searchTxt, loading) => {
-                                        if (searchTxt.trim().length < 2) return loading(false);
-                                        triggerSearch(searchTxt, loading, 'searchZones', 'users', userSearch);
-                                    }"
-                                >
-                                    <template #search="{ attributes, events }">
-                                        <input
-                                            class="vs__search"
-                                            :style="'display: ' + (userSearchZoneOpen ? 'unset' : 'none')"
-                                            v-bind="attributes"
-                                            v-on="events"
-                                        />
-                                    </template>
-                                    <template v-slot:option="zone">
-                                        {{zone.untouched_label + addSuppressToLabel(zone)}}
-                                    </template>
-                                    <template v-slot:no-options="{search}">
-                                        <template v-if="search.trim().length > 1">
-                                            Nessun risultato per "{{search}}"
+                                <label for="userSearchZone-select">Residenza&nbsp;
+                                    <v-select
+                                        multiple
+                                        id="userSearchZone-select"
+                                        v-model="userSearch.zones"
+                                        :options="zoneSearch.users"
+                                        @close="userSearchZoneOpen = false"
+                                        @open="searchOpen('userSearchZone')"
+                                        :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
+                                        :filter="fuseSearch"
+                                        @option:selected="zones => {
+                                            const oldLen = zones.length;
+                                            reduceZones(zones, userSearch);
+                                            if (oldLen == zones.length) triggerSearchUsers();
+                                        }"
+                                        @option:deselected="triggerSearchUsers"
+                                        @search="(searchTxt, loading) => {
+                                            if (searchTxt.trim().length < 2) return loading(false);
+                                            triggerSearch(searchTxt, loading, 'searchZones', 'users', userSearch);
+                                        }"
+                                    >
+                                        <template #search="{ attributes, events }">
+                                            <input
+                                                class="vs__search"
+                                                :style="'display: ' + (userSearchZoneOpen ? 'unset' : 'none')"
+                                                v-bind="attributes"
+                                                v-on="events"
+                                            />
                                         </template>
-                                        <template v-else>
-                                            Inserisci almeno 2 caratteri
+                                        <template v-slot:option="zone">
+                                            {{zone.untouched_label + addSuppressToLabel(zone)}}
                                         </template>
-                                    </template>
-                                </v-select>
+                                        <template v-slot:no-options="{search}">
+                                            <template v-if="search.trim().length > 1">
+                                                Nessun risultato per "{{search}}"
+                                            </template>
+                                            <template v-else>
+                                                Inserisci almeno 2 caratteri
+                                            </template>
+                                        </template>
+                                    </v-select>
+                                </label>
                             </div>
                             <div class="mpop-user-search-field mpop-50-wid">
-                                <label for="userSearchRespZone-select">Zone gestite</label>
-                                <v-select
-                                    multiple
-                                    id="userSearchRespZone-select"
-                                    v-model="userSearch.resp_zones"
-                                    :options="zoneSearch.users_resp"
-                                    @close="userSearchRespZoneOpen = false"
-                                    @open="searchOpen('userSearchRespZone')"
-                                    :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
-                                    :filter="fuseSearch"
-                                    @option:selected="zones => {
-                                        const oldLen = zones.length;
-                                        reduceZones(zones, userSearch, 'resp_zones');
-                                        if (oldLen == zones.length) triggerSearchUsers();
-                                    }"
-                                    @option:deselected="triggerSearchUsers"
-                                    @search="(searchTxt, loading) => {
-                                        if (searchTxt.trim().length < 2) return loading(false);
-                                        triggerSearch(searchTxt, loading, 'searchZones', 'users_resp', userSearch, 'resp_zones');
-                                    }"
-                                >
-                                    <template #search="{ attributes, events }">
-                                        <input
-                                            class="vs__search"
-                                            :style="'display: ' + (userSearchRespZoneOpen ? 'unset' : 'none')"
-                                            v-bind="attributes"
-                                            v-on="events"
-                                        />
-                                    </template>
-                                    <template v-slot:option="zone">
-                                        {{zone.untouched_label + addSuppressToLabel(zone)}}
-                                    </template>
-                                    <template v-slot:no-options="{search}">
-                                        <template v-if="search.trim().length > 1">
-                                            Nessun risultato per "{{search}}"
+                                <label for="userSearchRespZone-select">Zone gestite&nbps;
+                                    <v-select
+                                        multiple
+                                        id="userSearchRespZone-select"
+                                        v-model="userSearch.resp_zones"
+                                        :options="zoneSearch.users_resp"
+                                        @close="userSearchRespZoneOpen = false"
+                                        @open="searchOpen('userSearchRespZone')"
+                                        :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
+                                        :filter="fuseSearch"
+                                        @option:selected="zones => {
+                                            const oldLen = zones.length;
+                                            reduceZones(zones, userSearch, 'resp_zones');
+                                            if (oldLen == zones.length) triggerSearchUsers();
+                                        }"
+                                        @option:deselected="triggerSearchUsers"
+                                        @search="(searchTxt, loading) => {
+                                            if (searchTxt.trim().length < 2) return loading(false);
+                                            triggerSearch(searchTxt, loading, 'searchZones', 'users_resp', userSearch, 'resp_zones');
+                                        }"
+                                    >
+                                        <template #search="{ attributes, events }">
+                                            <input
+                                                class="vs__search"
+                                                :style="'display: ' + (userSearchRespZoneOpen ? 'unset' : 'none')"
+                                                v-bind="attributes"
+                                                v-on="events"
+                                            />
                                         </template>
-                                        <template v-else>
-                                            Inserisci almeno 2 caratteri
+                                        <template v-slot:option="zone">
+                                            {{zone.untouched_label + addSuppressToLabel(zone)}}
                                         </template>
-                                    </template>
-                                </v-select>
+                                        <template v-slot:no-options="{search}">
+                                            <template v-if="search.trim().length > 1">
+                                                Nessun risultato per "{{search}}"
+                                            </template>
+                                            <template v-else>
+                                                Inserisci almeno 2 caratteri
+                                            </template>
+                                        </template>
+                                    </v-select>
+                                </label>
                             </div>
                         </div>
                         <div>Totale: {{foundUsersTotal}}</div>
