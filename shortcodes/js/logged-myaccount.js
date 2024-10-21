@@ -951,6 +951,10 @@ createApp({
             }
             return role;
         }
+        const foundUsersColumns = reactive([
+            {name: 'ID', label: 'ID', field: 'ID'},
+            {name: 'login', label: 'Login', field: 'login'}
+        ]);
         return {
             selectedTab,
             profile,
@@ -1018,7 +1022,8 @@ createApp({
             userCsvFields,
             profilePhoneInput,
             userEditPhoneInput,
-            parsePhone
+            parsePhone,
+            foundUsersColumns
         };
     }
 })
