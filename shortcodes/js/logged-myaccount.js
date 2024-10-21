@@ -73,8 +73,7 @@ menuItems = [{
     label: 'Cambio password'
 }, {
     name: 'card',
-    label: 'Tessera',
-    separator: true
+    label: 'Tessera'
 }, {
     name: 'users',
     label: 'Utenti'
