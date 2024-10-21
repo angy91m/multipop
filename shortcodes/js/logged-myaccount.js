@@ -702,16 +702,16 @@ createApp({
                     mpop_billing_city: [],
                     mpop_resp_zones: [],
                     sortBy: {
-                        [userSearchTableOrder.sortBy]: !userSearchTableOrder.descending
+                        [userSearchTableOrder.value.sortBy]: !userSearchTableOrder.value.descending
                     }
                 };
-                if(userSearchTableOrder.lastSortBy.length) {
-                    if (Object.keys(userSearchTableOrder.lastSortBy[0])[0] == userSearchTableOrder.lastSortBy) {
-                        if (userSearchTableOrder.lastSortBy[1]) {
-                            reqObj.sortBy = {...reqObj.sortBy, ...userSearchTableOrder.lastSortBy[1]};
+                if(userSearchTableOrder.value.lastSortBy.length) {
+                    if (Object.keys(userSearchTableOrder.value.lastSortBy[0])[0] == userSearchTableOrder.value.lastSortBy) {
+                        if (userSearchTableOrder.value.lastSortBy[1]) {
+                            reqObj.sortBy = {...reqObj.sortBy, ...userSearchTableOrder.value.lastSortBy[1]};
                         }
                     } else {
-                        reqObj.sortBy = {...reqObj.sortBy, ...userSearchTableOrder.lastSortBy[0]};
+                        reqObj.sortBy = {...reqObj.sortBy, ...userSearchTableOrder.value.lastSortBy[0]};
                     }
                 }
                 delete reqObj.zones;
@@ -739,9 +739,10 @@ createApp({
                         foundUsers.push(...users.data.users);
                         foundUsersTotal.value = users.data.total;
                         userSearchLimit.value = users.data.limit;
+                        userSearchTableOrder.value.rowsNumber = users.data.total;
                         userSearchTableOrder.value.sortBy = Object.keys(users.data.sortBy[0])[0];
                         userSearchTableOrder.value.descending = !Object.values(users.data.sortBy[0])[0];
-                        userSearchTableOrder.lastSortBy = users.data.sortBy;
+                        userSearchTableOrder.value.lastSortBy = users.data.sortBy;
                     } else {
                         console.error('Unknown error');
                     }
