@@ -3,6 +3,7 @@ import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import * as Vue from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
 import 'https://unpkg.com/primevue/umd/primevue.min.js';
+import 'https://unpkg.com/@primevue/themes/umd/aura.min.js';
 const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick } = Vue,
 { loadModule } = window['vue3-sfc-loader'];
 const vSel = loadModule(`/wp-content/plugins/multipop/js/vue-select.js`, {
@@ -1020,5 +1021,11 @@ createApp({
         };
     }
 })
-.use(PrimeVue.Config)
+.use(PrimeVue.Config, {
+    theme: {
+        preset: PrimeVue.Themes.Aura
+    }
+})
+.component('p-datatable', PrimeVue.DataTable)
+.component('p-column', PrimeVue.Column)
 .mount('#app');
