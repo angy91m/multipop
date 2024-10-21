@@ -20,8 +20,10 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 <div id="app">
     <span v-for="(notice, noticeInd) in userNotices" :class="'mpop-app-notice' + ' notice-' + notice.type"><span @click="dismissNotice(noticeInd)"><?=$this::dashicon('no-alt')?></span><span v-html="notice.msg"></span></span>
     <q-table
+        :rows-per-page-options="[0]"
         :rows="foundUsers || []"
         :columns="foundUsersColumns"
+        hide-bottom
     />
     <table id="mpop-main-table">
         <tr>
