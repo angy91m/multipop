@@ -646,10 +646,10 @@ createApp({
                 url.searchParams.set(k, params[k]);
             }
             if (replace) {
-                return history.replaceState(historyTabs, '', url.href);
+                return history.replaceState(JSON.stringify(historyTabs), '', url.href);
             }
             historyTabs.unshift(selectedTab.value);
-            return history.pushState(historyTabs, '', url.href);
+            return history.pushState(JSON.stringify(historyTabs), '', url.href);
         }
         async function viewUser(ID, popstate = false) {
             if (ID == profile.ID) {
@@ -951,15 +951,18 @@ createApp({
             }
             if (!historyTabs.length) {
                 historyTabs.unshift(selectedTab.value);
-                history.replaceState(historyTabs, '', location.href);
+                history.replaceState(JSON.stringify(historyTabs), '', location.href);
             }
         });
         function onPopState(e) {
-            if (Array.isArray(e.state)){
-                selectTab(e.state[0], true);
-                historyTabs.length;
-                historyTabs.push(...e.state);
-            }
+            try {
+                const state = JSON.parse(e.state);
+                if (Array.isArray(state)){
+                    selectTab(state[0], true);
+                    historyTabs.length;
+                    historyTabs.push(...state);
+                }
+            } catch {}
         }
         onUnmounted(()=> {
             clearTimeout(searchUsersTimeout);
