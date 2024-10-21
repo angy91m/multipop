@@ -5,7 +5,6 @@ import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
 import 'https://unpkg.com/primevue/umd/primevue.min.js';
 const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick } = Vue,
 { loadModule } = window['vue3-sfc-loader'];
-console.log(PrimeVue);
 const vSel = loadModule(`/wp-content/plugins/multipop/js/vue-select.js`, {
     moduleCache: { vue: Vue },
     async getFile(url) {
@@ -68,8 +67,8 @@ createApp({
     components: {
         'v-select': defineAsyncComponent(() => vSel),
         'v-intl-phone': IntlTelInput,
-        'DataTable': PrimeVue.DataTable,
-        'Column': PrimeVue.Column
+        // 'DataTable': PrimeVue.DataTable,
+        // 'Column': PrimeVue.Column
     },
     setup() {
         function activeCardForYear(cards = [], year) {
