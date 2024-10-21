@@ -691,7 +691,8 @@ createApp({
             }
             return authorizedSubscriptionYears;
         }
-        async function searchUsers() {
+        async function searchUsers(...args) {
+            console.log(args);
             try {
                 userSearching.value = true;
                 foundUsers.length = 0;
