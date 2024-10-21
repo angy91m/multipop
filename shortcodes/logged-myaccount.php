@@ -409,7 +409,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             hide-bottom
                             :loading="userSearching"
                             binary-state-sort
-                            :pagination.sync="userSearchTablePagination"
+                            :pagination="userSearchTablePagination"
                             @request="searchUsers"
                         >
                             <template #body="props">
