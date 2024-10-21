@@ -14,6 +14,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/logged-myaccount.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-tel-input.css">
+<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet" type="text/css">
 <link href="https://cdn.jsdelivr.net/npm/quasar@2.17.1/dist/quasar.prod.css" rel="stylesheet" type="text/css">
 <div id="loaded-scripts" style="display:none"></div>
 <div id="app">
