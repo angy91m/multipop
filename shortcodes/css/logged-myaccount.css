@@ -1,53 +1,6 @@
 #app {
     max-width: 100%;
 }
-#app table#mpop-main-table {
-    width: 100%;
-}
-#app table#mpop-main-table > tbody > tr > td {
-    vertical-align: top;
-}
-#app table#mpop-main-table > tbody > tr > td:first-child {
-    margin-bottom: 18px;
-}
-#app table#mpop-main-table > tbody > tr > td:first-child div {
-    border: solid 1px #aaa;
-    border-radius: 5px;
-    text-transform: uppercase;
-}
-#app table#mpop-main-table > tbody > tr > td:first-child label {
-    font-family: sans-serif;
-    font-size: 11px;
-    margin-top: 5px;
-    margin-left: 8px;
-    cursor: pointer;
-    display: block;
-}
-#app table#mpop-main-table > tbody > tr > td:first-child ul {
-    list-style-type: none;
-    padding: 0;
-}
-#app table#mpop-main-table > tbody > tr > td:first-child li {
-    cursor: pointer;
-    padding-left: 15px;
-    padding-right: 15px;
-    font-family: sans-serif;
-    font-size: 14px;
-    margin-bottom: 10px;
-    line-height: 15px;
-}
-#app table#mpop-main-table > tbody > tr > td:first-child li.mpop-menu-title {
-    cursor: default;
-}
-#app table#mpop-main-table > tbody > tr > td:nth-child(2) {
-    width: 100%;
-}
-#mpop-tabs > div {
-    margin-left: 15px;
-}
-#mpop-tabs > div > *:first-child {
-    margin-top: 0;
-}
 #app > div > div > div.q-drawer-container > aside {
     width: 200px;
     transform: translateX(-200px);
@@ -158,47 +111,8 @@ span.mpop-app-notice > span > span.dashicons-before.dashicons-no-alt {
 .mpop-table-container {
     overflow-x: auto;
 }
-#mpop-user-search-table,
-.mpop-import-csv-table {
-    border-spacing: 0;
-    border-collapse: separate;
-    cursor: default;
-    white-space: nowrap;
-}
-#mpop-user-search-table th,
-#mpop-user-search-table td,
-.mpop-import-csv-table td,
-.mpop-import-csv-table th {
-    border: solid 1px #aaa;
-    padding: 5px 20px;
-}
-#mpop-user-search-table th,
-.mpop-import-csv-table th {
-    text-align: center;
-}
-#mpop-user-search-table th:not(:last-child),
-#mpop-user-search-table td:not(:last-child),
-.mpop-import-csv-table th:not(:last-child),
-.mpop-import-csv-table td:not(:last-child) {
-    border-right: none;
-}
-#mpop-user-search-table tr:not(:first-child) td,
-.mpop-import-csv-table tr:not(:first-child) td {
-    border-top: none;
-}
-#mpop-user-search-table th:first-child {
-    border-radius: 5px 0 0 0;
-}
 .mpop-click {
     cursor: pointer;
-}
-#mpop-user-search-table th:last-child {
-    border-radius: 0 5px 0 0;
-}
-#mpop-user-search-table .th-inner {
-    align-items: center;
-    display: flex;
-    justify-content: center;
 }
 #mpop-page-buttons {
     display: flex;
