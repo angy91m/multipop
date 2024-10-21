@@ -64,7 +64,7 @@ userCsvFields = [
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value;
 let searchUsersTimeout, triggerSearchTimeout;
 
-loadModule(`https://unpkg.com/primevue@3.15.0/primevue.min.js`, {
+loadModule(`https://unpkg.com/primevue/umd/primevue.min.js`, {
     moduleCache: { vue: Vue },
     async getFile(url) {
         const response = await fetch(url);
