@@ -24,7 +24,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
             <q-header elevated :class="$q.dark.isActive ? 'bg-secondary' : 'bg-black'">
                 <q-toolbar>
                 <q-btn flat @click="displayNav = !displayNav" round dense icon="menu" />
-                <q-toolbar-title>{{pageTitle}}</q-toolbar-title>
+                <q-toolbar-title>{{selectedTab.label}}</q-toolbar-title>
                 </q-toolbar>
             </q-header>
 

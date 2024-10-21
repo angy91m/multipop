@@ -99,9 +99,6 @@ createApp({
             name: 'summary',
             label: 'Riepilogo'
         }),
-        pageTitle = computed(() => {
-            return selectedTab.value.name == 'summary' ? 'Ciao' + (profile? (' ' + (profile.first_name ||profile.login)) : '') : selectedTab.value.label;
-        }),
         displayNav = ref(false),
         profile = reactive({}),
         profileInEditing = reactive({}),
@@ -1077,7 +1074,6 @@ createApp({
             foundUsersColumns,
             userSearching,
             userSearchTablePagination,
-            pageTitle,
             menuItems
         };
     }
