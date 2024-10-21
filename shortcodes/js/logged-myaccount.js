@@ -892,7 +892,7 @@ createApp({
             }
         }
         function selectTab(tab, popstate = false) {
-            if (!tab || selectedTab.value.name != tab.name) {
+            if (selectedTab.value.name != tab?.name) {
                 cancelEditProfile();
                 cancelEditUser();
                 const url = new URL(location);
