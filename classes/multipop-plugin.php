@@ -241,6 +241,7 @@ class MultipopPlugin {
         add_filter('discourse_email_verification', function() {return false;} );
         add_action('wpdc_sso_provider_before_sso_redirect', [$this, 'discourse_filter_login'], 10, 2 );
         add_filter('wpdc_sso_params', [$this, 'discourse_user_params'], 10, 2);
+        add_filter('wpdc_bypass_sync_sso', [$this, 'discourse_bypass_invited_users'], 10, 2);
         $this->delayed_scripts = [
             'updateDiscourseGroupsByUser' => function($user_id) {
                 sleep(10);
@@ -3128,6 +3129,9 @@ class MultipopPlugin {
         }
         $this->delay_script('updateDiscourseGroupsByUser', $user->ID);
         return $params;
+    }
+    public function discourse_bypass_invited_users($user_id, $user) {
+        return !$user->mpop_card_active;
     }
 }
 
