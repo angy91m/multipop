@@ -9,7 +9,9 @@ class ClientIPGetter {
             foreach ($proxies as $p) {
                 if (is_string($p)) {
                     $p = trim($p);
-                    if ($p) {$this->authorized_proxies[] = $p;}
+                    if (static::get_ip_version($p)) {
+                        $this->authorized_proxies[] = $p;
+                    }
                 }
             }
         } else {
