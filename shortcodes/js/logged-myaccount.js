@@ -44,6 +44,22 @@ userRoles = [
 ],
 historyTabs = [],
 cachedProps = {},
+foundUsersColumns = [
+    {name: 'ID', label: 'ID', sortable: true},
+    {name: 'login', label: 'Login', sortable: true},
+    {name: 'email', label: 'E-mail', sortable: true},
+    {name: 'mpop_mail_to_confirm', label: 'E-mail da confermare', sortable: true, format: val => val ? 'Sì': 'No'},
+    {name: 'mpop_card_active', label: 'Tessera attiva', sortable: true, format: val => val ? 'Sì': 'No'},
+    {name: 'first_name', label: 'Nome', sortable: true},
+    {name: 'last_name', label: 'Cognome', sortable: true},
+    {name: 'mpop_billing_state', label: 'Provincia', sortable: true},
+    {name: 'mpop_billing_city', label: 'Comune', sortable: true},
+    {name: 'mpop_resp_zones', label: 'Zone'},
+].map(col => {
+    col.align = 'left';
+    col.field = col.name;
+    return col;
+}),
 userCsvFields = [
     'login',
     'email',
@@ -63,7 +79,7 @@ userCsvFields = [
     'mpop_subscription_publish_agree',
     'mpop_org_role',
     'mpop_subscription_notes'
-],
+].map(col => ({name: col, label: col, align: 'left', field: col})),
 menuItems = [{
     name: 'summary',
     label: 'Riepilogo'
@@ -129,7 +145,7 @@ createApp({
         userSearchTablePagination = ref({
             sortBy: 'ID',
             descending: false,
-            rowsPerPage: 1000,
+            rowsPerPage: 0,
             rowsNumber: 0,
             page: 1,
             secondSortBy: null
@@ -991,22 +1007,6 @@ createApp({
             }
             return role;
         }
-        const foundUsersColumns = reactive([
-            {name: 'ID', label: 'ID', sortable: true},
-            {name: 'login', label: 'Login', sortable: true},
-            {name: 'email', label: 'E-mail', sortable: true},
-            {name: 'mpop_mail_to_confirm', label: 'E-mail da confermare', sortable: true, format: val => val ? 'Sì': 'No'},
-            {name: 'mpop_card_active', label: 'Tessera attiva', sortable: true, format: val => val ? 'Sì': 'No'},
-            {name: 'first_name', label: 'Nome', sortable: true},
-            {name: 'last_name', label: 'Cognome', sortable: true},
-            {name: 'mpop_billing_state', label: 'Provincia', sortable: true},
-            {name: 'mpop_billing_city', label: 'Comune', sortable: true},
-            {name: 'mpop_resp_zones', label: 'Zone'},
-        ].map(col => {
-            col.align = 'left';
-            col.field = col.name;
-            return col;
-        }));
         return {
             selectedTab,
             profile,
