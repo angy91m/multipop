@@ -724,7 +724,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 <script type="application/json" id="__MULTIPOP_DATA__">{
     "user": <?=json_encode($parsed_user)?>
 }</script>
-<script src="<?=plugins_url()?>/multipop/shortcodes/js/vue.global.min.js"></script>
-<script src="<?=plugins_url()?>/multipop/shortcodes/js/quasar.umd.prod.js"></script>
+<script src="<?=plugins_url()?>/multipop/js/vue.global.min.js"></script>
+<script src="<?=plugins_url()?>/multipop/js/quasar.umd.prod.js"></script>
 <script type="module" src="<?=plugins_url()?>/multipop/shortcodes/js/logged-myaccount.js"></script>
 <?php
