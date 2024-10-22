@@ -12,8 +12,12 @@ function html_dump($obj) {
     echo '</pre>';
     return ob_get_clean();
 }
-function save_test($obj, $id=0) {
-    file_put_contents(MULTIPOP_PLUGIN_PATH ."/test-$id.txt", html_dump($obj));
+function save_test($obj, $id=0, $append = false) {
+    $txt = '';
+    if ($append && file_exists(MULTIPOP_PLUGIN_PATH ."/test-$id.txt")) {
+        $txt = file_get_contents(MULTIPOP_PLUGIN_PATH ."/test-$id.txt");
+    }
+    file_put_contents(MULTIPOP_PLUGIN_PATH ."/test-$id.txt", $txt . html_dump($obj));
 }
 
 class MultipopPlugin {
@@ -2992,6 +2996,7 @@ class MultipopPlugin {
     }
 
     public function discourse_req_ca($verify, $url) {
+        save_test($url, 0, true);
         $discourse_connect_options = get_option('discourse_connect');
         if (
             is_array($discourse_connect_options)
