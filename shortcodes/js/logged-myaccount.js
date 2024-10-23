@@ -1051,7 +1051,9 @@ createApp({
             return role;
         }
         onMounted(() => {
-            console.log(intPhoneInstance.value.instance._utilsIsValidNumber);
+            intPhoneInstance.value.instance.setCountry('it');
+            intPhoneInstance.value.instance.setNumber('3280203109');
+            console.log(intPhoneInstance.value.instance.isValidNumber() ? intPhoneInstance.value.instance.getNumber(1).replace(' ', '-').replaceAll(' ', '').replace('-', ' ') : '');
         });
         return {
             selectedTab,
