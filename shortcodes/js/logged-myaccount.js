@@ -1,7 +1,7 @@
 import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
-const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, onMounted, defineAsyncComponent, nextTick } = Vue,
+const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
     const loaded = [];
@@ -295,6 +295,10 @@ createApp({
                     csvUsers.forEach(u => {
                         for (const k in u) {
                             if (typeof u[k] == 'string') {
+                                if (k == 'mpop_phone') {
+                                    u[k] = validatePhone(u[k].trim());
+                                    continue;
+                                }
                                 u[k] = u[k].trim();
                             }
                         }
@@ -1050,11 +1054,11 @@ createApp({
             }
             return role;
         }
-        onMounted(() => {
+        function validatePhone(p = '') {
             intPhoneInstance.value.instance.setCountry('it');
-            intPhoneInstance.value.instance.setNumber('3280203109');
-            console.log(intPhoneInstance.value.instance.isValidNumber() ? intPhoneInstance.value.instance.getNumber(1).replace(' ', '-').replaceAll(' ', '').replace('-', ' ') : '');
-        });
+            intPhoneInstance.value.instance.setNumber(p);
+            return parsePhone(intPhoneInstance.value);
+        }
         return {
             selectedTab,
             profile,
