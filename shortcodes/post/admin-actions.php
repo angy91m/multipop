@@ -62,6 +62,12 @@ switch( $post_data['action'] ) {
             }
         } else {
             $post_data['first_name'] = mb_strtoupper( trim($post_data['first_name']), 'UTF-8' );
+            if (!$this::is_valid_name($post_data['first_name'])) {
+                if (!isset($res_data['error'])) {
+                    $res_data['error'] = [];
+                }
+                $res_data['error'][] = 'first_name';
+            }
         }
         if (!isset($post_data['last_name']) || !is_string($post_data['last_name']) || mb_strlen(trim($post_data['last_name']), 'UTF-8') < 2) {
             if ($user->last_name) {
@@ -74,6 +80,12 @@ switch( $post_data['action'] ) {
             }
         } else {
             $post_data['last_name'] = mb_strtoupper( trim($post_data['last_name']), 'UTF-8' );
+            if (!$this::is_valid_name($post_data['last_name'])) {
+                if (!isset($res_data['error'])) {
+                    $res_data['error'] = [];
+                }
+                $res_data['error'][] = 'last_name';
+            }
         }
         if (!isset($post_data['mpop_billing_city']) || !preg_match('/^[A-Z]\d{3}$/', $post_data['mpop_billing_city'])) {
             if ($user->mpop_billing_city) {
@@ -129,7 +141,7 @@ switch( $post_data['action'] ) {
             }
         } else {
             try {
-                $post_data['mpop_birthdate'] = $this->validate_birthdate($post_data['mpop_birthdate']);
+                $post_data['mpop_birthdate'] = $this::validate_birthdate($post_data['mpop_birthdate']);
             } catch (Exception $e) {
                 if (!isset($res_data['error'])) {
                     $res_data['error'] = [];
@@ -152,7 +164,7 @@ switch( $post_data['action'] ) {
                 if (!$comuni) {
                     $comuni = $this->get_comuni_all();
                 }
-                $post_data['mpop_birthdate'] = $this->validate_birthplace($post_data['mpop_birthdate'],$post_data['mpop_birthplace'], $comuni);
+                $post_data['mpop_birthdate'] = $this::validate_birthplace($post_data['mpop_birthdate'],$post_data['mpop_birthplace'], $comuni);
             } catch (Exception $e) {
                 if (!isset($res_data['error'])) {
                     $res_data['error'] = [];
@@ -258,8 +270,7 @@ switch( $post_data['action'] ) {
             ) {
                 $this->delete_temp_token_by_user_id($user->ID, 'email_confirmation_link');
                 $token = $this->create_temp_token( $user->ID, 'email_confirmation_link' );
-                $res_mail = $this->send_confirmation_mail($token, $post_data['email']);
-                if (!$res_mail) {
+                if(!$this->send_confirmation_mail($token, $post_data['email'])) {
                     $this->delete_temp_token( $token );
                     $res_data['error'] = ['email'];
                     http_response_code( 400 );
@@ -276,8 +287,7 @@ switch( $post_data['action'] ) {
             } else {
                 $this->delete_temp_token_by_user_id($user->ID, 'email_confirmation_link');
                 $token = $this->create_temp_token( $user->ID, 'email_confirmation_link' );
-                $res_mail = $this->send_confirmation_mail($token, $user->user_email);
-                if (!$res_mail) {
+                if(!$this->send_confirmation_mail($token, $user->user_email)) {
                     $this->delete_temp_token( $token );
                     $res_data['error'] = ['email'];
                     http_response_code( 400 );
@@ -351,6 +361,28 @@ switch( $post_data['action'] ) {
         break;
     case 'admin_search_zones':
         $res_data['data'] = $this->search_zones($post_data['search']);
+        break;
+    case 'import_rows':
+        $res_rows = [];
+        if (!isset($post_data['rows']) || !is_array($post_data['rows'])) {
+            $res_data['error'] = ['rows'];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $post_data['forceYear'] = isset($post_data['forceYear']) ? $post_data['forceYear'] : false;
+        $post_data['forceQuote'] = isset($post_data['forceQuote']) ? $post_data['forceQuote'] : false;
+        if (!empty($post_data['rows'])) {
+            $comuni = $this->get_comuni_all();
+            foreach($post_data['rows'] as $row) {
+                try {
+                    $res_rows[] = $this->row_import($row, $post_data['forceYear'], $post_data['forceQuote'], $comuni);
+                } catch (Exception $e) {
+                    $res_rows[] = ['error' => $e->getMessage()];
+                }
+            }
+        }
+        $res_data['data'] = $res_rows;
         break;
     default:
         $res_data['error'] = ['action'];

@@ -40,6 +40,8 @@ class MultipopPlugin {
     private ?array $comuni_all;
     private ?array $province_all;
     private ?array $regioni_all;
+    public string $last_mail_error = '';
+    private ?object $invited_user;
     public const SUBS_STATUSES = [
         'tosee',
         'seen',
@@ -81,7 +83,8 @@ class MultipopPlugin {
     // USERNAME VALIDATION
     private static function is_valid_username( $username ) {
         if (
-            !preg_match('/^[a-z0-9._-]{3,20}$/', $username)
+            !is_string($username)
+            || !preg_match('/^[a-z0-9._-]{3,20}$/', $username)
             || !preg_match('/[a-z0-9]/', $username)
             || str_starts_with( $username, '.' )
             || str_starts_with( $username, '-' )
@@ -127,8 +130,52 @@ class MultipopPlugin {
         }
         return true;
     }
+    private static function sanitize_name(string $name) {
+        $substitutions = [
+            '/\s+,/' => ',',
+            "/'+/" => "'",
+            '/\'\s+/' => "' ",
+            '/\s+\'+/' => ' ',
+            '/,\'+/' => ',',
+            '/,+/' => ', ',
+            '/\s+/' => ' ',
+            '/^[, \']+|[, ]+$/' => ''
+
+        ];
+        return mb_strtoupper(
+            preg_replace(
+                array_keys($substitutions),
+                array_values($substitutions),
+                $name
+            ),
+            'UTF-8'
+        );
+    }
+    private static function translit_name(string $name) {
+        $name = mb_strtolower($name, 'UTF-8');
+        $others_chars = [
+            'ä' => 'ae',
+            'æ' => 'ae',
+            'ö' => 'oe',
+            'ü' => 'ue',
+        ];
+        return mb_strtoupper(iconv('UTF-8','ASCII//TRANSLIT',str_replace(array_keys($others_chars), array_values($others_chars), $name)), 'UTF-8');
+    }
+    private static function is_valid_name($name) {
+        if(!isset($name) || !is_string($name)) return false;
+        $name = trim(mb_strtoupper($name, 'UTF-8'));
+        $allowed_chars = "a-zàáâäæçčèéêëìíîïòóôöœùúûüšžß";
+        if (
+            !preg_match("/^[$allowed_chars][$allowed_chars\', ]*[$allowed_chars\']/")
+            || mb_strlen(preg_replace("/[^$allowed_chars]/", '', $name),'UTF-8') < 2
+            || sanitize_name($name) != $name
+        ) {
+            return false;
+        }
+        return true;
+    }
     private static function is_valid_phone($phone) {
-        if (isset($phone) && is_string($phone) && strlen($phone) >= 13 && preg_match('/^\+\d+ \d+$/', $phone)) {
+        if (is_string($phone) && strlen($phone) >= 13 && preg_match('/^\+\d+ \d+$/', $phone)) {
             return true;
         }
         return false;
@@ -197,6 +244,11 @@ class MultipopPlugin {
         // add_action('template_redirect', [$this, 'template_redirect'] );
         // CONNECT wp_mail to $this->send_mail()
         add_filter('pre_wp_mail', function ($res, $atts) {
+            if ($res) return $res;
+            $plugin_setts = $this->get_settings();
+            if (!$plugin_setts['mail_host'] || !$plugin_setts['mail_from']) {
+                return false;
+            }
             return $this->send_mail(['to' => $atts['to'], 'subject' => $atts['subject'], 'body' => $atts['message'], 'attachments' => $atts['attachments']]);
         }, 10, 2 );
         add_action('wp_head', [$this, 'wp_head'] );
@@ -270,6 +322,14 @@ class MultipopPlugin {
 
         // REDIRECT AFTER EMAIL CONFIRMATION
         // (IF USER CLICK ON A CONFIRMATION LINK BUT HE'S LOGGED IN WITH ANOTHER USER)
+        $this->mail_token_redirect($current_user);
+
+        // REDIRECT AFTER EMAIL INVITATION
+        // (IF USER CLICK ON A INVITATION LINK BUT HE'S LOGGED IN WITH ANOTHER USER)
+        $this->invite_token_redirect($current_user);
+    }
+
+    private function mail_token_redirect($current_user) {
         if (
             str_starts_with($this->req_url, get_permalink($this->settings['myaccount_page']))
             && isset($_REQUEST['mpop_mail_token'])
@@ -319,8 +379,31 @@ class MultipopPlugin {
                     $this->logout_redirect($this->req_url);
                 }
             } elseif ($user_id) {
-                $this->logout_redirect($this->req_url);
+                $this->delete_temp_token($_REQUEST['mpop_mail_token']);
+                $this->location_not_found();
             }
+        }
+    }
+    private function invite_token_redirect($current_user) {
+        if (
+            str_starts_with($this->req_url, get_permalink($this->settings['myaccount_page']))
+            && isset($_REQUEST['mpop_invite_token'])
+        ) {
+            if ( !preg_match('/^[a-f0-9]{32}$/', $_REQUEST['mpop_invite_token']) ) {
+                $this->location_not_found();
+            }
+            $invited_user_id = $this->verify_temp_token($_REQUEST['mpop_invite_token'], 'invite_link');
+            if ($invited_user_id && $current_user->ID) {
+                $this->delete_temp_token($_REQUEST['mpop_invite_token']);
+            }
+            if (!$invited_user_id || $current_user->ID) {
+                $this->location_not_found();
+            }
+            $invited_user = get_user_by('ID', $invited_user_id);
+            if (!$invited_user) {
+                $this->location_not_found();
+            }
+            $this->invited_user = $invited_user;
         }
     }
 
@@ -694,17 +777,19 @@ class MultipopPlugin {
             $phpmail->send();
             return true;
         } catch (Exception $e) {
-            return $phpmail->ErrorInfo;
+            $this->last_mail_error = $phpmail->ErrorInfo;
+            return false;
         }
     }
 
     private function send_confirmation_mail($token, $to) {
         $confirmation_link = get_permalink($this->settings['myaccount_page']);
-        return $this->send_mail([
-            'to' => $to,
-            'subject' =>'Conferma email',
-            'body' => 'Clicca sul link per confermare la tua email: <a href="'. $confirmation_link . '?mpop_mail_token=' . $token . '" target="_blank">'. $confirmation_link . '?mpop_mail_token=' . $token . '</a>'
-        ]);
+        return wp_mail($to,'Multipopolare - Conferma e-mail','Clicca sul link per confermare la tua e-mail: <a href="'. $confirmation_link . '?mpop_mail_token=' . $token . '" target="_blank">'. $confirmation_link . '?mpop_mail_token=' . $token . '</a>');
+    }
+
+    private function send_invitation_mail($token, $to) {
+        $confirmation_link = get_permalink($this->settings['myaccount_page']);
+        return wp_mail($to,'Multipopolare - Invito iscrizione','Sei stato invitato a iscriverti su Multipopolare.it. Clicca sul link per completare l\'iscrizione: <a href="'. $confirmation_link . '?mpop_invite_token=' . $token . '" target="_blank">'. $confirmation_link . '?mpop_invite_token=' . $token . '</a>');
     }
 
     private function get_last_webcard_number(int $year) {
@@ -1056,6 +1141,7 @@ class MultipopPlugin {
         if (is_null($user) || is_wp_error($user)) {
             return $user;
         }
+        if ($user->mpop_invited) return new WP_Error(401, "Inactive user's invitation");
         $roles = $user->roles;
         if (count( $roles ) == 0) {
             return new WP_Error(401, "No roles found");
@@ -1767,6 +1853,8 @@ class MultipopPlugin {
             'mpop_billing_zip' => $user->mpop_billing_zip,
             'mpop_billing_state' => $user->mpop_billing_state,
             'mpop_phone' => $user->mpop_phone,
+            'mpop_org_role' => $user->mpop_org_role,
+            'mpop_invited' => boolval($user->mpop_invited),
             'mpop_resp_zones' => [],
             'mpop_my_subscriptions' => $this->get_my_subscriptions($user->ID)
         ];
@@ -2118,16 +2206,16 @@ class MultipopPlugin {
         global $wpdb;
         $q_from = "FROM "
             . $this->db_prefix('subscriptions') . " s
-            LEFT JOIN " . $wpdb->prefix . "users users
+            LEFT JOIN $wpdb->users users
             ON s.user_id = users.ID
-            LEFT JOIN " . $wpdb->prefix . "users authors
+            LEFT JOIN $wpdb->users authors
             ON s.author_id = authors.ID
-            LEFT JOIN " . $wpdb->prefix . "users completers
+            LEFT JOIN $wpdb->users completers
             ON s.completer_id = completers.ID
-            LEFT JOIN " . $wpdb->prefix . "usermeta fn 
+            LEFT JOIN $wpdb->usermeta fn 
             ON s.user_id = fn.user_id 
             AND fn.meta_key = 'first_name'
-            LEFT JOIN " . $wpdb->prefix . "usermeta ln 
+            LEFT JOIN $wpdb->usermeta ln 
             ON s.user_id = ln.user_id 
             AND ln.meta_key = 'last_name' "
         ;
@@ -2216,6 +2304,7 @@ class MultipopPlugin {
                 status = 'completed',
                 updated_at = $now_ts,
                 completed_at = $now_ts,
+                signed_at = $signed_at,
                 completer_id = %d,
                 completer_ip = %s
                 ".($paypal ? '' : ", pp_order_id = NULL")."
@@ -2244,44 +2333,56 @@ class MultipopPlugin {
             $this->update_discourse_groups_by_user($sub['user_id']);
         }
     }
-    private function validate_birthdate($birth_date) {
-        if ( !is_string($birth_date) || strlen(trim($birth_date)) != 10) {
-            throw new Exception('mpop_birthdate');
+    private static function validate_date($date_string = '') {
+        if ( !is_string($date_string) || strlen(trim($date_string)) != 10) {
+            throw new Exception('Invalid date');
         }
-        $date_arr = array_map(function ($dt) {return intval($dt);}, explode('-', strval($birth_date) ) );
+        $date_arr = array_map(function ($dt) {return intval($dt);}, explode('-', strval($date_string) ) );
         if (
             count($date_arr) != 3
             || !checkdate($date_arr[1], $date_arr[2], $date_arr[0])
         ) {
-            throw new Exception('mpop_birthdate');
+            throw new Exception('Invalid date');
         }
-        $birth_date = date_create('now', new DateTimeZone(current_time('e')));
-        $birth_date->setDate($date_arr[0], $date_arr[1], $date_arr[2]);
-        $birth_date->setTime(0,0,0,0);
-        $min_birthdate = date_create('1910-10-13', new DateTimeZone('Europe/Rome'));
-        $min_birthdate->setTime(0,0,0,0);
-        $max_birthdate = date_create('now', new DateTimeZone('Europe/Rome'));
-        $max_birthdate->setTime(0,0,0,0);
-        $max_birthdate->sub(new DateInterval('P18Y'));
-        if (
-            $birth_date->getTimestamp() < $min_birthdate->getTimestamp()
-            || $birth_date->getTimestamp() > $max_birthdate->getTimestamp()
-        ) {
-            throw new Exception('mpop_birthdate');
-        }
-        return $birth_date;
+        $new_date = date_create('now', new DateTimeZone(current_time('e')));
+        $new_date->setDate($date_arr[0], $date_arr[1], $date_arr[2]);
+        $new_date->setTime(0,0,0,0);
+        return $new_date;
     }
-    private function validate_birthplace($birth_date, $birth_place, &$comuni = []) {
-        if (!preg_match('/^[A-Z]\d{3}$/', $birth_place)) {
+    private static function validate_birthdate($birthdate = '') {
+        try {
+            $birthdate = $this::validate_date($birthdate);
+            $min_birthdate = date_create('1910-10-13', new DateTimeZone('Europe/Rome'));
+            $min_birthdate->setTime(0,0,0,0);
+            $max_birthdate = date_create('now', new DateTimeZone('Europe/Rome'));
+            $max_birthdate->setTime(0,0,0,0);
+            $max_birthdate->sub(new DateInterval('P18Y'));
+            if (
+                $birthdate->getTimestamp() < $min_birthdate->getTimestamp()
+                || $birthdate->getTimestamp() > $max_birthdate->getTimestamp()
+            ) {
+                throw new Exception('mpop_birthdate');
+            }
+            return $birthdate;
+        } catch(Exception $e) {
+            throw new Exception('mpop_birthdate');
+        }
+    }
+    private function validate_birthplace($birthdate = '', $birthplace = '', &$comuni = []) {
+        if (!is_string($birthplace) || !preg_match('/^[A-Z]\d{3}$/', $birthplace)) {
             throw new Exception('mpop_birthplace');
         }
-        if (is_string($birth_date)) {
-            $birth_date = $this->validate_birthdate($birth_date);
+        if (is_string($birthdate)) {
+            $birthdate = $this::validate_birthdate($birthdate);
+        } else if (is_int($birthdate)) {
+            $birth_d = date_create('now', new DateTimeZone( current_time('e')));
+            $birth_d->setTimestamp($birth_d);
+            $birthdate = $birth_d;
         }
         if (empty($comuni)) {
             $comuni = $this->get_comuni_all();
         }
-        $found_bp = array_values(array_filter($comuni, function($c) use ($birth_place) {return $c['codiceCatastale'] == $birth_place;}));
+        $found_bp = array_values(array_filter($comuni, function($c) use ($birthplace) {return $c['codiceCatastale'] == $birthplace;}));
         if (!count($found_bp)) {
             throw new Exception('mpop_birthplace');
         }
@@ -2295,24 +2396,242 @@ class MultipopPlugin {
                 $soppr_arr_tm = array_map( function($v) {return intval(substr( $v, 0, 2));}, explode(':', $soppr_arr[1]));
                 $soppressione_dt->setDate($soppr_arr_dt[0], $soppr_arr_dt[1], $soppr_arr_dt[2]);
                 $soppressione_dt->setTime($soppr_arr_tm[0], $soppr_arr_tm[1], $soppr_arr_tm[2]);
-                if ($birth_date->getTimestamp() >= $soppressione_dt->getTimestamp()) {
+                if ($birthdate->getTimestamp() >= $soppressione_dt->getTimestamp()) {
                     throw new Exception('mpop_birthplace,mpop_birthplace');
                 }
             }
         }
-        return $birth_date->format('Y-m-d');
+        return $birthdate->format('Y-m-d');
     }
-    private function db_cache(string $q, string $group_key, int $expire = -1, bool $force = false, string $method = 'get_results', ...$args) {
-        $res = false;
-        if (!$force) {
-            $res = wp_cache_get(md5($q), $group_key);
+    private function row_import(array $row, $force_year = false, $force_quote = false, &$comuni = []) {
+        if (!isset($row['email']) || !$this::is_valid_email($row['email'])) {
+            throw new Exception('Invalid email');
         }
-        if ($res === false) {
-            global $wpdb;
-            $res = $wpdb->$method($q, ...$args);
-            wp_cache_add(md5($q), $res, $group_key, $expire < 0 ? 20 : $expire);
+        $row['email'] = strtolower($row['email']);
+        if (
+            get_user_by('email', $row['email'])
+            || !empty(get_users([
+                'meta_key' => '_new_email',
+                'meta_value' => $row['email'],
+                'meta_compare' => '='
+            ]))
+        ) {
+            throw new Exception('Duplicated email');
         }
-        return $res;
+        if (!isset($row['mpop_subscription_quote']) || (!is_float($row['mpop_subscription_quote']) && !is_int($row['mpop_subscription_quote'])) ) {
+            throw new Exception('Invalid mpop_subscription_quote');
+        }
+        if (!$force_quote) {
+            if (!$this->settings['min_subscription_payment']) {
+                throw new Exception('min_subscription_payment not setted in settings');
+            }
+            if ($row['mpop_subscription_quote'] < $this->settigs['min_subscription_payment']) {
+                throw new Exception('mpop_subscription_quote too little. Min: ' . $this->settigs['min_subscription_payment']);
+            }
+        } else {
+            if ($row['mpop_subscription_quote'] <= 0) {
+                throw new Exception('mpop_subscription_quote too little');
+            }
+        }
+        if (!isset($row['mpop_subscription_date'])) {
+            throw new Exception('Invalid mpop_subscription_quote');
+        }
+        $subscription_date = '';
+        try {
+            $subscription_date = $this::validate_date($row['mpop_subscription_date']);
+        } catch (Exception $e) {
+            throw new Exception('Invalid mpop_subscription_date');
+        }
+        if (!$force_year) {
+            if (!in_array(intval($subscription_date->format('Y')),$this->settings['authorized_subscription_years'])) {
+                throw new Exception('Invalid year in mpop_subscription_date');
+            }
+        }
+        if (
+            !isset($row['mpop_subscription_card_number'])
+            || !is_string($row['mpop_subscription_card_number'])
+            || !trim($row['mpop_subscription_card_number'])
+        ) {
+            throw new Exception('Invalid mpop_subscription_card_number');
+        } else {
+            $row['mpop_subscription_card_number'] = trim( mb_strtoupper( $row['mpop_subscription_card_number'], 'UTF-8'));
+            if (str_starts_with($row['mpop_subscription_card_number'], 'W')) {
+                throw new Exception('mpop_subscription_card_number cannot start with W');
+            }
+            if (!empty($this::get_subscription_by('card_number',$row['mpop_subscription_card_number'], $subscription_date->format('Y')))) {
+                throw new Exception('Duplicated mpop_subscription_card_number');
+            }
+        }
+        $user_input = [
+            'user_pass' => bin2hex(openssl_random_pseudo_bytes(16)),
+            'user_email' => $row['email'],
+            'role' => 'multipopolano',
+            'locate' => 'it_IT',
+            'meta_input' => [
+                'mpop_invited' => true
+            ]
+        ];
+        if (isset($row['mpop_org_role'])) {
+            if (in_array($row['mpop_org_role'],self::SINGLE_ORG_ROLES)) {
+                if (!empty(get_users([
+                    'meta_key' => 'mpop_org_role',
+                    'meta_value' => $row['mpop_org_role'],
+                    'meta_compare' => '='
+                ]))) {
+                    throw new Exception($row['mpop_org_role'] . ' mpop_org_role yet assigned');
+                }
+            } else {
+                throw new Exception('Invalid mpop_org_role');
+            }
+            $user_input['meta_input']['mpop_org_role'] = $row['mpop_org_role'];
+        }
+        $sub_notes = isset($row['mpop_subscription_notes']) ? trim(strval($row['mpop_subscription_notes'])) : '';
+        if (isset($row['login']) && is_string($row['login']) && strlen($row['login'])) {
+            $row['login'] = strtolower($row['login']);
+            if (!$this::is_valid_username($row['login'])) {
+                throw new Exception('Invalid login');
+            }
+            if (get_user_by('login', $row['login'])) {
+                throw new Exception('Duplicated login');
+            }
+            $user_input['user_login'] = $row['login'];
+            if (!isset($row['first_name']) || !$this::is_valid_name($row['first_name'])) {
+                throw new Exception('Invalid first_name');
+            }
+            $user_input['meta_input']['first_name'] = mb_strtoupper($row['first_name'], 'UTF-8');
+            if (!isset($row['last_name']) || !$this::is_valid_name($row['last_name'])) {
+                throw new Exception('Invalid last_name');
+            }
+            $user_input['meta_input']['last_name'] = mb_strtoupper($row['last_name'], 'UTF-8');
+            if (!isset($row['mpop_birthdate'])) {
+                throw new Exception('Invalid mpop_birthdate');
+            }
+            if (!isset($row['mpop_birthplace'])) {
+                throw new Exception('Invalid mpop_birthplace');
+            }
+            $birthdate = '';
+            try {
+                $birthdate = $this->validate_birthplace($row['mpop_birthdate'], $row['mpop_birthplace']);
+            } catch (Exception $e) {
+                throw new Exception('Invalid ' . $e->getMessage());
+            }
+            $user_input['meta_input']['mpop_birthdate'] = $birthdate->format('Y-m-d');
+            $user_input['meta_input']['mpop_birthplace'] = $row['mpop_birthplace'];
+            if (!isset($row['mpop_billing_address']) || !is_string($row['mpop_billing_address']) || mb_strlen(trim($row['mpop_billing_address']), 'UTF-8') < 2) {
+                throw new Exception('Invalid mpop_billing_address');
+            }
+            $user_input['meta_input']['mpop_billing_address'] = $row['mpop_billing_address'];
+            if (!isset($row['mpop_billing_city']) || !is_string($row['mpop_billing_city']) ) {
+                throw new Exception('Invalid mpop_billing_city');
+            }
+            if (!isset($row['mpop_billing_zip']) || !is_string($row['mpop_billing_zip']) ) {
+                throw new Exception('Invalid mpop_billing_zip');
+            }
+            if (empty($comuni)) {
+                $comuni = $this->get_comuni_all();
+            }
+            $comune = array_filter($comuni, function($c) {return !$c['soppresso'] && $c['codiceCatatale'] == $row['mpop_billing_city'];});
+            $comune = array_pop($comune);
+            if (!$comune) {
+                throw new Exception('Invalid mpop_billing_city');
+            }
+            if (!in_array($row['mpop_billing_zip'], $comune['cap'])) {
+                throw new Exception('Invalid mpop_billing_zip');
+            }
+            $user_input['meta_input']['mpop_billing_city'] = $row['mpop_billing_city'];
+            $user_input['meta_input']['mpop_billing_zip'] = $row['mpop_billing_zip'];
+            if (!isset($row['mpop_phone']) || !is_string($row['mpop_phone']) || !$this::is_valid_phone($row['mpop_phone'])) {
+                throw new Exception('Invalid mpop_phone');
+            }
+            $user_input['meta_input']['mpop_phone'] = $row['mpop_phone'];
+            $marketing_agree = isset($row['mpop_subscription_marketing_agree']) ? boolval($row['mpop_subscription_marketing_agree']) : true;
+            $newsletter_agree = isset($row['mpop_subscription_newsletter_agree']) ? boolval($row['mpop_subscription_newsletter_agree']) : true;
+            $publish_agree = isset($row['mpop_subscription_publish_agree']) ? boolval($row['mpop_subscription_publish_agree']) : true;
+        } else {
+            do {
+                $row['login'] = 'mp_' . bin2hex(openssl_random_pseudo_bytes(16));
+            } while(get_user_by('login', $row['login']));
+            $marketing_agree = false;
+            $newsletter_agree = false;
+            $publish_agree = false;
+        }
+        $user_id = wp_insert_user($user_input);
+        if (is_wp_error($user_id)) {
+            throw new Exception('Error during user save: ' . $user_id->get_error_message());
+        }
+        $sub_id = false;
+        try {
+            $sub_id = $this->create_subscription(
+                $user_id,
+                intval($subscription_date->format('Y')),
+                $row['mpop_subscription_quote'],
+                $marketing_agree,
+                $newsletter_agree,
+                $publish_agree,
+                '',
+                '',
+                0,
+                '',
+                '',
+                $sub_notes,
+                $force_year,
+                $force_quote
+            );
+        } catch(Exception $e) {
+            throw new Exception('Error while saving subscription: ' . $e->getMessage());
+        }
+        if (!$sub_id) {
+            throw new Exception('Error while saving subscription');
+        }
+        try {
+            $this->complete_subscription($sub_id,$row['mpop_subscription_card_number'],$subscription_date->getTimestamp());
+        } catch(Exception $e) {
+            throw new Exception('Error while completing subscription: ' . $e->getMessage());
+        }
+        $token = $this->create_temp_token($user_id,'invite_link',3600*24*30);
+        if(!$this->send_invitation_mail($token, $row['email'])) {
+            throw new Exception("Error while sending mail" . ($this->last_mail_error ? ': ' . $this->last_mail_error : ''));
+        }
+        return ['user_id'=> $user_id, 'sub_id' => $sub_id];
+    }
+    private function change_user_login($user_id, string $new_login, string $display_name = '') {
+        if (!$this::is_valid_username($new_login)) {
+            throw new Exception('user_login');
+        }
+        if (is_object($user_id)) {
+            $user_id = $user_id->ID;
+        }
+        if (!$user_id) {
+            throw new Exception('user_id');
+        }
+        $user = get_user_by('ID', $user_id);
+        if (!$user) {
+            throw new Exception('user_id');
+        }
+        if (!$user->mpop_invited || $user->discourse_sso_user_id) {
+            throw new Exception('user');
+        }
+        if( get_user_by('login', $new_login) ) {
+            throw new Exception('duplicated');
+        }
+        global $wpdb;
+        $wpdb->update(
+            $wpdb->users,
+            [
+                'user_login' => $new_login,
+                'user_nicename' => sanitize_title($new_login),
+                'display_name' => $display_name ? $display_name : $new_login
+            ],
+            ['ID', $user->ID]
+        );
+        $wpdb->update(
+            $wpdb->usermeta,
+            ['meta_value' => $new_login],
+            ['user_id'=> $user->ID, 'meta_key'=> 'nickname']
+        );
+        delete_user_meta($user->ID, 'mpop_invited');
+        clean_user_cache($user->ID);
+        update_user_caches(get_user_by('ID', $user->ID));
     }
     private function get_my_subscriptions($user_id) {
         if (is_object($user_id)) {
@@ -2349,7 +2668,7 @@ class MultipopPlugin {
         unset($res['completer_ip']);
         return $res;
     }
-    private function search_subscriptions(array $options = [], $limit = 100, $force = false) { 
+    private function search_subscriptions(array $options = [], $limit = 100) { 
         $options = $options + [
             'txt' => '',
             'user_id' => [],
@@ -2605,27 +2924,27 @@ class MultipopPlugin {
 
         $q_from = "FROM "
             . $this->db_prefix('subscriptions') . " s
-            LEFT JOIN " . $wpdb->prefix . "users users
+            LEFT JOIN $wpdb->users users
             ON s.user_id = users.ID
-            LEFT JOIN " . $wpdb->prefix . "users authors
+            LEFT JOIN $wpdb->users authors
             ON s.author_id = authors.ID
-            LEFT JOIN " . $wpdb->prefix . "users completers
+            LEFT JOIN $wpdb->users completers
             ON s.completer_id = completers.ID
-            LEFT JOIN " . $wpdb->prefix . "usermeta fn 
+            LEFT JOIN $wpdb->usermeta fn 
             ON s.user_id = fn.user_id 
             AND fn.meta_key = 'first_name'
-            LEFT JOIN " . $wpdb->prefix . "usermeta ln 
+            LEFT JOIN $wpdb->usermeta ln 
             ON s.user_id = ln.user_id 
             AND ln.meta_key = 'last_name'
-            LEFT JOIN " . $wpdb->prefix . "usermeta prov 
+            LEFT JOIN $wpdb->usermeta prov 
             ON s.user_id = prov.user_id 
             AND prov.meta_key = 'mpop_billing_state'
-            LEFT JOIN " . $wpdb->prefix . "usermeta comune 
+            LEFT JOIN $wpdb->usermeta comune 
             ON s.user_id = comune.user_id 
             AND comune.meta_key = 'mpop_billing_city' "
         ;
-        $q_count = "SELECT COUNT(DISTINCT s.id) as total_count " . $q_from . $q_where . ';';
-        $total = intval($this->db_cache($q_count, 'mpop_subs_search', -1, $force, 'get_var'));
+        $q_count = "SELECT COUNT(DISTINCT s.id) as total_count $q_from $q_where;";
+        $total = intval($wpdb->get_var($q_count));
         $pages = 1;
         $q_limit = "";
         if ($limit > 0) {
@@ -2646,11 +2965,10 @@ class MultipopPlugin {
             fn.meta_value AS first_name, 
             ln.meta_value AS last_name,
             prov.meta_value AS mpop_billing_state,
-            comune.meta_value AS mpop_billing_city "
-            . $q_from . $q_from . $q_limit . ';';
-        ;
+            comune.meta_value AS mpop_billing_city
+            $q_from $q_where $q_limit;";
         $res = [];
-        $res['subscriptions'] = $this->db_cache($q, 'mpop_subs_search', -1, $force, 'get_results', 'ARRAY_A');
+        $res['subscriptions'] = $wpdb->get_results($q, 'ARRAY_A');
         foreach($res['subscriptions'] as &$sub) {
             unset($sub['filename']);
             $sub['id'] = intval($sub['id']);
@@ -2678,7 +2996,7 @@ class MultipopPlugin {
         $extra_from = [];
         if (!empty($q->query_vars['mpop_extra_meta'])) {
             foreach($q->query_vars['mpop_extra_meta'] as $m_key => $m_type) {
-                $extra_from[$m_key] = "LEFT JOIN " . $wpdb->prefix . "usermeta mpop_exmt_$m_key ON (mp_users.ID = mpop_exmt_$m_key.user_id AND mpop_exmt_$m_key.meta_key = '$m_key')";
+                $extra_from[$m_key] = "LEFT JOIN $wpdb->usermeta mpop_exmt_$m_key ON (mp_users.ID = mpop_exmt_$m_key.user_id AND mpop_exmt_$m_key.meta_key = '$m_key')";
             }
         }
         if (!empty($extra_from)) {
@@ -2719,7 +3037,7 @@ class MultipopPlugin {
                 $sanitized_value,
                 $sanitized_value
             );
-            $q->query_from .= ' INNER JOIN ' . $wpdb->prefix . 'usermeta AS search_first_name ON ( ' . $wpdb->prefix . 'users.ID = search_first_name.user_id ) INNER JOIN ' . $wpdb->prefix . 'usermeta AS search_last_name ON ( ' . $wpdb->prefix . 'users.ID = search_last_name.user_id )';
+            $q->query_from .= " INNER JOIN $wpdb->usermeta AS search_first_name ON ( $wpdb->users.ID = search_first_name.user_id ) INNER JOIN $wpdb->usermeta AS search_last_name ON ( $wpdb->users.ID = search_last_name.user_id )";
         }
         remove_action('pre_user_query', [$this, 'user_search_pre_user_query']);
     }
@@ -2906,7 +3224,7 @@ class MultipopPlugin {
             foreach ($sort_keys as $k) {
                 if (in_array($k, $allowed_field_sorts)) {
                     if ($k == 'role') {
-                        $fsort_by[$wpdb->prefix . 'usermeta'] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
+                        $fsort_by[$wpdb->usermeta] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
                     } else {
                         $fsort_by[$k] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
                     }
@@ -2982,6 +3300,8 @@ class MultipopPlugin {
                 'mpop_billing_state' => $u->mpop_billing_state,
                 'mpop_billing_city' => $billing_city ? $billing_city['nome'] : '',
                 'mpop_phone' => $u->mpop_phone,
+                'mpop_org_role' => $u->mpop_org_role,
+                'mpop_invited' => $u->mpop_invited,
                 'mpop_resp_zones' => []
             ];
             if (isset($u->roles[0]) && $u->roles[0] == 'multipopolare_resp' && !empty($u->mpop_resp_zones)) {
@@ -2997,7 +3317,6 @@ class MultipopPlugin {
     }
 
     public function discourse_req_ca($verify, $url) {
-        save_test($url, 0, true);
         $discourse_connect_options = get_option('discourse_connect');
         if (
             is_array($discourse_connect_options)
@@ -3131,7 +3450,7 @@ class MultipopPlugin {
         return $params;
     }
     public function discourse_bypass_invited_users($user_id, $user) {
-        return !$user->mpop_card_active;
+        return str_starts_with($user->user_login, 'mp_');
     }
 }
 

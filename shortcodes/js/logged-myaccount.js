@@ -73,7 +73,7 @@ userCsvFields = [
     'mpop_phone',
     'mpop_subscription_quote',
     'mpop_subscription_date',
-    'mpop_subscription_card_id',
+    'mpop_subscription_card_number',
     'mpop_subscription_marketing_agree',
     'mpop_subscription_newsletter_agree',
     'mpop_subscription_publish_agree',

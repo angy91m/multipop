@@ -72,9 +72,8 @@ if (!$errors->has_errors()) {
                     ) {
                         $this->delete_temp_token_by_user_id($user->ID, 'email_confirmation_link');
                         $token = $this->create_temp_token( $user->ID, 'email_confirmation_link' );
-                        $mail_res = $this->send_confirmation_mail($token, $old_user->_new_email ? $old_user->_new_email : $old_user->user_email);
-                        if ( $mail_res !== true ) {
-                            $errors->add(500, $error_head . $mail_res);
+                        if(!$this->send_confirmation_mail($token, $old_user->_new_email ? $old_user->_new_email : $old_user->user_email)) {
+                            $errors->add(500, $error_head . ("Error while sending mail" . ($this->last_mail_error ? ': ' . $this->last_mail_error : '')));
                             return;
                         }
                         $user = $old_user;
@@ -130,9 +129,8 @@ if (!$errors->has_errors()) {
                             }
                             if ($mail_changed && isset($_POST['send_mail_confirmation']) && $_POST['send_mail_confirmation']) {
                                 $token = $this->create_temp_token( $user->ID, 'email_confirmation_link' );
-                                $mail_res = $this->send_confirmation_mail($token, $user_meta['_new_email'] ? $user_meta['_new_email'] : $user->user_email);
-                                if ( $mail_res !== true ) {
-                                    $errors->add(500, $error_head . $mail_res);
+                                if(!$this->send_confirmation_mail($token, $user_meta['_new_email'] ? $user_meta['_new_email'] : $user->user_email)) {
+                                    $errors->add(500, $error_head . ("Error while sending mail" . ($this->last_mail_error ? ': ' . $this->last_mail_error : '')));
                                     return;
                                 }
                             }

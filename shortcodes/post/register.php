@@ -71,7 +71,7 @@ if (get_user_by( 'login', $post_data['username'] )) {
 
 $user_id = wp_insert_user([
     'user_login' => $post_data['username'],
-    'user_nicename' => $post_data['username'],
+    'user_nicename' => sanitize_title($post_data['username']),
     'user_email' => $post_data['email'],
     'user_pass' => $post_data['password'],
     'role' => 'multipopolano',
@@ -101,8 +101,7 @@ $user_id = wp_insert_user([
 
 if (is_int($user_id)) {
     $token = $this->create_temp_token( $user_id, 'email_confirmation_link' );
-    $res = $this->send_confirmation_mail($token, $post_data['email']);
-    if ($res === true) {
+    if($this->send_confirmation_mail($token, $post_data['email'])) {
         $res_data['data'] = 'ok';
     } else {
         $this->delete_temp_token( $token );
