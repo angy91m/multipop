@@ -997,6 +997,7 @@ createApp({
             });
         }
         onBeforeMount(()=> {
+            console.log(IntlTelInput);
             const {user: parsedUser} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
             Object.assign(profile, parsedUser);
             generateNotices();
