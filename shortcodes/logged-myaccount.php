@@ -690,7 +690,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 :class="savingUserErrors.includes('mpop_phone') ? 'bad-input' : ''"
                                 @change-number="()=>userInEditing.mpop_phone = parsePhone(userEditPhoneInput)"
                                 @change-country="()=>userInEditing.mpop_phone = parsePhone(userEditPhoneInput)"
-                            />
+                            ></v-intl-phone>
                         </td>
                     </tr>
                     <tr v-if="profile.role == 'administrator' && profile.mpop_has_master_key && ['administrator', 'multipopolare_resp'].includes(userInView.role)">
@@ -712,8 +712,8 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                 ></q-table>
                 <div class="q-gutter-sm">
                     <button class="mpop-button" @click="uploadCsvRows" :disabled="saving || !csvUsers.length">Carica righe</button>
-                    <q-checkbox left-label v-model="csvImportOptions.forceYear" label="Forza anno" />
-                    <q-checkbox left-label v-model="csvImportOptions.forceQuote" label="Forza valore quota" />
+                    <q-checkbox left-label v-model="csvImportOptions.forceYear" label="Forza anno"></q-checkbox>
+                    <q-checkbox left-label v-model="csvImportOptions.forceQuote" label="Forza valore quota"></q-checkbox>
                 </div>
             </div>
             </q-page>
