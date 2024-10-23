@@ -2959,7 +2959,7 @@ class MultipopPlugin {
             ON s.user_id = comune.user_id 
             AND comune.meta_key = 'mpop_billing_city' "
         ;
-        $q_count = "SELECT COUNT(DISTINCT s.id) as total_count $q_from $q_where;";
+        $q_count = "SELECT COUNT(DISTINCT s.id) as total_count $q_from " . ($q_where ? "WHERE $q_where" : '') . ";";
         $total = intval($wpdb->get_var($q_count));
         $pages = 1;
         $q_limit = "";
@@ -2982,7 +2982,7 @@ class MultipopPlugin {
             ln.meta_value AS last_name,
             prov.meta_value AS mpop_billing_state,
             comune.meta_value AS mpop_billing_city
-            $q_from $q_where $q_limit;";
+            $q_from " . ($q_where ? "WHERE $q_where" : '') . " $q_limit;";
         $res = [];
         $res['subscriptions'] = $wpdb->get_results($q, 'ARRAY_A');
         foreach($res['subscriptions'] as &$sub) {
