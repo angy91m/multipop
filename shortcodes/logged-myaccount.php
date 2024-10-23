@@ -710,9 +710,11 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     hide-bottom
                     :pagination="{page:1,rowsPerPage:0}"
                 ></q-table>
-                <button class="mpop-button" @click="uploadCsvRows" :disabled="saving || !csvUsers.length">Carica righe</button>
-                <q-checkbox left-label v-model="csvImportOptions.forceYear" label="Forza anno" />
-                <q-checkbox left-label v-model="csvImportOptions.forceQuote" label="Forza valore quota" />
+                <div class="q-gutter-sm">
+                    <button class="mpop-button" @click="uploadCsvRows" :disabled="saving || !csvUsers.length">Carica righe</button>
+                    <q-checkbox left-label v-model="csvImportOptions.forceYear" label="Forza anno" />
+                    <q-checkbox left-label v-model="csvImportOptions.forceQuote" label="Forza valore quota" />
+                </div>
             </div>
             </q-page>
         </q-page-container>
