@@ -2220,6 +2220,17 @@ class MultipopPlugin {
             ON s.user_id = ln.user_id 
             AND ln.meta_key = 'last_name' "
         ;
+        save_test($wpdb->prepare(
+            "SELECT s.*,
+            users.user_login AS user_login,
+            users.user_email AS user_email,
+            authors.user_login AS author_login,
+            completers.user_login AS completer_login,
+            fn.meta_value AS first_name, 
+            ln.meta_value AS last_name
+            $q_from WHERE s.$getby = $search_format ". ($getby == 'card_number' ? "AND s.year = $year" : '') ." LIMIT 1;",
+            [$sub_id]
+        ));
         $res = $wpdb->get_row(
             $wpdb->prepare(
                 "SELECT s.*,
@@ -2264,10 +2275,10 @@ class MultipopPlugin {
         $webcard = false;
         $sub = $this->get_subscription_by('id', $sub_id);
         if (!$sub) {
-            throw new Exception('Invalid subscrition');
+            throw new Exception('Invalid subscription');
         }
         if ($sub['status'] != 'seen') {
-            throw new Exception("Invalid subscrition status: $sub[status]");
+            throw new Exception("Invalid subscription status: $sub[status]");
         }
         if ($card_number) {
             $card_number = trim($card_number);
