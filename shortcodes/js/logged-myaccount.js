@@ -36,6 +36,15 @@ passwordRegex = {
     },
     acceptedSymbols: "SPACE | \\ ! \" £ $ % & / ( ) = ? ' ^ , . ; : _ @ ° # * + [ ] { } _ -"
 },
+boolVal = v => {
+    if (typeof v == 'string' && v) {
+        v = v.toLowerCase();
+        if (['1','true','si','sì'].includes(v)) {
+            return true;
+        }
+    }
+    return false;
+},
 userRoles = [
     'multipopolano',
     'multipopolare_resp',
@@ -140,6 +149,10 @@ createApp({
         pwdChangeFields = reactive({}),
         pwdChanging = ref(false),
         csvUsers = reactive([]),
+        csvImportOptions = reactive({
+            forceQuote: false,
+            forceYear: false
+        }),
         profilePhoneInput = ref('profilePhoneInput'),
         userEditPhoneInput = ref('userEditPhoneInput'),
         userSearchTablePagination = ref({
@@ -288,6 +301,35 @@ createApp({
                 } else {
                     nextTick(()=> e.target.value = '');
                 }
+            }
+        }
+        async function uploadCsvRows() {
+            saving.value = true;
+            try {
+                if (csvUsers.length) {
+                    const response = await serverReq({
+                        action: 'admin_import_rows',
+                        rows: csvUsers.map(row => ({
+                            ...row,
+                            mpop_subscription_quote: parseFloat(row.mpop_subscription_quote.replace('€', '').replaceAll(',', '.').replaceAll(' ', '')),
+                            mpop_subscription_marketing_agree: boolVal(row.mpop_subscription_marketing_agree),
+                            mpop_subscription_newsletter_agree: boolVal(row.mpop_subscription_newsletter_agree),
+                            mpop_subscription_publish_agree: boolVal(row.mpop_subscription_publish_agree)
+                        })),
+                        ...csvImportOptions
+                    });
+                    if (response.ok) {
+                        const {data: rowResps} = await response.json();
+                        console.log(rowResps);
+                    } else {
+                        const {error} = await response.json();
+                        console.error(error);
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            } finally {
+                saving.value = false;
             }
         }
         async function birthCitiesSearch(searchText, user = false) {
@@ -1077,7 +1119,9 @@ createApp({
             foundUsersColumns,
             userSearching,
             userSearchTablePagination,
-            menuItems
+            menuItems,
+            csvImportOptions,
+            uploadCsvRows
         };
     }
 })

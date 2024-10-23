@@ -362,7 +362,7 @@ switch( $post_data['action'] ) {
     case 'admin_search_zones':
         $res_data['data'] = $this->search_zones($post_data['search']);
         break;
-    case 'import_rows':
+    case 'admin_import_rows':
         $res_rows = [];
         if (!isset($post_data['rows']) || !is_array($post_data['rows'])) {
             $res_data['error'] = ['rows'];
