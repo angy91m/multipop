@@ -2179,11 +2179,13 @@ class MultipopPlugin {
             $insert_data[] = ['filename', $rand_file_name, '%s'];
         }
         global $wpdb;
-        return $wpdb->insert(
+        if ($wpdb->insert(
             $wpdb->prefix . 'mpop_subscriptions',
             array_reduce($insert_data, function($arr, $v){$arr[$v[0]] = $v[1]; return $arr;}, []),
             array_map(function($v) {return $v[2];}, $insert_data)
-        );
+        )) {
+            return $wpdb->insert_id;
+        }
     }
     private function get_subscription_by($getby, $sub_id, $year = 0) {
         $search_format = '%d';
@@ -2220,18 +2222,6 @@ class MultipopPlugin {
             ON s.user_id = ln.user_id 
             AND ln.meta_key = 'last_name' "
         ;
-        save_test($sub_id,1);
-        save_test($wpdb->prepare(
-            "SELECT s.*,
-            users.user_login AS user_login,
-            users.user_email AS user_email,
-            authors.user_login AS author_login,
-            completers.user_login AS completer_login,
-            fn.meta_value AS first_name, 
-            ln.meta_value AS last_name
-            $q_from WHERE s.$getby = $search_format ". ($getby == 'card_number' ? "AND s.year = $year" : '') ." LIMIT 1;",
-            [$sub_id]
-        ));
         $res = $wpdb->get_row(
             $wpdb->prepare(
                 "SELECT s.*,
@@ -2606,7 +2596,6 @@ class MultipopPlugin {
                 $force_year,
                 $force_quote
             );
-            save_test($sub_id,2);
         } catch(Exception $e) {
             throw new Exception('Error while saving subscription: ' . $e->getMessage());
         }
