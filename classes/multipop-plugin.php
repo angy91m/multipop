@@ -2180,7 +2180,7 @@ class MultipopPlugin {
         }
         global $wpdb;
         return $wpdb->insert(
-            $this::db_prefix('subscriptions'),
+            $wpdb->prefix . 'mpop_subscriptions',
             array_reduce($insert_data, function($arr, $v){$arr[$v[0]] = $v[1]; return $arr;}, []),
             array_map(function($v) {return $v[2];}, $insert_data)
         );
