@@ -2280,7 +2280,7 @@ class MultipopPlugin {
             $webcard = true;
             $card_number = 'W'. $this->zerofill($this->get_last_webcard_number($sub['year'])+1);
         }
-        $date_now = date_create('now', current_time('e'));
+        $date_now = date_create('now', new DateTimeZone( current_time('e')));
         $now_ts = $date_now->getTimestamp();
         if ($signed_at) {
             if (is_string($signed_at)) {
