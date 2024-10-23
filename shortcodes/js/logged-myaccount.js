@@ -1051,7 +1051,7 @@ createApp({
             return role;
         }
         onMounted(() => {
-            console.log(intPhoneInstance.instance);
+            console.log(intPhoneInstance);
         });
         return {
             selectedTab,
