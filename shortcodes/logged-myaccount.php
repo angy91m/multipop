@@ -18,6 +18,11 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/logged-myaccount-fonts.css">
 <div id="loaded-scripts" style="display:none"></div>
 <div id="app">
+    <v-intl-phone
+        ref="intPhoneInstance"
+        :options="{initialCountry: 'it'}"
+        style="display:none"
+    ></v-intl-phone>
     <span v-for="(notice, noticeInd) in userNotices" :class="'mpop-app-notice' + ' notice-' + notice.type"><span @click="dismissNotice(noticeInd)"><?=$this::dashicon('no-alt')?></span><span v-html="notice.msg"></span></span>
     <div class="q-pa-md">
         <q-layout view="hHh Lpr lff" class="shadow-2 rounded-borders">
@@ -239,7 +244,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 :class="savingProfileErrors.includes('mpop_phone') ? 'bad-input' : ''"
                                 @change-number="()=>profileInEditing.mpop_phone = parsePhone(profilePhoneInput)"
                                 @change-country="()=>profileInEditing.mpop_phone = parsePhone(profilePhoneInput)"
-                            />
+                            ></v-intl-phone>
                         </td>
                     </tr>
                 </table>

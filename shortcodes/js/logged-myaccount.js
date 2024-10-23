@@ -1,7 +1,7 @@
 import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
-const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick } = Vue,
+const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, onMounted, defineAsyncComponent, nextTick } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
     const loaded = [];
@@ -112,7 +112,7 @@ menuItems = [{
     admin: true
 }],
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value;
-let searchUsersTimeout, triggerSearchTimeout;
+let searchUsersTimeout, triggerSearchTimeout, telUtils;
 createApp({
     components: {
         'v-select': defineAsyncComponent(() => vSel),
@@ -153,6 +153,7 @@ createApp({
             forceQuote: false,
             forceYear: false
         }),
+        intPhoneInstance = ref('intPhoneInstance'),
         profilePhoneInput = ref('profilePhoneInput'),
         userEditPhoneInput = ref('userEditPhoneInput'),
         userSearchTablePagination = ref({
@@ -997,7 +998,6 @@ createApp({
             });
         }
         onBeforeMount(()=> {
-            console.log(IntlTelInput);
             const {user: parsedUser} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
             Object.assign(profile, parsedUser);
             generateNotices();
@@ -1050,6 +1050,9 @@ createApp({
             }
             return role;
         }
+        onMounted(() => {
+            console.log(intPhoneInstance.instance);
+        });
         return {
             selectedTab,
             profile,
@@ -1122,7 +1125,8 @@ createApp({
             userSearchTablePagination,
             menuItems,
             csvImportOptions,
-            uploadCsvRows
+            uploadCsvRows,
+            intPhoneInstance
         };
     }
 })
