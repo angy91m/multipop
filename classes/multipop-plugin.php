@@ -163,7 +163,7 @@ class MultipopPlugin {
     }
     private static function is_valid_name($name) {
         if(!isset($name) || !is_string($name)) return false;
-        $name = trim(mb_strtoupper($name, 'UTF-8'));
+        $name = trim(mb_strtolower($name, 'UTF-8'));
         $allowed_chars = "a-zàáâäæçčèéêëìíîïòóôöœùúûüšžß";
         if (
             !preg_match("/^[$allowed_chars][$allowed_chars\', ]*[$allowed_chars\']/", $name)
