@@ -2220,6 +2220,7 @@ class MultipopPlugin {
             ON s.user_id = ln.user_id 
             AND ln.meta_key = 'last_name' "
         ;
+        save_test($sub_id,1);
         save_test($wpdb->prepare(
             "SELECT s.*,
             users.user_login AS user_login,
@@ -2605,6 +2606,7 @@ class MultipopPlugin {
                 $force_year,
                 $force_quote
             );
+            save_test($sub_id,2);
         } catch(Exception $e) {
             throw new Exception('Error while saving subscription: ' . $e->getMessage());
         }
