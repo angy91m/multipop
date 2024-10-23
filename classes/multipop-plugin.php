@@ -2515,7 +2515,7 @@ class MultipopPlugin {
             } catch (Exception $e) {
                 throw new Exception('Invalid ' . $e->getMessage());
             }
-            $user_input['meta_input']['mpop_birthdate'] = $birthdate->format('Y-m-d');
+            $user_input['meta_input']['mpop_birthdate'] = $birthdate;
             $user_input['meta_input']['mpop_birthplace'] = $row['mpop_birthplace'];
             if (!isset($row['mpop_billing_address']) || !is_string($row['mpop_billing_address']) || mb_strlen(trim($row['mpop_billing_address']), 'UTF-8') < 2) {
                 throw new Exception('Invalid mpop_billing_address');
