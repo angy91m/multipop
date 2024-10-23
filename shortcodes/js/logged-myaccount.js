@@ -1051,7 +1051,7 @@ createApp({
             return role;
         }
         onMounted(() => {
-            console.log(intPhoneInstance);
+            console.log(intPhoneInstance.value.instance._utilsIsValidNumber);
         });
         return {
             selectedTab,
