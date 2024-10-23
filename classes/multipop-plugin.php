@@ -2282,6 +2282,7 @@ class MultipopPlugin {
         }
         $date_now = date_create('now', new DateTimeZone( current_time('e')));
         $now_ts = $date_now->getTimestamp();
+        save_test($this::get_client_ip());
         if ($signed_at) {
             if (is_string($signed_at)) {
                 if (
