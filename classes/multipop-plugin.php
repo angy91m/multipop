@@ -2302,8 +2302,8 @@ class MultipopPlugin {
             $signed_at = $now_ts;
         }
         global $wpdb;
-        $wpdb->query($wpdb->prepare(
-            "UPDATE " . $this::db_prefix('subscription') . " SET 
+        if(!$wpdb->query($wpdb->prepare(
+            "UPDATE " . $this::db_prefix('subscriptions') . " SET 
                 card_number = %s,
                 status = 'completed',
                 updated_at = $now_ts,
@@ -2317,7 +2317,9 @@ class MultipopPlugin {
             $card_number,
             get_current_user_id(),
             $this::get_client_ip()
-        ]);
+        ])) {
+            throw new Exception("Error while saving on DB");
+        }
         if ($webcard) {
             $this->increment_last_webcard_number();
         }
