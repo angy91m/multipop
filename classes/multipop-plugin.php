@@ -2294,7 +2294,7 @@ class MultipopPlugin {
                 $signed_at->setDate(intval($signed_at_capture[1]),intval($signed_at_capture[2]), intval($signed_at_capture[3]));
                 $signed_at->setTime(0,0);
                 $signed_at = $signed_at->getTimestamp();
-            } else if (!is_int($signed_at) || $signed_at > 0) {
+            } else if (!is_int($signed_at) || $signed_at < 0) {
                 throw new Exception("Invalid signed_at");
             }
         } else {
