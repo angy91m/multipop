@@ -2282,7 +2282,6 @@ class MultipopPlugin {
         }
         $date_now = date_create('now', new DateTimeZone( current_time('e')));
         $now_ts = $date_now->getTimestamp();
-        save_test($this::get_client_ip());
         if ($signed_at) {
             if (is_string($signed_at)) {
                 if (
@@ -2312,12 +2311,13 @@ class MultipopPlugin {
                 completer_id = %d,
                 completer_ip = %s
                 ".($paypal ? '' : ", pp_order_id = NULL")."
-            WHERE id = $sub_id;"
-        ), [
-            $card_number,
-            get_current_user_id(),
-            $this::get_client_ip()
-        ])) {
+            WHERE id = $sub_id;",
+            [
+                $card_number,
+                get_current_user_id(),
+                $this::get_client_ip()
+            ]
+        ))) {
             throw new Exception("Error while saving on DB");
         }
         if ($webcard) {
