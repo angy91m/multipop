@@ -2403,6 +2403,23 @@ class MultipopPlugin {
         }
         return $birthdate->format('Y-m-d');
     }
+    private function get_comune_by_catasto(string $catasto, $soppressi = false, &$comuni= []) {
+        if (empty($catasto)) return false;
+        if (empty($comuni)) {
+            $comuni = $this->get_comuni_all();
+        }
+        $found = false;
+        foreach($comuni as $c) {
+            if (!$soppressi && $c['soppresso']) {
+                continue;
+            }
+            if ($catasto == $c['codiceCatastale']) {
+                $found = $c;
+                break;
+            }
+        }
+        return $found;
+    }
     private function row_import(array $row, $force_year = false, $force_quote = false, &$comuni = []) {
         if (!isset($row['email']) || !$this::is_valid_email($row['email'])) {
             throw new Exception('Invalid email');
@@ -2530,8 +2547,7 @@ class MultipopPlugin {
             if (empty($comuni)) {
                 $comuni = $this->get_comuni_all();
             }
-            $comune = array_filter($comuni, function($c) {return !$c['soppresso'] && $c['codiceCatatale'] == $row['mpop_billing_city'];});
-            $comune = array_pop($comune);
+            $comune = $this->get_comune_by_catasto($row['mpop_billing_city'], false, $comuni);
             if (!$comune) {
                 throw new Exception('Invalid mpop_billing_city');
             }
