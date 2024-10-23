@@ -2084,8 +2084,9 @@ class MultipopPlugin {
                     'tosee',
                     'seen',
                     'completed'
-                ]
-            ]);
+                ],
+                'pagination' => false
+            ], -1);
             if (count($others)) {
                 throw new Exception('User has got open subscription(s) yet: ' . implode( ',', array_map(function($o) {return $o['id'];}, $others)));
             }
@@ -2684,7 +2685,7 @@ class MultipopPlugin {
         unset($res['completer_ip']);
         return $res;
     }
-    private function search_subscriptions(array $options = [], $limit = 100) { 
+    private function search_subscriptions(array $options = [], $limit = 100, ) { 
         $options = $options + [
             'txt' => '',
             'user_id' => [],
@@ -2703,6 +2704,7 @@ class MultipopPlugin {
             'mpop_billing_state' => [],
             'mpop_billing_city' => [],
             'page' => 1,
+            'pagination' => true,
             'order_by' => ['s.updated_at' => false]
         ];
         $time_interval_reg = '/^\d*,\d*$/';
@@ -2959,11 +2961,14 @@ class MultipopPlugin {
             ON s.user_id = comune.user_id 
             AND comune.meta_key = 'mpop_billing_city' "
         ;
-        $q_count = "SELECT COUNT(DISTINCT s.id) as total_count $q_from " . ($q_where ? "WHERE $q_where" : '') . ";";
-        $total = intval($wpdb->get_var($q_count));
+        $total = 0;
+        if ($options['pagination']) {
+            $q_count = "SELECT COUNT(DISTINCT s.id) as total_count $q_from " . ($q_where ? "WHERE $q_where" : '') . ";";
+            $total = intval($wpdb->get_var($q_count));
+        }
         $pages = 1;
         $q_limit = "";
-        if ($limit > 0) {
+        if ($limit >= 0) {
             $pages = ceil($total / $limit);
             $q_limit = " LIMIT $limit";
             if ($options['page'] > $pages) {
@@ -3001,6 +3006,9 @@ class MultipopPlugin {
             $sub['author_id'] = intval($sub['author_id']);
             $sub['completer_id'] = intval($sub['completer_id']);
             unset($sub['completer_ip']);
+        }
+        if (!$options['pagination']) {
+            return $res['subscriptions'];
         }
         $res['total'] = $total;
         $res['pages'] = $pages;
