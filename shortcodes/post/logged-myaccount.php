@@ -253,7 +253,7 @@ switch ($post_data['action']) {
                     $comuni = $this->get_comuni_all();
                 }
                 try {
-                    $post_data['mpop_birthdate'] = $this::validate_birthplace($post_data['mpop_birthdate'], $post_data['mpop_birthplace'], $comuni);
+                    $post_data['mpop_birthdate'] = $this->validate_birthplace($post_data['mpop_birthdate'], $post_data['mpop_birthplace'], $comuni);
                 } catch(Exception $e) {
                     if (!isset($res_data['error'])) {
                         $res_data['error'] = [];

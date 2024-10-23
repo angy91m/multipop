@@ -2351,7 +2351,7 @@ class MultipopPlugin {
     }
     private static function validate_birthdate($birthdate = '') {
         try {
-            $birthdate = $this::validate_date($birthdate);
+            $birthdate = static::validate_date($birthdate);
             $min_birthdate = date_create('1910-10-13', new DateTimeZone('Europe/Rome'));
             $min_birthdate->setTime(0,0,0,0);
             $max_birthdate = date_create('now', new DateTimeZone('Europe/Rome'));
