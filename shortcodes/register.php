@@ -15,7 +15,7 @@ if (
 $this->show_hcaptcha_script();
 ?>
 <div id="app">
-    <?=$this->html_added()?>
+    <?php $this->html_added()?>
     <template v-if="!registered">
         <form class="mpop-form mpop-form-register">
             <p v-if="errorFields.has('server')" class="mpop-field-error">Errore sever</p>

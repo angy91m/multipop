@@ -10,7 +10,7 @@ if (
 }
 ?>
 <div id="app" class="mpop-form">
-    <?=$this->html_added()?>
+    <?php $this->html_added()?>
     <p class="mpop-form-row">
         <input type="text"  name="user" autocomplete="username" placeholder="Nome utente o e-mail" />
     </p>
