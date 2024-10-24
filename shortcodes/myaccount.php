@@ -12,5 +12,13 @@ if (!$current_user->ID) {
     }
 } else {
     // LOGGED IN
+    if (isset($current_user->roles[0]) && $current_user->roles[0] != 'administrator') {
+        $redirect_url = '/';
+        $discourse_connect_options = get_option('discourse_connect');
+        if (is_array($discourse_connect_options) && isset($discourse_connect_options['url']) && $discourse_connect_options['url']) {
+            $redirect_url = $discourse_connect_options['url'];
+        }
+        header('Location: ' . $redirect_url);
+    }
     require('logged-myaccount.php');
 }

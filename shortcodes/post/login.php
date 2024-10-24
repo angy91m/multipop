@@ -8,7 +8,7 @@ if (
 ) {
     $_GET['invalid_mpop_login'] = '1';
     header("Status: 401 Unauthorized");
-    header('location:'.  explode('?',$this->req_path)[0] . '?' . $this->export_GET());
+    header('Location: '.  explode('?',$this->req_path)[0] . '?' . $this->export_GET());
     exit();
 }
 $_POST['user'] = mb_strtolower(trim($_POST['user']), 'UTF-8');
@@ -18,7 +18,7 @@ if (
 ) {
     $_GET['invalid_mpop_login'] = '1';
     header("Status: 401 Unauthorized");
-    header('location:'.  explode('?',$this->req_path)[0] . '?' . $this->export_GET());
+    header('Location: '.  explode('?',$this->req_path)[0] . '?' . $this->export_GET());
     exit();
 }
 $res = wp_signon([
@@ -28,13 +28,13 @@ $res = wp_signon([
 if (get_class($res) == 'WP_Error') {
     $_GET['invalid_mpop_login'] = '1';
     header("Status: 401 Unauthorized");
-    header('location:'.  explode('?',$this->req_path)[0] . '?' . $this->export_GET());
+    header('Location: '.  explode('?',$this->req_path)[0] . '?' . $this->export_GET());
     exit();
 } else {
     if (isset($_GET['redirect_to'])) {
-        header('location:'. $_GET['redirect_to']);
+        header('Location: '. $_GET['redirect_to']);
     } else {
-        header('location:'. explode('?',$this->req_path)[0]);
+        header('Location: '. explode('?',$this->req_path)[0]);
     }
     exit();
 }

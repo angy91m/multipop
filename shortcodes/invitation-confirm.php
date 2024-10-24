@@ -17,7 +17,8 @@ if (
         <input type="password" name="password" autocomplete="password" placeholder="Password"/>
     </p>
     <p class="mpop-form-row">
-        <a href="./?mpop_forgot_password=1">Password dimenticata</a>
+        <?php wp_nonce_field( 'mpop-login', 'mpop-login-nonce' ); ?>
+        <button class="primary" name="login" value="login">Accedi</button>
     </p>
 </div>
 <script src="<?=plugins_url()?>/multipop/js/vue.global.min.js"></script>

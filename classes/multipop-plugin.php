@@ -1093,7 +1093,7 @@ class MultipopPlugin {
 
     // REDIRECT TO 404
     private function location_not_found() {
-        header('location:/404');
+        header('Location: /404');
         exit();
     }
 
@@ -3364,6 +3364,7 @@ class MultipopPlugin {
         $discourse_connect_options = get_option('discourse_connect');
         if (
             is_array($discourse_connect_options)
+            && isset($discourse_connect_options['url'])
             && $discourse_connect_options['url']
             && str_starts_with($url, $discourse_connect_options['url'])
             && file_exists( MULTIPOP_PLUGIN_PATH . '/discourse.ca' )
