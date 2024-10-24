@@ -52,6 +52,9 @@ if (!$errors->has_errors()) {
                 $old_user->user_pass = $user->user_pass;
             }
             $user = $old_user;
+            if (!isset($user->role) && isset($old_user->roles[0])) {
+                $user->role = $old_user->roles[0];
+            }
         }
     } else {
         $old_user = false;
