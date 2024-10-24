@@ -45,7 +45,7 @@ if (!$errors->has_errors()) {
                 )
             );
         }
-        save_test($this->current_user_is_admin());
+        save_test($user);
         if (!$this->current_user_is_admin()) {
             $old_user = get_user_by('ID', $user->ID);
             $old_user->description = $user->description;
@@ -56,7 +56,6 @@ if (!$errors->has_errors()) {
             if (!isset($user->role) && isset($old_user->roles[0])) {
                 $user->role = $old_user->roles[0];
             }
-            save_test($user,1);
         }
     } else {
         $old_user = false;
