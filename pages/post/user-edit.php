@@ -56,7 +56,7 @@ if (!$errors->has_errors()) {
             if (!isset($user->role) && isset($old_user->roles[0])) {
                 $user->role = $old_user->roles[0];
             }
-            save_test($user);
+            save_test($user,1);
         }
     } else {
         $old_user = false;
@@ -247,7 +247,6 @@ if (!$errors->has_errors()) {
     foreach($user_meta as $k => $v) {
         update_user_meta($user->ID, $k, $v);
     }
-    save_test($user);
     if (in_array($user->role, ['administrator', 'multipopolano', 'multipopolare_resp'])) {
         $this->update_discourse_groups_by_user($user);
     }
