@@ -1,4 +1,4 @@
-import { createApp, ref, computed, reactive, onMounted, onUnmounted } from '/wp-content/plugins/multipop/js/vue.esm-browser.js';
+const { createApp, ref, computed, reactive, onMounted, onUnmounted } = Vue;
 const mailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/s,
 usernameRegex = {
     rr: [

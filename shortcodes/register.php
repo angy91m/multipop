@@ -62,6 +62,7 @@ $this->show_hcaptcha_script();
     </template>
 </div>
 
+<script src="<?=plugins_url()?>/multipop/js/vue.global.min.js"></script>
 <script type="module" src="<?=plugins_url()?>/multipop/shortcodes/js/register.js"></script>
 <?php
 

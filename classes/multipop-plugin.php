@@ -262,7 +262,6 @@ class MultipopPlugin {
 
         // LOGIN
         // ADD ELEMENTS TO LOGIN PAGE
-        //add_action( 'woocommerce_login_form_start', [$this, 'html_login_mail_confirm'] );
         // CHECK AFTER LOGIN
         //add_action('wp_login', [$this,'filter_login'], 10, 2);
         add_filter('authenticate', [$this, 'filter_login'], 21, 1);
