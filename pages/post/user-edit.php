@@ -11,6 +11,10 @@ $user->user_email = mb_strtolower(trim($user->user_email), 'UTF-8');
 $user_meta = [];
 $error_head = '<strong>Multipopolare:</strong>&nbsp;';
 $master_key_len = 16;
+if (!isset($user->role) && isset($user->ID)) {
+    $old_user = get_user_by('ID', $user->ID);
+    $user->role = !empty($old_user->roles) ? $old_user->roles[0] : '';
+}
 if (!$errors->has_errors()) {
     if (defined('MPOP_PERSONAL_UPDATE') && MPOP_PERSONAL_UPDATE) {
         if (isset($_POST['master_key']) && $_POST['master_key']) {
@@ -53,9 +57,7 @@ if (!$errors->has_errors()) {
                 $old_user->user_pass = $user->user_pass;
             }
             $user = $old_user;
-            if (!isset($user->role) && isset($old_user->roles[0])) {
-                $user->role = $old_user->roles[0];
-            }
+            $user->role = !empty($old_user->roles) ? $old_user->roles[0] : '';
         }
     } else {
         $old_user = false;
@@ -81,11 +83,13 @@ if (!$errors->has_errors()) {
                             return;
                         }
                         $user = $old_user;
+                        $user->role = !empty($old_user->roles) ? $old_user->roles[0] : '';
                         return;
                     } elseif (isset($_POST['revoke_mail_confirmation']) && $_POST['revoke_mail_confirmation']) {
                         $user_meta['mpop_mail_to_confirm'] = true;
                         $user_meta['_new_email'] = false;
                         $user = $old_user;
+                        $user->role = !empty($old_user->roles) ? $old_user->roles[0] : '';
                         break;
                     }
                     if (
