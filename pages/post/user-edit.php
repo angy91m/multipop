@@ -11,10 +11,6 @@ $user->user_email = mb_strtolower(trim($user->user_email), 'UTF-8');
 $user_meta = [];
 $error_head = '<strong>Multipopolare:</strong>&nbsp;';
 $master_key_len = 16;
-if (!isset($user->role) && isset($user->ID)) {
-    $old_user = get_user_by('ID', $user->ID);
-    $user->role = !empty($old_user->roles) ? $old_user->roles[0] : '';
-}
 if (!$errors->has_errors()) {
     if (defined('MPOP_PERSONAL_UPDATE') && MPOP_PERSONAL_UPDATE) {
         if (isset($_POST['master_key']) && $_POST['master_key']) {
@@ -49,7 +45,6 @@ if (!$errors->has_errors()) {
                 )
             );
         }
-        save_test($user);
         if (!$this->current_user_is_admin()) {
             $old_user = get_user_by('ID', $user->ID);
             $old_user->description = $user->description;
@@ -249,6 +244,10 @@ if (!$errors->has_errors()) {
     }
     foreach($user_meta as $k => $v) {
         update_user_meta($user->ID, $k, $v);
+    }
+    if (!isset($user->role) && isset($user->ID)) {
+        $old_user = get_user_by('ID', $user->ID);
+        $user->role = !empty($old_user->roles) ? $old_user->roles[0] : '';
     }
     if (in_array($user->role, ['administrator', 'multipopolano', 'multipopolare_resp'])) {
         $this->update_discourse_groups_by_user($user);
