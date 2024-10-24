@@ -560,6 +560,7 @@ class MultipopPlugin {
             `authorized_subscription_years` VARCHAR(255) NOT NULL,
             `last_year_checked` INT NOT NULL,
             `min_subscription_payment` DOUBLE NOT NULL,
+            `temp_token_key` VARCHAR(255) NOT NULL,
             `master_doc_key` TEXT NULL,
             `master_doc_pubkey` TEXT NULL,
             `hcaptcha_site_key` VARCHAR(255) NULL,
@@ -638,7 +639,8 @@ class MultipopPlugin {
                     `last_year_checked`,
                     `min_subscription_payment`,
                     `pp_token_expiration`,
-                    `pp_sandbox`
+                    `pp_sandbox`,
+                    `temp_token_key`
                 )"
                 . " VALUES (
                     1,
@@ -656,7 +658,8 @@ class MultipopPlugin {
                     0,
                     15,
                     0,
-                    1
+                    1,
+                    '".base64_encode(openssl_random_pseudo_bytes(64))."'
                 ) ;";
             $wpdb->query($q);
         }
@@ -1368,9 +1371,10 @@ class MultipopPlugin {
         #[\SensitiveParameter]
             string $pub_key = ''
     ) {
+        $symkey = openssl_random_pseudo_bytes(32);
         $pub_key = openssl_pkey_get_public( "-----BEGIN PUBLIC KEY-----\n". base64_encode($pub_key) . "\n-----END PUBLIC KEY-----");
-        openssl_public_encrypt($data, $enc, $pub_key, OPENSSL_PKCS1_OAEP_PADDING);
-        return $enc;
+        openssl_public_encrypt($symkey, $enc_key, $pub_key, OPENSSL_PKCS1_OAEP_PADDING);
+        return strlen($enc_key) . '#' . $enc_key . $this->encrypt($data,$symkey);
     }
     
     
@@ -1445,8 +1449,12 @@ class MultipopPlugin {
             string $priv_key = ''
     ) {
         $priv_key = openssl_pkey_get_private( "-----BEGIN PRIVATE KEY-----\n". base64_encode($priv_key) . "\n-----END PRIVATE KEY-----");
-        openssl_private_decrypt($data, $dec, $priv_key, OPENSSL_PKCS1_OAEP_PADDING);
-        return $dec;
+        $splitter_pos = strpos($data, '#');
+        $symkey_len = intval(substr($data,0,$splitter_pos));
+        $enc_symkey = substr($data, $splitter_pos +1, $symkey_len);
+        openssl_private_decrypt($enc_symkey, $symkey, $priv_key, OPENSSL_PKCS1_OAEP_PADDING);
+        $data = substr($data, $splitter_pos +1 + $symkey_len);
+        return $this->decrypt($data, $symkey);
     }
 
 
