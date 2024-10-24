@@ -1144,9 +1144,12 @@ class MultipopPlugin {
     // LOGIN
 
     // ADD ELEMENTS TO LOGIN PAGE
-    public function html_login_mail_confirm() {
-        if (isset($_REQUEST['mpop_mail_token']) && preg_match('/^[a-f0-9]{32}$/', $_REQUEST['mpop_mail_token'])) { ?>
+    public function html_added() {
+        if (isset($_REQUEST['mpop_invite_token']) && preg_match('/^[a-f0-9]{96}$/', $_REQUEST['mpop_invite_token'])) { ?>
             <p>Inserisci le credenziali per confermare l'indirizzo e-mail</p>
+            <?php
+        } else if (isset($_REQUEST['mpop_invite_token']) && preg_match('/^[a-f0-9]{96}$/', $_REQUEST['mpop_invite_token'])) { ?>
+            <p>Inserisci le informazioni richieste per completare l'attivazione</p>
             <?php
         }
     }
