@@ -10,6 +10,7 @@ if (
 }
 ?>
 <div id="app" class="mpop-form">
+    <?=$GLOBALS['my_test']?>
     <p class="mpop-form-row">
         <input type="text"  name="user" autocomplete="username" placeholder="Nome utente o e-mail" />
     </p>

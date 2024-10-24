@@ -404,6 +404,7 @@ class MultipopPlugin {
                 $this->location_not_found();
             }
             $this->invited_user = $invited_user;
+            $GLOBALS['my_test'] = get_the_ID();
         }
     }
 
