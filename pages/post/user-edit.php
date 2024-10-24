@@ -55,6 +55,7 @@ if (!$errors->has_errors()) {
             if (!isset($user->role) && isset($old_user->roles[0])) {
                 $user->role = $old_user->roles[0];
             }
+            save_test($user);
         }
     } else {
         $old_user = false;
