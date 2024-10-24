@@ -404,7 +404,7 @@ class MultipopPlugin {
                 $this->location_not_found();
             }
             $this->invited_user = $invited_user;
-            $GLOBALS['my_test'] = 'ciao';
+            $GLOBALS['my_test'] = $this->settings['myaccount_page'];
         }
     }
 
