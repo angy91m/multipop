@@ -1145,7 +1145,7 @@ class MultipopPlugin {
 
     // ADD ELEMENTS TO LOGIN PAGE
     public function html_added() {
-        if (isset($_REQUEST['mpop_invite_token']) && preg_match('/^[a-f0-9]{96}$/', $_REQUEST['mpop_invite_token'])) { ?>
+        if (isset($_REQUEST['mpop_mail_token']) && preg_match('/^[a-f0-9]{96}$/', $_REQUEST['mpop_mail_token'])) { ?>
             <p>Inserisci le credenziali per confermare l'indirizzo e-mail</p>
             <?php
         } else if (isset($_REQUEST['mpop_invite_token']) && preg_match('/^[a-f0-9]{96}$/', $_REQUEST['mpop_invite_token'])) { ?>
