@@ -404,7 +404,12 @@ class MultipopPlugin {
                 $this->location_not_found();
             }
             $this->invited_user = $invited_user;
-            $GLOBALS['my_test'] = $this->settings['myaccount_page'];
+            add_filter('the_title', function($title, $post_id) {
+                if ($post_id == $this->settings['myaccount_page']) {
+                    return "Attiva il tuo account";
+                }
+                return $title;
+            }, 10, 2);
         }
     }
 
