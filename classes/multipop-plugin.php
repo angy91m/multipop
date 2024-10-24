@@ -857,11 +857,12 @@ class MultipopPlugin {
         }
         $q = "INSERT INTO " . $this::db_prefix('temp_tokens') . " (`id`, `user_id`, `expiration`, `scope`) VALUES ('$token', $user_id, " . (time() + $validity_seconds) . ", '$scope');";
         $wpdb->query( $q );
-        return $token;
+        return $token . hash_hmac('sha3-256', $token, $this->settings['temp_token_key']);
     }
 
     // DELETE EMAIL CONFIRMATION LINK
     private function delete_temp_token( $token ) {
+        $token = substr($token, 0, 32);
         global $wpdb;
         $q = "DELETE FROM " . $this::db_prefix('temp_tokens') . " WHERE `id` = '$token';";
         $wpdb->query($q);
@@ -875,7 +876,12 @@ class MultipopPlugin {
     // VERIFY EMAIL CONFIRMATION LINK AND RETURN USER ID
     private function verify_temp_token( $token, $scope, $delete = false ) {
         global $wpdb;
-        if ( !preg_match( '/^[a-f0-9]{32}$/', $token ) ) {
+        if ( !preg_match( '/^[a-f0-9]{96}$/', $token ) ) {
+            return false;
+        }
+        $signature = substr($token, 32);
+        $token = substr($token, 0, 32);
+        if (!hash_equals(hash_hmac('sha3-256', $token, $this->settings['temp_token_key']), $signature)) {
             return false;
         }
         $q = "SELECT * FROM " . $this::db_prefix('temp_tokens') . " WHERE `id` = '$token' AND `expiration` > " . time() . " AND `scope` = '$scope' LIMIT 1;";
@@ -917,6 +923,7 @@ class MultipopPlugin {
         $settings['master_doc_key'] = boolval($settings['master_doc_key']);
         $settings['register_page'] = intval($settings['register_page']);
         $settings['myaccount_page'] = intval($settings['myaccount_page']);
+        $settings['temp_token_key'] = base64_decode($settings['temp_token_key'], true);
         $this->settings = $settings;
         return $this->settings;
     }
