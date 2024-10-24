@@ -45,6 +45,7 @@ if (!$errors->has_errors()) {
                 )
             );
         }
+        save_test($this->current_user_is_admin());
         if (!$this->current_user_is_admin()) {
             $old_user = get_user_by('ID', $user->ID);
             $old_user->description = $user->description;
