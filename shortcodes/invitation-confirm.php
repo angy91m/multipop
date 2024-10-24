@@ -9,7 +9,7 @@ if (
     exit;
 }
 ?>
-<div id="app">
+<div id="app" class="mpop-form">
     <p class="mpop-form-row">
         <input type="text"  name="user" autocomplete="username" placeholder="Nome utente o e-mail" />
     </p>
