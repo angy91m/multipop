@@ -334,7 +334,7 @@ class MultipopPlugin {
             str_starts_with($this->req_url, get_permalink($this->settings['myaccount_page']))
             && isset($_REQUEST['mpop_mail_token'])
         ) {
-            if ( !preg_match('/^[a-f0-9]{32}$/', $_REQUEST['mpop_mail_token']) ) {
+            if ( !preg_match('/^[a-f0-9]{96}$/', $_REQUEST['mpop_mail_token']) ) {
                 $this->location_not_found();
             }
             $user_verified = $this->verify_temp_token($_REQUEST['mpop_mail_token'], 'email_confirmation_link');
@@ -389,7 +389,7 @@ class MultipopPlugin {
             str_starts_with($this->req_url, get_permalink($this->settings['myaccount_page']))
             && isset($_REQUEST['mpop_invite_token'])
         ) {
-            if ( !preg_match('/^[a-f0-9]{32}$/', $_REQUEST['mpop_invite_token']) ) {
+            if ( !preg_match('/^[a-f0-9]{96}$/', $_REQUEST['mpop_invite_token']) ) {
                 $this->location_not_found();
             }
             $invited_user_id = $this->verify_temp_token($_REQUEST['mpop_invite_token'], 'invite_link');
