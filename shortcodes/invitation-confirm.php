@@ -181,9 +181,13 @@ $invitation_props = [
         <label>Accetto le condizioni&nbsp;
             <input type="checkbox" v-model="user.mpop_subscription_marketing_agree"/>
         </label>
+    </p>
+    <p class="mpop-form-row">
         <label>Accetto le condizioni&nbsp;
             <input type="checkbox" v-model="user.mpop_subscription_newsletter_agree"/>
         </label>
+    </p>
+    <p class="mpop-form-row">
         <label>Accetto le condizioni&nbsp;
             <input type="checkbox" v-model="user.mpop_subscription_publish_agree"/>
         </label>
