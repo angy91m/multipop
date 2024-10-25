@@ -168,7 +168,7 @@ switch( $post_data['action'] ) {
         wp_set_current_user( $user->ID );
         $redirect_url = get_permalink($this->settings['myaccount_page']);
         header("Location: $redirect_url");
-        break;
+        exit;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];

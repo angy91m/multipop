@@ -1,5 +1,9 @@
 <?php
 defined( 'ABSPATH' ) || exit;
+if (!isset($this->invited_user) || !$this->invited_user->mpop_invited) {
+    header('Location: /');
+    exit;
+}
 if (
     !str_starts_with( $_SERVER['REQUEST_URI'], '/wp-admin' )
     && !str_starts_with( $_SERVER['REQUEST_URI'], '/wp-json' )
