@@ -234,9 +234,7 @@ createApp({
             triggerSearchTimeout = setTimeout( () => func(txt, ...args).then(() => loading(false)), 500);
         }
         return {
-            username,
-            password,
-            passwordConfirm,
+            user,
             isValidForm,
             activateAccount,
             startedFields,
