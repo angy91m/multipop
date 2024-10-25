@@ -211,7 +211,7 @@ class MultipopPlugin {
     }
 
     private static function delay_script(string $script, ...$argv) {
-        $test = true;
+        $test = false;
         return exec('php ' .MULTIPOP_PLUGIN_PATH . 'delayed_scripts/delayed.php ' . $script . ' ' . implode(' ', $argv) . ' >> '.($test? MULTIPOP_PLUGIN_PATH . '/delay_test.log' : '/dev/null').' 2>&1 &');
     }
 
@@ -309,8 +309,8 @@ class MultipopPlugin {
                 if (file_exists($file_path . '/' . $file_name)) {
                     $file_name = $file_path . '/' . $file_name;
                     $mails = json_decode(file_get_contents($file_name), true);
-                    save_test($mails);
                     if ($mails && is_array($mails)) {
+                        $this->get_settings();
                         foreach($mails as $m) {
                             $this->send_invitation_mail($m['token'], $m['to']);
                             sleep(5);
