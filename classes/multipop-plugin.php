@@ -166,8 +166,8 @@ class MultipopPlugin {
         $name = trim(mb_strtolower($name, 'UTF-8'));
         $allowed_chars = "a-zàáâäæçčèéêëìíîïòóôöœùúûüšžß";
         if (
-            !preg_match("/^[$allowed_chars][$allowed_chars\', ]*[$allowed_chars\']/", $name)
-            || mb_strlen(preg_replace("/[^$allowed_chars]/", '', $name),'UTF-8') < 2
+            !preg_match("/^[$allowed_chars][$allowed_chars\', ]*[$allowed_chars\']$/", $name)
+            || mb_strlen(preg_replace("/^[^$allowed_chars]$/", '', $name),'UTF-8') < 2
             || static::sanitize_name($name) != mb_strtoupper($name, 'UTF-8')
         ) {
             return false;
