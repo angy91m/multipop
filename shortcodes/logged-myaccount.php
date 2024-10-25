@@ -724,6 +724,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     <button class="mpop-button" @click="uploadCsvRows" :disabled="saving || !csvUsers.length">Carica righe</button>
                     <q-checkbox left-label v-model="csvImportOptions.forceYear" label="Forza anno"></q-checkbox>
                     <q-checkbox left-label v-model="csvImportOptions.forceQuote" label="Forza valore quota"></q-checkbox>
+                    <q-checkbox left-label v-model="csvImportOptions.delayedSend" label="Invio ritardato (un invio ogni 5 sec.)"></q-checkbox>
                 </div>
             </div>
             </q-page>

@@ -152,7 +152,8 @@ createApp({
         csvUsers = reactive([]),
         csvImportOptions = reactive({
             forceQuote: false,
-            forceYear: false
+            forceYear: false,
+            delayedSend: true
         }),
         intPhoneInstance = ref('intPhoneInstance'),
         profilePhoneInput = ref('profilePhoneInput'),

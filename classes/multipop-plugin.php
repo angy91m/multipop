@@ -297,6 +297,20 @@ class MultipopPlugin {
             'updateDiscourseGroupsByUser' => function($user_id) {
                 sleep(10);
                 $this->update_discourse_groups_by_user($user_id);
+            },
+            'flushSubscriptions' => function() {
+                $this->flush_subscriptions();
+            },
+            'sendMultipleInvitation' => function($file_name) {
+                if (file_exists($file_name)) {
+                    $mails = json_decode(file_get_contents($file_name), true);
+                    if ($mails && is_array($mails)) {
+                        foreach($mails as $m) {
+                            $this->send_invitation_mail($m['token'], $m['to']);
+                            sleep(5);
+                        }
+                    }
+                }
             }
         ];
     }
@@ -947,7 +961,7 @@ class MultipopPlugin {
         global $wpdb;
         $q = "DELETE FROM " . $this::db_prefix('temp_tokens') . " WHERE expiration <= " . time() . ";";
         $wpdb->query($q);
-        $this->flush_subscriptions();
+        $this->delay_script('flushSubscriptions');
     }
 
     // UPDATE TEMPMAIL LIST
@@ -2526,7 +2540,7 @@ class MultipopPlugin {
         }
         return $found;
     }
-    private function row_import(array $row, $force_year = false, $force_quote = false, &$comuni = []) {
+    private function row_import(array $row, $force_year = false, $force_quote = false, &$comuni = [], &$mails = []) {
         if (!isset($row['email']) || !$this::is_valid_email($row['email'])) {
             throw new Exception('Invalid email');
         }
@@ -2712,8 +2726,12 @@ class MultipopPlugin {
             throw new Exception('Error while completing subscription: ' . $e->getMessage());
         }
         $token = $this->create_temp_token($user_id,'invite_link',3600*24*30);
-        if(!$this->send_invitation_mail($token, $row['email'])) {
-            throw new Exception("Error while sending mail" . ($this->last_mail_error ? ': ' . $this->last_mail_error : ''));
+        if (!$mails) {
+            if(!$this->send_invitation_mail($token, $row['email'])) {
+                throw new Exception("Error while sending mail" . ($this->last_mail_error ? ': ' . $this->last_mail_error : ''));
+            }
+        } else {
+            $mails[] = ['token' => $token, $to => $row['email']];
         }
         return ['user_id'=> $user_id, 'sub_id' => $sub_id];
     }

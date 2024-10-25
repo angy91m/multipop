@@ -372,15 +372,22 @@ switch( $post_data['action'] ) {
         }
         $post_data['forceYear'] = isset($post_data['forceYear']) ? $post_data['forceYear'] : false;
         $post_data['forceQuote'] = isset($post_data['forceQuote']) ? $post_data['forceQuote'] : false;
+        $post_data['delayedSend'] = isset($post_data['delayedSend']) ? $post_data['delayedSend'] : false;
+        $invitation_to_send = $post_data['delayedSend'] ? [] : false;
         if (!empty($post_data['rows'])) {
             $comuni = $this->get_comuni_all();
             foreach($post_data['rows'] as $row) {
                 try {
-                    $res_rows[] = $this->row_import($row, $post_data['forceYear'], $post_data['forceQuote'], $comuni);
+                    $res_rows[] = $this->row_import($row, $post_data['forceYear'], $post_data['forceQuote'], $comuni, $invitation_to_send);
                 } catch (Exception $e) {
                     $res_rows[] = ['error' => $e->getMessage()];
                 }
             }
+        }
+        if ($invitation_to_send && !empty($invitation_to_send)) {
+            $file_name = MULTIPOP_PLUGIN_PATH . '/private/mail_to_send_' . bin2hex(openssl_random_pseudo_bytes(8)) . '.txt';
+            file_put_contents($file_name, json_encode($invitation_to_send, JSON_PRETTY_PRINT));
+            $this->delay_script('sendMultipleInvitation', $file_name);
         }
         $res_data['data'] = $res_rows;
         break;
