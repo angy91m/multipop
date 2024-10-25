@@ -8,11 +8,16 @@ if (
     require_once('post/invitation-confirm.php');
     exit;
 }
+$invitation_props = [
+    'ID' => $this->invited_user->ID,
+    'requireProps' =>  str_starts_with($this->user_login, 'mp_')
+];
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-tel-input.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/invitation-confirm.css">
+<script id="invitation-props" type="application/json"><?=json_encode($invitation_props)?></script>
 <div id="app" class="mpop-form">
     <?php $this->html_added()?>
     <p v-if="errorFields.has('server')" class="mpop-field-error">Errore sever</p>
