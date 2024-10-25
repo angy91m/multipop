@@ -187,7 +187,7 @@ $invitation_props = [
         </label>
     </p>
     <p class="mpop-form-row" v-show="marketingAgreeShow">
-        <button class="mpop-button" @click="marketingAgreeShow = false">Chiudi</button>
+        <button class="mpop-button" @click="marketingAgreeShow = false">Chiudi</button><br>
         Presto il mio consenso e fino alla revoca dello stesso, per la proposizione di offerte, comunicazioni commerciali e per il successivo invio di materiale informativo pubblicitario e/o promozionale e/o sondaggi di opinione, ricerche di mercato, invio di newsletter (di seguito complessivamente definite “attività di propaganda”) di MULTIPOPOLARE APS e/o da organizzazioni correlate. Il trattamento per attività di marketing avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea e/o chiamate da operatore), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo SMS e/o MMS, chiamate telefoniche senza l’intervento dell’operatore, posta elettronica, social network, newsletter, applicazioni interattive, notifiche push).
     </p>
     <p class="mpop-form-row">
@@ -196,7 +196,7 @@ $invitation_props = [
         </label>
     </p>
     <p class="mpop-form-row" v-show="newsletterAgreeShow">
-        <button class="mpop-button" @click="newsletterAgreeShow = false">Chiudi</button>
+        <button class="mpop-button" @click="newsletterAgreeShow = false">Chiudi</button><br>
         Presta il mio consenso e fino alla revoca dello stesso, per la comunicazioni di iniziative ed attività (di seguito complessivamente definite “attività di informazione dell’associazione”) di MULTIPOPOLARE APS e/o da organizzazioni correlate.<br>
         Il trattamento per attività di informazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo posta elettronica)
     </p>
@@ -206,7 +206,7 @@ $invitation_props = [
         </label>
     </p>
     <p class="mpop-form-row" v-show="publishAgreeShow">
-        <button class="mpop-button" @click="publishAgreeShow = false">Chiudi</button>
+        <button class="mpop-button" @click="publishAgreeShow = false">Chiudi</button><br>
         Presta il mio consenso e fino alla revoca dello stesso, per la comunicazioni di iniziative ed attività (di seguito complessivamente definite “attività di informazione dell’associazione”) di MULTIPOPOLARE APS e/o da organizzazioni correlate.<br>
         Il trattamento per attività di informazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo posta elettronica)
     </p>
