@@ -56,6 +56,7 @@ class MultipopPlugin {
     ];
     public ?object $disc_utils;
     public array $delayed_scripts = [];
+    public bool $delayed_action = false;
 
     // FORMAT DATETIME TO LOCAL STRING YYYY-MM-DD HH:MM:SS TZ
     private static function show_date_time($date) {
@@ -1007,7 +1008,7 @@ class MultipopPlugin {
     }
 
     private function flush_subscriptions() {
-        if (isset( $this->settings ) && is_array( $this->settings )) {
+        if (!$this->delayed_action && isset( $this->settings ) && is_array( $this->settings )) {
             $this_year = intval(current_time('Y'));
             if ( $this_year > $this->settings['last_year_checked'] ) {
                 global $wpdb;
@@ -3537,9 +3538,9 @@ class MultipopPlugin {
                         $provincia = array_filter($province_all, function($p) use ($user) { return $p['sigla'] == $user->mpop_billing_state; });
                         $provincia = array_pop( $provincia );
                         if ($provincia) {
-                            $groups[$user->mpop_billing_state] = ['name' => "mp_prov_$user->mpop_billing_state", 'full_name' => "Provincia di $provincia[nome]", 'owner' => false];
+                            $groups[$user->mpop_billing_state] = ['name' => "mp_pr_$user->mpop_billing_state", 'full_name' => "Provincia di $provincia[nome]", 'owner' => false];
                             $regione_name = $this->compact_regione_name($provincia['regione']);
-                            $groups[$provincia['regione']] = ['name' => "mp_reg_$regione_name", 'full_name' => "Regione $provincia[regione]", 'owner' => false];
+                            $groups[$provincia['regione']] = ['name' => "mp_rg_$regione_name", 'full_name' => "Regione $provincia[regione]", 'owner' => false];
                         }
                     }
                 }
@@ -3548,12 +3549,14 @@ class MultipopPlugin {
                         if (str_starts_with( $zone, 'reg_' )) {
                             $reg_fullname = substr($zone, 4);
                             $regione_name = $this->compact_regione_name($reg_fullname);
-                            $groups[$reg_fullname] = ['name' => "mp_reg_$regione_name", 'full_name' => "Regione $reg_fullname", 'owner' => true];
+                            $groups[$reg_fullname] = ['name' => "mp_rg_$regione_name", 'full_name' => "Regione $reg_fullname", 'owner' => false];
+                            $groups[] = ['name' => "mp_rgr_$regione_name", 'full_name' => "Responsabili regione $reg_fullname", 'owner' => false];
                             if (!$regioni_all) {
                                 $regioni_all = $this->get_regioni_all();
                             }
                             foreach($regioni_all[$reg_fullname] as $p) {
-                                $groups[$p['sigla']] = ['name' => "mp_prov_$p[sigla]", 'full_name' => "Provincia di $p[nome]", 'owner' => true];
+                                $groups[$p['sigla']] = ['name' => "mp_pr_$p[sigla]", 'full_name' => "Provincia di $p[nome]", 'owner' => false];
+                                $groups[$p['sigla'].'_r'] = ['name' => "mp_prr_$p[sigla]", 'full_name' => "Responsabili provincia di $p[nome]", 'owner' => false];
                             }
                         } else if (preg_match('/^[A-Z]{2}$/', $zone)) {
                             if (!$province_all) {
@@ -3562,7 +3565,8 @@ class MultipopPlugin {
                             $provincia = array_filter($province_all, function($p) use ($zone) { return $p['sigla'] == $zone; });
                             $provincia = array_pop( $provincia);
                             if ($provincia) {
-                                $groups[$provincia['sigla']] = ['name' => "mp_prov_$provincia[sigla]", 'full_name' => "Provincia di $provincia[nome]", 'owner' => true];
+                                $groups[$provincia['sigla']] = ['name' => "mp_pr_$provincia[sigla]", 'full_name' => "Provincia di $provincia[nome]", 'owner' => false];
+                                $groups[$provincia['sigla'].'_r'] = ['name' => "mp_prr_$provincia[sigla]", 'full_name' => "Responsabili provincia di $provincia[nome]", 'owner' => false];
                             }
                         }
                     }
