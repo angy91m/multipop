@@ -962,7 +962,9 @@ class MultipopPlugin {
         global $wpdb;
         $q = "DELETE FROM " . $this::db_prefix('temp_tokens') . " WHERE expiration <= " . time() . ";";
         $wpdb->query($q);
-        $this->delay_script('flushSubscriptions');
+        if (!$this->delayed_action) {
+            $this->delay_script('flushSubscriptions');
+        }
     }
 
     // UPDATE TEMPMAIL LIST
@@ -1008,7 +1010,7 @@ class MultipopPlugin {
     }
 
     private function flush_subscriptions() {
-        if (!$this->delayed_action && isset( $this->settings ) && is_array( $this->settings )) {
+        if ( isset( $this->settings ) && is_array( $this->settings )) {
             $this_year = intval(current_time('Y'));
             if ( $this_year > $this->settings['last_year_checked'] ) {
                 global $wpdb;
