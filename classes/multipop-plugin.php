@@ -97,7 +97,7 @@ class MultipopPlugin {
 
     // PASSWORD VALIDATION
     private static function is_valid_password( $password ) {
-        if ( mb_strlen( $password, 'UTF-8' ) < 8 ) {return false;}
+        if ( !is_string($password) || mb_strlen( $password, 'UTF-8' ) < 8 ) {return false;}
         $rr = [
             '/[a-z]+/',
             '/[A-Z]+/',
@@ -175,7 +175,7 @@ class MultipopPlugin {
         return true;
     }
     private static function is_valid_phone($phone) {
-        if (is_string($phone) && strlen($phone) >= 13 && preg_match('/^\+\d+ \d+$/', $phone)) {
+        if (is_string($phone) && strlen($phone) >= 13 && strlen($phone) <= 16 && preg_match('/^\+\d+ \d+$/', $phone)) {
             return true;
         }
         return false;
@@ -2397,7 +2397,7 @@ class MultipopPlugin {
             throw new Exception('mpop_birthdate');
         }
     }
-    private function validate_birthplace($birthdate = '', $birthplace = '', &$comuni = []) {
+    private function validate_birthplace($birthdate = '', $birthplace = '', &$comuni = [], $return_birthplace = false) {
         if (!is_string($birthplace) || !preg_match('/^[A-Z]\d{3}$/', $birthplace)) {
             throw new Exception('mpop_birthplace');
         }
@@ -2411,16 +2411,16 @@ class MultipopPlugin {
         if (empty($comuni)) {
             $comuni = $this->get_comuni_all();
         }
-        $found_bp = array_values(array_filter($comuni, function($c) use ($birthplace) {return $c['codiceCatastale'] == $birthplace;}));
+        $found_bp = $this->get_comune_by_catasto($birthplace, true, $comuni);
         if (!count($found_bp)) {
             throw new Exception('mpop_birthplace');
         }
-        if (isset($found_bp[0]['soppresso']) && $found_bp[0]['soppresso']) {
-            if (!isset($found_bp[0]['dataSoppressione'])) {
+        if (isset($found_bp['soppresso']) && $found_bp['soppresso']) {
+            if (!isset($found_bp['dataSoppressione'])) {
                 throw new Exception('mpop_birthplace,mpop_birthplace');
             } else {
                 $soppressione_dt = date_create('now', new DateTimeZone('UTC'));
-                $soppr_arr = explode('T', $found_bp[0]['dataSoppressione']);
+                $soppr_arr = explode('T', $found_bp['dataSoppressione']);
                 $soppr_arr_dt = array_map( function($v) {return intval($v);}, explode('-', $soppr_arr[0]));
                 $soppr_arr_tm = array_map( function($v) {return intval(substr( $v, 0, 2));}, explode(':', $soppr_arr[1]));
                 $soppressione_dt->setDate($soppr_arr_dt[0], $soppr_arr_dt[1], $soppr_arr_dt[2]);
@@ -2429,6 +2429,9 @@ class MultipopPlugin {
                     throw new Exception('mpop_birthplace,mpop_birthplace');
                 }
             }
+        }
+        if ($return_birthplace) {
+            return [$birthdate->format('Y-m-d'), $found_bp];
         }
         return $birthdate->format('Y-m-d');
     }

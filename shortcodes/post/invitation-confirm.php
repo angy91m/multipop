@@ -66,29 +66,57 @@ switch( $post_data['action'] ) {
         }
         break;
     case 'activate_account':
-        if (!isset($post_data['user_id']) || !is_int($post_data['user_id']) || $post_data['user_id'] < 1) {
-            $res_data['error'] = ['user_id'];
-            http_response_code( 400 );
-            echo json_encode( $res_data );
-            exit;
-        }
-        $user = get_user_by('ID', $post_data['user_id']);
-        if (!$user || !$user->mpop_invited) {
-            $res_data['error'] = ['user_id'];
-            http_response_code( 400 );
-            echo json_encode( $res_data );
-            exit;
-        }
+        $user = $this->invited_user;
         $res_data['error'] = [];
+        $residenza = false;
+        if (!isset($post_data['password']) || !$this::is_valid_password($post_data['password'])) {
+            $res_data['error'][] = 'password';
+        }
         if (str_starts_with($user->user_login, 'mp_')) {
+            if(!isset($post_data['username']) || !$this::is_valid_username($post_data['username'])) {
+                $res_data['error'][] = 'username';
+            }
             if(!isset($post_data['first_name']) || !$this::is_valid_name($post_data['first_name'])) {
                 $res_data['error'][] = 'first_name';
             }
             if(!isset($post_data['last_name']) || !$this::is_valid_name($post_data['last_name'])) {
                 $res_data['error'][] = 'last_name';
             }
-        } else {
-
+            $comuni = [];
+            if(!isset($post_data['mpop_birthdate'])) {
+                $res_data['error'][] = 'mpop_birthdate';
+            } else {
+                if(!isset($post_data['mpop_birthplace']) ) {
+                    $res_data['error'][] = 'mpop_birthplace';
+                } else {
+                    if (empty($comuni)) {
+                        $comuni = $this->get_comuni_all();
+                    }
+                    try {
+                        $post_data['mpop_birthdate'] = $this->validate_birthplace($post_data['mpop_birthdate'], $post_data['mpop_birthplace'], $comuni);
+                    } catch(Exception $e) {
+                        array_push($res_data['error'], ...explode(',',$e->getMessage()));
+                    }
+                }
+            }
+            if (!isset($post_data['mpop_billing_city']) || !is_string($post_data['mpop_billing_city']) || !preg_match('/^[A-Z]{3}\d$/', $post_data['mpop_billing_city'])) {
+                $res_data['error'][] = 'mpop_billing_city';
+            } else {
+                if (empty($comuni)) {
+                    $comuni = $this->get_comuni_all();
+                }
+                $residenza = $this->get_comune_by_catasto($post_data['mpop_billing_city'], false, $comuni);
+                if (!$residenza) {
+                    $res_data['error'][] = 'mpop_billing_city';
+                } else {
+                    if(!isset($post_data['mpop_billing_zip']) || !in_array($post_data['mpop_billing_zip'], $residenza['cap'])) {
+                        $res_data['error'][] = 'mpop_billing_zip';
+                    }
+                }
+            }
+            if (!isset($post_data['mpop_phone']) || !$this::is_valid_phone($post_data['mpop_phone'])) {
+                $res_data['error'][] = 'mpop_phone';
+            }
         }
         if (!empty($res_data['error'])) {
             http_response_code( 400 );
@@ -97,8 +125,26 @@ switch( $post_data['action'] ) {
         } else {
             unset($res_data['error']);
         }
-        $post_data['first_name'] = mb_strtoupper($post_data['first_name'], 'UTF-8');
-        $post_data['last_name'] = mb_strtoupper($post_data['last_name'], 'UTF-8');
+        $meta_input = [
+            'mpop_marketing_agree' => isset($post_data['mpop_subscription_marketing_agree']) ? boolval($post_data['mpop_subscription_marketing_agree']) : false,
+            'mpop_newsletter_agree' => isset($post_data['mpop_subscription_newsletter_agree']) ? boolval($post_data['mpop_subscription_newsletter_agree']) : false,
+            'mpop_publish_agree' => isset($post_data['mpop_subscription_publish_agree']) ? boolval($post_data['mpop_subscription_publish_agree']) : false
+        ] +(str_starts_with($user->user_login, 'mp_') ? [
+            'first_name' => mb_strtoupper($post_data['first_name'], 'UTF-8'),
+            'last_name' =>  mb_strtoupper($post_data['last_name'], 'UTF-8'),
+            'mpop_birthdate' => $post_data['mpop_birthdate'],
+            'mpop_birthplace' => $post_data['mpop_birthplace'],
+            'mpop_billing_city' => $post_data['mpop_billing_city'],
+            'mpop_billing_state' => $residenza['provincia']['sigla'],
+            'mpop_billing_zip' => $post_data['mpop_billing_zip'],
+            'mpop_phone' => $post_data['mpop_phone']
+        ] : []);
+        $user_edits = [
+            'ID' => $user->ID,
+            'user_pass' => $post_data['password'],
+            'meta_input' => $meta_input
+        ];
+        $res_data['data'] = $user_edits;
         break;
     default:
         $res_data['error'] = ['action'];

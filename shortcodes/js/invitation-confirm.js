@@ -57,7 +57,7 @@ passwordRegex = {
     },
     acceptedSymbols: "| \\ ! \" £ $ % & / ( ) = ? ' ^ , . ; : _ @ ° # * + [ ] { } _ -"
 },
-{ID: user_id, requireProps} = JSON.parse(document.getElementById('invitation-props').innerText),
+{requireProps} = JSON.parse(document.getElementById('invitation-props').innerText),
 maxBirthDate = new Date();
 maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
 let triggerSearchTimeout;
@@ -133,7 +133,6 @@ createApp({
             if (requireProps) {
                 reqObj = {
                     ...user,
-                    user_id,
                     username: user.username.trim(),
                     password: user.password.trim(),
                     mpop_billing_city: user.mpop_billing_city.codiceCatastale,
@@ -143,7 +142,6 @@ createApp({
                 delete reqObj['password_confirm'];
             } else {
                 reqObj = {
-                    user_id,
                     password: user.password.trim(),
                     action: 'activate_account'
                 };

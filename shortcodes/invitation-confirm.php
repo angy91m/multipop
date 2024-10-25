@@ -9,7 +9,6 @@ if (
     exit;
 }
 $invitation_props = [
-    'ID' => $this->invited_user->ID,
     'requireProps' =>  str_starts_with($this->invited_user->user_login, 'mp_')
 ];
 ?>
