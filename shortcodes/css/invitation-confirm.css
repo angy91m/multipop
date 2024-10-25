@@ -2,3 +2,6 @@
 #inv_last_name {
     text-transform: uppercase;
 }
+#billingCity-select:not(:disabled) {
+    background: #fff;
+}
