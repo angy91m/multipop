@@ -178,6 +178,17 @@ $invitation_props = [
         ></v-intl-phone>
     </p>
     <p class="mpop-form-row">
+        <label>Accetto le condizioni&nbsp;
+            <input type="checkbox" v-model="user.mpop_subscription_marketing_agree"/>
+        </label>
+        <label>Accetto le condizioni&nbsp;
+            <input type="checkbox" v-model="user.mpop_subscription_newsletter_agree"/>
+        </label>
+        <label>Accetto le condizioni&nbsp;
+            <input type="checkbox" v-model="user.mpop_subscription_publish_agree"/>
+        </label>
+    </p>
+    <p class="mpop-form-row">
         <?php wp_nonce_field( 'mpop-invite', 'mpop-invite-nonce' ); ?>
         <button class="primary" @click="activateAccount" :disabled="!isValidForm">Attiva l'account</button>
     </p>

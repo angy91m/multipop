@@ -57,6 +57,7 @@ passwordRegex = {
     },
     acceptedSymbols: "| \\ ! \" £ $ % & / ( ) = ? ' ^ , . ; : _ @ ° # * + [ ] { } _ -"
 },
+{ID: user_id, requireProps} = JSON.parse(document.getElementById('invitation-props').innerText),
 maxBirthDate = new Date();
 maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
 let triggerSearchTimeout;
@@ -123,15 +124,25 @@ createApp({
         async function activateAccount(e) {
             e.preventDefault();
             requesting.value = true;
-            const reqObj = {
-                ...user,
-                username: user.username.trim(),
-                password: user.password.trim(),
-                mpop_billing_city: user.mpop_billing_city.codiceCatastale,
-                mpop_birthplace: user.mpop_birthplace.codiceCatastale,
-                action: 'activate_account'
-            };
-            delete reqObj['password_confirm'];
+            let reqObj;
+            if (requireProps) {
+                reqObj = {
+                    ...user,
+                    user_id,
+                    username: user.username.trim(),
+                    password: user.password.trim(),
+                    mpop_billing_city: user.mpop_billing_city.codiceCatastale,
+                    mpop_birthplace: user.mpop_birthplace.codiceCatastale,
+                    action: 'activate_account'
+                };
+                delete reqObj['password_confirm'];
+            } else {
+                reqObj = {
+                    user_id,
+                    password: user.password.trim(),
+                    action: 'activate_account'
+                };
+            }
             const res = await serverReq(reqObj);
             try {
                 const json = await res.json();
@@ -280,6 +291,7 @@ createApp({
             parsePhone,
             searchOpen,
             addSuppressToLabel,
+            requireProps,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
         };
     }
