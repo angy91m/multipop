@@ -2732,7 +2732,7 @@ class MultipopPlugin {
         }
         $token = $this->create_temp_token($user_id,'invite_link',3600*24*30);
         if (is_array($mails)) {
-            $mails[] = ['token' => $token, $to => $row['email']];
+            $mails[] = ['token' => $token, 'to' => $row['email']];
         } else {
             if(!$this->send_invitation_mail($token, $row['email'])) {
                 throw new Exception("Error while sending mail" . ($this->last_mail_error ? ': ' . $this->last_mail_error : ''));
