@@ -128,7 +128,8 @@ switch( $post_data['action'] ) {
         $meta_input = [
             'mpop_marketing_agree' => isset($post_data['mpop_subscription_marketing_agree']) ? boolval($post_data['mpop_subscription_marketing_agree']) : false,
             'mpop_newsletter_agree' => isset($post_data['mpop_subscription_newsletter_agree']) ? boolval($post_data['mpop_subscription_newsletter_agree']) : false,
-            'mpop_publish_agree' => isset($post_data['mpop_subscription_publish_agree']) ? boolval($post_data['mpop_subscription_publish_agree']) : false
+            'mpop_publish_agree' => isset($post_data['mpop_subscription_publish_agree']) ? boolval($post_data['mpop_subscription_publish_agree']) : false,
+            'mpop_invited' => false
         ] +(str_starts_with($user->user_login, 'mp_') ? [
             'first_name' => mb_strtoupper($post_data['first_name'], 'UTF-8'),
             'last_name' =>  mb_strtoupper($post_data['last_name'], 'UTF-8'),
@@ -144,7 +145,14 @@ switch( $post_data['action'] ) {
             'user_pass' => $post_data['password'],
             'meta_input' => $meta_input
         ];
-        $res_data['data'] = $user_edits;
+        $sub = $this->search_subscriptions(['user_id' => [$user->ID], 'pagination' => false], 1);
+        $res_data['data'] = $sub;
+        // wp_update_user($user_edits);
+        // $sub = $this->search_subscriptions(['user_id' => [$user->ID], 'pagination' => false], 1);
+        // if (str_starts_with($user->user_login, 'mp_')) {
+        //     $this->change_user_login($user->ID, $post_data['username'], mb_strtoupper($post_data['first_name'], 'UTF-8') + ' ' + mb_strtoupper($post_data['last_name'], 'UTF-8'));
+        // }
+        // $res_data['data'] = $user_edits;
         break;
     default:
         $res_data['error'] = ['action'];
