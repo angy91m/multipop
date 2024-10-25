@@ -2,7 +2,8 @@
 #inv_last_name {
     text-transform: uppercase;
 }
-#billingCity-select:not(:disabled) {
+#billingCity-select:not(:disabled),
+#birthplace-select:not(:disabled) {
     background: #fff;
 }
 #billing-address {
