@@ -8,9 +8,9 @@ if (
     || (
         isset($this->settings['hcaptcha_site_key'])
         && (
-            !isset($_POST['hcaptcha-response'])
-            || !is_string($_POST['hcaptcha-response'])
-            || !$this->verify_hcaptcha( $post_data['hcaptcha-response'] )
+            !isset($_POST['h-captcha-response'])
+            || !is_string($_POST['h-captcha-response'])
+            || !$this->verify_hcaptcha( $post_data['h-captcha-response'] )
         )
     )
 ) {
