@@ -163,10 +163,14 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
             }
         }
         if ($new_groups[0]['name'] == 'mp_disabled_users') {
-            $res = static::discourse_request( "/admin/users/$user->discourse_sso_user_id/log_out", array( 'method' => 'POST' ) );
+            $res = static::discourse_request( "/admin/users/$user->discourse_sso_user_id/log_out", ['method' => 'POST'] );
 			if (is_wp_error($res)) {
 				return false;
 			}
+        }
+        $disc_user = static::mpop_discourse_user($user->ID);
+        if (!is_wp_error($disc_user) && $disc_user->user->username != $user->user_login) {
+            static::discourse_request("/users/".$disc_user->user->username."/preferences/username", ['method' => 'PUT', 'body' => ['new_username' => $user->user_login]]);
         }
     }
 	public static function logout_user_from_discourse($user_id) {
