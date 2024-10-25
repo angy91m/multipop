@@ -1009,6 +1009,9 @@ createApp({
                         loadedScripts.appendChild(xlsxLoader);
                     }
                 }
+                if (!popstate && tab.name == 'users') {
+                    searchUsers();
+                }
             }
         }
         function displayLocalDate(dt) {
