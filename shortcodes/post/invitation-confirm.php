@@ -146,13 +146,36 @@ switch( $post_data['action'] ) {
             'meta_input' => $meta_input
         ];
         $sub = array_pop($this->search_subscriptions(['user_id' => [$user->ID], 'pagination' => false], 1));
-        $res_data['data'] = $sub;
-        // wp_update_user($user_edits);
-        // $sub = $this->search_subscriptions(['user_id' => [$user->ID], 'pagination' => false], 1);
-        // if (str_starts_with($user->user_login, 'mp_')) {
-        //     $this->change_user_login($user->ID, $post_data['username'], mb_strtoupper($post_data['first_name'], 'UTF-8') + ' ' + mb_strtoupper($post_data['last_name'], 'UTF-8'));
-        // }
-        // $res_data['data'] = $user_edits;
+        if (!$sub) {
+            $res_data['error'] = ['subscription'];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        wp_update_user($user_edits);
+        global $wpdb;
+        $wpdb->query("UPDATE ". $this::db_prefix('subscriptions') . " SET
+            marketing_agree = " . intval($meta_input['mpop_marketing_agree']) . ",
+            newsletter_agree = " . intval($meta_input['mpop_newsletter_agree']) . ",
+            publish_agree = " . intval($meta_input['mpop_publish_agree']) . "
+            WHERE id = $sub[id] ;"
+        );
+        if (str_starts_with($user->user_login, 'mp_')) {
+            $this->change_user_login($user->ID, $post_data['username'], mb_strtoupper($post_data['first_name'], 'UTF-8') . ' ' . mb_strtoupper($post_data['last_name'], 'UTF-8'));
+        }
+        $this->delete_temp_token_by_user_id($user->ID, 'invite_link');
+        wp_set_auth_cookie( $user->ID, true );
+        wp_set_current_user( $user->ID );
+        $redirect_url = get_permalink($this->settings['myaccount_page']);
+        $discourse_connect_options = get_option('discourse_connect');
+        if (
+            is_array($discourse_connect_options)
+            && isset($discourse_connect_options['url'])
+            && $discourse_connect_options['url']
+        ) {
+            $redirect_url = $discourse_connect_options['url'] . '/login';
+        }
+        header("Location: $redirect_url");
         break;
     default:
         $res_data['error'] = ['action'];
