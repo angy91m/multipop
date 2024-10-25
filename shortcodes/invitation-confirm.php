@@ -215,7 +215,7 @@ $invitation_props = [
     </p>
     <p class="mpop-form-row">
         <?php wp_nonce_field( 'mpop-invite', 'mpop-invite-nonce' ); ?>
-        <button class="primary" @click="activateAccount" :disabled="!isValidForm">Attiva l'account</button>
+        <button class="primary" @click="activateAccount" :disabled="requesting || !isValidForm">Attiva l'account</button>
     </p>
     <p v-if="errorFields.size" class="mpop-field-error">Alcuni campi contengono degli errori. Rincontrolla per favore</p>
 </div>
