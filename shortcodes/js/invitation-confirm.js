@@ -123,12 +123,16 @@ createApp({
         async function activateAccount(e) {
             e.preventDefault();
             requesting.value = true;
-            const res = await serverReq({
+            const reqObj = {
                 ...user,
                 username: user.username.trim(),
                 password: user.password.trim(),
+                mpop_billing_city: user.mpop_billing_city.codiceCatastale,
+                mpop_birthplace: user.mpop_birthplace.codiceCatastale,
                 action: 'activate_account'
-            });
+            };
+            delete reqObj['password_confirm'];
+            const res = await serverReq(reqObj);
             try {
                 const json = await res.json();
                 if (res.ok && json.data == 'ok') //registered.value = true;

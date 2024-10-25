@@ -156,7 +156,7 @@ if (
         </select>
     </p>
     <p class="mpop-form-row">
-        <label for="billing-address">CAP</label><br>
+        <label for="billing-address">Indirizzo</label><br>
         <textarea id="billing-address" v-model="user.mpop_billing_address" :class="errorFields.has('mpop_billing_address') ? 'bad-input' : ''" :disabled="!user.mpop_billing_zip"></textarea>
     </p>
     <p class="mpop-form-row">
