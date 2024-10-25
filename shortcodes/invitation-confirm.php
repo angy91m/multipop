@@ -37,10 +37,10 @@ if (
         <input v-model="user.password_confirm" @input="startField('passwordConfirm')" type="password" :class="startedFields.has('passwordConfirm') ? (isValidPasswordConfirm() ? '' : ' bad-input' ) : ''" id="inv_password_confirm" placeholder="Conferma password"/>
     </p>
     <p class="mpop-form-row">
-        <input v-model="user.first_name" @input="startField('first_name')" type="text" :class="startedFields.has('first_name') ? (isValidName() ? '' : ' bad-input' ) : ''" id="inv_first_name" placeholder="Nome"/>
+        <input v-model="user.first_name" @input="startField('first_name')" type="text" :class="errorFields.has('first_name') ?  ' bad-input' : ''" id="inv_first_name" placeholder="Nome"/>
     </p>
     <p class="mpop-form-row">
-        <input v-model="user.last_name" @input="startField('last_name')" type="text" :class="startedFields.has('last_name') ? (isValidName() ? '' : ' bad-input' ) : ''" id="inv_last_name" placeholder="Cognome"/>
+        <input v-model="user.last_name" @input="startField('last_name')" type="text" :class="errorFields.has('first_name') ?  ' bad-input' : ''" id="inv_last_name" placeholder="Cognome"/>
     </p>
     <p class="mpop-form-row">
         <label>Data di nascita<br>
