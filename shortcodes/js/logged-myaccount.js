@@ -87,7 +87,8 @@ userCsvFields = [
     'mpop_subscription_newsletter_agree',
     'mpop_subscription_publish_agree',
     'mpop_org_role',
-    'mpop_subscription_notes'
+    'mpop_subscription_notes',
+    'esito'
 ].map(col => ({name: col, label: col, align: 'left', field: col})),
 menuItems = [{
     name: 'summary',
@@ -300,6 +301,7 @@ createApp({
                                     continue;
                                 }
                                 u[k] = u[k].trim();
+                                u['esito'] = '';
                             }
                         }
                     });
@@ -325,7 +327,7 @@ createApp({
                     });
                     if (response.ok) {
                         const {data: rowResps} = await response.json();
-                        console.log(rowResps);
+                        rowResps.forEach((res, i) => csvUsers[i].esito = res.error || 'OK');
                     } else {
                         const {error} = await response.json();
                         console.error(error);
@@ -751,18 +753,18 @@ createApp({
         async function resendInvitationMail() {
             saving.value = true;
             try {
-                let res = await serverReq({
+                const res = await serverReq({
                     ID: userInView.ID,
                     action: 'admin_resend_invitation_mail'
                 });
                 if (res.ok) {
-                    res = await res.json();
-                    generateNotices(res.notices || []);
+                    const {notices = []} = await res.json();
+                    generateNotices(notices);
                 } else {
                     try {
-                        const {notices} = await res.json();
+                        const {notices = []} = await res.json();
                         if (error) {
-                            generateNotices(notices || []);
+                            generateNotices(notices);
                         } else {
                             console.error('Unknown error');
                         }
