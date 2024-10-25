@@ -304,7 +304,9 @@ class MultipopPlugin {
                 $this->flush_subscriptions();
             },
             'sendMultipleInvitation' => function($file_name) {
-                if (file_exists($file_name)) {
+                $file_path = MULTIPOP_PLUGIN_PATH . '/private';
+                if (file_exists($file_path . '/' . $file_name)) {
+                    $file_name = $file_path . '/' . $file_name;
                     $mails = json_decode(file_get_contents($file_name), true);
                     save_test($mails);
                     if ($mails && is_array($mails)) {
