@@ -149,8 +149,9 @@ createApp({
             const res = await serverReq(reqObj);
             try {
                 const json = await res.json();
-                if (res.ok && json.data == 'ok') //registered.value = true;
-                if (json.error) {
+                if (res.ok && json.data) {
+                    location.href = json.data;
+                } else if (json.error) {
                     json.error.forEach(e => {
                         errorFields.add(e);
                     });

@@ -165,10 +165,8 @@ switch( $post_data['action'] ) {
         }
         $this->delete_temp_token_by_user_id($user->ID, 'invite_link');
         wp_set_auth_cookie( $user->ID, true );
-        wp_set_current_user( $user->ID );
-        $redirect_url = get_permalink($this->settings['myaccount_page']);
-        header("Location: $redirect_url");
-        exit;
+        $res_data['data'] = get_permalink($this->settings['myaccount_page']);
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
