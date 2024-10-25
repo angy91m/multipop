@@ -489,6 +489,10 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         <td><strong>Confermata:</strong></td>
                         <td><input type="checkbox" v-model="userInEditing.mpop_mail_confirmed"></td>
                     </tr>
+                    <tr v-if="userInView.mpop_invited && !userEditing">
+                        <td><strong>Utente invitato</strong></td>
+                        <td><button class="mpop-button" @click="resendInvitationMail">Reinvia e-mail di invito</button></td>
+                    </tr>
                     <tr>
                         <td><strong>Nome:</strong></td>
                         <td v-if="!userEditing">{{userInView.first_name}}</td>

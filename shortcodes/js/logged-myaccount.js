@@ -748,6 +748,33 @@ createApp({
                 pushQueryParams({'view-user': ID});
             }
         }
+        async function resendInvitationMail() {
+            saving.value = true;
+            try {
+                const res = await serverReq({
+                    ID: userInView.ID,
+                    action: 'admin_resend_invitation_mail'
+                });
+                if (res.ok) {
+                    const res = await res.json();
+                    generateNotices(res.notices || []);
+                } else {
+                    try {
+                        const {notices} = await res.json();
+                        if (error) {
+                            generateNotices(notices || []);
+                        } else {
+                            console.error('Unknown error');
+                        }
+                    } catch {
+                        console.error('Unknown error');
+                    }
+    
+                }
+            } finally {
+                saving.value = false;
+            }
+        }
         async function getAuthorizedSubscriptionYears() {
             if ( !isCachedProp('authorizedSubscriptionYears') ) {
                 const res = await serverReq({
@@ -1132,7 +1159,8 @@ createApp({
             menuItems,
             csvImportOptions,
             uploadCsvRows,
-            intPhoneInstance
+            intPhoneInstance,
+            resendInvitationMail
         };
     }
 })

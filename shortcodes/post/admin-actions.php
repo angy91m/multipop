@@ -384,6 +384,34 @@ switch( $post_data['action'] ) {
         }
         $res_data['data'] = $res_rows;
         break;
+    case 'admin_resend_invitation_mail':
+        if (!isset($post_data['ID']) || !is_int($post_data['ID'])) {
+            $res_data['error'] = ['ID'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessun utente selezionato']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $user = get_user_by('ID', $post_data['ID']);
+        if (!$user || !$user->mpop_invited) {
+            $res_data['error'] = ['ID'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Utente non valido']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $this->delete_temp_token_by_user_id($user->ID, 'invite_link');
+        $token = $this->create_temp_token($user->ID,'invite_link',3600*24*30);
+        if(!$this->send_invitation_mail($token, $user->user_email)) {
+            $res_data['error'] = ['server'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => "Errore durante l'invio dell'invito" . ($this->last_mail_error ? ': ' . $this->last_mail_error : '')]];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $res_data['data'] = 'ok';
+        $res_data['notices'] = [['type'=>'success', 'msg' => 'Invito inviato con successo']];
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
