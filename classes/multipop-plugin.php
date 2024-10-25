@@ -212,7 +212,7 @@ class MultipopPlugin {
 
     private static function delay_script(string $script, ...$argv) {
         $test = true;
-        return exec('php ' .MULTIPOP_PLUGIN_PATH . 'delayed_scripts/delayed.php ' . $script . ' ' . implode(' ', $argv) . ' >> '.($test? MULTIPOP_PLUGIN_PATH . '/delay_test.log' : '/dev/null').' &');
+        return exec('php ' .MULTIPOP_PLUGIN_PATH . 'delayed_scripts/delayed.php ' . $script . ' ' . implode(' ', $argv) . ' >> '.($test? MULTIPOP_PLUGIN_PATH . '/delay_test.log' : '/dev/null').' 2>&1 &');
     }
 
     // DB PREFIX FOR PLUGIN TABLES
