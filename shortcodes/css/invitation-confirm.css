@@ -8,3 +8,6 @@
 #billing-address {
     min-width: 200px;
 }
+.mpop-click {
+    cursor: pointer;
+}

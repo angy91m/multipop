@@ -182,7 +182,7 @@ $invitation_props = [
         <strong>Consensi facoltativi</strong>
     </p>
     <p class="mpop-form-row">
-        <label><span @click="marketingAgreeShow = !marketingAgreeShow">Accetto le condizioni commerciali</span>&nbsp;
+        <label><span class="mpop-click" @click="e => {e.preventDefault(); marketingAgreeShow = !marketingAgreeShow}">Accetto le condizioni commerciali</span>&nbsp;
             <input type="checkbox" v-model="user.mpop_subscription_marketing_agree"/>
         </label>
     </p>
@@ -191,7 +191,7 @@ $invitation_props = [
         Presto il mio consenso e fino alla revoca dello stesso, per la proposizione di offerte, comunicazioni commerciali e per il successivo invio di materiale informativo pubblicitario e/o promozionale e/o sondaggi di opinione, ricerche di mercato, invio di newsletter (di seguito complessivamente definite “attività di propaganda”) di MULTIPOPOLARE APS e/o da organizzazioni correlate. Il trattamento per attività di marketing avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea e/o chiamate da operatore), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo SMS e/o MMS, chiamate telefoniche senza l’intervento dell’operatore, posta elettronica, social network, newsletter, applicazioni interattive, notifiche push).
     </p>
     <p class="mpop-form-row">
-        <label><span @click="newsletterAgreeShow = !newsletterAgreeShow">Accetto le condizioni della newsletter</span>&nbsp;
+        <label><span class="mpop-click" @click="e => {e.preventDefault(); newsletterAgreeShow = !newsletterAgreeShow}">Accetto le condizioni della newsletter</span>&nbsp;
             <input type="checkbox" v-model="user.mpop_subscription_newsletter_agree"/>
         </label>
     </p>
@@ -201,7 +201,7 @@ $invitation_props = [
         Il trattamento per attività di informazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo posta elettronica)
     </p>
     <p class="mpop-form-row">
-        <label><span @click="publishAgreeShow = !publishAgreeShow">Accetto le condizioni</span>&nbsp;
+        <label><span class="mpop-click" @click="e => {e.preventDefault(); publishAgreeShow = !publishAgreeShow}">Accetto le condizioni</span>&nbsp;
             <input type="checkbox" v-model="user.mpop_subscription_publish_agree"/>
         </label>
     </p>
