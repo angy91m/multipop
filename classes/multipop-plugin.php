@@ -2667,6 +2667,7 @@ class MultipopPlugin {
             do {
                 $row['login'] = 'mp_' . bin2hex(openssl_random_pseudo_bytes(16));
             } while(get_user_by('login', $row['login']));
+            $user_input['user_login'] = $row['login'];
             $marketing_agree = false;
             $newsletter_agree = false;
             $publish_agree = false;
