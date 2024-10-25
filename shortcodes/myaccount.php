@@ -16,7 +16,7 @@ if (!$current_user->ID) {
         $redirect_url = '/';
         $discourse_connect_options = get_option('discourse_connect');
         if (is_array($discourse_connect_options) && isset($discourse_connect_options['url']) && $discourse_connect_options['url']) {
-            $redirect_url = $discourse_connect_options['url'];
+            $redirect_url = $discourse_connect_options['url'] . '/login';
         }
         header('Location: ' . $redirect_url);
     }
