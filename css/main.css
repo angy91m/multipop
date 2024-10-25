@@ -1,6 +1,6 @@
 .mpop-form > *,
-.mpop-form > * > input,
-.mpop-form > * > label > input {
+.mpop-form > * > input:not([type="checkbox"]),
+.mpop-form > * > label > input:not([type="checkbox"]) {
     width: 100%;
 }
 .bad-input {
