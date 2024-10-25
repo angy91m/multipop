@@ -316,6 +316,7 @@ class MultipopPlugin {
                             sleep(5);
                         }
                     }
+                    unlink($file_name);
                 }
             }
         ];
