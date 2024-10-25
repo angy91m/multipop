@@ -66,7 +66,7 @@ createApp({
         'v-intl-phone': IntlTelInput
     },
     setup() {
-        const user = {
+        const user = reactive({
             username: '',
             password: '',
             password_confirm: '',
@@ -82,7 +82,7 @@ createApp({
             mpop_subscription_marketing_agree: false,
             mpop_subscription_newsletter_agree: false,
             mpop_subscription_publish_agree: false
-        },
+        }),
         birthplaceOpen = ref(false),
         billingCityOpen = ref(false),
         userNotices = reactive([]),
