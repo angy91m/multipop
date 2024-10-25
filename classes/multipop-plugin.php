@@ -2735,7 +2735,7 @@ class MultipopPlugin {
             throw new Exception('duplicated');
         }
         global $wpdb;
-        save_test($wpdb->update(
+        $wpdb->update(
             $wpdb->users,
             [
                 'user_login' => $new_login,
@@ -2743,7 +2743,7 @@ class MultipopPlugin {
                 'display_name' => $display_name ? $display_name : $new_login
             ],
             ['ID' => $user->ID]
-        ));
+        );
         $wpdb->update(
             $wpdb->usermeta,
             ['meta_value' => $new_login],
