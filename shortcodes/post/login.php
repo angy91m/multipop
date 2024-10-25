@@ -10,7 +10,7 @@ if (
         && (
             !isset($_POST['hcaptcha-response'])
             || !is_string($_POST['hcaptcha-response'])
-            || !$this->verify_hcaptcha( $post_data['hcaptcha-response'] )
+            || !$this->verify_hcaptcha( $_POST['hcaptcha-response'] )
         )
     )
 ) {
