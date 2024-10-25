@@ -56,7 +56,9 @@ passwordRegex = {
         return validRegex >= 3;
     },
     acceptedSymbols: "| \\ ! \" £ $ % & / ( ) = ? ' ^ , . ; : _ @ ° # * + [ ] { } _ -"
-};
+},
+maxBirthDate = new Date();
+maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
 let triggerSearchTimeout;
 createApp({
     components: {
@@ -252,7 +254,8 @@ createApp({
             birthCities,
             billingCities,
             phoneInput,
-            parsePhone
+            parsePhone,
+            maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
         };
     }
 }).mount('#app');
