@@ -217,6 +217,7 @@ $invitation_props = [
         <?php wp_nonce_field( 'mpop-invite', 'mpop-invite-nonce' ); ?>
         <button class="primary" @click="activateAccount" :disabled="!isValidForm">Attiva l'account</button>
     </p>
+    <p v-if="errorFields.size" class="mpop-field-error">Alcuni campi contengono degli errori. Rincontrolla per favore</p>
 </div>
 <script src="<?=plugins_url()?>/multipop/js/vue.global.min.js"></script>
 <script type="module" src="<?=plugins_url()?>/multipop/shortcodes/js/invitation-confirm.js"></script>
