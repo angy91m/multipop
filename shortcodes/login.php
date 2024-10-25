@@ -19,6 +19,7 @@ if (
     <p class="mpop-form-row">
         <a href="./?mpop_forgot_password=1">Password dimenticata</a>
     </p>
+    <?=$this->create_hcaptcha()?>
     <p class="mpop-form-row">
         <?php wp_nonce_field( 'mpop-login', 'mpop-login-nonce' ); ?>
         <button type="submit" class="primary" name="login" value="login">Accedi</button>
