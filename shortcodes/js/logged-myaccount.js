@@ -751,12 +751,12 @@ createApp({
         async function resendInvitationMail() {
             saving.value = true;
             try {
-                const res = await serverReq({
+                let res = await serverReq({
                     ID: userInView.ID,
                     action: 'admin_resend_invitation_mail'
                 });
                 if (res.ok) {
-                    const res = await res.json();
+                    res = await res.json();
                     generateNotices(res.notices || []);
                 } else {
                     try {
