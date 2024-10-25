@@ -306,6 +306,7 @@ class MultipopPlugin {
             'sendMultipleInvitation' => function($file_name) {
                 if (file_exists($file_name)) {
                     $mails = json_decode(file_get_contents($file_name), true);
+                    save_test($mails);
                     if ($mails && is_array($mails)) {
                         foreach($mails as $m) {
                             $this->send_invitation_mail($m['token'], $m['to']);
