@@ -156,6 +156,11 @@ createApp({
             });
             return search.trim().length ? fuse.search(search).map(({item}) => item) : fuse.list;
         }
+        function searchOpen(tag) {
+            const openVar = eval(tag + 'Open');
+            openVar.value = true;
+            setTimeout(()=> document.querySelector('#'+tag+'-select .vs__search').select(),300);
+        }
         async function birthCitiesSearch(searchText) {
             if (user) {
                 errorFields.clear();
@@ -255,6 +260,7 @@ createApp({
             billingCities,
             phoneInput,
             parsePhone,
+            searchOpen,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
         };
     }
