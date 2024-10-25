@@ -22,7 +22,7 @@
 :where(.wp-site-blocks *:focus) {
     outline: unset;
 }
-p.mpop-form-row input[type="text"],
+p.mpop-form-row > input[type="text"],
 p.mpop-form-row input[type="password"],
 p.mpop-form-row input[type="email"],
 p.mpop-form-row input[type="button"],
