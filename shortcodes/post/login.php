@@ -7,6 +7,7 @@ if (
     || !wp_verify_nonce( $_POST['mpop-login-nonce'], 'mpop-login' )
     || (
         isset($this->settings['hcaptcha_site_key'])
+        && trim($this->settings['hcaptcha_site_key'])
         && (
             !isset($_POST['hcaptcha-response'])
             || !is_string($_POST['hcaptcha-response'])
