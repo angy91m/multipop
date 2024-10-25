@@ -71,8 +71,9 @@ createApp({
             first_name: '',
             last_name: '',
             mpop_birthdate: undefined,
-            mpop_birthplace: undefined,
+            mpop_birthplace: '',
             mpop_billing_city: '',
+            mpop_billing_state: '',
             mpop_billing_zip: '',
             mpop_billing_address: '',
             mpop_phone: '',
@@ -96,6 +97,7 @@ createApp({
             && user.mpop_birthdate
             && user.mpop_birthplace
             && user.mpop_billing_city
+            && user.mpop_billing_state
             && user.mpop_billing_address.trim()
             && user.mpop_billing_zip
             && user.mpop_phone
