@@ -9,18 +9,14 @@ if (!isset($post_data['action']) || !is_string($post_data['action']) || !trim($p
     echo json_encode( $res_data );
     exit;
 }
-$min_birthdate = date_create('1910-10-13', new DateTimeZone('Europe/Rome'));
-$min_birthdate->setTime(0,0,0,0);
-$max_birthdate = date_create('now', new DateTimeZone('Europe/Rome'));
-$max_birthdate->setTime(0,0,0,0);
-$max_birthdate->sub(new DateInterval('P18Y'));
 if (!isset($post_data['mpop-logged-myaccount-nonce']) || !is_string($post_data['mpop-logged-myaccount-nonce'])) {
     $res_data['error'] = ['nonce'];
     $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
     http_response_code( 400 );
     echo json_encode( $res_data );
     exit;
-} else if (!wp_verify_nonce($post_data['mpop-logged-myaccount-nonce'], 'mpop-logged-myaccount')) {
+}
+if (!wp_verify_nonce($post_data['mpop-logged-myaccount-nonce'], 'mpop-logged-myaccount')) {
     $res_data['error'] = ['nonce'];
     $res_data['notices'] = [['type'=>'error', 'msg' => 'Pagina scaduta. Ricarica la pagina e riprova']];
     http_response_code( 401 );
@@ -53,98 +49,45 @@ switch ($post_data['action']) {
         $res_data['data'] = ['years' => $years];
         break;
     case 'get_birth_cities':
-        if (!isset($post_data['mpop_birthplace']) || !is_string($post_data['mpop_birthplace']) || mb_strlen(trim($post_data['mpop_birthplace']), 'UTF-8') < 2) {
+        if (!isset($post_data['mpop_birthplace'])) {
             $res_data['error'] = ['mpop_birthplace'];
             http_response_code( 400 );
             echo json_encode( $res_data );
             exit;
         }
-        if (!isset($post_data['mpop_birthdate']) || !is_string($post_data['mpop_birthdate']) || strlen(trim($post_data['mpop_birthdate'])) != 10) {
+        if (!isset($post_data['mpop_birthdate'])) {
             $res_data['error'] = ['mpop_birthdate'];
             http_response_code( 400 );
             echo json_encode( $res_data );
             exit;
         }
-        $date_arr = array_map(function ($dt) {return intval($dt);}, explode('-', $post_data['mpop_birthdate'] ) );
-        if (
-            count($date_arr) != 3
-            || !checkdate($date_arr[1], $date_arr[2], $date_arr[0])
-        ) {
-            $res_data['error'] = ['mpop_birthdate'];
+        $post_birthdate = '';
+        try {
+            $filtered_comuni = $this->get_birth_cities($post_data['mpop_birthplace'], $post_data['mpop_birthdate']);
+            $res_data['data'] = ['comuni' => $filtered_comuni];
+        } catch (Exception $err) {
+            $res_data['error'] = explode(',',$err->getMessage());
             http_response_code( 400 );
             echo json_encode( $res_data );
             exit;
         }
-        $post_birthdate = date_create('now', new DateTimeZone(current_time('e')));
-        $post_birthdate->setDate($date_arr[0], $date_arr[1], $date_arr[2]);
-        $post_birthdate->setTime(0,0,0,0);
-        if (
-            $post_birthdate->getTimestamp() < $min_birthdate->getTimestamp()
-            || $post_birthdate->getTimestamp() > $max_birthdate->getTimestamp()
-        ) {
-            $res_data['error'] = ['mpop_birthdate'];
-            http_response_code( 400 );
-            echo json_encode( $res_data );
-            exit;
-        }
-        $post_birthplace = trim(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper( $post_data['mpop_birthplace'], 'UTF-8' )));
-        $comuni = $this->get_comuni_all();
-        $filtered_comuni = [];
-        foreach($comuni as $c) {
-            if (isset($c['soppresso']) && $c['soppresso']) {
-                if (!isset($c['dataSoppressione']) || !$c['dataSoppressione']) {
-                    continue;
-                } else {
-                    $soppressione_dt = date_create('now', new DateTimeZone('UTC'));
-                    $soppr_arr = explode('T', $c['dataSoppressione']);
-                    $soppr_arr_dt = array_map( function($v) {return intval($v);}, explode('-', $soppr_arr[0]));
-                    $soppr_arr_tm = array_map( function($v) {return intval(substr( $v, 0, 2));}, explode(':', $soppr_arr[1]));
-                    $soppressione_dt->setDate($soppr_arr_dt[0], $soppr_arr_dt[1], $soppr_arr_dt[2]);
-                    $soppressione_dt->setTime($soppr_arr_tm[0], $soppr_arr_tm[1], $soppr_arr_tm[2]);
-                    $c['dataSoppressione'] = $soppressione_dt;
-                }
-            }
-            if (
-                (
-                    !isset($c['soppresso'])
-                    || !$c['soppresso']
-                    || $post_birthdate->getTimestamp() < $c['dataSoppressione']->getTimestamp()
-                )
-                && (
-                    strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper($c['nome'], 'UTF-8')), $post_birthplace) !== false
-                    || strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper($c['provincia']['nome'], 'UTF-8')), $post_birthplace) !== false
-                    || strpos($c['provincia']['sigla'], $post_birthplace) !== false
-                    || ( isset($c['codiceCatastale']) && strpos($c['codiceCatastale'], $post_birthplace) !== false)
-                )
-            ) {
-                $c = $this->add_birthplace_labels($c)[0];
-                $filtered_comuni[] = $c;
-            }
-        }
-        $res_data['data'] = ['comuni' => $filtered_comuni];
         break;
     case 'get_billing_cities':
-        if (!isset($post_data['mpop_billing_city']) || !is_string($post_data['mpop_billing_city']) || mb_strlen(trim($post_data['mpop_billing_city']), 'UTF-8') < 2) {
+        if (!isset($post_data['mpop_billing_city'])) {
             $res_data['error'] = ['mpop_billing_city'];
             http_response_code( 400 );
             echo json_encode( $res_data );
             exit;
         }
-        $post_billing_city = trim(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper( $post_data['mpop_billing_city'], 'UTF-8' )));
-        $comuni = $this->get_comuni_all();
-        $filtered_comuni = [];
-        foreach($comuni as $c) {
-            if (isset($c['soppresso']) && $c['soppresso']) {
-                continue;
-            }
-            if (
-                strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper($c['nome'], 'UTF-8')), $post_billing_city) !== false
-            ) {
-                $c = $this->add_billing_city_labels($c)[0];
-                $filtered_comuni[] = $c;
-            }
+        try {
+            $filtered_comuni = $this->get_billing_cities($post_data['mpop_billing_city']);
+            $res_data['data'] = ['comuni' => $filtered_comuni];
+        } catch(Exception $e) {
+            $res_data['error'] = explode(',',$err->getMessage());
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
         }
-        $res_data['data'] = ['comuni' => $filtered_comuni];
         break;
     case 'update_profile':
         $comuni = false;

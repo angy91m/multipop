@@ -39,11 +39,11 @@ $this->show_hcaptcha_script();
                 </ul>
             </div>
             <p class="mpop-form-row">
-                <input v-model="password" @input="startField('password')" type="password" :class="startedFields.has('password') ? (isValidPassword() ? '' : ' bad-input' ) : ''" name="password" id="reg_password" autocomplete="new-password" placeholder="Password"/>
+                <input v-model="password" @input="startField('password')" type="password" :class="startedFields.has('password') ? (isValidPassword() ? '' : ' bad-input' ) : ''" name="password" id="reg_password" placeholder="Password"/>
             </p>
             <p v-if="startedFields.has('passwordConfirm') && !isValidPasswordConfirm()" class="mpop-field-error">Le password non coincidono</p>
             <p class="mpop-form-row">
-                <input v-model="passwordConfirm" @input="startField('passwordConfirm')" type="password" :class="startedFields.has('passwordConfirm') ? (isValidPasswordConfirm() ? '' : ' bad-input' ) : ''" name="passwordConfirm" id="reg_password_confirm" autocomplete="new-password-confirm" placeholder="Conferma password"/>
+                <input v-model="passwordConfirm" @input="startField('passwordConfirm')" type="password" :class="startedFields.has('passwordConfirm') ? (isValidPasswordConfirm() ? '' : ' bad-input' ) : ''" name="passwordConfirm" id="reg_password_confirm" placeholder="Conferma password"/>
             </p>
 
             <p>Riceverai un link per confermare l'indirizzo</p>

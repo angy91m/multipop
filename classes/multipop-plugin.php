@@ -102,7 +102,7 @@ class MultipopPlugin {
             '/[a-z]+/',
             '/[A-Z]+/',
             '/[0-9]+/',
-            '/[ |\\!"£$%&\/()=?\'^,.;:_@°#*+[\]{}_-]+/'
+            '/[|\\!"£$%&\/()=?\'^,.;:_@°#*+[\]{}_-]+/'
         ];
         $res = 0;
         foreach ( $rr as $r ) {
@@ -2431,6 +2431,77 @@ class MultipopPlugin {
             }
         }
         return $birthdate->format('Y-m-d');
+    }
+    private function get_birth_cities($birthplace, $birthdate, &$comuni = []) {
+        if (!is_string($birthplace) || mb_strlen(trim($birthplace), 'UTF-8') < 2) {
+            throw new Exception('mpop_birthplace');
+        }
+        if (is_string($birthdate)) {
+            $birthdate = $this::validate_birthdate($birthdate);
+        } else if (is_int($birthdate)) {
+            $birth_d = date_create('now', new DateTimeZone( current_time('e')));
+            $birth_d->setTimestamp($birth_d);
+            $birthdate = $birth_d;
+        }
+        $birthplace = trim(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper( $birthplace, 'UTF-8' )));
+        if (empty($comuni)) {
+            $comuni = $this->get_comuni_all();
+        }
+        $filtered_comuni = [];
+        foreach($comuni as $c) {
+            if (isset($c['soppresso']) && $c['soppresso']) {
+                if (!isset($c['dataSoppressione']) || !$c['dataSoppressione']) {
+                    continue;
+                } else {
+                    $soppressione_dt = date_create('now', new DateTimeZone('UTC'));
+                    $soppr_arr = explode('T', $c['dataSoppressione']);
+                    $soppr_arr_dt = array_map( function($v) {return intval($v);}, explode('-', $soppr_arr[0]));
+                    $soppr_arr_tm = array_map( function($v) {return intval(substr( $v, 0, 2));}, explode(':', $soppr_arr[1]));
+                    $soppressione_dt->setDate($soppr_arr_dt[0], $soppr_arr_dt[1], $soppr_arr_dt[2]);
+                    $soppressione_dt->setTime($soppr_arr_tm[0], $soppr_arr_tm[1], $soppr_arr_tm[2]);
+                    $c['dataSoppressione'] = $soppressione_dt;
+                }
+            }
+            if (
+                (
+                    !isset($c['soppresso'])
+                    || !$c['soppresso']
+                    || $birthdate->getTimestamp() < $c['dataSoppressione']->getTimestamp()
+                )
+                && (
+                    strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper($c['nome'], 'UTF-8')), $birthplace) !== false
+                    || strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper($c['provincia']['nome'], 'UTF-8')), $birthplace) !== false
+                    || strpos($c['provincia']['sigla'], $birthplace) !== false
+                    || ( isset($c['codiceCatastale']) && strpos($c['codiceCatastale'], $birthplace) !== false)
+                )
+            ) {
+                $c = $this->add_birthplace_labels($c)[0];
+                $filtered_comuni[] = $c;
+            }
+        }
+        return $filtered_comuni;
+    }
+    private function get_billing_cities($billing_city, &$comuni = []) {
+        if (!is_string($billing_city) || mb_strlen(trim($billing_city), 'UTF-8') < 2) {
+            throw new Exception('mpop_billing_city');
+        }
+        $billing_city = trim(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper( $billing_city, 'UTF-8' )));
+        if (empty($comuni)) {
+            $comuni = $this->get_comuni_all();
+        }
+        $filtered_comuni = [];
+        foreach($comuni as $c) {
+            if (isset($c['soppresso']) && $c['soppresso']) {
+                continue;
+            }
+            if (
+                strpos(iconv('UTF-8','ASCII//TRANSLIT',mb_strtoupper($c['nome'], 'UTF-8')), $billing_city) !== false
+            ) {
+                $c = $this->add_billing_city_labels($c)[0];
+                $filtered_comuni[] = $c;
+            }
+        }
+        return $filtered_comuni;
     }
     private function get_comune_by_catasto(string $catasto, $soppressi = false, &$comuni= []) {
         if (empty($catasto)) return false;

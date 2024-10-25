@@ -26,7 +26,7 @@ passwordRegex = {
         /[a-z]+/s,
         /[A-Z]+/s,
         /[0-9]+/s,
-        /[ |\\!"£$%&/()=?'^,.;:_@°#*+[\]{}_-]+/s
+        /[|\\!"£$%&/()=?'^,.;:_@°#*+[\]{}_-]+/s
     ],
     test(password) {
         if (password.length < 8 || password.length > 64) return false;
@@ -34,7 +34,7 @@ passwordRegex = {
         passwordRegex.rr.forEach(r => validRegex += r.test(password) ? 1 : 0);
         return validRegex >= 3;
     },
-    acceptedSymbols: "SPACE | \\ ! \" £ $ % & / ( ) = ? ' ^ , . ; : _ @ ° # * + [ ] { } _ -"
+    acceptedSymbols: "| \\ ! \" £ $ % & / ( ) = ? ' ^ , . ; : _ @ ° # * + [ ] { } _ -"
 },
 boolVal = v => {
     if (typeof v == 'string' && v) {
@@ -112,7 +112,7 @@ menuItems = [{
     admin: true
 }],
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value;
-let searchUsersTimeout, triggerSearchTimeout, telUtils;
+let searchUsersTimeout, triggerSearchTimeout;
 createApp({
     components: {
         'v-select': defineAsyncComponent(() => vSel),
