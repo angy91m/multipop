@@ -1,5 +1,6 @@
 .mpop-form > *,
-.mpop-form > * > input {
+.mpop-form > * > input,
+.mpop-form > * > label > input {
     width: 100%;
 }
 .bad-input {
