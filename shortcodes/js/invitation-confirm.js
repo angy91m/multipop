@@ -233,6 +233,15 @@ createApp({
             const func = eval(callable);
             triggerSearchTimeout = setTimeout( () => func(txt, ...args).then(() => loading(false)), 500);
         }
+        function addSuppressToLabel(option) {
+            let res = '';
+            if (option.type == 'provincia' || option.type == 'regione') {
+                if (option.soppressa) res += ' (soppressa)';
+            } else {
+                if (option.soppresso) res += ' (soppresso)';
+            }
+            return res;
+        }
         function serverReq(obj) {
             return fetch(location.href, {
                 method: 'POST',
@@ -266,6 +275,7 @@ createApp({
             phoneInput,
             parsePhone,
             searchOpen,
+            addSuppressToLabel,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
         };
     }
