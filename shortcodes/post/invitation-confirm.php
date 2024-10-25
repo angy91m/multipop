@@ -162,6 +162,11 @@ switch( $post_data['action'] ) {
         );
         if (str_starts_with($user->user_login, 'mp_')) {
             $this->change_user_login($user->ID, $post_data['username'], mb_strtoupper($post_data['first_name'], 'UTF-8') . ' ' . mb_strtoupper($post_data['last_name'], 'UTF-8'));
+            $user = get_user_by('ID',$user->ID);
+        }
+        $disc_utils = $this->discourse_utilities();
+        if ($disc_utils) {
+            $disc_utils::sync_sso_record($disc_utils::get_sso_params($user));
         }
         $this->delete_temp_token_by_user_id($user->ID, 'invite_link');
         wp_set_auth_cookie( $user->ID, true );
