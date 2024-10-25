@@ -501,6 +501,9 @@ class MultipopPlugin {
             if (isset($_REQUEST['invalid_mpop_mail_token'])) {
                 $this->add_user_notice('Token di conferma non valido');
             }
+            if (isset($_REQUEST['invalid_mpop_login'])) {
+                $this->add_user_notice('Credenziali non valide');
+            }
             if (isset($_REQUEST['mpop_mail_not_confirmed'])) {
                 $this->add_user_notice("L'indirizzo e-mail non è ancora confermato. Controlla nella tua casella di posta per il link di conferma.");
             }
