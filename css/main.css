@@ -1,4 +1,4 @@
-.mpop-form > * 
+.mpop-form > *,
 .mpop-form > * > input {
     width: 100%;
 }
