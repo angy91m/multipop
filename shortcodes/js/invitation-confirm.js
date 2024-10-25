@@ -84,6 +84,9 @@ createApp({
             mpop_subscription_newsletter_agree: false,
             mpop_subscription_publish_agree: false
         }),
+        marketingAgreeShow = ref(false),
+        newsletterAgreeShow = ref(false),
+        publishAgreeShow = ref(false),
         birthplaceOpen = ref(false),
         billingCityOpen = ref(false),
         userNotices = reactive([]),
@@ -292,6 +295,9 @@ createApp({
             searchOpen,
             addSuppressToLabel,
             requireProps,
+            marketingAgreeShow,
+            newsletterAgreeShow,
+            publishAgreeShow,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
         };
     }

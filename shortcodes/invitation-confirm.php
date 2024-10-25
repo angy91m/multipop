@@ -177,20 +177,38 @@ $invitation_props = [
             @change-country="()=>user.mpop_phone = parsePhone(phoneInput)"
         ></v-intl-phone>
     </p>
+    <br>
     <p class="mpop-form-row">
-        <label>Accetto le condizioni&nbsp;
+        <strong>Consensi facoltativi</strong>
+    </p>
+    <p class="mpop-form-row">
+        <label><span @click="marketingAgreeShow = !marketingAgreeShow">Accetto le condizioni commerciali</span>&nbsp;
             <input type="checkbox" v-model="user.mpop_subscription_marketing_agree"/>
         </label>
     </p>
+    <p class="mpop-form-row" v-show="marketingAgreeShow">
+        <button class="mpop-button" @click="marketingAgreeShow = false">Chiudi</button>
+        Presto il mio consenso e fino alla revoca dello stesso, per la proposizione di offerte, comunicazioni commerciali e per il successivo invio di materiale informativo pubblicitario e/o promozionale e/o sondaggi di opinione, ricerche di mercato, invio di newsletter (di seguito complessivamente definite “attività di propaganda”) di MULTIPOPOLARE APS e/o da organizzazioni correlate. Il trattamento per attività di marketing avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea e/o chiamate da operatore), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo SMS e/o MMS, chiamate telefoniche senza l’intervento dell’operatore, posta elettronica, social network, newsletter, applicazioni interattive, notifiche push).
+    </p>
     <p class="mpop-form-row">
-        <label>Accetto le condizioni&nbsp;
+        <label><span @click="newsletterAgreeShow = !newsletterAgreeShow">Accetto le condizioni della newsletter</span>&nbsp;
             <input type="checkbox" v-model="user.mpop_subscription_newsletter_agree"/>
         </label>
     </p>
+    <p class="mpop-form-row" v-show="newsletterAgreeShow">
+        <button class="mpop-button" @click="newsletterAgreeShow = false">Chiudi</button>
+        Presta il mio consenso e fino alla revoca dello stesso, per la comunicazioni di iniziative ed attività (di seguito complessivamente definite “attività di informazione dell’associazione”) di MULTIPOPOLARE APS e/o da organizzazioni correlate.<br>
+        Il trattamento per attività di informazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo posta elettronica)
+    </p>
     <p class="mpop-form-row">
-        <label>Accetto le condizioni&nbsp;
+        <label><span @click="publishAgreeShow = !publishAgreeShow">Accetto le condizioni</span>&nbsp;
             <input type="checkbox" v-model="user.mpop_subscription_publish_agree"/>
         </label>
+    </p>
+    <p class="mpop-form-row" v-show="publishAgreeShow">
+        <button class="mpop-button" @click="publishAgreeShow = false">Chiudi</button>
+        Presta il mio consenso e fino alla revoca dello stesso, per la comunicazioni di iniziative ed attività (di seguito complessivamente definite “attività di informazione dell’associazione”) di MULTIPOPOLARE APS e/o da organizzazioni correlate.<br>
+        Il trattamento per attività di informazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo posta elettronica)
     </p>
     <p class="mpop-form-row">
         <?php wp_nonce_field( 'mpop-invite', 'mpop-invite-nonce' ); ?>
