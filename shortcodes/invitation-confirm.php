@@ -174,7 +174,7 @@ if (
     </p>
     <p class="mpop-form-row">
         <?php wp_nonce_field( 'mpop-invite', 'mpop-invite-nonce' ); ?>
-        <button class="primary" name="login" value="login">Attiva l'account</button>
+        <button class="primary" @click="activateAccount" :disabled="!isValidForm">Attiva l'account</button>
     </p>
 </div>
 <script src="<?=plugins_url()?>/multipop/js/vue.global.min.js"></script>
