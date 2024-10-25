@@ -60,7 +60,7 @@ if (
         />
         </label>
     </p>
-    <p>
+    <p class="mpop-form-row" style="width:unset">
         <v-select
             id="birthplace-select"
             :class="errorFields.has('mpop_birthplace') ? 'bad-input' : ''"
@@ -97,7 +97,7 @@ if (
             </template>
         </v-select>
     </p>
-    <p>
+    <p class="mpop-form-row" style="width:unset">
         <v-select
             id="billingCity-select"
             v-model="user.mpop_billing_city"
@@ -162,7 +162,7 @@ if (
     <p class="mpop-form-row">
         <textarea v-model="user.mpop_billing_address" :class="errorFields.has('mpop_billing_address') ? 'bad-input' : ''" :disabled="!user.mpop_billing_zip"></textarea>
     </p>
-    <p>
+    <p class="mpop-form-row">
         <v-intl-phone
             ref="phoneInput"
             :options="{initialCountry: 'it'}"
