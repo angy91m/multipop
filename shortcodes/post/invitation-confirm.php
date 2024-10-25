@@ -145,7 +145,7 @@ switch( $post_data['action'] ) {
             'user_pass' => $post_data['password'],
             'meta_input' => $meta_input
         ];
-        $sub = $this->search_subscriptions(['user_id' => [$user->ID], 'pagination' => false], 1);
+        $sub = array_pop($this->search_subscriptions(['user_id' => [$user->ID], 'pagination' => false], 1));
         $res_data['data'] = $sub;
         // wp_update_user($user_edits);
         // $sub = $this->search_subscriptions(['user_id' => [$user->ID], 'pagination' => false], 1);
