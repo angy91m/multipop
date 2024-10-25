@@ -5,6 +5,14 @@ if (
     || !isset($_POST['user']) || !is_string($_POST['user'])
     || !isset($_POST['password']) || !is_string($_POST['password'])
     || !wp_verify_nonce( $_POST['mpop-login-nonce'], 'mpop-login' )
+    || (
+        isset($this->settings['hcaptcha_site_key'])
+        && (
+            !isset($_POST['hcaptcha-response'])
+            || !is_string($_POST['hcaptcha-response'])
+            || !$this->verify_hcaptcha( $post_data['hcaptcha-response'] )
+        )
+    )
 ) {
     $_GET['invalid_mpop_login'] = '1';
     header("Status: 401 Unauthorized");
