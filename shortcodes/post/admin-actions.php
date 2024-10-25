@@ -189,7 +189,7 @@ switch( $post_data['action'] ) {
             'meta_key' => 'mpop_phone',
             'meta_value' => $post_data['mpop_phone'],
             'meta_compare' => '=',
-            'login__not_in' => [$current_user->user_login]
+            'login__not_in' => [$user->user_login]
         ]))) {
             if (!isset($res_data['error'])) {
                 $res_data['error'] = [];
