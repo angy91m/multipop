@@ -2728,7 +2728,7 @@ class MultipopPlugin {
         if (!$user) {
             throw new Exception('user_id');
         }
-        if (!$user->mpop_invited || $user->discourse_sso_user_id) {
+        if ($user->discourse_sso_user_id) {
             throw new Exception('user');
         }
         if( get_user_by('login', $new_login) ) {
