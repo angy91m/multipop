@@ -123,17 +123,11 @@ createApp({
         async function activateAccount(e) {
             e.preventDefault();
             requesting.value = true;
-            const res = await fetch(location.href, {
-                method: 'POST',
-                body: JSON.stringify({
-                    ...user,
-                    username: user.username.trim(),
-                    password: user.password.trim(),
-                    action: 'activate_account'
-                }),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+            const res = await serverReq({
+                ...user,
+                username: user.username.trim(),
+                password: user.password.trim(),
+                action: 'activate_account'
             });
             try {
                 const json = await res.json();
@@ -240,7 +234,7 @@ createApp({
             triggerSearchTimeout = setTimeout( () => func(txt, ...args).then(() => loading(false)), 500);
         }
         function serverReq(obj) {
-            return fetch(location.origin + location.pathname, {
+            return fetch(location.href, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
