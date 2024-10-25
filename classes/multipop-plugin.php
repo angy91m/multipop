@@ -1565,6 +1565,11 @@ class MultipopPlugin {
     }
     private function show_hcaptcha_script() { ?>
         <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+        <script type="text/javascript">
+            function hcaptchaCallback(token) {
+                document.querySelector("input[name=hcaptcha-response]").value = token;
+            }
+        </script>
         <?php
     }
     private function create_hcaptcha() {
