@@ -43,14 +43,6 @@ if (
         <input v-model="user.last_name" @input="startField('last_name')" type="text" :class="startedFields.has('last_name') ? (isValidName() ? '' : ' bad-input' ) : ''" id="inv_last_name" placeholder="Cognome"/>
     </p>
     <p class="mpop-form-row">
-        <input type="date"
-            :class="errorFields.has('mpop_birthdate') ? 'bad-input' : ''"
-            min="1910-10-13" :max="maxBirthDate"
-            v-model="user.mpop_birthdate"
-            @change="()=> {if (!user.mpop_birthdate) user.mpop_birthplace = '';}"
-        />
-    </p>
-    <p class="mpop-form-row">
         <label>Data di nascita<br>
         <input type="date"
             :class="errorFields.has('mpop_birthdate') ? 'bad-input' : ''"
@@ -61,6 +53,7 @@ if (
         </label>
     </p>
     <p class="mpop-form-row">
+        <label for="birthplace-select">Comune di nascita</label><br>
         <v-select
             id="birthplace-select"
             :class="errorFields.has('mpop_birthplace') ? 'bad-input' : ''"
@@ -98,6 +91,7 @@ if (
         </v-select>
     </p>
     <p class="mpop-form-row">
+        <label for="billingCity-select">Comune di residenza</label><br>
         <v-select
             id="billingCity-select"
             v-model="user.mpop_billing_city"
@@ -146,27 +140,32 @@ if (
         </v-select>
     </p>
     <p class="mpop-form-row">
-        <select v-model="user.mpop_billing_state" :class="errorFields.has('mpop_billing_state') ? 'bad-input' : ''" disabled>
+        <label for="billing-state-select">Provincia di residenza</label><br>
+        <select id="billing-state-select" v-model="user.mpop_billing_state" :class="errorFields.has('mpop_billing_state') ? 'bad-input' : ''" disabled>
             <option
                 v-if="user.mpop_billing_city"
                 :value="user.mpop_billing_city.provincia.sigla">{{user.mpop_billing_city.provincia.sigla}}</option>
         </select>
     </p>
     <p class="mpop-form-row">
-        <select v-model="user.mpop_billing_zip" :class="errorFields.has('mpop_billing_zip') ? 'bad-input' : ''" :disabled="!user.mpop_billing_city || user.mpop_billing_city.cap.length == 1">
+        <label for="billing-zip-select">CAP</label><br>
+        <select id="billing-zip-select" v-model="user.mpop_billing_zip" :class="errorFields.has('mpop_billing_zip') ? 'bad-input' : ''" :disabled="!user.mpop_billing_city || user.mpop_billing_city.cap.length == 1">
             <template v-if="user.mpop_billing_city">
                 <option v-for="cap in user.mpop_billing_city.cap" :value="cap">{{cap}}</option>
             </template>
         </select>
     </p>
     <p class="mpop-form-row">
-        <textarea v-model="user.mpop_billing_address" :class="errorFields.has('mpop_billing_address') ? 'bad-input' : ''" :disabled="!user.mpop_billing_zip"></textarea>
+        <label for="billing-address">CAP</label><br>
+        <textarea id="billing-address" v-model="user.mpop_billing_address" :class="errorFields.has('mpop_billing_address') ? 'bad-input' : ''" :disabled="!user.mpop_billing_zip"></textarea>
     </p>
     <p class="mpop-form-row">
+        <label for="phone">Telefono</label><br>
         <v-intl-phone
+            id="phone"
             ref="phoneInput"
             :options="{initialCountry: 'it'}"
-            value=""
+            value="+39"
             :class="errorFields.has('mpop_phone') ? 'bad-input' : ''"
             @change-number="()=>user.mpop_phone = parsePhone(phoneInput)"
             @change-country="()=>user.mpop_phone = parsePhone(phoneInput)"
