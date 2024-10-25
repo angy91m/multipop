@@ -60,7 +60,7 @@ if (
         />
         </label>
     </p>
-    <p class="mpop-form-row" style="width:unset">
+    <p class="mpop-form-row">
         <v-select
             id="birthplace-select"
             :class="errorFields.has('mpop_birthplace') ? 'bad-input' : ''"
@@ -97,7 +97,7 @@ if (
             </template>
         </v-select>
     </p>
-    <p class="mpop-form-row" style="width:unset">
+    <p class="mpop-form-row">
         <v-select
             id="billingCity-select"
             v-model="user.mpop_billing_city"
