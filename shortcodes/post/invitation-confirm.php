@@ -99,7 +99,7 @@ switch( $post_data['action'] ) {
                     }
                 }
             }
-            if (!isset($post_data['mpop_billing_city']) || !is_string($post_data['mpop_billing_city']) || !preg_match('/^[A-Z]{3}\d$/', $post_data['mpop_billing_city'])) {
+            if (!isset($post_data['mpop_billing_city']) || !is_string($post_data['mpop_billing_city']) || !preg_match('/^[A-Z]\d{3}$/', $post_data['mpop_billing_city'])) {
                 $res_data['error'][] = 'mpop_billing_city';
             } else {
                 if (empty($comuni)) {
