@@ -8,6 +8,7 @@ if (
     require_once('post/login.php');
     exit;
 }
+$this->show_hcaptcha_script();
 ?>
 <form class="mpop-form mpop-form-login" method="post">
     <p class="mpop-form-row">
