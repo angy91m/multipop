@@ -94,10 +94,9 @@ span.mpop-app-notice > span > span.dashicons-before.dashicons-no-alt {
 #mpop-passwordChange input {
     margin-bottom: 9px;
 }
-#birthplace-select:not(:disabled) {
-    background: #fff;
-}
-#billingCity-select:not(:disabled) {
+#birthplace-select:not(:disabled),
+#billingCity-select:not(:disabled),
+#userEditingRespZone-select:not(:disabled) {
     background: #fff;
 }
 .mpop-user-search-field {
