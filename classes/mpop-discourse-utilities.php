@@ -169,6 +169,7 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
 			}
         }
         $disc_user = static::mpop_discourse_user($user->ID);
+        save_test($disc_user);
         if (!is_wp_error($disc_user) && $disc_user->user->username != $user->user_login) {
             static::discourse_request("/users/".$disc_user->user->username."/preferences/username", ['method' => 'PUT', 'body' => ['new_username' => $user->user_login]]);
         }
