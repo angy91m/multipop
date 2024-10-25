@@ -198,7 +198,7 @@ $invitation_props = [
     <p class="mpop-form-row" v-show="newsletterAgreeShow">
         <button class="mpop-button" @click="newsletterAgreeShow = false">Chiudi</button><br>
         Presta il mio consenso e fino alla revoca dello stesso, per la comunicazioni di iniziative ed attività (di seguito complessivamente definite “attività di informazione dell’associazione”) di MULTIPOPOLARE APS e/o da organizzazioni correlate.<br>
-        Il trattamento per attività di informazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo posta elettronica)
+        Il trattamento per attività di informazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo posta elettronica).
     </p>
     <p class="mpop-form-row">
         <label><span class="mpop-click" @click="e => {e.preventDefault(); publishAgreeShow = !publishAgreeShow}">Accetto le condizioni</span>&nbsp;
@@ -208,7 +208,7 @@ $invitation_props = [
     <p class="mpop-form-row" v-show="publishAgreeShow">
         <button class="mpop-button" @click="publishAgreeShow = false">Chiudi</button><br>
         Presta il mio consenso e fino alla revoca dello stesso, per la comunicazioni di iniziative ed attività (di seguito complessivamente definite “attività di informazione dell’associazione”) di MULTIPOPOLARE APS e/o da organizzazioni correlate.<br>
-        Il trattamento per attività di informazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo posta elettronica)
+        Il trattamento per attività di informazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo posta elettronica).
     </p>
     <p class="mpop-form-row">
         <?php wp_nonce_field( 'mpop-invite', 'mpop-invite-nonce' ); ?>
