@@ -129,7 +129,6 @@ createApp({
                     ...user,
                     username: user.username.trim(),
                     password: user.password.trim(),
-                    nonce: document.getElementById('mpop-invite-nonce').value,
                     action: 'activate_account'
                 }),
                 headers: {
@@ -248,7 +247,7 @@ createApp({
                 },
                 body: JSON.stringify({
                     ...obj,
-                    'mpop-logged-myaccount-nonce': loggedMyAccountNonce
+                    'mpop-invite-nonce': document.getElementById('mpop-invite-nonce').value,
                 })
             });
         }
