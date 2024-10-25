@@ -240,6 +240,18 @@ createApp({
             const func = eval(callable);
             triggerSearchTimeout = setTimeout( () => func(txt, ...args).then(() => loading(false)), 500);
         }
+        function serverReq(obj) {
+            return fetch(location.origin + location.pathname, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ...obj,
+                    'mpop-logged-myaccount-nonce': loggedMyAccountNonce
+                })
+            });
+        }
         return {
             user,
             isValidForm,
