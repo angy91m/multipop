@@ -2742,7 +2742,7 @@ class MultipopPlugin {
                 'user_nicename' => sanitize_title($new_login),
                 'display_name' => $display_name ? $display_name : $new_login
             ],
-            ['ID', $user->ID]
+            ['ID' => $user->ID]
         ));
         $wpdb->update(
             $wpdb->usermeta,
