@@ -374,8 +374,6 @@ switch( $post_data['action'] ) {
         $post_data['forceQuote'] = isset($post_data['forceQuote']) ? $post_data['forceQuote'] : false;
         $post_data['delayedSend'] = isset($post_data['delayedSend']) ? $post_data['delayedSend'] : false;
         $invitation_to_send = $post_data['delayedSend'] ? [] : false;
-        save_test($invitation_to_send);
-        exit;
         if (!empty($post_data['rows'])) {
             $comuni = $this->get_comuni_all();
             foreach($post_data['rows'] as $row) {
