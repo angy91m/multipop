@@ -5,3 +5,6 @@
 #billingCity-select:not(:disabled) {
     background: #fff;
 }
+#billin-address {
+    min-width: 200px;
+}
