@@ -65,6 +65,41 @@ switch( $post_data['action'] ) {
             exit;
         }
         break;
+    case 'activate_account':
+        if (!isset($post_data['user_id']) || !is_int($post_data['user_id']) || $post_data['user_id'] < 1) {
+            $res_data['error'] = ['user_id'];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $user = get_user_by('ID', $post_data['user_id']);
+        if (!$user || !$user->mpop_invited) {
+            $res_data['error'] = ['user_id'];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $res_data['error'] = [];
+        if (str_starts_with($user->user_login, 'mp_')) {
+            if(!isset($post_data['first_name']) || !$this::is_valid_name($post_data['first_name'])) {
+                $res_data['error'][] = 'first_name';
+            }
+            if(!isset($post_data['last_name']) || !$this::is_valid_name($post_data['last_name'])) {
+                $res_data['error'][] = 'last_name';
+            }
+        } else {
+
+        }
+        if (!empty($res_data['error'])) {
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        } else {
+            unset($res_data['error']);
+        }
+        $post_data['first_name'] = mb_strtoupper($post_data['first_name'], 'UTF-8');
+        $post_data['last_name'] = mb_strtoupper($post_data['last_name'], 'UTF-8');
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];

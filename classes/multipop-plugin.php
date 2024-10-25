@@ -161,8 +161,8 @@ class MultipopPlugin {
         ];
         return mb_strtoupper(iconv('UTF-8','ASCII//TRANSLIT',str_replace(array_keys($others_chars), array_values($others_chars), $name)), 'UTF-8');
     }
-    private static function is_valid_name($name) {
-        if(!isset($name) || !is_string($name)) return false;
+    private static function is_valid_name($name = '') {
+        if(!is_string($name) || !$name) return false;
         $name = trim(mb_strtolower($name, 'UTF-8'));
         $allowed_chars = "a-zàáâäæçčèéêëìíîïòóôöœùúûüšžß";
         if (

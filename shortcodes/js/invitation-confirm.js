@@ -94,19 +94,21 @@ createApp({
         billingCities = reactive([]),
         phoneInput = ref('phoneInput'),
         requesting = ref(false),
-        isValidForm = computed( () =>
-            isValidUsername()
-            && isValidPassword()
-            && isValidPasswordConfirm()
-            && user.first_name.trim()
-            && user.last_name.trim()
-            && user.mpop_birthdate
-            && user.mpop_birthplace
-            && user.mpop_billing_city
-            && user.mpop_billing_state
-            && user.mpop_billing_address.trim()
-            && user.mpop_billing_zip
-            && user.mpop_phone
+        isValidForm = computed( () => requireProps ?
+                isValidUsername()
+                && isValidPassword()
+                && isValidPasswordConfirm()
+                && user.first_name.trim()
+                && user.last_name.trim()
+                && user.mpop_birthdate
+                && user.mpop_birthplace
+                && user.mpop_billing_city
+                && user.mpop_billing_state
+                && user.mpop_billing_address.trim()
+                && user.mpop_billing_zip
+                && user.mpop_phone
+            :
+                isValidPassword() && isValidPasswordConfirm()
         ),
         startedFields = reactive(new Set([])),
         errorFields = reactive(new Set([])),
