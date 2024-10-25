@@ -112,6 +112,13 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
 		if (!$user || !$user->discourse_sso_user_id) {
 			return false;
 		}
+        $disc_user = static::mpop_discourse_user($user->ID);
+        if (!is_wp_error($disc_user) && $disc_user->user->username != $user->user_login) {
+            if (!is_wp_error(static::discourse_request("/users/".$disc_user->user->username."/preferences/username", ['method' => 'PUT', 'body' => ['new_username' => $user->user_login]]))) {
+                update_user_meta($user->ID, 'discourse_username', $user->user_login);
+                $user->discourse_username = $user->user_login;
+            }
+        }
         $current_groups = static::get_mpop_discourse_groups_by_user($user);
         if (is_wp_error($current_groups)) {return $current_groups;}
         $add_groups = [];
@@ -167,11 +174,6 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
 			if (is_wp_error($res)) {
 				return false;
 			}
-        }
-        $disc_user = static::mpop_discourse_user($user->ID);
-        save_test($disc_user);
-        if (!is_wp_error($disc_user) && $disc_user->user->username != $user->user_login) {
-            static::discourse_request("/users/".$disc_user->user->username."/preferences/username", ['method' => 'PUT', 'body' => ['new_username' => $user->user_login]]);
         }
     }
 	public static function logout_user_from_discourse($user_id) {
