@@ -27,7 +27,7 @@ p.mpop-form-row input[type="password"],
 p.mpop-form-row input[type="email"],
 p.mpop-form-row input[type="button"],
 p.mpop-form-row input[type="submit"],
-p.mpop-form-row button,
+p.mpop-form-row > button,
 button.mpop-button {
     border: 1px #555 solid;
     padding: 10px;
@@ -39,7 +39,7 @@ button.mpop-button {
 
 p.mpop-form-row input[type="button"],
 p.mpop-form-row input[type="submit"],
-p.mpop-form-row button,
+p.mpop-form-row > button,
 button.mpop-button {
     padding: 15px;
     border: 0px;
