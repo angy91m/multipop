@@ -15,7 +15,7 @@ if (
 <div id="app" class="mpop-form">
     <?php $this->html_added()?>
     <p v-if="errorFields.has('server')" class="mpop-field-error">Errore sever</p>
-    <p v-if="startedFields.has('username') && !isValidUsername() && !errorFields.has('duplicated')" class="mpop-field-error">Il nome utente può contenere solo lettere minuscole, numeri e i simboli . _ -<br>Inoltre non può iniziare e terminare con i simboli . -</p>
+    <p v-if="()=>startedFields.has('username') && !isValidUsername() && !errorFields.has('duplicated')" class="mpop-field-error">Il nome utente può contenere solo lettere minuscole, numeri e i simboli . _ -<br>Inoltre non può iniziare e terminare con i simboli . -</p>
     <p v-if="!isValidUsername() && errorFields.has('duplicated')" class="mpop-field-error">Nome utente già registrato</p>
     <p class="mpop-form-row">
         <input v-model="user.username" @input="()=> {startField('username'); console.log(isValidUsername())}" type="text" :class="startedFields.has('username') ? (isValidUsername() ? '' : ' bad-input' ) : ''" id="inv_username" autocomplete="username" placeholder="Nome utente" />
