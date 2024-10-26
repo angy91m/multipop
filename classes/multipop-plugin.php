@@ -3586,10 +3586,12 @@ class MultipopPlugin {
         }
         return array_values($groups);
     }
-    private function sync_discourse_record($user, $force = false) {
-        if ($user && !is_object($user)) {
-            $user = get_user_by('ID', $user);
+    private function sync_discourse_record($user_id, $force = false) {
+        if (!$user_id) {return;}
+        if (is_object($user_id)) {
+            $user_id = $user_id->ID;
         }
+        $user = get_user_by('ID', $user_id);
         if (!$user) {return;}
         if (!$force && !$user->discourse_sso_user_id) {return;}
         $disc_utils = $this->discourse_utilities();
