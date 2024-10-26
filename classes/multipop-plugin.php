@@ -3587,7 +3587,7 @@ class MultipopPlugin {
         return array_values($groups);
     }
     private function sync_discourse_record($user, $force = false) {
-        if ($user || !is_object($user)) {
+        if ($user && !is_object($user)) {
             $user = get_user_by('ID', $user);
         }
         if (!$user) {return;}
