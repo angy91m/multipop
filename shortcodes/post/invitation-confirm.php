@@ -129,9 +129,6 @@ switch( $post_data['action'] ) {
             unset($res_data['error']);
         }
         $meta_input = [
-            'mpop_marketing_agree' => isset($post_data['mpop_subscription_marketing_agree']) ? boolval($post_data['mpop_subscription_marketing_agree']) : false,
-            'mpop_newsletter_agree' => isset($post_data['mpop_subscription_newsletter_agree']) ? boolval($post_data['mpop_subscription_newsletter_agree']) : false,
-            'mpop_publish_agree' => isset($post_data['mpop_subscription_publish_agree']) ? boolval($post_data['mpop_subscription_publish_agree']) : false,
             'mpop_invited' => false
         ] +(str_starts_with($user->user_login, 'mp_') ? [
             'first_name' => mb_strtoupper($post_data['first_name'], 'UTF-8'),
@@ -142,7 +139,10 @@ switch( $post_data['action'] ) {
             'mpop_billing_state' => $residenza['provincia']['sigla'],
             'mpop_billing_zip' => $post_data['mpop_billing_zip'],
             'mpop_billing_address' => $post_data['mpop_billing_address'],
-            'mpop_phone' => $post_data['mpop_phone']
+            'mpop_phone' => $post_data['mpop_phone'],
+            'mpop_marketing_agree' => isset($post_data['mpop_subscription_marketing_agree']) ? boolval($post_data['mpop_subscription_marketing_agree']) : false,
+            'mpop_newsletter_agree' => isset($post_data['mpop_subscription_newsletter_agree']) ? boolval($post_data['mpop_subscription_newsletter_agree']) : false,
+            'mpop_publish_agree' => isset($post_data['mpop_subscription_publish_agree']) ? boolval($post_data['mpop_subscription_publish_agree']) : false
         ] : []);
         $user_edits = [
             'ID' => $user->ID,
@@ -158,14 +158,14 @@ switch( $post_data['action'] ) {
         }
         add_filter('send_password_change_email', function() {return false;}, 10, 0);
         wp_update_user($user_edits);
-        global $wpdb;
-        $wpdb->query("UPDATE ". $this::db_prefix('subscriptions') . " SET
-            marketing_agree = " . intval($meta_input['mpop_marketing_agree']) . ",
-            newsletter_agree = " . intval($meta_input['mpop_newsletter_agree']) . ",
-            publish_agree = " . intval($meta_input['mpop_publish_agree']) . "
-            WHERE id = $sub[id] ;"
-        );
         if (str_starts_with($user->user_login, 'mp_')) {
+            global $wpdb;
+            $wpdb->query("UPDATE ". $this::db_prefix('subscriptions') . " SET
+                marketing_agree = " . intval($meta_input['mpop_marketing_agree']) . ",
+                newsletter_agree = " . intval($meta_input['mpop_newsletter_agree']) . ",
+                publish_agree = " . intval($meta_input['mpop_publish_agree']) . "
+                WHERE id = $sub[id] ;"
+            );
             $this->change_user_login($user->ID, $post_data['username'], mb_strtoupper($post_data['first_name'], 'UTF-8') . ' ' . mb_strtoupper($post_data['last_name'], 'UTF-8'));
             $user = get_user_by('ID',$user->ID);
         } else {
@@ -173,6 +173,7 @@ switch( $post_data['action'] ) {
             update_user_caches(get_user_by('ID', $user->ID));
             $user = get_user_by('ID',$user->ID);
         }
+        save_test($user);
         $this->sync_discourse_record($user, true);
         $this->delete_temp_token_by_user_id($user->ID, 'invite_link');
         wp_set_auth_cookie( $user->ID, true );
