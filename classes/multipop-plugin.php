@@ -74,7 +74,7 @@ class MultipopPlugin {
     }
 
     // EMAIL VALIDATION
-    private static function is_valid_email( $email, $check_temp_mail = false, $bypass_discourse_system_user = false ) {
+    private function is_valid_email( $email, $check_temp_mail = false, $bypass_discourse_system_user = false ) {
         $disc_system_user = false;
         if (!$bypass_discourse_system_user) {
             $disc_system_user = $this->get_discourse_system_user();
@@ -2573,7 +2573,7 @@ class MultipopPlugin {
         return $found;
     }
     private function row_import(array $row, $force_year = false, $force_quote = false, &$comuni = [], &$mails = []) {
-        if (!isset($row['email']) || !$this::is_valid_email($row['email'])) {
+        if (!isset($row['email']) || !$this->is_valid_email($row['email'])) {
             throw new Exception('Invalid email');
         }
         $row['email'] = strtolower($row['email']);

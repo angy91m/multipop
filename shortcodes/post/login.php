@@ -22,7 +22,7 @@ if (
 }
 $_POST['user'] = mb_strtolower(trim($_POST['user']), 'UTF-8');
 if (
-    !$this::is_valid_email( $_POST['user'], false, true )
+    !$this->is_valid_email( $_POST['user'], false, true )
     && !$this::is_valid_username( $_POST['user'], true )
 ) {
     $_GET['invalid_mpop_login'] = '1';

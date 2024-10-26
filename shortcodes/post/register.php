@@ -17,7 +17,7 @@ if (
 }
 $post_data['email'] = mb_strtolower(trim($post_data['email']), 'UTF-8');
 if (
-    !$this::is_valid_email( $post_data['email'], true )
+    !$this->is_valid_email( $post_data['email'], true )
 ) {
     $res_data['error'] = ['email'];
 }

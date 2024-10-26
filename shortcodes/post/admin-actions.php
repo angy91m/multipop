@@ -43,7 +43,7 @@ switch( $post_data['action'] ) {
         $comuni = false;
         $found_caps = [];
         $card_active = $user->mpop_card_active;
-        if (!isset($post_data['email']) || !is_string($post_data['email']) || !$this::is_valid_email(trim($post_data['email']), true)) {
+        if (!isset($post_data['email']) || !is_string($post_data['email']) || !$this->is_valid_email(trim($post_data['email']), true)) {
             $res_data['error'] = ['email'];
         } else {
             $post_data['email'] = mb_strtolower( trim($post_data['email']), 'UTF-8' );
