@@ -112,19 +112,6 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
 		if (!$user || !$user->discourse_sso_user_id) {
 			return false;
 		}
-        // static::sync_sso_record(static::get_sso_params($user));
-        // $disc_user = static::mpop_discourse_user($user->ID);
-        // if (!is_wp_error($disc_user)) {
-        //     if ($disc_user->user->username != $user->user_login) {
-        //         if (!is_wp_error(static::discourse_request("/users/".$disc_user->user->username."/preferences/username", ['method' => 'PUT', 'body' => ['new_username' => $user->user_login]]))) {
-        //             update_user_meta($user->ID, 'discourse_username', $user->user_login);
-        //             $user->discourse_username = $user->user_login;
-        //         }
-        //     }
-        //     if ($disc_user->user->name != $user->display_name) {
-        //         static::discourse_request("/u/$user->user_login.json", ['method' => 'PUT', 'body' => ['name' => $user->display_name]]);
-        //     }
-        // }
         $current_groups = static::get_mpop_discourse_groups_by_user($user);
         if (is_wp_error($current_groups)) {return $current_groups;}
         $add_groups = [];
