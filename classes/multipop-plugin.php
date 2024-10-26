@@ -3642,7 +3642,7 @@ class MultipopPlugin {
             $disc_utils = $this->discourse_utilities();
             if ($disc_utils) {
                 $disc_user_name = $discourse_connect_options['publish-username'];
-                $res = $disc_utils::discorse_request("/u/$disc_user_name.json");
+                $res = $disc_utils::discourse_request("/u/$disc_user_name.json");
                 if (!is_wp_error($res)) {
                     return $res->user;
                 }
