@@ -6,7 +6,7 @@ window.onload = () => {
     emailOriginal = _new_email || emailEl.value,
     emailRow = emailEl.parentElement,
     roleSelect = document.querySelector('select[name="role"]'),
-    roleMultipop = ['multipopolano', 'multipopolare_resp'].includes(roleSelect.value),
+    roleMultipop = ['multipopolano', 'multipopolare_resp', 'multipopolare_friend'].includes(roleSelect.value),
     options = Array.from(roleSelect.querySelectorAll('option'));
     options.unshift( options.splice(options.findIndex(o => o.value == 'multipopolare_resp'), 1).pop() );
     options.unshift( options.splice(options.findIndex(o => o.value == 'multipopolano'), 1).pop() );
@@ -69,7 +69,7 @@ window.onload = () => {
         }
     });
     roleSelect.addEventListener('change', () => {
-        if (['multipopolano', 'multipopolare_resp'].includes(roleSelect.value)) {
+        if (['multipopolano', 'multipopolare_resp', 'multipopolare_friend'].includes(roleSelect.value)) {
             if (_new_email) {
                 emailEl.value = _new_email_edit;
             }
@@ -145,7 +145,7 @@ window.onload = () => {
             currentUserMasterKey.disabled = true;
         });
     }
-    if (['multipopolano', 'multipopolare_resp'].includes(roleSelect.value) && _new_email ) {
+    if (['multipopolano', 'multipopolare_resp', 'multipopolare_friend'].includes(roleSelect.value) && _new_email ) {
         emailEl.value = _new_email;
     }
 };

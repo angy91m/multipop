@@ -48,6 +48,7 @@ boolVal = v => {
 userRoles = [
     'multipopolano',
     'multipopolare_resp',
+    'multipopolare_friend',
     'administrator',
     'others'
 ],
@@ -171,6 +172,7 @@ createApp({
             roles: [
                 'multipopolano',
                 'multipopolare_resp',
+                'multipopolare_friend',
                 'administrator'
             ],
             page: 1,
@@ -1075,6 +1077,9 @@ createApp({
             switch(role) {
                 case 'multipopolare_resp':
                     role = 'Responsabile';
+                    break;
+                case 'multipopolare_friend':
+                    role = 'Amica/o di Multipopolare';
                     break;
                 case 'administrator':
                     role = "Amministratore";

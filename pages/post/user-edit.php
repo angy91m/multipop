@@ -60,8 +60,8 @@ if (!$errors->has_errors()) {
             $old_user = get_user_by('ID', $user->ID);
         }
         do {
-            if (in_array($user->role, ['multipopolano', 'multipopolare_resp'])) {
-                // FLOW FOR ROLES multipopolano & multipopolare_resp
+            if (in_array($user->role, ['multipopolano', 'multipopolare_resp', 'multipopolare_friend'])) {
+                // FLOW FOR ROLES multipopolano, multipopolare_resp & multipopolare_friend
                 if ($update) {
                     // FLOW FOR UPDATES
                     if (
@@ -249,7 +249,7 @@ if (!$errors->has_errors()) {
         $old_user = get_user_by('ID', $user->ID);
         $user->role = !empty($old_user->roles) ? $old_user->roles[0] : '';
     }
-    if (in_array($user->role, ['administrator', 'multipopolano', 'multipopolare_resp'])) {
+    if (in_array($user->role, ['administrator', 'multipopolano', 'multipopolare_resp', 'multipopolare_friend'])) {
         $this->sync_discourse_record($user);
     }
 }

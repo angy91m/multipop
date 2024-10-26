@@ -10,7 +10,7 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
         $this->update_comuni(true);
         $this->add_admin_notice("Aggiornamento in corso", 'success');
     } else if (!empty(trim($_REQUEST['send_test_mail']))) {
-        if (!$this::is_valid_email(trim($_REQUEST['send_test_mail']))) {
+        if (!$this::is_valid_email(trim($_REQUEST['send_test_mail']), false, true)) {
             $this->add_admin_notice("Indirizzo e-mail non valido");
         } else {
             $res = $this->send_mail([
@@ -59,7 +59,7 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
             $edits['mail_password'] = $_REQUEST['mail_password'];
         }
         if (is_string($_REQUEST['mail_from'])) {
-            if ( $this::is_valid_email(trim($_REQUEST['mail_from'])) ) {
+            if ( $this::is_valid_email(trim($_REQUEST['mail_from']), false, true) ) {
                 $edits['mail_from'] = trim($_REQUEST['mail_from']);
             } else {
                 $this->add_admin_notice( 'mail_from non valido' );
@@ -82,7 +82,7 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
             );
             $invalid = false;
             foreach ($emails as $email) {
-                if (!$this::is_valid_email($email)) {
+                if (!$this::is_valid_email($email, false, true)) {
                     $invalid = true;
                     break;
                 }

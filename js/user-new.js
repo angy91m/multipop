@@ -26,7 +26,7 @@ window.onload = () => {
         }
     });
     roleSelect.addEventListener('change', () => {
-        if (['multipopolano', 'multipopolare_resp'].includes(roleSelect.value)) {
+        if (['multipopolano', 'multipopolare_resp', 'multipopolare_friend'].includes(roleSelect.value)) {
             if (confirmedEl.disabled) {
                 customContainer.style.display = 'unset';
                 confirmedEl.disabled = false;

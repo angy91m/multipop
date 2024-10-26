@@ -13,7 +13,7 @@ if (
     exit;
 }
 $invitation_props = [
-    'requireProps' =>  str_starts_with($this->invited_user->user_login, 'mp_')
+    'requireProps' => str_starts_with($this->invited_user->user_login, 'mp_')
 ];
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
