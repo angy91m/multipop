@@ -114,6 +114,9 @@ switch( $post_data['action'] ) {
                     }
                 }
             }
+            if (!isset($post_data['mpop_billing_address']) || !is_string($post_data['mpop_billing_address']) || mb_strlen(trim($post_data['mpop_billing_address']), 'UTF-8') < 2 || mb_strlen(trim($post_data['mpop_billing_address']), 'UTF-8') > 200) {
+                $res_data['error'][] = 'mpop_billing_address';
+            }
             if (!isset($post_data['mpop_phone']) || !$this::is_valid_phone($post_data['mpop_phone'])) {
                 $res_data['error'][] = 'mpop_phone';
             }
@@ -138,6 +141,7 @@ switch( $post_data['action'] ) {
             'mpop_billing_city' => $post_data['mpop_billing_city'],
             'mpop_billing_state' => $residenza['provincia']['sigla'],
             'mpop_billing_zip' => $post_data['mpop_billing_zip'],
+            'mpop_billing_address' => $post_data['mpop_billing_address'],
             'mpop_phone' => $post_data['mpop_phone']
         ] : []);
         $user_edits = [

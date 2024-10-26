@@ -144,7 +144,7 @@ switch ($post_data['action']) {
                 $found_caps = $found_bc[0]['cap'];
             }
         }
-        if (!isset($post_data['mpop_billing_address']) || !is_string($post_data['mpop_billing_address']) || mb_strlen(trim($post_data['mpop_billing_address']), 'UTF-8') < 2) {
+        if (!isset($post_data['mpop_billing_address']) || !is_string($post_data['mpop_billing_address']) || mb_strlen(trim($post_data['mpop_billing_address']), 'UTF-8') < 2 || mb_strlen(trim($post_data['mpop_billing_address']), 'UTF-8') > 200) {
             if (!isset($res_data['error'])) {
                 $res_data['error'] = [];
             }
