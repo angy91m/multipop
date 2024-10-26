@@ -213,11 +213,11 @@ $invitation_props = [
             <button class="mpop-button" @click="publishAgreeShow = false">Chiudi</button><br>
             Presta il mio consenso e fino alla revoca dello stesso, per la pubblicazione del mio nominativo su riviste, cataloghi, brochure, annuari, siti, ecc. (di seguito complessivamente definite “attività di pubblicazione dell’associazione”) di MULTIPOPOLARE APS e/o da organizzazioni correlate. Il trattamento per attività di pubblicazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo pubblicazioni cartacee), ovvero mediante sistemi “elettronici” (a titolo esemplificativo pubblicazioni elettroniche, social network, sito, blog, ecc.).
         </p>
-        <p class="mpop-form-row">
-            <?php wp_nonce_field( 'mpop-invite', 'mpop-invite-nonce' ); ?>
-            <button class="primary" @click="activateAccount" :disabled="requesting || !isValidForm">Attiva l'account</button>
-        </p>
     </template>
+    <p class="mpop-form-row">
+        <?php wp_nonce_field( 'mpop-invite', 'mpop-invite-nonce' ); ?>
+        <button class="primary" @click="activateAccount" :disabled="requesting || !isValidForm">Attiva l'account</button>
+    </p>
     <p v-if="errorFields.size" class="mpop-field-error">Alcuni campi contengono degli errori. Rincontrolla per favore</p>
 </div>
 <script src="<?=plugins_url()?>/multipop/js/vue.global.min.js"></script>
