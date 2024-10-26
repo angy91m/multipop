@@ -3582,7 +3582,7 @@ class MultipopPlugin {
             }
         }
         if(empty($groups)) {
-            $groups[] = ['name' => 'mp_disabled_users', 'full_name' => 'Utenti WP disabilitati', 'owner' => false];
+            $groups[] = ['name' => 'mp_disabled_users', 'full_name' => 'Utenti Wordpress disabilitati', 'owner' => false];
         }
         return array_values($groups);
     }
