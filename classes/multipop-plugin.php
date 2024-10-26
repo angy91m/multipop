@@ -3631,7 +3631,7 @@ class MultipopPlugin {
         return $params;
     }
     public function discourse_bypass_invited_users($user_id, $user) {
-        return str_starts_with($user->user_login, 'mp_');
+        return $user->mpop_mail_to_confirm || str_starts_with($user->user_login, 'mp_');
     }
 }
 
