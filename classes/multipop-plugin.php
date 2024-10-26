@@ -2649,6 +2649,9 @@ class MultipopPlugin {
             if (!$this::is_valid_username($row['login'])) {
                 throw new Exception('Invalid login');
             }
+            if (get_user_by('login', $row['login'])) {
+                throw new Exception('Duplicated login');
+            }
         } else {
             if (isset($row['mpop_org_role'])) {
                 if (in_array($row['mpop_org_role'],self::SINGLE_ORG_ROLES)) {

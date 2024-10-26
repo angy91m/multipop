@@ -88,6 +88,7 @@ userCsvFields = [
     'mpop_subscription_newsletter_agree',
     'mpop_subscription_publish_agree',
     'mpop_org_role',
+    'mpop_friend',
     'mpop_subscription_notes',
     'esito'
 ].map(col => ({name: col, label: col, align: 'left', field: col})),
