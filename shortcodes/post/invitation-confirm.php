@@ -168,6 +168,9 @@ switch( $post_data['action'] ) {
         if (str_starts_with($user->user_login, 'mp_')) {
             $this->change_user_login($user->ID, $post_data['username'], mb_strtoupper($post_data['first_name'], 'UTF-8') . ' ' . mb_strtoupper($post_data['last_name'], 'UTF-8'));
             $user = get_user_by('ID',$user->ID);
+        } else {
+            clean_user_cache($user->ID);
+            update_user_caches(get_user_by('ID', $user->ID));
         }
         $this->sync_discourse_record($user, true);
         $this->delete_temp_token_by_user_id($user->ID, 'invite_link');
