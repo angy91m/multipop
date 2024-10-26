@@ -112,7 +112,7 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
 		if (!$user || !$user->discourse_sso_user_id) {
 			return false;
 		}
-        static::sync_sso_record(static::get_sso_params($user));
+        // static::sync_sso_record(static::get_sso_params($user));
         // $disc_user = static::mpop_discourse_user($user->ID);
         // if (!is_wp_error($disc_user)) {
         //     if ($disc_user->user->username != $user->user_login) {

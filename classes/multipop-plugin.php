@@ -212,7 +212,7 @@ class MultipopPlugin {
 
     private static function delay_script(string $script, ...$argv) {
         $test = false;
-        //return exec('php ' .MULTIPOP_PLUGIN_PATH . 'delayed_scripts/delayed.php ' . $script . ' ' . implode(' ', $argv) . ' '.($test? '>>'.MULTIPOP_PLUGIN_PATH . '/delay_test.log' : '>/dev/null').' 2>&1 &');
+        return exec('php ' .MULTIPOP_PLUGIN_PATH . 'delayed_scripts/delayed.php ' . $script . ' ' . implode(' ', $argv) . ' '.($test? '>>'.MULTIPOP_PLUGIN_PATH . '/delay_test.log' : '>/dev/null').' 2>&1 &');
     }
 
     // DB PREFIX FOR PLUGIN TABLES
@@ -3607,7 +3607,7 @@ class MultipopPlugin {
             }
             $params['groups'] = implode( ',', array_map(function($g) {return $g['name'];}, $groups) );
         }
-        //$this->delay_script('updateDiscourseGroupsByUser', $user->ID);
+        $this->delay_script('updateDiscourseGroupsByUser', $user->ID);
         return $params;
     }
     public function discourse_bypass_invited_users($user_id, $user) {
