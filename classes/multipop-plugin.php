@@ -3539,7 +3539,6 @@ class MultipopPlugin {
         if (!$user) {
             return false;
         }
-        save_test($user,2);
         $groups = [];
         $province_all = false;
         $regioni_all = false;
@@ -3632,7 +3631,7 @@ class MultipopPlugin {
         return $params;
     }
     public function discourse_bypass_invited_users($user_id, $user) {
-        return $user->mpop_mail_to_confirm || str_starts_with($user->user_login, 'mp_');
+        return $user->mpop_mail_to_confirm || $user->mpop_invited || str_starts_with($user->user_login, 'mp_');
     }
 }
 

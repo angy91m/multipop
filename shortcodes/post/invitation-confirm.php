@@ -173,7 +173,6 @@ switch( $post_data['action'] ) {
             update_user_caches(get_user_by('ID', $user->ID));
             $user = get_user_by('ID',$user->ID);
         }
-        save_test($user);
         $this->sync_discourse_record($user, true);
         $this->delete_temp_token_by_user_id($user->ID, 'invite_link');
         wp_set_auth_cookie( $user->ID, true );
