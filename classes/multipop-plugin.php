@@ -93,7 +93,7 @@ class MultipopPlugin {
     private static function is_valid_username( $username, $login = false ) {
         $disc_system_username = false;
         if(!$login) {
-            $disc_system_username = $this::get_discourse_system_username();
+            $disc_system_username = static::get_discourse_system_username();
         }
         if (
             !is_string($username)
