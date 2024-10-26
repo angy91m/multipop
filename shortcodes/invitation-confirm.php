@@ -38,7 +38,7 @@ $invitation_props = [
             <li>Un carattere speciale tra questi: {{ acceptedSymbols }}</li>
         </ul>
     </div>
-    <p v-if="requireProps" class="mpop-form-row">
+    <p class="mpop-form-row">
         <input v-model="user.password" @input="startField('password')" type="password" :class="startedFields.has('password') ? (isValidPassword() ? '' : ' bad-input' ) : ''" name="password" id="inv_password" placeholder="Password"/>
     </p>
     <p v-if="startedFields.has('passwordConfirm') && !isValidPasswordConfirm()" class="mpop-field-error">Le password non coincidono</p>
