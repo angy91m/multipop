@@ -171,6 +171,7 @@ switch( $post_data['action'] ) {
         } else {
             clean_user_cache($user->ID);
             update_user_caches(get_user_by('ID', $user->ID));
+            $user = get_user_by('ID',$user->ID);
         }
         $this->sync_discourse_record($user, true);
         $this->delete_temp_token_by_user_id($user->ID, 'invite_link');
