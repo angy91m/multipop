@@ -156,6 +156,7 @@ switch( $post_data['action'] ) {
             echo json_encode( $res_data );
             exit;
         }
+        add_filter('send_password_change_email', function() {return false;}, 10, 0);
         wp_update_user($user_edits);
         global $wpdb;
         $wpdb->query("UPDATE ". $this::db_prefix('subscriptions') . " SET
