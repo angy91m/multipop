@@ -1074,7 +1074,7 @@ class MultipopPlugin {
                 ]
             ]);
             if ($user->discourse_sso_user_id && isset($user->roles[0]) && in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
-                $this->update_discourse_groups_by_user($user);
+                $this->sync_discourse_record($user);
             }
         }
     }
@@ -1089,7 +1089,7 @@ class MultipopPlugin {
         if ($user->mpop_card_active) {
             update_user_meta($user->ID, 'mpop_card_active', false);
             if ($user->discourse_sso_user_id && isset($user->roles[0]) && in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
-                $this->update_discourse_groups_by_user($user);
+                $this->sync_discourse_record($user);
             }
         }
     }
@@ -2385,7 +2385,7 @@ class MultipopPlugin {
                 'ID' => $sub['user_id'],
                 'meta_input' => $meta_input
             ]);
-            $this->update_discourse_groups_by_user($sub['user_id']);
+            $this->sync_discourse_record($sub['user_id']);
         }
     }
     private static function validate_date($date_string = '') {
@@ -3585,6 +3585,16 @@ class MultipopPlugin {
             $groups[] = ['name' => 'mp_disabled_users', 'full_name' => 'Utenti WP disabilitati', 'owner' => false];
         }
         return array_values($groups);
+    }
+    private function sync_discourse_record($user, $force = false) {
+        if ($user || !is_object($user)) {
+            $user = get_user_by('ID', $user);
+        }
+        if (!$user) {return;}
+        if (!$force && !$user->discourse_sso_user_id) {return;}
+        $disc_utils = $this->discourse_utilities();
+        if (!$disc_utils) {return;}
+        $disc_utils::sync_sso_record($disc_utils::get_sso_params($user));
     }
     private function update_discourse_groups_by_user($user) {
         $disc_utils = $this->discourse_utilities();

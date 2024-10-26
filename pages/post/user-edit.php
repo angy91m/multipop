@@ -250,6 +250,6 @@ if (!$errors->has_errors()) {
         $user->role = !empty($old_user->roles) ? $old_user->roles[0] : '';
     }
     if (in_array($user->role, ['administrator', 'multipopolano', 'multipopolare_resp'])) {
-        $this->update_discourse_groups_by_user($user);
+        $this->sync_discourse_record($user);
     }
 }
