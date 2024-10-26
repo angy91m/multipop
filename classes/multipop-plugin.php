@@ -3610,6 +3610,7 @@ class MultipopPlugin {
             $disc_utils = $this->discourse_utilities();
             if ($disc_utils) {
                 $disc_groups = $disc_utils->get_discourse_mpop_groups();
+                save_test($disc_groups);
                 foreach($groups as $g) {
                     $found = array_filter($disc_groups, function($dg) use ($g) {return $dg->name == $g['name'];});
                     if (!count($found)) {
