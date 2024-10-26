@@ -149,12 +149,14 @@ switch( $post_data['action'] ) {
             'user_pass' => $post_data['password'],
             'meta_input' => $meta_input
         ];
-        $sub = array_pop($this->search_subscriptions(['user_id' => [$user->ID], 'pagination' => false], 1));
-        if (!$sub) {
-            $res_data['error'] = ['subscription'];
-            http_response_code( 400 );
-            echo json_encode( $res_data );
-            exit;
+        if ($user->roles[0] != 'multipopolare_friend') {
+            $sub = array_pop($this->search_subscriptions(['user_id' => [$user->ID], 'pagination' => false], 1));
+            if (!$sub) {
+                $res_data['error'] = ['subscription'];
+                http_response_code( 400 );
+                echo json_encode( $res_data );
+                exit;
+            }
         }
         add_filter('send_password_change_email', function() {return false;}, 10, 0);
         wp_update_user($user_edits);
