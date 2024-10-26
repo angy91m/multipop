@@ -310,14 +310,21 @@ class MultipopPlugin {
                 if (file_exists($file_path . '/' . $file_name)) {
                     $file_name = $file_path . '/' . $file_name;
                     $mails = json_decode(file_get_contents($file_name), true);
+                    $errors = [];
                     if ($mails && is_array($mails)) {
                         $this->get_settings();
                         foreach($mails as $m) {
-                            $this->send_invitation_mail($m['token'], $m['to']);
+                            if(!$this->send_invitation_mail($m['token'], $m['to'])) {
+                                $errors[] = ['to' => $m['to'], 'error' => $this->last_mail_error];
+                            }
                             sleep(5);
                         }
                     }
-                    unlink($file_name);
+                    if (!empty($errors)) {
+                        file_put_contents($file_name . '.error.log', json_encode($errors, JSON_PRETTY_PRINT));
+                    } else {
+                        unlink($file_name);
+                    }
                 }
             }
         ];
@@ -2075,7 +2082,7 @@ class MultipopPlugin {
             ]]
         ]);
     }
-    private function check_mime_type(string $file_conten, $accepted = true) {
+    private function check_mime_type(string $file_content, $accepted = true) {
         $f_info = new finfo(FILEINFO_MIME_TYPE);
         $mime = $f_info->buffer($file_content);
         if (is_string($accepted)) {
