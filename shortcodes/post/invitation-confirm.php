@@ -73,7 +73,7 @@ switch( $post_data['action'] ) {
             $res_data['error'][] = 'password';
         }
         if (str_starts_with($user->user_login, 'mp_')) {
-            if(!isset($post_data['username']) || !$this::is_valid_username($post_data['username'])) {
+            if(!isset($post_data['username']) || !$this::is_valid_username($post_data['username']) || get_user_by('login', $post_data['username'])) {
                 $res_data['error'][] = 'username';
             }
             if(!isset($post_data['first_name']) || !$this::is_valid_name($post_data['first_name'])) {
@@ -117,7 +117,7 @@ switch( $post_data['action'] ) {
             if (!isset($post_data['mpop_billing_address']) || !is_string($post_data['mpop_billing_address']) || mb_strlen(trim($post_data['mpop_billing_address']), 'UTF-8') < 2 || mb_strlen(trim($post_data['mpop_billing_address']), 'UTF-8') > 200) {
                 $res_data['error'][] = 'mpop_billing_address';
             }
-            if (!isset($post_data['mpop_phone']) || !$this::is_valid_phone($post_data['mpop_phone'])) {
+            if (!isset($post_data['mpop_phone']) || !$this::is_valid_phone($post_data['mpop_phone']) || !empty(get_users(['meta_key' => 'mpop_phone', 'meta_value' => $post_data['mpop_phone'], 'meta_compare' => '=']))) {
                 $res_data['error'][] = 'mpop_phone';
             }
         }
