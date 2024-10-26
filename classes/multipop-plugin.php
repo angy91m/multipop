@@ -3539,6 +3539,7 @@ class MultipopPlugin {
         if (!$user) {
             return false;
         }
+        save_test($user,2);
         $groups = [];
         $province_all = false;
         $regioni_all = false;
