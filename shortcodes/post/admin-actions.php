@@ -338,6 +338,7 @@ switch( $post_data['action'] ) {
             $user_edits['ID'] = $user->ID;
             wp_update_user( $user_edits );
             delete_user_meta( $user->ID, 'mpop_profile_pending_edits' );
+            save_test('modificato');
             if ($user->discourse_sso_user_id && isset($user->roles[0]) && in_array($user->roles[0], ['administrator', 'multipopolano', 'multipopolare_resp'])) {
                 $this->sync_discourse_record($user);
             }
