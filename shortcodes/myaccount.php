@@ -14,7 +14,7 @@ if (!$current_user->ID) {
     // LOGGED IN
     if (isset($current_user->roles[0]) && $current_user->roles[0] != 'administrator') {
         $redirect_url = '/';
-        if (isset($current_user->roles[0]) && $current_user->roles[0] != 'multipopolare_friend' ||  $current_user->mpop_card_active) {
+        if (isset($current_user->roles[0]) && $current_user->roles[0] == 'multipopolare_friend' ||  $current_user->mpop_card_active) {
             $discourse_connect_options = get_option('discourse_connect');
             if (is_array($discourse_connect_options) && isset($discourse_connect_options['url']) && $discourse_connect_options['url']) {
                 $redirect_url = $discourse_connect_options['url'] . '/login';
