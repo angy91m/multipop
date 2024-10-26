@@ -2652,6 +2652,7 @@ class MultipopPlugin {
             if (get_user_by('login', $row['login'])) {
                 throw new Exception('Duplicated login');
             }
+            $user_input['user_login'] = $row['login'];
         } else {
             if (isset($row['mpop_org_role'])) {
                 if (in_array($row['mpop_org_role'],self::SINGLE_ORG_ROLES)) {
