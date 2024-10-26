@@ -85,6 +85,7 @@ class MultipopPlugin {
     private static function is_valid_username( $username ) {
         if (
             !is_string($username)
+            || $username == 'wp_system'
             || !preg_match('/^[a-z0-9._-]{3,20}$/', $username)
             || !preg_match('/[a-z0-9]/', $username)
             || str_starts_with( $username, '.' )
