@@ -25,7 +25,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
         ></v-intl-phone>
     </div>
     <span v-for="(notice, noticeInd) in userNotices" :class="'mpop-app-notice' + ' notice-' + notice.type"><span @click="dismissNotice(noticeInd)"><?=$this::dashicon('no-alt')?></span><span v-html="notice.msg"></span></span>
-    <div class="q-pa-md" dark>
+    <div class="q-pa-md">
         <q-layout view="hHh Lpr lff" class="shadow-2 rounded-borders">
             <q-header elevated class="bg-red-9" style="position: relative">
                 <q-toolbar>
@@ -41,7 +41,6 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                 bordered
                 dark
             >
-            <!-- :class="($q.dark.isActive ? 'bg-grey-9' : 'bg-grey-3')" -->
                 <q-scroll-area class="fit">
                 <q-list>
 
