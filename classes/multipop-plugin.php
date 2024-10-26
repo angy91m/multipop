@@ -3607,7 +3607,7 @@ class MultipopPlugin {
             }
             $params['groups'] = implode( ',', array_map(function($g) {return $g['name'];}, $groups) );
         }
-        $this->delay_script('updateDiscourseGroupsByUser', $user->ID);
+        //$this->delay_script('updateDiscourseGroupsByUser', $user->ID);
         return $params;
     }
     public function discourse_bypass_invited_users($user_id, $user) {
