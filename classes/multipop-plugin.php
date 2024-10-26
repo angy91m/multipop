@@ -3631,7 +3631,27 @@ class MultipopPlugin {
         $this->delay_script('updateDiscourseGroupsByUser', $user->ID);
         return $params;
     }
+    private function get_discourse_system_user() {
+        $user = false;
+        $discourse_connect_options = get_option('discourse_connect');
+        if (
+            is_array($discourse_connect_options)
+            && isset($discourse_connect_options['publish-username'])
+            && $discourse_connect_options['publish-username']
+        ) {
+            $disc_utils = $this->discourse_utilities();
+            if ($disc_utils) {
+                $disc_user_name = $discourse_connect_options['publish-username'];
+                $res = $disc_utils::discorse_request("/u/$disc_user_name.json");
+                if (!is_wp_error($res)) {
+                    return $res->user;
+                }
+            }
+        }
+        return false;
+    }
     public function discourse_bypass_invited_users($user_id, $user) {
+        save_test($this->get_discourse_system_user());
         return $user->mpop_mail_to_confirm || $user->mpop_invited || str_starts_with($user->user_login, 'mp_');
     }
 }
