@@ -149,7 +149,6 @@ switch( $post_data['action'] ) {
             'user_pass' => $post_data['password'],
             'meta_input' => $meta_input
         ];
-        save_test($user_edits);
         $sub = array_pop($this->search_subscriptions(['user_id' => [$user->ID], 'pagination' => false], 1));
         if (!$sub) {
             $res_data['error'] = ['subscription'];
@@ -174,7 +173,6 @@ switch( $post_data['action'] ) {
             update_user_caches(get_user_by('ID', $user->ID));
             $user = get_user_by('ID',$user->ID);
         }
-        save_test($user->mpop_billing_state, 1);
         $this->sync_discourse_record($user, true);
         $this->delete_temp_token_by_user_id($user->ID, 'invite_link');
         wp_set_auth_cookie( $user->ID, true );

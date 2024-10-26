@@ -2691,6 +2691,7 @@ class MultipopPlugin {
             if (!in_array($row['mpop_billing_zip'], $comune['cap'])) {
                 throw new Exception('Invalid mpop_billing_zip');
             }
+            $user_input['meta_input']['mpop_billing_state'] = $comune['provincia']['sigla'];
             $user_input['meta_input']['mpop_billing_city'] = $row['mpop_billing_city'];
             $user_input['meta_input']['mpop_billing_zip'] = $row['mpop_billing_zip'];
             if (!isset($row['mpop_phone']) || !is_string($row['mpop_phone']) || !$this::is_valid_phone($row['mpop_phone'])) {
@@ -3539,7 +3540,6 @@ class MultipopPlugin {
         if (!$user) {
             return false;
         }
-        save_test($user->mpop_billing_state,2);
         $groups = [];
         $province_all = false;
         $regioni_all = false;
