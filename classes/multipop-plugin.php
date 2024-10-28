@@ -1130,7 +1130,7 @@ class MultipopPlugin {
                 return;
             }
         }
-        exec(MULTIPOP_PLUGIN_PATH . 'comuni/comuni-update.sh --skip-on-error=attivi,soppressi,multicap > /dev/null &');
+        exec(MULTIPOP_PLUGIN_PATH . 'comuni/comuni-update.sh --skip-on-error=attivi,soppressi,multicap --flush=2 > /dev/null &');
     }
 
     // LOGOUT AND REDIRECT TO URL OR HOME
