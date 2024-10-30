@@ -192,7 +192,7 @@ switch ($post_data['action']) {
             }
             $res_data['error'][] = 'mpop_phone';
         }
-        if (!$has_subs) {
+        if (empty($has_subs)) {
             if (!isset($post_data['mpop_birthdate'])) {
                 if (!isset($res_data['error'])) {
                     $res_data['error'] = [];
