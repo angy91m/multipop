@@ -95,7 +95,6 @@ switch ($post_data['action']) {
     case 'update_profile':
         $comuni = false;
         $found_caps = [];
-        save_test($this->search_subscriptions(['user_id' => [$current_user->ID], 'pagination' => false], 1));
         $has_subs = !empty($this->search_subscriptions(['user_id' => [$current_user->ID], 'pagination' => false], 1));
         if (!isset($post_data['email']) || !is_string($post_data['email']) || !$this->is_valid_email(trim($post_data['email']), true)) {
             $res_data['error'] = ['email'];
@@ -209,6 +208,7 @@ switch ($post_data['action']) {
                     $res_data['error'][] = 'mpop_birthdate';
                 }
             }
+            save_test($post_data['mpop_birthplace_country']);
             if (!isset($post_data['mpop_birthplace_country']) || !$this->get_country_by_code($post_data['mpop_birthplace_country'])) {
                 if (!isset($res_data['error'])) {
                     $res_data['error'] = [];
