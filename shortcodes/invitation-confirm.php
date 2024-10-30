@@ -73,7 +73,16 @@ $invitation_props = [
             @open="searchOpen('birthplaceCountry')"
             label="name"
             :reduce="c=>c.code"
-        ></v-select>
+        >
+            <template #search="{ attributes, events }">
+                <input
+                    class="vs__search"
+                    :style="'display: ' + (birthplaceCountryOpen || !user.mpop_birthplace_country ? 'unset' : 'none')"
+                    v-bind="attributes"
+                    v-on="events"
+                />
+            </template>
+        </v-select>
     </p>
     <p v-if="requireProps && user.mpop_birthplace_country && user.mpop_birthplace_country != 'ita'" class="mpop-form-row">
         <label for="birthplace-select">Comune di nascita</label><br>
@@ -124,7 +133,16 @@ $invitation_props = [
             @open="searchOpen('billingCountry')"
             label="name"
             :reduce="c=>c.code"
-        ></v-select>
+        >
+            <template #search="{ attributes, events }">
+                <input
+                    class="vs__search"
+                    :style="'display: ' + (billingCountryOpen || !user.mpop_billing_country ? 'unset' : 'none')"
+                    v-bind="attributes"
+                    v-on="events"
+                />
+            </template>
+        </v-select>
     </p>
     <template v-if="user.mpop_billing_country && user.mpop_billing_country != 'ita'">
         <p v-if="requireProps" class="mpop-form-row">

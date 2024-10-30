@@ -1,7 +1,7 @@
 import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
-const { createApp, ref, computed, reactive, defineAsyncComponent, onBeforeMount } = Vue,
+const { createApp, ref, computed, reactive, defineAsyncComponent, onMounted } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
     const loaded = [];
@@ -278,7 +278,7 @@ createApp({
                 })
             });
         }
-        onBeforeMount(async () => {
+        onMounted(async () => {
             const countriesRes = await serverReq({action: 'get_countries'});
             countries.push(...(await countriesRes.json()).data.countries);
             if (role == 'multipopolano') {
