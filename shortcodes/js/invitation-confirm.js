@@ -295,7 +295,7 @@ createApp({
                     user.mpop_billing_state = profile.mpop_billing_state || '';
                     user.mpop_billing_zip = profile.mpop_billing_zip || '';
                     user.mpop_billing_address = profile.mpop_billing_address || '';
-                    user.mpop_phone = profile.mpop_phone || '';
+                    if (profile.mpop_phone) phoneInput.value.instance.setNumber(profile.mpop_phone);
                 }
                 user.mpop_subscription_marketing_agree = profile.mpop_marketing_agree || false;
                 user.mpop_subscription_newsletter_agree = profile.mpop_newsletter_agree || false;
