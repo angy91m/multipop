@@ -2819,7 +2819,6 @@ class MultipopPlugin {
                             } catch (Exception $e) {
                                 throw new Exception('Invalid ' . $e->getMessage());
                             }
-                            throw new Exception('Invalid mpop_birthplace');
                         }
                     }
                 }
