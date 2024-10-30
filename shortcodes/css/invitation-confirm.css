@@ -3,7 +3,9 @@
     text-transform: uppercase;
 }
 #billingCity-select:not(:disabled),
-#birthplace-select:not(:disabled) {
+#birthplace-select:not(:disabled),
+#birthplaceCountry-select:not(:disabled),
+#billingCountry-select:not(:disabled) {
     background: #fff;
 }
 #billing-address {

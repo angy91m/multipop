@@ -96,6 +96,8 @@ span.mpop-app-notice > span > span.dashicons-before.dashicons-no-alt {
 }
 #birthplace-select:not(:disabled),
 #billingCity-select:not(:disabled),
+#birthplaceCountry-select:not(:disabled),
+#billingCountry-select:not(:disabled),
 #userEditingRespZone-select:not(:disabled) {
     background: #fff;
 }

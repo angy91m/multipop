@@ -115,7 +115,23 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         </td>
                     </tr>
                     <tr>
-                        <td><strong>Luogo di nascita:</strong></td>
+                        <td><strong>Nazione di nascita:</strong></td>
+                        <td v-if="!profileEditing">{{showCountryName(profile.mpop_birthplace_country)}}</td>
+                        <td v-else>
+                            <v-select
+                                id="birthplaceCountry-select"
+                                :class="savingProfileErrors.has('mpop_birthplace_country') ? 'bad-input' : ''"
+                                v-model="profileInEditing.mpop_birthplace_country"
+                                :options="countries"
+                                @close="birthplaceCountryOpen = false"
+                                @open="searchOpen('birthplaceCountry')"
+                                label="name"
+                                :reduce="c=>c.code"
+                            ></v-select>
+                        </td>
+                    </tr>
+                    <tr v-if="(profileEditing ? profileInEditing || profile).mpop_birthplace_country == 'ita'">
+                        <td><strong>Comune di nascita:</strong></td>
                         <td v-if="!profileEditing">{{profile.mpop_birthplace ? (profile.mpop_birthplace.nome + ' (' + profile.mpop_birthplace.provincia.sigla +')' + addSuppressToLabel(profile.mpop_birthplace) ) : ''}}</td>
                         <td v-else>
                             <v-select
@@ -156,79 +172,97 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         </td>
                     </tr>
                     <tr>
-                        <td><strong>Comune di residenza:</strong></td>
-                        <td v-if="!profileEditing">{{ profile.mpop_billing_city ? profile.mpop_billing_city.nome + addSuppressToLabel(profile.mpop_billing_city) : ''}}</td>
+                        <td><strong>Nazione di residenza:</strong></td>
+                        <td v-if="!profileEditing">{{showCountryName(profile.mpop_billing_country)}}</td>
                         <td v-else>
                             <v-select
-                                id="billingCity-select"
-                                v-model="profileInEditing.mpop_billing_city"
-                                :class="savingProfileErrors.includes('mpop_billing_city') ? 'bad-input' : ''"
-                                :options="billingCities"
-                                @close="billingCityOpen = false"
-                                @open="searchOpen('billingCity')"
-                                :get-option-label="(option) => option.nome + addSuppressToLabel(option)"
-                                :filter="fuseSearch"
-                                @option:selected="c => {
-                                    profileInEditing.mpop_billing_state = c.provincia.sigla;
-                                    if (c.cap.length == 1) {
-                                        profileInEditing.mpop_billing_zip = c.cap[0];
-                                    } else {
+                                id="billingCountry-select"
+                                :class="savingProfileErrors.has('mpop_billing_country') ? 'bad-input' : ''"
+                                v-model="profileInEditing.mpop_billing_country"
+                                :options="countries"
+                                @close="billingCountryOpen = false"
+                                @open="searchOpen('billingCountry')"
+                                label="name"
+                                :reduce="c=>c.code"
+                            ></v-select>
+                        </td>
+                    </tr>
+                    <template v-if="(profileEditing ? profileInEditing || profile).mpop_billing_country == 'ita'">
+                        <tr>
+                            <td><strong>Comune di residenza:</strong></td>
+                            <td v-if="!profileEditing">{{ profile.mpop_billing_city ? profile.mpop_billing_city.nome + addSuppressToLabel(profile.mpop_billing_city) : ''}}</td>
+                            <td v-else>
+                                <v-select
+                                    id="billingCity-select"
+                                    v-model="profileInEditing.mpop_billing_city"
+                                    :class="savingProfileErrors.includes('mpop_billing_city') ? 'bad-input' : ''"
+                                    :options="billingCities"
+                                    @close="billingCityOpen = false"
+                                    @open="searchOpen('billingCity')"
+                                    :get-option-label="(option) => option.nome + addSuppressToLabel(option)"
+                                    :filter="fuseSearch"
+                                    @option:selected="c => {
+                                        profileInEditing.mpop_billing_state = c.provincia.sigla;
+                                        if (c.cap.length == 1) {
+                                            profileInEditing.mpop_billing_zip = c.cap[0];
+                                        } else {
+                                            profileInEditing.mpop_billing_zip = '';
+                                        }
+                                    }"
+                                    @option:deselected="() => {
+                                        profileInEditing.mpop_billing_state = '';
                                         profileInEditing.mpop_billing_zip = '';
-                                    }
-                                }"
-                                @option:deselected="() => {
-                                    profileInEditing.mpop_billing_state = '';
-                                    profileInEditing.mpop_billing_zip = '';
-                                }"
-                                @search="(searchTxt, loading) => {
-                                    if (searchTxt.trim().length < 2) return loading(false);
-                                    triggerSearch(searchTxt, loading, 'billingCitiesSearch');
-                                }"
-                            >
-                                <template #search="{ attributes, events }">
-                                    <input
-                                        class="vs__search"
-                                        :style="'display: ' + (billingCityOpen || !profileInEditing.mpop_billing_city ? 'unset' : 'none')"
-                                        v-bind="attributes"
-                                        v-on="events"
-                                    />
-                                </template>
-                                <template v-slot:option="city">
-                                    {{city.nome}} ({{city.provincia.sigla}}){{addSuppressToLabel(city)}}
-                                </template>
-                                <template v-slot:no-options="{search}">
-                                    <template v-if="search.trim().length > 1">
-                                        Nessun risultato per "{{search}}"
+                                    }"
+                                    @search="(searchTxt, loading) => {
+                                        if (searchTxt.trim().length < 2) return loading(false);
+                                        triggerSearch(searchTxt, loading, 'billingCitiesSearch');
+                                    }"
+                                >
+                                    <template #search="{ attributes, events }">
+                                        <input
+                                            class="vs__search"
+                                            :style="'display: ' + (billingCityOpen || !profileInEditing.mpop_billing_city ? 'unset' : 'none')"
+                                            v-bind="attributes"
+                                            v-on="events"
+                                        />
                                     </template>
-                                    <template v-else>
-                                        Inserisci almeno 2 caratteri
+                                    <template v-slot:option="city">
+                                        {{city.nome}} ({{city.provincia.sigla}}){{addSuppressToLabel(city)}}
                                     </template>
-                                </template>
-                            </v-select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>Provincia di residenza:</strong></td>
-                        <td v-if="!profileEditing">{{profile.mpop_billing_state}}</td>
-                        <td v-else>
-                            <select v-model="profileInEditing.mpop_billing_state" :class="savingProfileErrors.includes('mpop_billing_state') ? 'bad-input' : ''" disabled>
-                                <option
-                                    v-if="profileInEditing.mpop_billing_city"
-                                    :value="profileInEditing.mpop_billing_city.provincia.sigla">{{profileInEditing.mpop_billing_city.provincia.sigla}}</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>CAP:</strong></td>
-                        <td v-if="!profileEditing">{{profile.mpop_billing_zip}}</td>
-                        <td v-else>
-                            <select v-model="profileInEditing.mpop_billing_zip" :class="savingProfileErrors.includes('mpop_billing_zip') ? 'bad-input' : ''" :disabled="!profileInEditing.mpop_billing_city || profileInEditing.mpop_billing_city.cap.length == 1">
-                                <template v-if="profileInEditing.mpop_billing_city">
-                                    <option v-for="cap in profileInEditing.mpop_billing_city.cap" :value="cap">{{cap}}</option>
-                                </template>
-                            </select>
-                        </td>
-                    </tr>
+                                    <template v-slot:no-options="{search}">
+                                        <template v-if="search.trim().length > 1">
+                                            Nessun risultato per "{{search}}"
+                                        </template>
+                                        <template v-else>
+                                            Inserisci almeno 2 caratteri
+                                        </template>
+                                    </template>
+                                </v-select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Provincia di residenza:</strong></td>
+                            <td v-if="!profileEditing">{{profile.mpop_billing_state}}</td>
+                            <td v-else>
+                                <select v-model="profileInEditing.mpop_billing_state" :class="savingProfileErrors.includes('mpop_billing_state') ? 'bad-input' : ''" disabled>
+                                    <option
+                                        v-if="profileInEditing.mpop_billing_city"
+                                        :value="profileInEditing.mpop_billing_city.provincia.sigla">{{profileInEditing.mpop_billing_city.provincia.sigla}}</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>CAP:</strong></td>
+                            <td v-if="!profileEditing">{{profile.mpop_billing_zip}}</td>
+                            <td v-else>
+                                <select v-model="profileInEditing.mpop_billing_zip" :class="savingProfileErrors.includes('mpop_billing_zip') ? 'bad-input' : ''" :disabled="!profileInEditing.mpop_billing_city || profileInEditing.mpop_billing_city.cap.length == 1">
+                                    <template v-if="profileInEditing.mpop_billing_city">
+                                        <option v-for="cap in profileInEditing.mpop_billing_city.cap" :value="cap">{{cap}}</option>
+                                    </template>
+                                </select>
+                            </td>
+                        </tr>
+                    </template>
                     <tr>
                         <td><strong>Indirizzo di residenza:</strong></td>
                         <td v-if="!profileEditing">{{profile.mpop_billing_address}}</td>
@@ -570,7 +604,23 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         </td>
                     </tr>
                     <tr>
-                        <td><strong>Luogo di nascita:</strong></td>
+                        <td><strong>Nazione di nascita:</strong></td>
+                        <td v-if="!userEditing">{{showCountryName(userInView.mpop_birthplace_country)}}</td>
+                        <td v-else>
+                            <v-select
+                                id="birthplaceCountry-select"
+                                :class="savingUserErrors.has('mpop_birthplace_country') ? 'bad-input' : ''"
+                                v-model="userInEditing.mpop_birthplace_country"
+                                :options="countries"
+                                @close="birthplaceCountryOpen = false"
+                                @open="searchOpen('birthplaceCountry')"
+                                label="name"
+                                :reduce="c=>c.code"
+                            ></v-select>
+                        </td>
+                    </tr>
+                    <tr v-if="(userEditing ? userInEditing || userInView).mpop_birthplace_country == 'ita'">
+                        <td><strong>Comune di nascita:</strong></td>
                         <td v-if="!userEditing">{{userInView.mpop_birthplace ? (userInView.mpop_birthplace.nome + ' (' + userInView.mpop_birthplace.provincia.sigla +')' + addSuppressToLabel(userInView.mpop_birthplace) ) : ''}}</td>
                         <td v-else>
                             <v-select
@@ -611,79 +661,97 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         </td>
                     </tr>
                     <tr>
-                        <td><strong>Comune di residenza:</strong></td>
-                        <td v-if="!userEditing">{{ userInView.mpop_billing_city ? userInView.mpop_billing_city.nome + addSuppressToLabel(userInView.mpop_billing_city) : ''}}</td>
+                        <td><strong>Nazione di residenza:</strong></td>
+                        <td v-if="!userEditing">{{showCountryName(userInView.mpop_billing_country)}}</td>
                         <td v-else>
                             <v-select
-                                id="billingCity-select"
-                                v-model="userInEditing.mpop_billing_city"
-                                :class="savingUserErrors.includes('mpop_billing_city') ? 'bad-input' : ''"
-                                :options="billingCities"
-                                @close="billingCityOpen = false"
-                                @open="searchOpen('billingCity')"
-                                :get-option-label="(option) => option.nome + addSuppressToLabel(option)"
-                                :filter="fuseSearch"
-                                @option:selected="c => {
-                                    userInEditing.mpop_billing_state = c.provincia.sigla;
-                                    if (c.cap.length == 1) {
-                                        userInEditing.mpop_billing_zip = c.cap[0];
-                                    } else {
+                                id="billingCountry-select"
+                                :class="savingUserErrors.has('mpop_billing_country') ? 'bad-input' : ''"
+                                v-model="userInEditing.mpop_billing_country"
+                                :options="countries"
+                                @close="billingCountryOpen = false"
+                                @open="searchOpen('billingCountry')"
+                                label="name"
+                                :reduce="c=>c.code"
+                            ></v-select>
+                        </td>
+                    </tr>
+                    <template v-if="(userEditing ? userInEditing || userInView).mpop_billing_country == 'ita'">
+                        <tr>
+                            <td><strong>Comune di residenza:</strong></td>
+                            <td v-if="!userEditing">{{ userInView.mpop_billing_city ? userInView.mpop_billing_city.nome + addSuppressToLabel(userInView.mpop_billing_city) : ''}}</td>
+                            <td v-else>
+                                <v-select
+                                    id="billingCity-select"
+                                    v-model="userInEditing.mpop_billing_city"
+                                    :class="savingUserErrors.includes('mpop_billing_city') ? 'bad-input' : ''"
+                                    :options="billingCities"
+                                    @close="billingCityOpen = false"
+                                    @open="searchOpen('billingCity')"
+                                    :get-option-label="(option) => option.nome + addSuppressToLabel(option)"
+                                    :filter="fuseSearch"
+                                    @option:selected="c => {
+                                        userInEditing.mpop_billing_state = c.provincia.sigla;
+                                        if (c.cap.length == 1) {
+                                            userInEditing.mpop_billing_zip = c.cap[0];
+                                        } else {
+                                            userInEditing.mpop_billing_zip = '';
+                                        }
+                                    }"
+                                    @option:deselected="() => {
+                                        userInEditing.mpop_billing_state = '';
                                         userInEditing.mpop_billing_zip = '';
-                                    }
-                                }"
-                                @option:deselected="() => {
-                                    userInEditing.mpop_billing_state = '';
-                                    userInEditing.mpop_billing_zip = '';
-                                }"
-                                @search="(searchTxt, loading) => {
-                                    if (searchTxt.trim().length < 2) return loading(false);
-                                    triggerSearch(searchTxt, loading, 'billingCitiesSearch');
-                                }"
-                            >
-                                <template #search="{ attributes, events }">
-                                    <input
-                                        class="vs__search"
-                                        :style="'display: ' + (billingCityOpen || !userInEditing.mpop_billing_city ? 'unset' : 'none')"
-                                        v-bind="attributes"
-                                        v-on="events"
-                                    />
-                                </template>
-                                <template v-slot:option="city">
-                                    {{city.nome}} ({{city.provincia.sigla}}){{addSuppressToLabel(city)}}
-                                </template>
-                                <template v-slot:no-options="{search}">
-                                    <template v-if="search.trim().length > 1">
-                                        Nessun risultato per "{{search}}"
+                                    }"
+                                    @search="(searchTxt, loading) => {
+                                        if (searchTxt.trim().length < 2) return loading(false);
+                                        triggerSearch(searchTxt, loading, 'billingCitiesSearch');
+                                    }"
+                                >
+                                    <template #search="{ attributes, events }">
+                                        <input
+                                            class="vs__search"
+                                            :style="'display: ' + (billingCityOpen || !userInEditing.mpop_billing_city ? 'unset' : 'none')"
+                                            v-bind="attributes"
+                                            v-on="events"
+                                        />
                                     </template>
-                                    <template v-else>
-                                        Inserisci almeno 2 caratteri
+                                    <template v-slot:option="city">
+                                        {{city.nome}} ({{city.provincia.sigla}}){{addSuppressToLabel(city)}}
                                     </template>
-                                </template>
-                            </v-select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>Provincia di residenza:</strong></td>
-                        <td v-if="!userEditing">{{userInView.mpop_billing_state}}</td>
-                        <td v-else>
-                            <select v-model="userInEditing.mpop_billing_state" :class="savingUserErrors.includes('mpop_billing_state') ? 'bad-input' : ''" disabled>
-                                <option
-                                    v-if="userInEditing.mpop_billing_city"
-                                    :value="userInEditing.mpop_billing_city.provincia.sigla">{{userInEditing.mpop_billing_city.provincia.sigla}}</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>CAP:</strong></td>
-                        <td v-if="!userEditing">{{userInView.mpop_billing_zip}}</td>
-                        <td v-else>
-                            <select v-model="userInEditing.mpop_billing_zip" :class="savingUserErrors.includes('mpop_billing_zip') ? 'bad-input' : ''" :disabled="!userInEditing.mpop_billing_city || userInEditing.mpop_billing_city.cap.length == 1">
-                                <template v-if="userInEditing.mpop_billing_city">
-                                    <option v-for="cap in userInEditing.mpop_billing_city.cap" :value="cap">{{cap}}</option>
-                                </template>
-                            </select>
-                        </td>
-                    </tr>
+                                    <template v-slot:no-options="{search}">
+                                        <template v-if="search.trim().length > 1">
+                                            Nessun risultato per "{{search}}"
+                                        </template>
+                                        <template v-else>
+                                            Inserisci almeno 2 caratteri
+                                        </template>
+                                    </template>
+                                </v-select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Provincia di residenza:</strong></td>
+                            <td v-if="!userEditing">{{userInView.mpop_billing_state}}</td>
+                            <td v-else>
+                                <select v-model="userInEditing.mpop_billing_state" :class="savingUserErrors.includes('mpop_billing_state') ? 'bad-input' : ''" disabled>
+                                    <option
+                                        v-if="userInEditing.mpop_billing_city"
+                                        :value="userInEditing.mpop_billing_city.provincia.sigla">{{userInEditing.mpop_billing_city.provincia.sigla}}</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>CAP:</strong></td>
+                            <td v-if="!userEditing">{{userInView.mpop_billing_zip}}</td>
+                            <td v-else>
+                                <select v-model="userInEditing.mpop_billing_zip" :class="savingUserErrors.includes('mpop_billing_zip') ? 'bad-input' : ''" :disabled="!userInEditing.mpop_billing_city || userInEditing.mpop_billing_city.cap.length == 1">
+                                    <template v-if="userInEditing.mpop_billing_city">
+                                        <option v-for="cap in userInEditing.mpop_billing_city.cap" :value="cap">{{cap}}</option>
+                                    </template>
+                                </select>
+                            </td>
+                        </tr>
+                    </template>
                     <tr>
                         <td><strong>Indirizzo di residenza:</strong></td>
                         <td v-if="!userEditing">{{userInView.mpop_billing_address}}</td>

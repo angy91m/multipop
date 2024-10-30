@@ -136,12 +136,15 @@ createApp({
         userInView = reactive({}),
         profileEditing = ref(false),
         userEditing = ref(false),
+        birthplaceCountryOpen = ref(false),
         birthplaceOpen = ref(false),
+        billingCountryOpen = ref(false),
         billingCityOpen = ref(false),
         userSearchZoneOpen = ref(false),
         userSearchRespZoneOpen = ref(false),
         userEditingRespZoneOpen = ref(false),
         authorizedSubscriptionYears = reactive([]),
+        countries = reactive([]),
         saving = ref(false),
         savingProfileErrors = reactive([]),
         savingUserErrors = reactive([]),
@@ -208,17 +211,51 @@ createApp({
             }
             return buttons;
         }),
+        isValidProfileBirthPlace = computed(()=>profileInEditing.mpop_birthplace_country && (profileInEditing.mpop_birthplace_country != 'ita' || profileInEditing.mpop_birthplace)),
+        isValidProfileBillingPlace = computed(()=>profileInEditing.mpop_billing_country && (profileInEditing.mpop_billing_country != 'ita' || (profileInEditing.mpop_billing_city && profileInEditing.mpop_billing_state && profileInEditing.mpop_billing_zip))),
         validProfileForm = computed(()=>
             mailRegex.test(profileInEditing.email.trim())
             && profileInEditing.first_name.trim()
             && profileInEditing.last_name.trim()
             && profileInEditing.mpop_birthdate
-            && profileInEditing.mpop_birthplace
-            && profileInEditing.mpop_billing_city
-            && profileInEditing.mpop_billing_state
+            && isValidProfileBirthPlace.value
+            && isValidProfileBillingPlace.value
             && profileInEditing.mpop_billing_address.trim()
-            && profileInEditing.mpop_billing_zip
             && profileInEditing.mpop_phone
+        ),
+        isValidUserBirthPlace = computed(()=> (!userInView.mpop_birthplace_country || userInEditing.mpop_birthplace_country) && (!userInView.mpop_birthplace || (userInEditing.mpop_birthplace_country && (userInEditing.mpop_birthplace_country != 'ita' || userInEditing.mpop_birthplace )))),
+        isValidUserBillingPlace = computed(()=>
+            (!userInView.mpop_billing_country || userInEditing.mpop_billing_country)
+            && (
+                !userInView.mpop_billing_city
+                || (
+                    userInEditing.mpop_birthplace_country
+                    && (
+                        userInEditing.mpop_birthplace_country != 'ita'
+                        || userInEditing.mpop_billing_city
+                    )
+                )
+            )
+            && (
+                !userInView.mpop_billing_state
+                || (
+                    userInEditing.mpop_birthplace_country
+                    && (
+                        userInEditing.mpop_birthplace_country != 'ita'
+                        || userInEditing.mpop_billing_state
+                    )
+                )
+            )
+            && (
+                !userInView.mpop_billing_zip
+                || (
+                    userInEditing.mpop_birthplace_country
+                    && (
+                        userInEditing.mpop_birthplace_country != 'ita'
+                        || userInEditing.mpop_billing_zip
+                    )
+                )
+            )
         ),
         validUserForm = computed(()=>
             mailRegex.test(userInEditing.email.trim())
@@ -226,10 +263,9 @@ createApp({
             && ( !userInView.last_name || userInEditing.last_name.trim() )
             && ( !userInView.mpop_birthdate || userInEditing.mpop_birthdate )
             && ( !userInView.mpop_birthplace || userInEditing.mpop_birthplace )
-            && ( !userInView.mpop_billing_city || userInEditing.mpop_billing_city )
-            && ( !userInView.mpop_billing_state || userInEditing.mpop_billing_state )
+            && isValidUserBirthPlace.value
+            && isValidUserBillingPlace.value
             && ( !userInView.mpop_billing_address || userInEditing.mpop_billing_address.trim() )
-            && ( !userInView.mpop_billing_zip || userInEditing.mpop_billing_zip )
             && ( !userInView.mpop_phone || userInEditing.mpop_phone )
         ),
         staticPwdErrors = reactive([]),
@@ -564,8 +600,10 @@ createApp({
                 first_name: profileInEditing.first_name.trim(),
                 last_name: profileInEditing.last_name.trim(),
                 mpop_birthdate: profileInEditing.mpop_birthdate,
-                mpop_birthplace: profileInEditing.mpop_birthplace.codiceCatastale,
-                mpop_billing_city: profileInEditing.mpop_billing_city.codiceCatastale,
+                mpop_birthplace_country: profileInEditing.mpop_birthplace_country,
+                mpop_birthplace: profileInEditing.mpop_birthplace_country == 'ita' ? profileInEditing.mpop_birthplace.codiceCatastale : '',
+                mpop_billing_country: profileInEditing.mpop_billing_country,
+                mpop_billing_city: profileInEditing.mpop_billing_country == 'ita' ? profileInEditing.mpop_billing_city.codiceCatastale : '',
                 mpop_billing_address: profileInEditing.mpop_billing_address.trim(),
                 mpop_billing_zip: profileInEditing.mpop_billing_zip,
                 mpop_phone: profileInEditing.mpop_phone
@@ -635,8 +673,10 @@ createApp({
                 first_name: userInEditing.first_name?.trim(),
                 last_name: userInEditing.last_name?.trim(),
                 mpop_birthdate: userInEditing.mpop_birthdate,
-                mpop_birthplace: userInEditing.mpop_birthplace?.codiceCatastale,
-                mpop_billing_city: userInEditing.mpop_billing_city?.codiceCatastale,
+                mpop_birthplace_country: userInEditing.mpop_birthplace_country,
+                mpop_birthplace: userInEditing.mpop_birthplace_country == 'ita' ? userInEditing.mpop_birthplace?.codiceCatastale : '',
+                mpop_billing_country: userInEditing.mpop_billing_country,
+                mpop_billing_city: userInEditing.mpop_billing_country == 'ita' ? userInEditing.mpop_billing_city?.codiceCatastale: '',
                 mpop_billing_address: userInEditing.mpop_billing_address?.trim(),
                 mpop_billing_zip: userInEditing.mpop_billing_zip,
                 mpop_phone: userInEditing.mpop_phone,
@@ -906,8 +946,14 @@ createApp({
             if (!profile.mpop_birthdate) {
                 missingFields.push('Data di nascita');
             }
+            if (!profile.mpop_birthplace_country) {
+                missingFields.push('Nazione di nascita');
+            }
             if (!profile.mpop_birthplace) {
-                missingFields.push('Luogo di nascita');
+                missingFields.push('Comune di nascita');
+            }
+            if (!profile.mpop_billing_country) {
+                missingFields.push('Nazione di nascita');
             }
             if (!profile.mpop_billing_address) {
                 missingFields.push('Indirizzo di residenza');
@@ -1052,6 +1098,7 @@ createApp({
                 historyTabs.unshift(selectedTab.value);
                 history.replaceState(JSON.parse(JSON.stringify(historyTabs)), '', location.href);
             }
+            serverReq({action: 'get_countries'}).then(r => r.json()).then(({data: {countries: cs}}) => countries.push(...cs));
         });
         function onPopState(e) {
             if (Array.isArray(e.state)){
@@ -1093,6 +1140,9 @@ createApp({
             }
             return role;
         }
+        function showCountryName(code) {
+            return code && countries.length ? countries.find(c => c.code == code).name : '';
+        }
         function validatePhone(p = '') {
             intPhoneInstance.value.instance.setCountry('it');
             intPhoneInstance.value.instance.setNumber(p);
@@ -1112,7 +1162,9 @@ createApp({
             selectTab,
             displayLocalDate,
             birthCities,
+            birthplaceCountryOpen,
             birthplaceOpen,
+            billingCountryOpen,
             billingCityOpen,
             billingCities,
             updateProfile,
@@ -1172,7 +1224,9 @@ createApp({
             csvImportOptions,
             uploadCsvRows,
             intPhoneInstance,
-            resendInvitationMail
+            resendInvitationMail,
+            countries,
+            showCountryName
         };
     }
 })

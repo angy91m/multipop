@@ -24,6 +24,9 @@ if (!wp_verify_nonce($post_data['mpop-invite-nonce'], 'mpop-invite')) {
     exit;
 }
 switch( $post_data['action'] ) {
+    case 'get_countries':
+        $res_data['data'] = ['countries' => $this->get_countries_all()];
+        break;
     case 'get_birth_cities':
         if (!isset($post_data['mpop_birthplace'])) {
             $res_data['error'] = ['mpop_birthplace'];
@@ -65,6 +68,9 @@ switch( $post_data['action'] ) {
             exit;
         }
         break;
+    case 'get_profile':
+        $res_data['data'] = ['profile' => $this->myaccount_get_profile($this->invited_user, true)];
+        break;
     case 'activate_account':
         $user = $this->invited_user;
         $res_data['error'] = [];
@@ -85,7 +91,18 @@ switch( $post_data['action'] ) {
             $comuni = [];
             if(!isset($post_data['mpop_birthdate'])) {
                 $res_data['error'][] = 'mpop_birthdate';
+                $post_data['mpop_birthdate'] = false;
             } else {
+                try {
+                    $post_data['mpop_birthdate'] = $this::validate_birthdate($post_data['mpop_birthdate']);
+                } catch(Exception $e) {
+                    $res_data['error'][] = 'mpop_birthdate';
+                    $post_data['mpop_birthdate'] = false;
+                }
+            }
+            if (!isset($post_data['mpop_birthplace_country']) || !$this->get_country_by_code($post_data['mpop_birthplace_country'])) {
+                $res_data['error'][] = 'mpop_birthplace_country';
+            } else if ($post_data['mpop_birthplace_country'] == 'ita' && $post_data['mpop_birthdate']) {
                 if(!isset($post_data['mpop_birthplace']) ) {
                     $res_data['error'][] = 'mpop_birthplace';
                 } else {
@@ -98,19 +115,25 @@ switch( $post_data['action'] ) {
                         array_push($res_data['error'], ...explode(',',$e->getMessage()));
                     }
                 }
+            } else if ($post_data['mpop_birthdate']) {
+                $post_data['mpop_birthdate'] = $post_data['mpop_birthdate']->format('Y-m-d');
             }
-            if (!isset($post_data['mpop_billing_city']) || !is_string($post_data['mpop_billing_city']) || !preg_match('/^[A-Z]\d{3}$/', $post_data['mpop_billing_city'])) {
-                $res_data['error'][] = 'mpop_billing_city';
-            } else {
-                if (empty($comuni)) {
-                    $comuni = $this->get_comuni_all();
-                }
-                $residenza = $this->get_comune_by_catasto($post_data['mpop_billing_city'], false, $comuni);
-                if (!$residenza) {
+            if (!isset($post_data['mpop_billing_country']) || !$this->get_country_by_code($post_data['mpop_billing_country'])) {
+                $res_data['error'][] = 'mpop_billing_country';
+            } else if ($post_data['mpop_billing_country'] == 'ita') {
+                if (!isset($post_data['mpop_billing_city']) || !is_string($post_data['mpop_billing_city']) || !preg_match('/^[A-Z]\d{3}$/', $post_data['mpop_billing_city'])) {
                     $res_data['error'][] = 'mpop_billing_city';
                 } else {
-                    if(!isset($post_data['mpop_billing_zip']) || !in_array($post_data['mpop_billing_zip'], $residenza['cap'])) {
-                        $res_data['error'][] = 'mpop_billing_zip';
+                    if (empty($comuni)) {
+                        $comuni = $this->get_comuni_all();
+                    }
+                    $residenza = $this->get_comune_by_catasto($post_data['mpop_billing_city'], false, $comuni);
+                    if (!$residenza) {
+                        $res_data['error'][] = 'mpop_billing_city';
+                    } else {
+                        if(!isset($post_data['mpop_billing_zip']) || !in_array($post_data['mpop_billing_zip'], $residenza['cap'])) {
+                            $res_data['error'][] = 'mpop_billing_zip';
+                        }
                     }
                 }
             }
@@ -130,19 +153,22 @@ switch( $post_data['action'] ) {
         }
         $meta_input = [
             'mpop_invited' => false
-        ] +(str_starts_with($user->user_login, 'mp_') ? [
-            'first_name' => mb_strtoupper($post_data['first_name'], 'UTF-8'),
-            'last_name' =>  mb_strtoupper($post_data['last_name'], 'UTF-8'),
-            'mpop_birthdate' => $post_data['mpop_birthdate'],
-            'mpop_birthplace' => $post_data['mpop_birthplace'],
-            'mpop_billing_city' => $post_data['mpop_billing_city'],
-            'mpop_billing_state' => $residenza['provincia']['sigla'],
-            'mpop_billing_zip' => $post_data['mpop_billing_zip'],
-            'mpop_billing_address' => $post_data['mpop_billing_address'],
-            'mpop_phone' => $post_data['mpop_phone'],
+        ] + ($user->roles[0] == 'multipopolano'? [
             'mpop_marketing_agree' => isset($post_data['mpop_subscription_marketing_agree']) ? boolval($post_data['mpop_subscription_marketing_agree']) : false,
             'mpop_newsletter_agree' => isset($post_data['mpop_subscription_newsletter_agree']) ? boolval($post_data['mpop_subscription_newsletter_agree']) : false,
             'mpop_publish_agree' => isset($post_data['mpop_subscription_publish_agree']) ? boolval($post_data['mpop_subscription_publish_agree']) : false
+        ]:[]) +(str_starts_with($user->user_login, 'mp_') ? [
+            'first_name' => mb_strtoupper($post_data['first_name'], 'UTF-8'),
+            'last_name' =>  mb_strtoupper($post_data['last_name'], 'UTF-8'),
+            'mpop_birthdate' => $post_data['mpop_birthdate'],
+            'mpop_birthplace_country' => $post_data['mpop_birthplace_country'],
+            'mpop_birthplace' => $post_data['mpop_birthplace_country'] == 'ita' ? $post_data['mpop_birthplace'] : '',
+            'mpop_billing_country' => $post_data['mpop_billing_country'],
+            'mpop_billing_city' => $post_data['mpop_billing_country'] == 'ita' ? $post_data['mpop_billing_city'] : '',
+            'mpop_billing_state' => $post_data['mpop_billing_country'] == 'ita' ? $residenza['provincia']['sigla'] : '',
+            'mpop_billing_zip' => $post_data['mpop_billing_country'] == 'ita' ? $post_data['mpop_billing_zip'] : '',
+            'mpop_billing_address' => $post_data['mpop_billing_address'],
+            'mpop_phone' => $post_data['mpop_phone']
         ] : []);
         $user_edits = [
             'ID' => $user->ID,

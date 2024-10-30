@@ -1,7 +1,7 @@
 import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.mjs';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
-const { createApp, ref, computed, reactive, defineAsyncComponent } = Vue,
+const { createApp, ref, computed, reactive, defineAsyncComponent, onBeforeMount } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
     const loaded = [];
@@ -57,7 +57,7 @@ passwordRegex = {
     },
     acceptedSymbols: "| \\ ! \" £ $ % & / ( ) = ? ' ^ , . ; : _ @ ° # * + [ ] { } _ -"
 },
-{requireProps} = JSON.parse(document.getElementById('invitation-props').innerText),
+{requireProps, role} = JSON.parse(document.getElementById('invitation-props').innerText),
 maxBirthDate = new Date();
 maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
 let triggerSearchTimeout;
@@ -74,7 +74,9 @@ createApp({
             first_name: '',
             last_name: '',
             mpop_birthdate: undefined,
+            mpop_birthplace_country: '',
             mpop_birthplace: '',
+            mpop_billing_country: '',
             mpop_billing_city: '',
             mpop_billing_state: '',
             mpop_billing_zip: '',
@@ -84,16 +86,21 @@ createApp({
             mpop_subscription_newsletter_agree: false,
             mpop_subscription_publish_agree: false
         }),
+        countries = reactive([]),
         marketingAgreeShow = ref(false),
         newsletterAgreeShow = ref(false),
         publishAgreeShow = ref(false),
+        birthplaceCountryOpen = ref(false),
         birthplaceOpen = ref(false),
+        billingCountryOpen = ref(false),
         billingCityOpen = ref(false),
         userNotices = reactive([]),
         birthCities = reactive([]),
         billingCities = reactive([]),
         phoneInput = ref('phoneInput'),
         requesting = ref(false),
+        isValidBirthPlace = computed(()=>user.mpop_birthplace_country && (user.mpop_birthplace_country != 'ita' || user.mpop_birthplace)),
+        isValidBillingPlace = computed(()=>user.mpop_billing_country && (user.mpop_billing_country != 'ita' || (user.mpop_billing_city && user.mpop_billing_state && user.mpop_billing_zip))),
         isValidForm = computed( () => requireProps ?
                 isValidUsername()
                 && isValidPassword()
@@ -101,11 +108,9 @@ createApp({
                 && user.first_name.trim()
                 && user.last_name.trim()
                 && user.mpop_birthdate
-                && user.mpop_birthplace
-                && user.mpop_billing_city
-                && user.mpop_billing_state
+                && isValidBirthPlace.value
+                && isValidBillingPlace.value
                 && user.mpop_billing_address.trim()
-                && user.mpop_billing_zip
                 && user.mpop_phone
             :
                 isValidPassword() && isValidPasswordConfirm()
@@ -135,10 +140,10 @@ createApp({
                     ...user,
                     username: user.username.trim(),
                     password: user.password.trim(),
-                    mpop_billing_city: user.mpop_billing_city.codiceCatastale,
-                    mpop_birthplace: user.mpop_birthplace.codiceCatastale,
                     action: 'activate_account'
                 };
+                if (user.mpop_birthplace) reqObj.mpop_birthplace = user.mpop_birthplace.codiceCatastale;
+                if (user.mpop_billing_city) reqObj.mpop_billing_city = user.mpop_billing_city.codiceCatastale;
                 delete reqObj['password_confirm'];
             } else {
                 reqObj = {
@@ -273,6 +278,30 @@ createApp({
                 })
             });
         }
+        onBeforeMount(async () => {
+            const countriesRes = await serverReq({action: 'get_countries'});
+            countries.push(...(await countriesRes.json()).data.countries);
+            if (role == 'multipopolano') {
+                const profileRes = await serverReq({action: 'get_profile'}),
+                {data: {profile}} = await profileRes.json();
+                if (requireProps){
+                    user.first_name = profile.first_name || '';
+                    user.last_name = profile.last_name || '';
+                    user.mpop_birthdate = profile.mpop_birthdate || undefined;
+                    user.mpop_birthplace_country = profile.mpop_birthplace_country || '';
+                    user.mpop_birthplace = profile.mpop_birthplace || '';
+                    user.mpop_billing_country = profile.mpop_billing_country || '';
+                    user.mpop_billing_city = profile.mpop_billing_city || '';
+                    user.mpop_billing_state = profile.mpop_billing_state || '';
+                    user.mpop_billing_zip = profile.mpop_billing_zip || '';
+                    user.mpop_billing_address = profile.mpop_billing_address || '';
+                    user.mpop_phone = profile.mpop_phone || '';
+                }
+                user.mpop_subscription_marketing_agree = profile.mpop_marketing_agree || false;
+                user.mpop_subscription_newsletter_agree = profile.mpop_newsletter_agree || false;
+                user.mpop_subscription_publish_agree = profile.mpop_publish_agree || false;
+            }
+        });
         return {
             user,
             isValidForm,
@@ -287,7 +316,9 @@ createApp({
             requesting,
             triggerSearch,
             fuseSearch,
+            birthplaceCountryOpen,
             birthplaceOpen,
+            billingCountryOpen,
             billingCityOpen,
             birthCities,
             billingCities,
@@ -299,6 +330,8 @@ createApp({
             marketingAgreeShow,
             newsletterAgreeShow,
             publishAgreeShow,
+            countries,
+            role,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2)
         };
     }

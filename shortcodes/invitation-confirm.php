@@ -13,7 +13,8 @@ if (
     exit;
 }
 $invitation_props = [
-    'requireProps' => str_starts_with($this->invited_user->user_login, 'mp_')
+    'requireProps' => str_starts_with($this->invited_user->user_login, 'mp_'),
+    'role' => $this->invited_user->roles[0]
 ];
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
@@ -62,6 +63,19 @@ $invitation_props = [
         </label>
     </p>
     <p v-if="requireProps" class="mpop-form-row">
+        <label for="birthplaceCountry-select">Nazione di nascita</label><br>
+        <v-select
+            id="birthplaceCountry-select"
+            :class="errorFields.has('mpop_birthplace_country') ? 'bad-input' : ''"
+            v-model="user.mpop_birthplace_country"
+            :options="countries"
+            @close="birthplaceCountryOpen = false"
+            @open="searchOpen('birthplaceCountry')"
+            label="name"
+            :reduce="c=>c.code"
+        ></v-select>
+    </p>
+    <p v-if="requireProps && user.mpop_birthplace_country && user.mpop_birthplace_country != 'ita'" class="mpop-form-row">
         <label for="birthplace-select">Comune di nascita</label><br>
         <v-select
             id="birthplace-select"
@@ -100,70 +114,85 @@ $invitation_props = [
         </v-select>
     </p>
     <p v-if="requireProps" class="mpop-form-row">
-        <label for="billingCity-select">Comune di residenza</label><br>
+        <label for="billingCountry-select">Nazione di residenza</label><br>
         <v-select
-            id="billingCity-select"
-            v-model="user.mpop_billing_city"
-            :class="errorFields.has('mpop_billing_city') ? 'bad-input' : ''"
-            :options="billingCities"
-            @close="billingCityOpen = false"
-            @open="searchOpen('billingCity')"
-            :get-option-label="(option) => option.nome + addSuppressToLabel(option)"
-            :filter="fuseSearch"
-            @option:selected="c => {
-                user.mpop_billing_state = c.provincia.sigla;
-                if (c.cap.length == 1) {
-                    user.mpop_billing_zip = c.cap[0];
-                } else {
+            id="billingCountry-select"
+            :class="errorFields.has('mpop_billing_country') ? 'bad-input' : ''"
+            v-model="user.mpop_billing_country"
+            :options="countries"
+            @close="billingCountryOpen = false"
+            @open="searchOpen('billingCountry')"
+            label="name"
+            :reduce="c=>c.code"
+        ></v-select>
+    </p>
+    <template v-if="user.mpop_billing_country && user.mpop_billing_country != 'ita'">
+        <p v-if="requireProps" class="mpop-form-row">
+            <label for="billingCity-select">Comune di residenza</label><br>
+            <v-select
+                id="billingCity-select"
+                v-model="user.mpop_billing_city"
+                :class="errorFields.has('mpop_billing_city') ? 'bad-input' : ''"
+                :options="billingCities"
+                @close="billingCityOpen = false"
+                @open="searchOpen('billingCity')"
+                :get-option-label="(option) => option.nome + addSuppressToLabel(option)"
+                :filter="fuseSearch"
+                @option:selected="c => {
+                    user.mpop_billing_state = c.provincia.sigla;
+                    if (c.cap.length == 1) {
+                        user.mpop_billing_zip = c.cap[0];
+                    } else {
+                        user.mpop_billing_zip = '';
+                    }
+                }"
+                @option:deselected="() => {
+                    user.mpop_billing_state = '';
                     user.mpop_billing_zip = '';
-                }
-            }"
-            @option:deselected="() => {
-                user.mpop_billing_state = '';
-                user.mpop_billing_zip = '';
-            }"
-            @search="(searchTxt, loading) => {
-                if (searchTxt.trim().length < 2) return loading(false);
-                triggerSearch(searchTxt, loading, 'billingCitiesSearch');
-            }"
-        >
-            <template #search="{ attributes, events }">
-                <input
-                    class="vs__search"
-                    :style="'display: ' + (billingCityOpen || !user.mpop_billing_city ? 'unset' : 'none')"
-                    v-bind="attributes"
-                    v-on="events"
-                />
-            </template>
-            <template v-slot:option="city">
-                {{city.nome}} ({{city.provincia.sigla}}){{addSuppressToLabel(city)}}
-            </template>
-            <template v-slot:no-options="{search}">
-                <template v-if="search.trim().length > 1">
-                    Nessun risultato per "{{search}}"
+                }"
+                @search="(searchTxt, loading) => {
+                    if (searchTxt.trim().length < 2) return loading(false);
+                    triggerSearch(searchTxt, loading, 'billingCitiesSearch');
+                }"
+            >
+                <template #search="{ attributes, events }">
+                    <input
+                        class="vs__search"
+                        :style="'display: ' + (billingCityOpen || !user.mpop_billing_city ? 'unset' : 'none')"
+                        v-bind="attributes"
+                        v-on="events"
+                    />
                 </template>
-                <template v-else>
-                    Inserisci almeno 2 caratteri
+                <template v-slot:option="city">
+                    {{city.nome}} ({{city.provincia.sigla}}){{addSuppressToLabel(city)}}
                 </template>
-            </template>
-        </v-select>
-    </p>
-    <p v-if="requireProps" class="mpop-form-row">
-        <label for="billing-state-select">Provincia di residenza</label><br>
-        <select id="billing-state-select" v-model="user.mpop_billing_state" :class="errorFields.has('mpop_billing_state') ? 'bad-input' : ''" disabled>
-            <option
-                v-if="user.mpop_billing_city"
-                :value="user.mpop_billing_city.provincia.sigla">{{user.mpop_billing_city.provincia.sigla}}</option>
-        </select>
-    </p>
-    <p v-if="requireProps" class="mpop-form-row">
-        <label for="billing-zip-select">CAP</label><br>
-        <select id="billing-zip-select" v-model="user.mpop_billing_zip" :class="errorFields.has('mpop_billing_zip') ? 'bad-input' : ''" :disabled="!user.mpop_billing_city || user.mpop_billing_city.cap.length == 1">
-            <template v-if="user.mpop_billing_city">
-                <option v-for="cap in user.mpop_billing_city.cap" :value="cap">{{cap}}</option>
-            </template>
-        </select>
-    </p>
+                <template v-slot:no-options="{search}">
+                    <template v-if="search.trim().length > 1">
+                        Nessun risultato per "{{search}}"
+                    </template>
+                    <template v-else>
+                        Inserisci almeno 2 caratteri
+                    </template>
+                </template>
+            </v-select>
+        </p>
+        <p v-if="requireProps" class="mpop-form-row">
+            <label for="billing-state-select">Provincia di residenza</label><br>
+            <select id="billing-state-select" v-model="user.mpop_billing_state" :class="errorFields.has('mpop_billing_state') ? 'bad-input' : ''" disabled>
+                <option
+                    v-if="user.mpop_billing_city"
+                    :value="user.mpop_billing_city.provincia.sigla">{{user.mpop_billing_city.provincia.sigla}}</option>
+            </select>
+        </p>
+        <p v-if="requireProps" class="mpop-form-row">
+            <label for="billing-zip-select">CAP</label><br>
+            <select id="billing-zip-select" v-model="user.mpop_billing_zip" :class="errorFields.has('mpop_billing_zip') ? 'bad-input' : ''" :disabled="!user.mpop_billing_city || user.mpop_billing_city.cap.length == 1">
+                <template v-if="user.mpop_billing_city">
+                    <option v-for="cap in user.mpop_billing_city.cap" :value="cap">{{cap}}</option>
+                </template>
+            </select>
+        </p>
+    </template>
     <p v-if="requireProps" class="mpop-form-row">
         <label for="billing-address">Indirizzo</label><br>
         <textarea id="billing-address" v-model="user.mpop_billing_address" :class="errorFields.has('mpop_billing_address') ? 'bad-input' : ''" :disabled="!user.mpop_billing_zip"></textarea>
@@ -180,7 +209,7 @@ $invitation_props = [
             @change-country="()=>user.mpop_phone = parsePhone(phoneInput)"
         ></v-intl-phone>
     </p>
-    <template v-if="requireProps">
+    <template v-if="role == 'multipopolano'">
         <br>
         <p class="mpop-form-row">
             <strong>Consensi facoltativi</strong>

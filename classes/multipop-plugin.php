@@ -40,6 +40,7 @@ class MultipopPlugin {
     private ?array $comuni_all;
     private ?array $province_all;
     private ?array $regioni_all;
+    private ?array $countries_all;
     public string $last_mail_error = '';
     private ?object $invited_user;
     private $discourse_system_user;
@@ -1663,6 +1664,16 @@ class MultipopPlugin {
         }
         return $this->regioni_all;
     }
+    private function get_countries_all() {
+        if (!isset($this->countries_all)) {
+            $countries = json_decode(file_get_contents(MULTIPOP_PLUGIN_PATH . '/comuni/countries.json'), true);
+            if (!is_array($countries)) {
+                $countries = [];
+            }
+            $this->countries_all = $countries;
+        } 
+        return $this->countries_all;
+    }
     private function add_birthplace_labels(...$comuni) {
         foreach($comuni as $i=>$c) {
             $comuni[$i]['untouched_label'] = mb_strtoupper($c['nome'], 'UTF-8') . ' (' . $c['provincia']['sigla'] . ') - ' . $c['codiceCatastale'];
@@ -1924,7 +1935,11 @@ class MultipopPlugin {
             'mpop_billing_city' => $user->mpop_billing_city,
             'mpop_billing_zip' => $user->mpop_billing_zip,
             'mpop_billing_state' => $user->mpop_billing_state,
+            'mpop_billing_country' => $user->mpop_billing_country,
             'mpop_phone' => $user->mpop_phone,
+            'mpop_marketing_agree' => boolval($user->mpop_marketing_agree),
+            'mpop_newsletter_agree' => boolval($user->mpop_newsletter_agree),
+            'mpop_publish_agree' => boolval($user->mpop_publish_agree),
             'mpop_org_role' => $user->mpop_org_role,
             'mpop_invited' => boolval($user->mpop_invited),
             'mpop_resp_zones' => [],
@@ -1943,18 +1958,18 @@ class MultipopPlugin {
             $comuni = false;
             if ($parsed_user['mpop_birthplace']) {
                 $comuni = $this->get_comuni_all();
-                $fc = array_values(array_filter($comuni, function($c) use ($parsed_user) {return $c['codiceCatastale'] == $parsed_user['mpop_birthplace'];}));
-                if (count($fc)) {
-                    $parsed_user['mpop_birthplace'] = $this->add_birthplace_labels(...$fc)[0];
+                $fc = $this->get_comune_by_catasto($parsed_user['mpop_birthplace'], true);
+                if ($fc) {
+                    $parsed_user['mpop_birthplace'] = $this->add_birthplace_labels($fc)[0];
                 }
             }
             if ($parsed_user['mpop_billing_city']) {
-                if (!isset($comuni)) {
+                if (!$comuni) {
                     $comuni = $this->get_comuni_all();
                 }
-                $fc = array_values(array_filter($comuni, function($c) use ($parsed_user) {return $c['codiceCatastale'] == $parsed_user['mpop_billing_city'];}));
-                if (count($fc)) {
-                    $parsed_user['mpop_billing_city'] = $this->add_billing_city_labels(...$fc)[0];
+                $fc = $this->get_comune_by_catasto($parsed_user['mpop_billing_city'], true);
+                if ($fc) {
+                    $parsed_user['mpop_billing_city'] = $this->add_billing_city_labels($fc)[0];
                 }
             }
         }
@@ -2555,8 +2570,22 @@ class MultipopPlugin {
         }
         return $filtered_comuni;
     }
+    private function get_country_by_code($code, &$countries = []) {
+        if (!is_string($code) || empty($code)) {return false;}
+        if (empty($countries)) {
+            $countries = $this->get_countries_all();
+        }
+        $found = false;
+        foreach($countries as $c) {
+            if ($c['code'] == $code) {
+                $found = $c;
+                break;
+            }
+        }
+        return $found;
+    }
     private function get_comune_by_catasto(string $catasto, $soppressi = false, &$comuni= []) {
-        if (empty($catasto)) return false;
+        if (empty($catasto)) {return false;}
         if (empty($comuni)) {
             $comuni = $this->get_comuni_all();
         }
@@ -2669,6 +2698,12 @@ class MultipopPlugin {
                 $user_input['meta_input']['mpop_org_role'] = $row['mpop_org_role'];
             }
             $sub_notes = isset($row['mpop_subscription_notes']) ? trim(strval($row['mpop_subscription_notes'])) : '';
+            $marketing_agree = isset($row['mpop_subscription_marketing_agree']) ? boolval($row['mpop_subscription_marketing_agree']) : false;
+            $newsletter_agree = isset($row['mpop_subscription_newsletter_agree']) ? boolval($row['mpop_subscription_newsletter_agree']) : false;
+            $publish_agree = isset($row['mpop_subscription_publish_agree']) ? boolval($row['mpop_subscription_publish_agree']) : false;
+            $user_input['meta_input']['mpop_marketing_agree'] = $marketing_agree;
+            $user_input['meta_input']['mpop_newsletter_agree'] = $newsletter_agree;
+            $user_input['meta_input']['mpop_publish_agree'] = $publish_agree;
             if (isset($row['login']) && is_string($row['login']) && strlen($row['login'])) {
                 $row['login'] = strtolower($row['login']);
                 if (!$this::is_valid_username($row['login'])) {
@@ -2689,55 +2724,140 @@ class MultipopPlugin {
                 if (!isset($row['mpop_birthdate'])) {
                     throw new Exception('Invalid mpop_birthdate');
                 }
-                if (!isset($row['mpop_birthplace'])) {
-                    throw new Exception('Invalid mpop_birthplace');
-                }
-                $birthdate = '';
                 try {
-                    $birthdate = $this->validate_birthplace($row['mpop_birthdate'], $row['mpop_birthplace']);
+                    $row['mpop_birthdate'] = $this::validate_birthdate($row['mpop_birthdate']);
                 } catch (Exception $e) {
-                    throw new Exception('Invalid ' . $e->getMessage());
+                    throw new Exception('Invalid mpop_birthdate');
                 }
-                $user_input['meta_input']['mpop_birthdate'] = $birthdate;
-                $user_input['meta_input']['mpop_birthplace'] = $row['mpop_birthplace'];
+                if (!isset($row['mpop_birthplace_country']) || !$this->get_country_by_code($row['mpop_birthplace_country'])) {
+                    throw new Exception('Invalid mpop_birthplace_country');
+                }
+                $user_input['meta_input']['mpop_birthplace_country'] = $row['mpop_birthplace_country'];
+                if ($row['mpop_birthplace_country'] == 'ita') {
+                    if (!isset($row['mpop_birthplace'])) {
+                        throw new Exception('Invalid mpop_birthplace');
+                    }
+                    try {
+                        $birthdate = $this->validate_birthplace($row['mpop_birthdate'], $row['mpop_birthplace']);
+                        $user_input['meta_input']['mpop_birthdate'] = $birthdate;
+                        $user_input['meta_input']['mpop_birthplace'] = $row['mpop_birthplace'];
+                    } catch (Exception $e) {
+                        throw new Exception('Invalid ' . $e->getMessage());
+                    }
+                } else {
+                    $user_input['meta_input']['mpop_birthdate'] = $row['mpop_birthdate']->format('Y-m-d');
+                }
                 if (!isset($row['mpop_billing_address']) || !is_string($row['mpop_billing_address']) || mb_strlen(trim($row['mpop_billing_address']), 'UTF-8') < 2) {
                     throw new Exception('Invalid mpop_billing_address');
                 }
                 $user_input['meta_input']['mpop_billing_address'] = $row['mpop_billing_address'];
-                if (!isset($row['mpop_billing_city']) || !is_string($row['mpop_billing_city']) ) {
-                    throw new Exception('Invalid mpop_billing_city');
+                if (!isset($row['mpop_billing_country']) || !$this->get_country_by_code($row['mpop_billing_country']) ) {
+                    throw new Exception('Invalid mpop_billing_country');
+                } elseif ($row['mpop_billing_country'] == 'ita') {
+                    if (!isset($row['mpop_billing_city']) || !is_string($row['mpop_billing_city']) ) {
+                        throw new Exception('Invalid mpop_billing_city');
+                    }
+                    if (!isset($row['mpop_billing_zip']) || !is_string($row['mpop_billing_zip']) ) {
+                        throw new Exception('Invalid mpop_billing_zip');
+                    }
+                    if (empty($comuni)) {
+                        $comuni = $this->get_comuni_all();
+                    }
+                    $comune = $this->get_comune_by_catasto($row['mpop_billing_city'], false, $comuni);
+                    if (!$comune) {
+                        throw new Exception('Invalid mpop_billing_city');
+                    }
+                    if (!in_array($row['mpop_billing_zip'], $comune['cap'])) {
+                        throw new Exception('Invalid mpop_billing_zip');
+                    }
+                    $user_input['meta_input']['mpop_billing_state'] = $comune['provincia']['sigla'];
+                    $user_input['meta_input']['mpop_billing_city'] = $row['mpop_billing_city'];
+                    $user_input['meta_input']['mpop_billing_zip'] = $row['mpop_billing_zip'];
                 }
-                if (!isset($row['mpop_billing_zip']) || !is_string($row['mpop_billing_zip']) ) {
-                    throw new Exception('Invalid mpop_billing_zip');
-                }
-                if (empty($comuni)) {
-                    $comuni = $this->get_comuni_all();
-                }
-                $comune = $this->get_comune_by_catasto($row['mpop_billing_city'], false, $comuni);
-                if (!$comune) {
-                    throw new Exception('Invalid mpop_billing_city');
-                }
-                if (!in_array($row['mpop_billing_zip'], $comune['cap'])) {
-                    throw new Exception('Invalid mpop_billing_zip');
-                }
-                $user_input['meta_input']['mpop_billing_state'] = $comune['provincia']['sigla'];
-                $user_input['meta_input']['mpop_billing_city'] = $row['mpop_billing_city'];
-                $user_input['meta_input']['mpop_billing_zip'] = $row['mpop_billing_zip'];
+                $user_input['meta_input']['mpop_billing_country'] = $row['mpop_billing_country'];
                 if (!isset($row['mpop_phone']) || !is_string($row['mpop_phone']) || !$this::is_valid_phone($row['mpop_phone'])) {
                     throw new Exception('Invalid mpop_phone');
                 }
                 $user_input['meta_input']['mpop_phone'] = $row['mpop_phone'];
-                $marketing_agree = isset($row['mpop_subscription_marketing_agree']) ? boolval($row['mpop_subscription_marketing_agree']) : true;
-                $newsletter_agree = isset($row['mpop_subscription_newsletter_agree']) ? boolval($row['mpop_subscription_newsletter_agree']) : true;
-                $publish_agree = isset($row['mpop_subscription_publish_agree']) ? boolval($row['mpop_subscription_publish_agree']) : true;
             } else {
                 do {
                     $row['login'] = 'mp_' . bin2hex(openssl_random_pseudo_bytes(16));
                 } while(get_user_by('login', $row['login']));
                 $user_input['user_login'] = $row['login'];
-                $marketing_agree = false;
-                $newsletter_agree = false;
-                $publish_agree = false;
+                if (isset($row['first_name']) && $row['first_name']) {
+                    if (!$this::is_valid_name($row['first_name'])) {
+                        throw new Exception('Invalid first_name');
+                    }
+                    $user_input['meta_input']['first_name'] = mb_strtoupper($row['first_name'], 'UTF-8');
+                }
+                if (isset($row['last_name']) && $row['last_name']) {
+                    if (!$this::is_valid_name($row['last_name'])) {
+                        throw new Exception('Invalid last_name');
+                    }
+                    $user_input['meta_input']['last_name'] = mb_strtoupper($row['last_name'], 'UTF-8');
+                }
+                $birthdate = '';
+                if (isset($row['mpop_birthdate']) && $row['mpop_birthdate']) {
+                    try {
+                        $birthdate = $this::validate_birthdate($row['mpop_birthdate']);
+                    } catch (Exception $e) {
+                        throw new Exception('Invalid mpop_birthdate');
+                    }
+                    $user_input['meta_input']['mpop_birthdate'] = $birthdate->format('Y-m-d');
+                }
+                if (isset($row['mpop_birthplace_country']) && $row['mpop_birthplace_country']) {
+                    if (!$this->get_country_by_code($row['mpop_birthplace_country'])) {
+                        throw new Exception('Invalid mpop_birthplace_country');
+                    }
+                    $user_input['meta_input']['mpop_birthplace_country'] = $row['mpop_birthplace_country'];
+                    if ($row['mpop_birthplace_country'] == 'ita') {
+                        if (isset($row['mpop_birthplace']) && $row['mpop_birthplace']) {
+                            try {
+                                $this->validate_birthplace($birthdate, $row['mpop_birthplace']);
+                                $user_input['meta_input']['mpop_birthplace'] = $row['mpop_birthplace'];
+                            } catch (Exception $e) {
+                                throw new Exception('Invalid ' . $e->getMessage());
+                            }
+                            throw new Exception('Invalid mpop_birthplace');
+                        }
+                    }
+                }
+                if (isset($row['mpop_billing_address']) && is_string($row['mpop_billing_address'])) {
+                    $user_input['meta_input']['mpop_billing_address'] = $row['mpop_billing_address'];
+                }
+                if (isset($row['mpop_billing_country']) && $row['mpop_billing_country']) {
+                    if (!$this->get_country_by_code($row['mpop_billing_country'])) {
+                        throw new Exception('Invalid mpop_billing_country');
+                    }
+                    $user_input['meta_input']['mpop_billing_country'] = $row['mpop_billing_country'];
+                    if ($row['mpop_billing_country'] == 'ita') {
+                        if (isset($row['mpop_billing_city']) && $row['mpop_billing_city'] ) {
+                            if (empty($comuni)) {
+                                $comuni = $this->get_comuni_all();
+                            }
+                            $comune = $this->get_comune_by_catasto($row['mpop_billing_city'], false, $comuni);
+                            if (!$comune) {
+                                throw new Exception('Invalid mpop_billing_city');
+                            }
+                            $user_input['meta_input']['mpop_billing_state'] = $comune['provincia']['sigla'];
+                            $user_input['meta_input']['mpop_billing_city'] = $row['mpop_billing_city'];
+                            if (isset($row['mpop_billing_zip']) && $row['mpop_billing_zip'] ) {
+                                if (!in_array($row['mpop_billing_zip'], $comune['cap'])) {
+                                    throw new Exception('Invalid mpop_billing_zip');
+                                }
+                                $user_input['meta_input']['mpop_billing_zip'] = $row['mpop_billing_zip'];
+                            } else if (count($comune['cap']) == 1) {
+                                $user_input['meta_input']['mpop_billing_zip'] = $comune['cap'][0];
+                            }
+                        }
+                    }
+                }
+                if (isset($row['mpop_phone']) && is_string($row['mpop_phone']) && $row['mpop_phone']) {
+                    if (!$this::is_valid_phone($row['mpop_phone'])) {
+                        throw new Exception('Invalid mpop_phone');
+                    }
+                    $user_input['meta_input']['mpop_phone'] = $row['mpop_phone'];
+                }
             }
         }
         $user_id = wp_insert_user($user_input);
@@ -2875,6 +2995,7 @@ class MultipopPlugin {
             'completed_at' => ',',
             'author_id' => [],
             'completer_id' => [],
+            'mpop_billing_country' => [],
             'mpop_billing_state' => [],
             'mpop_billing_city' => [],
             'page' => 1,
@@ -2883,6 +3004,7 @@ class MultipopPlugin {
         ];
         $time_interval_reg = '/^\d*,\d*$/';
         $quote_interval_reg = '/^(\d+(\.\d{1,2})?)?,(\d+(\.\d{1,2})?)?$/';
+        $mpop_billing_country_reg = '/^[a-z]{3}$/';
         $mpop_billing_state_reg = '/^[A-Z]{2}$/';
         $mpop_billing_city_reg = '/^[A-Z]\d{3}$/';
         $allowed_sorts = [
@@ -2906,6 +3028,7 @@ class MultipopPlugin {
             'completed_at',
             'author',
             'completer_id',
+            'mpop_billing_country',
             'mpop_billing_state',
             'mpop_billing_city'
         ];
@@ -2927,6 +3050,7 @@ class MultipopPlugin {
             || !preg_match($time_interval_reg, $options['completed_at'])
             || !is_array($options['author_id'])
             || !is_array($options['completer_id'])
+            || !is_array($options['mpop_billing_country'])
             || !is_array($options['mpop_billing_state'])
             || !is_array($options['mpop_billing_city'])
             || !is_int($options['page'])
@@ -2974,6 +3098,7 @@ class MultipopPlugin {
         $options['completer_id'] = array_values(array_unique(array_filter($options['completer_id'], function($id) {return is_int($id) && $id > 0;})));
         $options['year'] = array_values(array_unique(array_filter($options['year'], function($y) {return is_int($y) && $y > 0;})));
         $options['status'] = array_values(array_unique(array_filter($options['status'], function($s) {return in_array($s, MultipopPlugin::SUBS_STATUSES);})));
+        $options['mpop_billing_country'] = array_values(array_unique(array_filter($options['mpop_billing_country'], function($s) use ($mpop_billing_country_reg) {return preg_match($mpop_billing_country_reg, $s);})));
         $options['mpop_billing_state'] = array_values(array_unique(array_filter($options['mpop_billing_state'], function($s) use ($mpop_billing_state_reg) {return preg_match($mpop_billing_state_reg, $s);})));
         $options['mpop_billing_city'] = array_values(array_unique(array_filter($options['mpop_billing_city'], function($c) use ($mpop_billing_city_reg) {return preg_match($mpop_billing_city_reg, $c);})));
         $order_by = "";
@@ -3003,6 +3128,9 @@ class MultipopPlugin {
                         break;
                     case 'completer_id':
                         $k = 'completers.user_login';
+                        break;
+                    case 'mpop_billing_country':
+                        $k = 'country.meta_value';
                         break;
                     case 'mpop_billing_state':
                         $k = 'prov.meta_value';
@@ -3107,6 +3235,9 @@ class MultipopPlugin {
         if (count($options['completer_id'])) {
             $append_to_where("s.completer_id IN ( " . implode(',',$options['completer_id']) . " )");
         }
+        if (count($options['mpop_billing_country'])) {
+            $append_to_where("country.meta_value IN ( " . implode(',', array_map(function($s) {return "'$s'";},$options['mpop_billing_country'])) . " )");
+        }
         if (count($options['mpop_billing_state'])) {
             $append_to_where("prov.meta_value IN ( " . implode(',', array_map(function($s) {return "'$s'";},$options['mpop_billing_state'])) . " )");
         }
@@ -3122,17 +3253,20 @@ class MultipopPlugin {
             ON s.author_id = authors.ID
             LEFT JOIN $wpdb->users completers
             ON s.completer_id = completers.ID
-            LEFT JOIN $wpdb->usermeta fn 
-            ON s.user_id = fn.user_id 
+            LEFT JOIN $wpdb->usermeta fn
+            ON s.user_id = fn.user_id
             AND fn.meta_key = 'first_name'
-            LEFT JOIN $wpdb->usermeta ln 
-            ON s.user_id = ln.user_id 
+            LEFT JOIN $wpdb->usermeta ln
+            ON s.user_id = ln.user_id
             AND ln.meta_key = 'last_name'
-            LEFT JOIN $wpdb->usermeta prov 
-            ON s.user_id = prov.user_id 
+            LEFT JOIN $wpdb->usermeta country
+            ON s.user_id = country.user_id
+            AND country.meta_key = 'mpop_billing_country'
+            LEFT JOIN $wpdb->usermeta prov
+            ON s.user_id = prov.user_id
             AND prov.meta_key = 'mpop_billing_state'
-            LEFT JOIN $wpdb->usermeta comune 
-            ON s.user_id = comune.user_id 
+            LEFT JOIN $wpdb->usermeta comune
+            ON s.user_id = comune.user_id
             AND comune.meta_key = 'mpop_billing_city' "
         ;
         $total = 0;
@@ -3159,6 +3293,7 @@ class MultipopPlugin {
             completers.user_login AS completer_login,
             fn.meta_value AS first_name, 
             ln.meta_value AS last_name,
+            country.meta_value AS mpop_billing_country,
             prov.meta_value AS mpop_billing_state,
             comune.meta_value AS mpop_billing_city
             $q_from " . ($q_where ? "WHERE $q_where" : '') . " $q_limit;";
@@ -3259,6 +3394,7 @@ class MultipopPlugin {
     private function user_search(
         $txt= '',
         $roles = true,
+        array $mpop_billing_country = [],
         array $mpop_billing_state = [],
         array $mpop_billing_city = [],
         array $mpop_resp_zones = [],
@@ -3325,8 +3461,16 @@ class MultipopPlugin {
         if (is_string($txt) && trim($txt) && !preg_match("\r|\n|\t",$txt)) {
             $query['mpop_custom_search'] = $txt;
         }
+        $mpop_billing_country = array_values(array_unique(array_filter($mpop_billing_country, function($s) { return preg_match('/^[a-z]{3}$/', $s); })));
         $mpop_billing_state = array_values(array_unique(array_filter($mpop_billing_state, function($s) { return preg_match('/^[A-Z]{2}$/', $s); })));
         $mpop_billing_city = array_values(array_unique(array_filter($mpop_billing_city, function($s) { return preg_match('/^[A-Z]\d{3}$/', $s); })));
+        if (count($mpop_billing_country)) {
+            $meta_q['mpop_billing_country'] = [
+                'key' => 'mpop_billing_country',
+                'compare' => 'IN',
+                'value' => $mpop_billing_country
+            ];
+        }
         if (count($mpop_billing_state)) {
             $meta_q['mpop_billing_state'] = [
                 'key' => 'mpop_billing_state',
@@ -3409,6 +3553,7 @@ class MultipopPlugin {
             'mpop_mail_to_confirm',
             'first_name',
             'last_name',
+            'mpop_billing_country',
             'mpop_billing_state',
             'mpop_billing_city',
             'mpop_card_active'
@@ -3482,8 +3627,7 @@ class MultipopPlugin {
         foreach($res as $u) {
             $billing_city = '';
             if ($u->mpop_billing_city) {
-                $billing_city = array_filter($comuni_all, function($c) use ($u) {return $c['codiceCatastale'] == $u->mpop_billing_city; } );
-                $billing_city = array_pop($billing_city);
+                $billing_city = $this->get_comune_by_catasto($u->mpop_billing_city, true);
             }
             $parsed_u = [
                 'ID' => intval($u->ID),
@@ -3495,6 +3639,7 @@ class MultipopPlugin {
                 'last_name' => $u->last_name,
                 'mpop_card_active' => $u->mpop_card_active ? true : false,
                 'mpop_mail_to_confirm' => boolval($u->mpop_mail_to_confirm ),
+                'mpop_billing_country' => $u->mpop_billing_country,
                 'mpop_billing_state' => $u->mpop_billing_state,
                 'mpop_billing_city' => $billing_city ? $billing_city['nome'] : '',
                 'mpop_phone' => $u->mpop_phone,
@@ -3593,6 +3738,11 @@ class MultipopPlugin {
                             $regione_name = $this->compact_regione_name($provincia['regione']);
                             $groups[$provincia['regione']] = ['name' => "mp_rg_$regione_name", 'full_name' => "Regione $provincia[regione]", 'owner' => false];
                         }
+                    }
+                } else if ($user->mpop_billing_country && $user->mpop_billing_country != 'ita') {
+                    $country = $this->get_country_by_code($user->mpop_billing_country);
+                    if ($country) {
+                        $groups[$country['code']] = ['name' => "mp_ct_$country[code]", 'full_name' => "Stato $country[name]", 'owner' => false];
                     }
                 }
                 if ($user->mpop_card_active && $user->roles[0] == 'multipopolare_resp' && !empty($user->mpop_resp_zones)) {
