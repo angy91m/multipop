@@ -634,7 +634,16 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 @open="searchOpen('birthplaceCountry')"
                                 label="name"
                                 :reduce="c=>c.code"
-                            ></v-select>
+                            >
+                                <template #search="{ attributes, events }">
+                                    <input
+                                        class="vs__search"
+                                        :style="'display: ' + (birthplaceCountryOpen || !userInEditing.mpop_birthplace_country ? 'unset' : 'none')"
+                                        v-bind="attributes"
+                                        v-on="events"
+                                    />
+                                </template>
+                            </v-select>
                         </td>
                     </tr>
                     <tr v-if="(userEditing ? userInEditing : userInView).mpop_birthplace_country == 'ita'">
@@ -691,7 +700,16 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 @open="searchOpen('billingCountry')"
                                 label="name"
                                 :reduce="c=>c.code"
-                            ></v-select>
+                            >
+                                <template #search="{ attributes, events }">
+                                    <input
+                                        class="vs__search"
+                                        :style="'display: ' + (billingCountryOpen || !userInEditing.mpop_billing_country ? 'unset' : 'none')"
+                                        v-bind="attributes"
+                                        v-on="events"
+                                    />
+                                </template>
+                            </v-select>
                         </td>
                     </tr>
                     <template v-if="(userEditing ? userInEditing : userInView).mpop_billing_country == 'ita'">
