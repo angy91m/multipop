@@ -140,7 +140,7 @@ switch( $post_data['action'] ) {
             if (!isset($post_data['mpop_billing_address']) || !is_string($post_data['mpop_billing_address']) || mb_strlen(trim($post_data['mpop_billing_address']), 'UTF-8') < 2 || mb_strlen(trim($post_data['mpop_billing_address']), 'UTF-8') > 200) {
                 $res_data['error'][] = 'mpop_billing_address';
             }
-            if (!isset($post_data['mpop_phone']) || !$this::is_valid_phone($post_data['mpop_phone']) || !empty(get_users(['meta_key' => 'mpop_phone', 'meta_value' => $post_data['mpop_phone'], 'meta_compare' => '=']))) {
+            if (!isset($post_data['mpop_phone']) || !$this::is_valid_phone($post_data['mpop_phone']) || !empty(get_users(['meta_key' => 'mpop_phone', 'meta_value' => $post_data['mpop_phone'], 'meta_compare' => '=', 'login__not_in' => [$user->user_login]]))) {
                 $res_data['error'][] = 'mpop_phone';
             }
         }
