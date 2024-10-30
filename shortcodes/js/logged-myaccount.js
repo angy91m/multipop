@@ -859,6 +859,7 @@ createApp({
                 const reqObj = {
                     action: 'admin_search_users',
                     ...userSearch,
+                    mpop_billing_country: [],
                     mpop_billing_state: [],
                     mpop_billing_city: [],
                     mpop_resp_zones: [],
