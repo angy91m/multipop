@@ -1930,6 +1930,7 @@ class MultipopPlugin {
             'mpop_mail_to_confirm' => boolval( $user->mpop_mail_to_confirm ),
             'mpop_card_active' => boolval($user->mpop_card_active ),
             'mpop_birthdate' => $user->mpop_birthdate,
+            'mpop_birthplace_country' => $user->mpop_birthplace_country,
             'mpop_birthplace' => $user->mpop_birthplace,
             'mpop_billing_address' => $user->mpop_billing_address,
             'mpop_billing_city' => $user->mpop_billing_city,

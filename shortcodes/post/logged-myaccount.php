@@ -192,7 +192,7 @@ switch ($post_data['action']) {
             }
             $res_data['error'][] = 'mpop_phone';
         }
-        if (empty($has_subs)) {
+        if (!$has_subs) {
             if (!isset($post_data['mpop_birthdate'])) {
                 if (!isset($res_data['error'])) {
                     $res_data['error'] = [];
@@ -208,7 +208,6 @@ switch ($post_data['action']) {
                     $res_data['error'][] = 'mpop_birthdate';
                 }
             }
-            save_test($post_data['mpop_birthplace_country']);
             if (!isset($post_data['mpop_birthplace_country']) || !$this->get_country_by_code($post_data['mpop_birthplace_country'])) {
                 if (!isset($res_data['error'])) {
                     $res_data['error'] = [];
