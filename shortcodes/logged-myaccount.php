@@ -127,7 +127,16 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 @open="searchOpen('birthplaceCountry')"
                                 label="name"
                                 :reduce="c=>c.code"
-                            ></v-select>
+                            >
+                                <template #search="{ attributes, events }">
+                                    <input
+                                        class="vs__search"
+                                        :style="'display: ' + (birthplaceCountryOpen || !profileInEditing.mpop_birthplace_country ? 'unset' : 'none')"
+                                        v-bind="attributes"
+                                        v-on="events"
+                                    />
+                                </template>
+                            </v-select>
                         </td>
                     </tr>
                     <tr v-if="(profileEditing ? profileInEditing : profile).mpop_birthplace_country == 'ita'">
@@ -184,7 +193,16 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                 @open="searchOpen('billingCountry')"
                                 label="name"
                                 :reduce="c=>c.code"
-                            ></v-select>
+                            >
+                                <template #search="{ attributes, events }">
+                                    <input
+                                        class="vs__search"
+                                        :style="'display: ' + (billingCountryOpen || !profileInEditing.mpop_billing_country ? 'unset' : 'none')"
+                                        v-bind="attributes"
+                                        v-on="events"
+                                    />
+                                </template>
+                            </v-select>
                         </td>
                     </tr>
                     <template v-if="(profileEditing ? profileInEditing : profile).mpop_billing_country == 'ita'">
@@ -609,7 +627,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         <td v-else>
                             <v-select
                                 id="birthplaceCountry-select"
-                                :class="savingUserErrors.has('mpop_birthplace_country') ? 'bad-input' : ''"
+                                :class="savingUserErrors.includes('mpop_birthplace_country') ? 'bad-input' : ''"
                                 v-model="userInEditing.mpop_birthplace_country"
                                 :options="countries"
                                 @close="birthplaceCountryOpen = false"
@@ -666,7 +684,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         <td v-else>
                             <v-select
                                 id="billingCountry-select"
-                                :class="savingUserErrors.has('mpop_billing_country') ? 'bad-input' : ''"
+                                :class="savingUserErrors.includes('mpop_billing_country') ? 'bad-input' : ''"
                                 v-model="userInEditing.mpop_billing_country"
                                 :options="countries"
                                 @close="billingCountryOpen = false"

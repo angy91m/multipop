@@ -954,7 +954,7 @@ createApp({
                 missingFields.push('Comune di nascita');
             }
             if (!profile.mpop_billing_country) {
-                missingFields.push('Nazione di nascita');
+                missingFields.push('Nazione di residenza');
             }
             if (!profile.mpop_billing_address) {
                 missingFields.push('Indirizzo di residenza');
