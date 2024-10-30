@@ -120,7 +120,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         <td v-else>
                             <v-select
                                 id="birthplaceCountry-select"
-                                :class="savingProfileErrors.has('mpop_birthplace_country') ? 'bad-input' : ''"
+                                :class="savingProfileErrors.includes('mpop_birthplace_country') ? 'bad-input' : ''"
                                 v-model="profileInEditing.mpop_birthplace_country"
                                 :options="countries"
                                 @close="birthplaceCountryOpen = false"
@@ -177,7 +177,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         <td v-else>
                             <v-select
                                 id="billingCountry-select"
-                                :class="savingProfileErrors.has('mpop_billing_country') ? 'bad-input' : ''"
+                                :class="savingProfileErrors.includes('mpop_billing_country') ? 'bad-input' : ''"
                                 v-model="profileInEditing.mpop_billing_country"
                                 :options="countries"
                                 @close="billingCountryOpen = false"
