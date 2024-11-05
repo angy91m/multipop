@@ -1035,7 +1035,7 @@ class MultipopPlugin {
         }
         if (isset($options['email']) && is_string($options['email'])) {
             $pdf->setPage(1);
-            $pdf->setY(81.2);
+            $pdf->setY(81.4);
             $pdf->setX(22);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['email']?></span>
