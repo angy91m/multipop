@@ -11,7 +11,7 @@ ob_start();
         <h2>Richiesta di adesione all’associazione Multipopolare APS</h2>
         <h2 style="font-family: 'helveticalight'; font-size: 12pt; line-height: 12px;">Autorizzazione al trattamento dei dati personali ai sensi dell’art. 13<br/>del Regolamento (UE) 2016/679</h2>
     </span>
-    <p style="font-family: 'helveticalight'; font-size: 12pt; line-height: 15px;">Il/La sottoscritto/a <span class="sugg">(nome cognome)</span>&nbsp;<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u><br/>
+    <p style="font-family: 'helveticalight'; font-size: 12pt; line-height: 15px;">Il/La sottoscritto/a <span class="sugg">(nome cognome)</span>&nbsp;<u><?=$this->nbsp(32)?></u><br/>
         nato a<br/>
         il <span class="sugg">(gg/mm/aaaa)</span><br/>
         residente a<br/>
@@ -31,7 +31,7 @@ $pdf->SetY($pdf->GetY()-4);
 ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: right;">Firma<?=$this->nbsp(32)?></p>
-    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>&nbsp;(<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>), <u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>/<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>/<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u></p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><u><?=$this->nbsp(31)?></u>&nbsp;(<u><?=$this->nbsp(7)?></u>), <u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(14)?></u></p>
     <p style="line-height:15px"></p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: justify"><span style="font-family: 'helveticamedium'">Consenso a trattamenti ulteriori, consigliati ma non indispensabili per la continuazione del rapporto (selezionare le voci)</span><br/><br/>
         Presta il suo consenso e fino alla revoca dello stesso, per la proposizione di offerte, comunicazioni commerciali e per il successivo invio di materiale informativo pubblicitario e/o promozionale e/o sondaggi di opinione, ricerche di mercato, invio di newsletter di MULTIPOPOLARE APS (di seguito complessivamente definite “attività di propaganda”) del Titolare e/o da organizzazioni correlate. Il trattamento per attività di marketing avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea e/o chiamate da operatore), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo SMS e/o MMS, chiamate telefoniche senza l’intervento dell’operatore, posta elettronica, social network, newsletter, applicazioni interattive, notifiche push)
@@ -52,7 +52,7 @@ ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: right">Firma<?=$this->nbsp(32)?></p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">Luogo e data</p>
-    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>&nbsp;(<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>), <u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>/<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>/<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u></p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><u><?=$this->nbsp(31)?></u>&nbsp;(<u><?=$this->nbsp(7)?></u>), <u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(14)?></u></p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: justify">Presta il suo consenso e fino alla revoca dello stesso, per la comunicazioni di iniziative ed attività di MULTIPOPOLARE APS (di seguito complessivamente definite “attività di informazione dell’associazione”) del Titolare e/o da organizzazioni correlate.<br/>Il trattamento per attività di informazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo posta elettronica)</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
@@ -70,7 +70,7 @@ ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: right">Firma<?=$this->nbsp(32)?></p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">Luogo e data</p>
-    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>&nbsp;(<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>), <u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>/<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>/<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u></p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><u><?=$this->nbsp(31)?></u>&nbsp;(<u><?=$this->nbsp(7)?></u>), <u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(14)?></u></p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: justify">Presta il suo consenso e fino alla revoca dello stesso, per la pubblicazione del suo nominativo su riviste, cataloghi, brochure, annuari, siti, ecc. di MULTIPOPOLARE APS (di seguito complessivamente definite “attività di pubblicazione dell’associazione”) del Titolare e/o da organizzazioni correlate. Il trattamento per attività di pubblicazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo pubblicazioni cartacee), ovvero mediante sistemi “elettronici” (a titolo esemplificativo pubblicazioni elettroniche, social network, sito, blog, ecc.)</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
@@ -88,7 +88,7 @@ ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: right">Firma<?=$this->nbsp(32)?></p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">Luogo e data</p>
-    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>&nbsp;(<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>), <u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>/<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>/<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u></p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><u><?=$this->nbsp(31)?></u>&nbsp;(<u><?=$this->nbsp(7)?></u>), <u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(14)?></u></p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->AddPage();
@@ -114,23 +114,23 @@ ob_start();
         <br/><span style="font-family:'helveticamedium'">Diritti dell’Interessato</span>
         <br/>1) L’interessato ha diritto di ottenere la conferma dell’esistenza o meno di dati personali che lo riguardano, anche se non ancora registrati, e la loro comunicazione in forma intelligibile
         <br/>2) L’interessato ha diritto di ottenere l’indicazione:
-        <br/>&nbsp;&nbsp;&nbsp;&nbsp;a) dell’origine dei dati personali;
-        <br/>&nbsp;&nbsp;&nbsp;&nbsp;b) delle finalità e modalità del trattamento;
-        <br/>&nbsp;&nbsp;&nbsp;&nbsp;c) della logica applicata in caso di trattamento effettuato con l’ausilio di strumenti elettronici;
-        <br/>&nbsp;&nbsp;&nbsp;&nbsp;d) degli estremi identificativi del rappresentante designato ai sensi dell’articolo 5, comma 2;
-        <br/>&nbsp;&nbsp;&nbsp;&nbsp;e) dei soggetti o delle categorie di soggetti ai quali i dati personali possono essere comunicati o che possono venirne a conoscenza in qualità di
-        <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rappresentante designato nel territorio dello Stato, di responsabili o incaricati.
+        <br/><?=$this->nbsp(4)?>a) dell’origine dei dati personali;
+        <br/><?=$this->nbsp(4)?>b) delle finalità e modalità del trattamento;
+        <br/><?=$this->nbsp(4)?>c) della logica applicata in caso di trattamento effettuato con l’ausilio di strumenti elettronici;
+        <br/><?=$this->nbsp(4)?>d) degli estremi identificativi del rappresentante designato ai sensi dell’articolo 5, comma 2;
+        <br/><?=$this->nbsp(4)?>e) dei soggetti o delle categorie di soggetti ai quali i dati personali possono essere comunicati o che possono venirne a conoscenza in qualità di
+        <br/><?=$this->nbsp(8)?>rappresentante designato nel territorio dello Stato, di responsabili o incaricati.
         <br/>3) L’interessato ha diritto di ottenere:
-        <br/>&nbsp;&nbsp;&nbsp;&nbsp;a) l’aggiornamento, la rettificazione ovvero, quando vi ha interesse, l’integrazione dei dati;
-        <br/>&nbsp;&nbsp;&nbsp;&nbsp;b) la cancellazione, la trasformazione in forma anonima o il blocco dei dati trattati in violazione di legge, compresi quelli di cui non è necessaria la
-        <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;conservazione in relazione agli scopi per i quali i dati sono stati raccolti o successivamente trattati;
-        <br/>&nbsp;&nbsp;&nbsp;&nbsp;c) l’attestazione che le operazioni di cui alle lettere a) e b) sono state portate a conoscenza, anche per quanto riguarda il loro contenuto, di coloro ai quali
-        <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i dati sono stati comunicati o diffusi, eccettuato il caso in cui tale adempimento si rivela impossibile o comporta un impiego di mezzi manifestamente
-        <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sproporzionato rispetto al diritto tutelato;
-        <br/>&nbsp;&nbsp;&nbsp;&nbsp;d) la portabilità dei dati.
+        <br/><?=$this->nbsp(4)?>a) l’aggiornamento, la rettificazione ovvero, quando vi ha interesse, l’integrazione dei dati;
+        <br/><?=$this->nbsp(4)?>b) la cancellazione, la trasformazione in forma anonima o il blocco dei dati trattati in violazione di legge, compresi quelli di cui non è necessaria la
+        <br/><?=$this->nbsp(8)?>conservazione in relazione agli scopi per i quali i dati sono stati raccolti o successivamente trattati;
+        <br/><?=$this->nbsp(4)?>c) l’attestazione che le operazioni di cui alle lettere a) e b) sono state portate a conoscenza, anche per quanto riguarda il loro contenuto, di coloro ai quali
+        <br/><?=$this->nbsp(8)?>i dati sono stati comunicati o diffusi, eccettuato il caso in cui tale adempimento si rivela impossibile o comporta un impiego di mezzi manifestamente
+        <br/><?=$this->nbsp(8)?>sproporzionato rispetto al diritto tutelato;
+        <br/><?=$this->nbsp(4)?>d) la portabilità dei dati.
         <br/>4) L’interessato ha diritto di opporsi, in tutto o in parte:
-        <br/>&nbsp;&nbsp;&nbsp;&nbsp;a) per motivi legittimi al trattamento dei dati personali che lo riguardano, ancorché pertinenti allo scopo della raccolta;
-        <br/>&nbsp;&nbsp;&nbsp;&nbsp;b) al trattamento di dati personali che lo riguardano a fini di invio di materiale pubblicitario o di vendita diretta o per il compimento di ricerche di mercato
+        <br/><?=$this->nbsp(4)?>a) per motivi legittimi al trattamento dei dati personali che lo riguardano, ancorché pertinenti allo scopo della raccolta;
+        <br/><?=$this->nbsp(4)?>b) al trattamento di dati personali che lo riguardano a fini di invio di materiale pubblicitario o di vendita diretta o per il compimento di ricerche di mercato
         <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o di comunicazione commerciale.
         <br/>Per esercitare i propri diritti o per ottenere le informazioni relative all’eventuale trasferimento dei Suoi dati verso un Paese terzo, potrà formulare espressa richiesta scritta da inviarsi all’Ufficio Tesseramento di MULTIPOPOLARE APS all’indirizzo di posta elettronica:
         <br/><span style="font-family:'helveticamedium'">organizzazione@multipopolare.it</span>
