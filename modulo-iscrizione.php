@@ -11,14 +11,14 @@ ob_start();
         <h2>Richiesta di adesione all’associazione Multipopolare APS</h2>
         <h2 style="font-family: 'helveticalight'; font-size: 12pt; line-height: 12px;">Autorizzazione al trattamento dei dati personali ai sensi dell’art. 13<br/>del Regolamento (UE) 2016/679</h2>
     </span>
-    <p style="font-family: 'helveticalight'; font-size: 12pt; line-height: 15px;">Il/La sottoscritto/a <span class="sugg">(nome cognome)</span>&nbsp;&nbsp;<span style="font-family: 'helveticamedium'">CIAO MONDO</span><br/>
-        nato a&nbsp;&nbsp;<span style="font-family: 'helveticamedium'">CIAO (PR)</span><br/>
-        il <span class="sugg">(gg/mm/aaaa)</span>&nbsp;&nbsp;<span style="font-family: 'helveticamedium'">CIAO</span><br/>
-        residente a&nbsp;&nbsp;<span style="font-family: 'helveticamedium'">CIAO (PR)</span><br/>
-        indirizzo&nbsp;&nbsp;<span style="font-family: 'helveticamedium'">CIAO</span><br/>
-        cap&nbsp;&nbsp;<span style="font-family: 'helveticamedium'">CIAO</span><br/>
-        telefono&nbsp;&nbsp;<span style="font-family: 'helveticamedium'">CIAO</span><br/>
-        email&nbsp;&nbsp;<span style="font-family: 'helveticamedium'">CIAO</span><br/><br/>
+    <p style="font-family: 'helveticalight'; font-size: 12pt; line-height: 15px;">Il/La sottoscritto/a <span class="sugg">(nome cognome)</span><br/>
+        nato a<br/>
+        il <span class="sugg">(gg/mm/aaaa)</span><br/>
+        residente a<br/>
+        indirizzo<br/>
+        cap<br/>
+        telefono<br/>
+        email<br/><br/>
         <span style="font-family: 'helveticamedium'">chiede di aderire all’associazione Multipopolare APS</span><br/>
         <span style="color: #aaa; font-size:10pt;">(A cura di Multipopolare)</span><br/>
         Quota tessera:&nbsp;&nbsp;<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>&nbsp;&nbsp;&nbsp;&nbsp;Numero tessera:&nbsp;&nbsp;<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>&nbsp;&nbsp;&nbsp;&nbsp;Anno riferimento:&nbsp;&nbsp;<span style="font-family: 'helveticamedium'">2024</span><!--span style="font-family: 'helveticamedium'">W0000001/2024</span-->

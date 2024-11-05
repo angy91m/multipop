@@ -859,11 +859,11 @@ class MultipopPlugin {
     }
 
     // CREATE PDF
-    private function pdf_create(array $pdf_config = []) {
+    private function pdf_create(array $pdf_config = [], $export = true) {
         require_once(MULTIPOP_PLUGIN_PATH . '/classes/multipopdf.php');
         $pdf = new MultipoPDF($pdf_config+['logo'=> MULTIPOP_PLUGIN_PATH . '/logo-pdf.png']);
         require_once(MULTIPOP_PLUGIN_PATH . '/modulo-iscrizione.php');
-        return $pdf->export_file();
+        return $export ? $pdf->export_file() : $pdf;
     }
     
     // IMPORT PDF
