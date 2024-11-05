@@ -882,6 +882,15 @@ class MultipopPlugin {
         return $pdf;
     }
     private function pdf_compile($pdf, $options = []) {
+        if (isset($options['name']) && is_string($options['name']) && $options['name']) {
+            $pdf->setPage(1);
+            $pdf->setY(10);
+            $pdf->setX(40);
+            ob_start(); ?>
+            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">€&nbsp;<?=$options['name']?></span>
+            <?php
+            $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+        }
         if (isset($options['quote']) && (is_int($options['quote']) || is_float($options['quote'])) && $options['quote'] > 0) {
             $options['quote'] = number_format($options['quote'],2, ',','');
             $pdf->setPage(1);
@@ -902,6 +911,13 @@ class MultipopPlugin {
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
         return $pdf;
+    }
+    public function nbsp(int $qnty = 1) {
+        $res = '';
+        for ($i=0; $i<$qnty; $i++) {
+            $res .= '&nbsp;';
+        }
+        return $res;
     }
     // private function pdf_import(string $file = '', array $options = [], string $key = '') {
     //     require_once(MULTIPOP_PLUGIN_PATH . '/classes/multipopdf.php');
