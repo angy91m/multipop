@@ -15,7 +15,7 @@ ob_start();
         nato a&nbsp;<u><?=$this->nbsp(108)?></u>&nbsp;(<u><?=$this->nbsp(8)?></u>)<br/>
         il <span class="sugg">(gg/mm/aaaa)</span>&nbsp;<u><?=$this->nbsp(8)?></u>/<u><?=$this->nbsp(8)?></u>/<u><?=$this->nbsp(16)?></u><br/>
         residente a&nbsp;<u><?=$this->nbsp(101)?></u>&nbsp;(<u><?=$this->nbsp(8)?></u>)<br/>
-        indirizzo&nbsp;<u><?=$this->nbsp(117)?></u><br/>
+        indirizzo&nbsp;<u><?=$this->nbsp(116)?></u><br/>
         cap&nbsp;<u><?=$this->nbsp(30)?></u><br/>
         telefono&nbsp;<u><?=$this->nbsp(64)?></u><br/>
         email&nbsp;<u><?=$this->nbsp(121)?></u><br/><br/>
