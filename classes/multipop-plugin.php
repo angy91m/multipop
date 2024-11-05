@@ -922,9 +922,48 @@ class MultipopPlugin {
                     <?php
                     $pdf->writeHTML(ob_get_clean(),true, false, false, false);
                     $pdf->setY(49.5);
-                    $pdf->setX(155);
+                    $pdf->setX(155.2);
                     ob_start(); ?>
-                    <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">&nbsp;&nbsp;-</span>
+                    <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">&nbsp;-</span>
+                    <?php
+                    $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+                }
+            }
+        }
+        if (isset($options['mpop_billing_country']) && is_string($options['mpop_billing_country']) && $options['mpop_billing_country']) {
+            if ($options['mpop_billing_country'] == 'ita') {
+                if (isset($options['mpop_billing_city']) && is_string($options['mpop_billing_city']) && $options['mpop_billing_city']) {
+                    $bc = $this->get_comune_by_catasto($options['mpop_billing_city'], true);
+                    if ($bc) {
+                        $pdf->setPage(1);
+                        $pdf->setY(89.5);
+                        $pdf->setX(28.5);
+                        ob_start(); ?>
+                        <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$bc['nome']?></span>
+                        <?php
+                        $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+                        $pdf->setY(89.5);
+                        $pdf->setX(155);
+                        ob_start(); ?>
+                        <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$bc['provincia']['sigla']?></span>
+                        <?php
+                        $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+                    }
+                }
+            } else {
+                $country = $this->get_country_by_code($options['mpop_birthplace_country']);
+                if ($country) {
+                    $pdf->setPage(1);
+                    $pdf->setY(89.5);
+                    $pdf->setX(28.5);
+                    ob_start(); ?>
+                    <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$country['name']?></span>
+                    <?php
+                    $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+                    $pdf->setY(89.5);
+                    $pdf->setX(155.2);
+                    ob_start(); ?>
+                    <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">&nbsp;-</span>
                     <?php
                     $pdf->writeHTML(ob_get_clean(),true, false, false, false);
                 }
