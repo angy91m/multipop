@@ -940,7 +940,7 @@ class MultipopPlugin {
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
             $pdf->setY(54.7);
-            $pdf->setX(48);
+            $pdf->setX(46);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$date_arr[1]?></span>
             <?php
