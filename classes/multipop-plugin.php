@@ -883,11 +883,12 @@ class MultipopPlugin {
     }
     private function pdf_compile($pdf, $options = []) {
         if (isset($options['quote']) && (is_int($options['quote']) || is_float($options['quote'])) && $options['quote'] > 0) {
+            $options['quote'] = number_format($options['quote'],2, ',','');
             $pdf->setPage(1);
             $pdf->setY(102);
             $pdf->setX(30);
             ob_start(); ?>
-            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;€ Ciao</span>
+            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">€&nbsp;<?=$options['quote']?></span>
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
