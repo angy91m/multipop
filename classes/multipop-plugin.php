@@ -870,7 +870,7 @@ class MultipopPlugin {
     private function pdf_import(string $pdf_file_string = '') {
         require_once(MULTIPOP_PLUGIN_PATH . '/classes/multipopdf.php');
         $pdf = new MultipoPDF(['mpop_import' => true]);
-        $fd = fopen('data://application/pdf;base64,'. base64_encode($pdf_file_string));
+        $fd = fopen('data://application/pdf;base64,'. base64_encode($pdf_file_string), 'r');
         $pages_count = $pdf->setSourceFile($fd);
         for ($i=1; $i<=$pages_count; $i++) {
             if ($i > 1) {
