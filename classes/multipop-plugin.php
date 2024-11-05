@@ -897,8 +897,8 @@ class MultipopPlugin {
                     $bp = $this->get_comune_by_catasto($options['mpop_birthplace'], true);
                     if ($bp) {
                         $pdf->setPage(1);
-                        $pdf->setY(50);
-                        $pdf->setX(30);
+                        $pdf->setY(49);
+                        $pdf->setX(26);
                         ob_start(); ?>
                         <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$bp['nome']?></span>
                         <?php
