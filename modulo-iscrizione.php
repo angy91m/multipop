@@ -32,7 +32,7 @@ ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: right;">Firma&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">_________________ (____), ____/____/_______</p>
-    <p style="line-height:35px"></p>
+    <p style="line-height:30px"></p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: justify"><span style="font-family: 'helveticamedium'">Consenso a trattamenti ulteriori, consigliati ma non indispensabili per la continuazione del rapporto (selezionare le voci)</span><br/><br/>
         Presta il suo consenso e fino alla revoca dello stesso, per la proposizione di offerte, comunicazioni commerciali e per il successivo invio di materiale informativo pubblicitario e/o promozionale e/o sondaggi di opinione, ricerche di mercato, invio di newsletter di MULTIPOPOLARE APS (di seguito complessivamente definite “attività di propaganda”) del Titolare e/o da organizzazioni correlate. Il trattamento per attività di marketing avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea e/o chiamate da operatore), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo SMS e/o MMS, chiamate telefoniche senza l’intervento dell’operatore, posta elettronica, social network, newsletter, applicazioni interattive, notifiche push)
     </p>
@@ -45,14 +45,15 @@ $pdf->setY($next_line[1]-1.7);
 ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Presto il consenso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nego il consenso</p>
-    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><span style="color: #aaa">Luogo</span>, 01/01/25</p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">Luogo e data</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->SetY($pdf->GetY()-4);
 ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: right">Firma&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
-    <p style="line-height:35px"></p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">_________________ (____), ____/____/_______</p>
+    <p style="line-height:30px"></p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: justify">Presta il suo consenso e fino alla revoca dello stesso, per la comunicazioni di iniziative ed attività di MULTIPOPOLARE APS (di seguito complessivamente definite “attività di informazione dell’associazione”) del Titolare e/o da organizzazioni correlate.<br/>Il trattamento per attività di informazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo posta elettronica)</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
@@ -63,14 +64,15 @@ $pdf->setY($next_line[1]-1.7);
 ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Presto il consenso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nego il consenso</p>
-    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><span style="color: #aaa">Luogo</span>, 01/01/25</p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">Luogo e data</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->SetY($pdf->GetY()-4);
 ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: right">Firma&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
-    <p style="line-height:35px"></p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">_________________ (____), ____/____/_______</p>
+    <p style="line-height:30px"></p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: justify">Presta il suo consenso e fino alla revoca dello stesso, per la pubblicazione del suo nominativo su riviste, cataloghi, brochure, annuari, siti, ecc. di MULTIPOPOLARE APS (di seguito complessivamente definite “attività di pubblicazione dell’associazione”) del Titolare e/o da organizzazioni correlate. Il trattamento per attività di pubblicazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo pubblicazioni cartacee), ovvero mediante sistemi “elettronici” (a titolo esemplificativo pubblicazioni elettroniche, social network, sito, blog, ecc.)</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
@@ -81,13 +83,14 @@ $pdf->setY($next_line[1]-1.7);
 ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Presto il consenso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nego il consenso</p>
-    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><span style="color: #aaa">Luogo</span>, 01/01/25</p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">Luogo e data</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->SetY($pdf->GetY()-4);
 ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: right">Firma&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">_________________ (____), ____/____/_______</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->AddPage();
