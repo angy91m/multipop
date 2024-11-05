@@ -9,7 +9,7 @@ if (
     exit;
 }
 $parsed_user = $this->myaccount_get_profile($current_user, true, true);
-file_put_contents( MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_compile($this->pdf_import($this->pdf_create()), ['quote' => 1000])->export_file());
+file_put_contents( MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_compile($this->pdf_import($this->pdf_create()), ['quote' => 1000, 'card_number'=> 'W000000'])->export_file());
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-tel-input.css">

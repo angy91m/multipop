@@ -892,6 +892,15 @@ class MultipopPlugin {
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
+        if (isset($options['card_number']) && is_string($options['card_number']) && $options['card_number']) {
+            $pdf->setPage(1);
+            $pdf->setY(102);
+            $pdf->setX(60);
+            ob_start(); ?>
+            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">€&nbsp;<?=$options['card_number']?></span>
+            <?php
+            $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+        }
         return $pdf;
     }
     // private function pdf_import(string $file = '', array $options = [], string $key = '') {
