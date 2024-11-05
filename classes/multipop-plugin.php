@@ -933,8 +933,8 @@ class MultipopPlugin {
         if (isset($options['mpop_birthdate']) && is_string($options['mpop_birthdate']) && $options['mpop_birthdate']) {
             $date_arr = explode('-', $options['mpop_birthdate']);
             $pdf->setPage(1);
-            $pdf->setY(55);
-            $pdf->setX(34);
+            $pdf->setY(54.3);
+            $pdf->setX(35);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$date_arr[2]?></span>
             <?php
