@@ -991,13 +991,21 @@ class MultipopPlugin {
                 }
             }
         }
-
         if (isset($options['mpop_billing_address']) && is_string($options['mpop_billing_address'])) {
             $pdf->setPage(1);
             $pdf->setY(65.4);
             $pdf->setX(27);
             ob_start(); ?>
-            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=preg_replace("/\r\n|\r|\n/", ' ',$options['mpop_billing_address'] . "\nciao" )?></span>
+            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=preg_replace("/\r\n|\r|\n/", ' ',$options['mpop_billing_address'])?></span>
+            <?php
+            $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+        }
+        if (isset($options['mpop_billing_zip']) && is_string($options['mpop_billing_zip'])) {
+            $pdf->setPage(1);
+            $pdf->setY(70.6);
+            $pdf->setX(27);
+            ob_start(); ?>
+            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['mpop_billing_zip']?></span>
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
