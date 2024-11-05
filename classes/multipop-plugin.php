@@ -930,6 +930,15 @@ class MultipopPlugin {
                 }
             }
         }
+        if (isset($options['mpop_birthdate']) && is_string($options['mpop_birthdate']) && $options['mpop_birthdate']) {
+            $date_arr = explode('-', $options['mpop_birthdate']);
+            $pdf->setPage(1);
+            $pdf->setY(55);
+            $pdf->setX(34);
+            ob_start(); ?>
+            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$date_arr[2]?></span>
+            <?php
+        }
         if (isset($options['mpop_billing_country']) && is_string($options['mpop_billing_country']) && $options['mpop_billing_country']) {
             if ($options['mpop_billing_country'] == 'ita') {
                 if (isset($options['mpop_billing_city']) && is_string($options['mpop_billing_city']) && $options['mpop_billing_city']) {
