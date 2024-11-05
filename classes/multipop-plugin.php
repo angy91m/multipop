@@ -886,7 +886,7 @@ class MultipopPlugin {
             $options['quote'] = number_format($options['quote'],2, ',','');
             $pdf->setPage(1);
             $pdf->setY(102);
-            $pdf->setX(115);
+            $pdf->setX(40);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">€&nbsp;<?=$options['quote']?></span>
             <?php
@@ -895,7 +895,7 @@ class MultipopPlugin {
         if (isset($options['card_number']) && is_string($options['card_number']) && $options['card_number']) {
             $pdf->setPage(1);
             $pdf->setY(102);
-            $pdf->setX(60);
+            $pdf->setX(115);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">€&nbsp;<?=$options['card_number']?></span>
             <?php
