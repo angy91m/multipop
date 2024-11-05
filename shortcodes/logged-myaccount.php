@@ -9,7 +9,7 @@ if (
     exit;
 }
 $parsed_user = $this->myaccount_get_profile($current_user, true, true);
-
+file_put_contents( MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_create());
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-tel-input.css">

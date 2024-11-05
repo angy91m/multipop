@@ -151,7 +151,7 @@ createApp({
         savingProfileErrors = reactive([]),
         savingUserErrors = reactive([]),
         userNotices = reactive([]),
-        helloName = computed(()=> profile.first_name ? profile.first_name : profile.login),
+        helloName = computed(()=> profile.first_name || profile.login),
         birthCities = reactive([]),
         billingCities = reactive([]),
         pwdChangeFields = reactive({}),
