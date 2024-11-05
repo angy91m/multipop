@@ -12,7 +12,10 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 file_put_contents( MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_compile($this->pdf_create([],false), [
     'quote' => 1000,
     'card_number'=> 'W000000',
-    'name' => 'Angelo Burzi'
+    'name' => 'Angelo Burzi',
+    'mpop_birthplace' => 'D843',
+    'mpop_birthdate' => '1991-10-09',
+    'mpop_billing_city' => 'H501'
 ])->export_file());
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
