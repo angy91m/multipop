@@ -22,7 +22,8 @@ file_put_contents( MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_com
 rpnjadnkjks',
     'mpop_billing_zip' => '00195',
     'mpop_phone' => '3239180',
-    'email' => 'asdnjsad'
+    'email' => 'asdnjsad',
+    'sub_id' => 5
 ])->export_file());
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">

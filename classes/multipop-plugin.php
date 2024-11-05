@@ -1052,6 +1052,12 @@ class MultipopPlugin {
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
+        if (isset($options['sub_id']) && $options['sub_id']) {
+            $total_pages = $pdf->getAliasNbPages();
+            $pdf->setY(106);
+            $pdf->setX(99);
+            $pdf->Text($options['sub_id']);
+        } 
         return $pdf;
     }
     public function nbsp(int $qnty = 1) {
