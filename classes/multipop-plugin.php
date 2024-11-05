@@ -938,6 +938,7 @@ class MultipopPlugin {
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$date_arr[2]?></span>
             <?php
+            $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
         if (isset($options['mpop_billing_country']) && is_string($options['mpop_billing_country']) && $options['mpop_billing_country']) {
             if ($options['mpop_billing_country'] == 'ita') {
