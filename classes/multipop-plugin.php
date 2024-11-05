@@ -884,7 +884,7 @@ class MultipopPlugin {
     private function pdf_compile($pdf, $options = []) {
         if (isset($options['name']) && is_string($options['name']) && $options['name']) {
             $pdf->setPage(1);
-            $pdf->setY(43);
+            $pdf->setY(44);
             $pdf->setX(70);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['name']?></span>
