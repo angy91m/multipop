@@ -13,8 +13,8 @@ ob_start();
     </span>
     <p style="font-family: 'helveticalight'; font-size: 12pt; line-height: 15px;">Il/La sottoscritto/a <span class="sugg">(nome cognome)</span>&nbsp;<u><?=$this->nbsp(80)?></u><br/>
         nato a&nbsp;<u><?=$this->nbsp(108)?></u>&nbsp;(<u><?=$this->nbsp(8)?></u>)<br/>
-        il <span class="sugg">(gg/mm/aaaa)</span>&nbsp;<u><?=$this->nbsp(8)?></u>/<u><?=$this->nbsp(8)?></u>/<u><?=$this->nbsp(17)?></u><br/>
-        residente a<br/>
+        il <span class="sugg">(gg/mm/aaaa)</span>&nbsp;<u><?=$this->nbsp(8)?></u>/<u><?=$this->nbsp(8)?></u>/<u><?=$this->nbsp(16)?></u><br/>
+        residente a&nbsp;<u><?=$this->nbsp(100)?></u>&nbsp;(<u><?=$this->nbsp(8)?></u>)<br/>
         indirizzo<br/>
         cap<br/>
         telefono<br/>
