@@ -1011,7 +1011,7 @@ class MultipopPlugin {
             $pdf->setY(65.4);
             $pdf->setX(27);
             ob_start(); ?>
-            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=preg_replace("/\r\n|\r|\n/", ' ',$options['mpop_billing_address'])?></span>
+            <span style="font-family: 'helveticamedium'; font-size: 11pt; line-height: 15px;"><?=preg_replace("/\r\n|\r|\n/", ' ',$options['mpop_billing_address'])?></span>
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
