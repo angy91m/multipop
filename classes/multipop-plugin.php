@@ -936,13 +936,13 @@ class MultipopPlugin {
                     $bc = $this->get_comune_by_catasto($options['mpop_billing_city'], true);
                     if ($bc) {
                         $pdf->setPage(1);
-                        $pdf->setY(60.3);
-                        $pdf->setX(35);
+                        $pdf->setY(60.2);
+                        $pdf->setX(37);
                         ob_start(); ?>
                         <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$bc['nome']?></span>
                         <?php
                         $pdf->writeHTML(ob_get_clean(),true, false, false, false);
-                        $pdf->setY(60.3);
+                        $pdf->setY(60.2);
                         $pdf->setX(155);
                         ob_start(); ?>
                         <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$bc['provincia']['sigla']?></span>
@@ -954,13 +954,13 @@ class MultipopPlugin {
                 $country = $this->get_country_by_code($options['mpop_birthplace_country']);
                 if ($country) {
                     $pdf->setPage(1);
-                    $pdf->setY(60.3);
-                    $pdf->setX(35);
+                    $pdf->setY(60.2);
+                    $pdf->setX(37);
                     ob_start(); ?>
                     <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$country['name']?></span>
                     <?php
                     $pdf->writeHTML(ob_get_clean(),true, false, false, false);
-                    $pdf->setY(60.3);
+                    $pdf->setY(60.2);
                     $pdf->setX(155.2);
                     ob_start(); ?>
                     <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">&nbsp;-</span>
