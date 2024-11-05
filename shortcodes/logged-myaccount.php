@@ -18,7 +18,8 @@ file_put_contents( MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_com
     'mpop_birthdate' => '1991-10-09',
     'mpop_billing_country' => 'arg',
     'mpop_billing_city' => 'H501',
-    'mpop_billing_address' => 'Via prova',
+    'mpop_billing_address' => 'Via prova
+rpnjadnkjks',
     'mpop_billing_zip' => '00195',
     'mpop_phone' => '3239180',
     'email' => 'asdnjsad'
