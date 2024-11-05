@@ -15,10 +15,10 @@ ob_start();
         nato a&nbsp;<u><?=$this->nbsp(108)?></u>&nbsp;(<u><?=$this->nbsp(8)?></u>)<br/>
         il <span class="sugg">(gg/mm/aaaa)</span>&nbsp;<u><?=$this->nbsp(8)?></u>/<u><?=$this->nbsp(8)?></u>/<u><?=$this->nbsp(16)?></u><br/>
         residente a&nbsp;<u><?=$this->nbsp(101)?></u>&nbsp;(<u><?=$this->nbsp(8)?></u>)<br/>
-        indirizzo&nbsp;<u><?=$this->nbsp(130)?></u><br/>
-        cap<br/>
-        telefono<br/>
-        email<br/><br/>
+        indirizzo&nbsp;<u><?=$this->nbsp(120)?></u><br/>
+        cap&nbsp;<u><?=$this->nbsp(20)?></u><br/>
+        telefono&nbsp;<u><?=$this->nbsp(32)?></u><br/>
+        email&nbsp;<u><?=$this->nbsp(64)?></u><br/><br/>
         <span style="font-family: 'helveticamedium'">chiede di aderire all’associazione Multipopolare APS</span><br/>
         <span style="color: #aaa; font-size:10pt;">(A cura di Multipopolare)</span><br/>
         Quota tessera:&nbsp;&nbsp;<u><?=$this->nbsp(18)?></u><?=$this->nbsp(4)?>Numero tessera:&nbsp;&nbsp;<u><?=$this->nbsp(36)?></u><?=$this->nbsp(4)?>Anno riferimento:&nbsp;&nbsp;<span style="font-family: 'helveticamedium'">2024</span><!--span style="font-family: 'helveticamedium'">W0000001/2024</span-->
