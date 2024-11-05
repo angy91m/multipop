@@ -1027,9 +1027,18 @@ class MultipopPlugin {
         if (isset($options['mpop_phone']) && is_string($options['mpop_phone'])) {
             $pdf->setPage(1);
             $pdf->setY(75.8);
-            $pdf->setX(37);
+            $pdf->setX(28.5);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['mpop_phone']?></span>
+            <?php
+            $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+        }
+        if (isset($options['email']) && is_string($options['email'])) {
+            $pdf->setPage(1);
+            $pdf->setY(81);
+            $pdf->setX(21);
+            ob_start(); ?>
+            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['email']?></span>
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
