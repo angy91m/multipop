@@ -303,7 +303,7 @@ createApp({
             const thisYear = (new Date()).getFullYear();
             return profile.mpop_card_active && (!nearActiveSub.value || nearActiveSub.value.year != thisYear) ? [] : authorizedSubscriptionYears.filter(y => y >= thisYear && !activeCardForYear(profile.mpop_my_subscritions || [], y));
         }),
-        otherSubscriptions = computed(() => (profile.mpop_my_subscritions || []).filter(c => nearActiveSub.value ? nearActiveSub.value.id !== c : true)),
+        otherSubscriptions = computed(() => (profile.mpop_my_subscritions || []).filter(c => nearActiveSub.value ? nearActiveSub.value.id !== c.id : true)),
         maxBirthDate = new Date();
         maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
         function fuseSearch(options, search) {
