@@ -903,7 +903,8 @@ class MultipopPlugin {
                         <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$bp['nome']?></span>
                         <?php
                         $pdf->writeHTML(ob_get_clean(),true, false, false, false);
-                        $pdf->setX(90);
+                        $pdf->setY(49.5);
+                        $pdf->setX(150);
                         ob_start(); ?>
                         <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$bp['provincia']['sigla']?></span>
                         <?php
