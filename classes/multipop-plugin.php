@@ -867,21 +867,11 @@ class MultipopPlugin {
     }
     
     // IMPORT PDF
-    private function pdf_import(string $file = '', array $options = [], string $key = '') {
+    private function pdf_import(string $pdf_file_string = '') {
         require_once(MULTIPOP_PLUGIN_PATH . '/classes/multipopdf.php');
         $pdf = new MultipoPDF(['mpop_import' => true]);
-        $fd = $file;
-        if (isset($options['key'])) {
-            if (isset($options['key'], )) {
-                if (strlen($options['key'], ) != 32) {
-                    throw new Exception('Invalid key');
-                }
-                $fd = fopen('data://application/pdf;base64,'. base64_encode( $this->decrypt(file_get_contents($file), $options['key'], isset($options['mac_key']) ? $options['mac_key'] : '')), 'r');
-            }
-        } else if (isset($options['password'])) {
-            $fd = fopen('data://application/pdf;base64,'. base64_encode( $this->decrypt_with_password(file_get_contents($file), $options['password'], isset($options['mac_key']) ? $options['mac_key'] : '')), 'r');
-        }
-        $pages_count = $pdf->setSourceFile( $fd );
+        $fd = fopen('data://application/pdf;base64,'. base64_encode($pdf_file_string));
+        $pages_count = $pdf->setSourceFile($fd);
         for ($i=1; $i<=$pages_count; $i++) {
             if ($i > 1) {
                 $pdf->AddPage();
@@ -891,6 +881,30 @@ class MultipopPlugin {
         }
         return $pdf;
     }
+    // private function pdf_import(string $file = '', array $options = [], string $key = '') {
+    //     require_once(MULTIPOP_PLUGIN_PATH . '/classes/multipopdf.php');
+    //     $pdf = new MultipoPDF(['mpop_import' => true]);
+    //     $fd = $file;
+    //     if (isset($options['key'])) {
+    //         if (isset($options['key'], )) {
+    //             if (strlen($options['key'], ) != 32) {
+    //                 throw new Exception('Invalid key');
+    //             }
+    //             $fd = fopen('data://application/pdf;base64,'. base64_encode( $this->decrypt(file_get_contents($file), $options['key'], isset($options['mac_key']) ? $options['mac_key'] : '')), 'r');
+    //         }
+    //     } else if (isset($options['password'])) {
+    //         $fd = fopen('data://application/pdf;base64,'. base64_encode( $this->decrypt_with_password(file_get_contents($file), $options['password'], isset($options['mac_key']) ? $options['mac_key'] : '')), 'r');
+    //     }
+    //     $pages_count = $pdf->setSourceFile( $fd );
+    //     for ($i=1; $i<=$pages_count; $i++) {
+    //         if ($i > 1) {
+    //             $pdf->AddPage();
+    //         }
+    //         $tpl = $pdf->importPage($i);
+    //         $pdf->useTemplate($tpl);
+    //     }
+    //     return $pdf;
+    // }
 
     // CREATE EMAIL CONFIRMATION LINK
     private function create_temp_token( int $user_id, string $scope, int $validity_seconds = 3600 ) {
