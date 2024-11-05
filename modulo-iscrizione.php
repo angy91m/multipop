@@ -11,7 +11,7 @@ ob_start();
         <h2>Richiesta di adesione all’associazione Multipopolare APS</h2>
         <h2 style="font-family: 'helveticalight'; font-size: 12pt; line-height: 12px;">Autorizzazione al trattamento dei dati personali ai sensi dell’art. 13<br/>del Regolamento (UE) 2016/679</h2>
     </span>
-    <p style="font-family: 'helveticalight'; font-size: 12pt; line-height: 15px;">Il/La sottoscritto/a <span class="sugg">(nome cognome)</span>&nbsp;<u><?=$this->nbsp(32)?></u><br/>
+    <p style="font-family: 'helveticalight'; font-size: 12pt; line-height: 15px;">Il/La sottoscritto/a <span class="sugg">(nome cognome)</span>&nbsp;<u><?=$this->nbsp(80)?></u><br/>
         nato a<br/>
         il <span class="sugg">(gg/mm/aaaa)</span><br/>
         residente a<br/>
