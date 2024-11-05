@@ -895,7 +895,7 @@ class MultipopPlugin {
         if (isset($options['card_number']) && is_string($options['card_number']) && $options['card_number']) {
             $pdf->setPage(1);
             $pdf->setY(102);
-            $pdf->setX(99);
+            $pdf->setX(100);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['card_number']?></span>
             <?php
