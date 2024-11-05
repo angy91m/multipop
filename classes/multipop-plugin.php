@@ -995,7 +995,7 @@ class MultipopPlugin {
         if (isset($options['mpop_billing_address']) && is_string($options['mpop_billing_address'])) {
             $pdf->setPage(1);
             $pdf->setY(65.4);
-            $pdf->setX(25);
+            $pdf->setX(28);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['mpop_billing_address']?></span>
             <?php
