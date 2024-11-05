@@ -13,6 +13,7 @@ file_put_contents( MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_com
     'quote' => 1000,
     'card_number'=> 'W000000',
     'name' => 'Angelo Burzi',
+    'mpop_birthplace_country' => 'ita',
     'mpop_birthplace' => 'D843',
     'mpop_birthdate' => '1991-10-09',
     'mpop_billing_city' => 'H501'

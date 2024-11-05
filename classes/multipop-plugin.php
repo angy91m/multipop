@@ -891,6 +891,22 @@ class MultipopPlugin {
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
+        if (isset($options['mpop_birthplace_country']) && is_string($options['mpop_birthplace_country']) && $options['mpop_birthplace_country']) {
+            if ($options['mpop_birthplace_country'] == 'ita') {
+                if (isset($options['mpop_birthplace']) && is_string($options['mpop_birthplace']) && $options['mpop_birthplace']) {
+                    $bp = $this->get_comune_by_catasto($options['mpop_birthplace'], true);
+                    if ($bp) {
+                        $pdf->setPage(1);
+                        $pdf->setY(50);
+                        $pdf->setX(30);
+                        ob_start(); ?>
+                        <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$bp['nome']?></span>
+                        <?php
+                        $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+                    }
+                }
+            }
+        }
         if (isset($options['quote']) && (is_int($options['quote']) || is_float($options['quote'])) && $options['quote'] > 0) {
             $options['quote'] = number_format($options['quote'],2, ',','');
             $pdf->setPage(1);
