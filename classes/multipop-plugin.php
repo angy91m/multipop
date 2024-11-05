@@ -911,6 +911,17 @@ class MultipopPlugin {
                         $pdf->writeHTML(ob_get_clean(),true, false, false, false);
                     }
                 }
+            } else {
+                $country = $this->get_country_by_code($options['mpop_birthplace_country']);
+                if ($country) {
+                    $pdf->setPage(1);
+                    $pdf->setY(49.5);
+                    $pdf->setX(28.5);
+                    ob_start(); ?>
+                    <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$country['name']?></span>
+                    <?php
+                    $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+                }
             }
         }
         if (isset($options['quote']) && (is_int($options['quote']) || is_float($options['quote'])) && $options['quote'] > 0) {
