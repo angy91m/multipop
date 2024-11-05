@@ -884,7 +884,7 @@ class MultipopPlugin {
     private function pdf_compile($pdf, $options = []) {
         if (isset($options['quote']) && (is_int($options['quote']) || is_float($options['quote'])) && $options['quote'] > 0) {
             $pdf->setPage(1);
-            $pdf->setY(10);
+            $pdf->setY(100);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">Ciao</span>
             <?php
