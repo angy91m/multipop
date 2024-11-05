@@ -881,6 +881,17 @@ class MultipopPlugin {
         }
         return $pdf;
     }
+    private function pdf_compile($pdf, $options = []) {
+        if (isset($options['quote']) && (is_int($options['quote']) || is_float($options['quote'])) && $options['quote'] > 0) {
+            $pdf->setPage(1);
+            $pdf->setY(10);
+            ob_start(); ?>
+            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">Ciao</span>
+            <?php
+            $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+        }
+        return $pdf;
+    }
     // private function pdf_import(string $file = '', array $options = [], string $key = '') {
     //     require_once(MULTIPOP_PLUGIN_PATH . '/classes/multipopdf.php');
     //     $pdf = new MultipoPDF(['mpop_import' => true]);
