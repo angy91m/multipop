@@ -62,13 +62,13 @@ $pdf->setY($next_line[1]-1.7);
 ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Presto il consenso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nego il consenso</p>
-    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">Luogo e data</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->SetY($pdf->GetY()-4);
 ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: right">Firma&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">Luogo e data</p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">_________________ (____), ____/____/_______</p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: justify">Presta il suo consenso e fino alla revoca dello stesso, per la pubblicazione del suo nominativo su riviste, cataloghi, brochure, annuari, siti, ecc. di MULTIPOPOLARE APS (di seguito complessivamente definite “attività di pubblicazione dell’associazione”) del Titolare e/o da organizzazioni correlate. Il trattamento per attività di pubblicazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo pubblicazioni cartacee), ovvero mediante sistemi “elettronici” (a titolo esemplificativo pubblicazioni elettroniche, social network, sito, blog, ecc.)</p>
 <?php
@@ -80,13 +80,13 @@ $pdf->setY($next_line[1]-1.7);
 ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Presto il consenso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nego il consenso</p>
-    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">Luogo e data</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->SetY($pdf->GetY()-4);
 ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: right">Firma&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">Luogo e data</p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">_________________ (____), ____/____/_______</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
