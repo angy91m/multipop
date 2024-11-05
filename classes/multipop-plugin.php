@@ -1003,7 +1003,7 @@ class MultipopPlugin {
         if (isset($options['mpop_billing_zip']) && is_string($options['mpop_billing_zip'])) {
             $pdf->setPage(1);
             $pdf->setY(70.6);
-            $pdf->setX(27);
+            $pdf->setX(20);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['mpop_billing_zip']?></span>
             <?php
