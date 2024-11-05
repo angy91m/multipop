@@ -138,7 +138,7 @@ ob_start();
         <br/><span style="font-family:'helveticamedium'">Titolare e responsabili del trattamento</span>
         <br/>Titolare del trattamento dei dati personali è MULTIPOPOLARE APS, e-mail: <span style="font-family:'helveticamedium'">organizzazione@multipopolare.it</span>
         <br/>
-        <br/><span style="font-family:'helveticamedium'">IL PRESENTE MODULO VA COMPILATO E FIRMATO IN OGNI SUA PARTE E SPEDITO PER MAIL AL SEGUENTE INDIRIZZO:</span>
+        <br/><span style="font-family:'helveticamedium'">IL PRESENTE MODULO VA COMPILATO E FIRMATO IN OGNI SUA PARTE E CARICATO TRAMITE L'APPOSITO MODULO SUL SITO multipopolare.it O SPEDITO PER MAIL AL SEGUENTE INDIRIZZO:</span>
         <br/><span style="font-family:'helveticamedium'">organizzazione@multipopolare.it</span>
     </p>
 <?php
