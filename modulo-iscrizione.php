@@ -12,7 +12,7 @@ ob_start();
         <h2 style="font-family: 'helveticalight'; font-size: 12pt; line-height: 12px;">Autorizzazione al trattamento dei dati personali ai sensi dell’art. 13<br/>del Regolamento (UE) 2016/679</h2>
     </span>
     <p style="font-family: 'helveticalight'; font-size: 12pt; line-height: 15px;">Il/La sottoscritto/a <span class="sugg">(nome cognome)</span>&nbsp;<u><?=$this->nbsp(80)?></u><br/>
-        nato a&nbsp;<u><?=$this->nbsp(108)?></u>&nbsp;(<u><?=$this->nbsp(8)?></u>)<br/>
+        nato a&nbsp;<u><?=$this->nbsp(103)?></u>&nbsp;(<u><?=$this->nbsp(8)?></u>)<br/>
         il <span class="sugg">(gg/mm/aaaa)</span><br/>
         residente a<br/>
         indirizzo<br/>
