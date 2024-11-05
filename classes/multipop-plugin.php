@@ -1054,7 +1054,7 @@ class MultipopPlugin {
         }
         if (isset($options['sub_id']) && $options['sub_id']) {
             $total_pages = $pdf->getAliasNbPages();
-            $pdf->Text(99, 106,$options['sub_id']);
+            $pdf->Text(99, 320,$total_page);
         } 
         return $pdf;
     }
