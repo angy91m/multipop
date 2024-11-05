@@ -275,7 +275,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             <td v-else>
                                 <select v-model="profileInEditing.mpop_billing_zip" :class="savingProfileErrors.includes('mpop_billing_zip') ? 'bad-input' : ''" :disabled="!profileInEditing.mpop_billing_city || profileInEditing.mpop_billing_city.cap.length == 1">
                                     <template v-if="profileInEditing.mpop_billing_city">
-                                        <option v-for="cap in profileInEditing.mpop_billing_city.cap" :value="cap">{{cap}}</option>
+                                        <option v-for="cap in profileInEditing.mpop_billing_city.cap" :key="cap" :value="cap">{{cap}}</option>
                                     </template>
                                 </select>
                             </td>
@@ -327,7 +327,10 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         </ul>
                         <div v-if="availableYearsToOrder.length" id="mpop-avail-years-to-order">
                             <p v-if="isProfileCompleted">
-                                Ordina per i seguenti anni: {{availableYearsToOrder}}
+                                Richiedi la tua tessera per l'anno:&nbsp;
+                                <select>
+                                    <option v-for="y in availableYearsToOrder" :key="y" :value="y">{{y}}</option>
+                                </select>
                             </p>
                             <p v-else>Per richiedere una nuova tessera è necessario completare i tuoi dati del profilo</p>
                         </div>
@@ -344,7 +347,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="card in otherSubscriptions">
+                                    <tr v-for="card in otherSubscriptions" :key="card.id">
                                         <td>{{card.id}}</td>
                                     </tr>
                                 </tbody>
@@ -358,7 +361,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                 <div class="mpop-user-search-field">
                     <input type="text" v-model="userSearch.txt" @input="triggerSearchUsers" placeholder="Nome, e-mail, username" />
                 </div>
-                <div class="mpop-user-search-field" v-for="role in userRoles">
+                <div class="mpop-user-search-field" v-for="(role, index) in userRoles" :key="index">
                     <label :for="'user-search-'+role">{{showRole(role)}}&nbsp;
                         <input :id="'user-search-'+role" type="checkbox" v-model="userSearch.roles" @change="triggerSearchUsers" :value="role"/>
                     </label>
@@ -475,7 +478,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                 <div id="mpop-page-buttons">
                     <button class="mpop-button" @click="changeUserSearchPage(1)" v-if="userSearch.page != 1 && !pageButtons.includes(1) && userSearch.page -2 > 0" style="width:auto">Inizio</button>
                     <button class="mpop-button" @click="changeUserSearchPage(userSearch.page -1)" v-if="userSearch.page != 1 && !pageButtons.includes(userSearch.page -1)" style="padding:1px"><?=$this->dashicon('arrow-left')?></button>
-                    <button :class="'mpop-button' + (p == userSearch.page ? ' mpop-page-selected' : '')" v-for="p in pageButtons" @click="changeUserSearchPage(p)">{{p}}</button>
+                    <button :class="'mpop-button' + (p == userSearch.page ? ' mpop-page-selected' : '')" v-for="p in pageButtons" :key="p" @click="changeUserSearchPage(p)">{{p}}</button>
                     <button class="mpop-button" @click="changeUserSearchPage(userSearch.page +1)" v-if="userSearch.page != foundUsersPageTotal && !pageButtons.includes(userSearch.page +1)" style="padding:1px"><?=$this->dashicon('arrow-right')?></button>
                     <button class="mpop-button" @click="changeUserSearchPage(foundUsersPageTotal)" v-if="userSearch.page != foundUsersPageTotal && !pageButtons.includes(foundUsersPageTotal) && userSearch.page +2 <= foundUsersPageTotal" style="width:auto">Fine</button>
                 </div>
@@ -564,7 +567,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         <td v-if="!userEditing || profile.role != 'administrator'">
                             <template v-if="userInView.mpop_resp_zones.length">
                                 <ul>
-                                    <li v-for="z in userInView.mpop_resp_zones">{{z.untouched_label + addSuppressToLabel(z)}}</li>
+                                    <li v-for="(z, index) in userInView.mpop_resp_zones" :key="index">{{z.untouched_label + addSuppressToLabel(z)}}</li>
                                 </ul>
                             </template>
                             <template v-else>
@@ -782,7 +785,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                             <td v-else>
                                 <select v-model="userInEditing.mpop_billing_zip" :class="savingUserErrors.includes('mpop_billing_zip') ? 'bad-input' : ''" :disabled="!userInEditing.mpop_billing_city || userInEditing.mpop_billing_city.cap.length == 1">
                                     <template v-if="userInEditing.mpop_billing_city">
-                                        <option v-for="cap in userInEditing.mpop_billing_city.cap" :value="cap">{{cap}}</option>
+                                        <option v-for="cap in userInEditing.mpop_billing_city.cap" :key="cap" :value="cap">{{cap}}</option>
                                     </template>
                                 </select>
                             </td>
