@@ -991,6 +991,16 @@ class MultipopPlugin {
                 }
             }
         }
+
+        if (isset($options['mpop_billing_address']) && is_string($options['mpop_billing_address'])) {
+            $pdf->setPage(1);
+            $pdf->setY(65.4);
+            $pdf->setX(35.7);
+            ob_start(); ?>
+            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['mpop_billing_address']?></span>
+            <?php
+            $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+        }
         if (isset($options['quote']) && (is_int($options['quote']) || is_float($options['quote'])) && $options['quote'] > 0) {
             $options['quote'] = number_format($options['quote'],2, ',','');
             $pdf->setPage(1);
