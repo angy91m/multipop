@@ -62,7 +62,7 @@ $pdf->RegularPolygon($next_line[0]+40,$next_line[1], 2, 4, 45, false, '', [], [3
 $pdf->setY($next_line[1]-1.7);
 ob_start();
 ?>
-    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Presto il consenso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nego il consenso</p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><?=$this->nbsp(6)?>Presto il consenso<?=$this->nbsp(17)?>Nego il consenso</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->SetY($pdf->GetY()-4);
@@ -80,7 +80,7 @@ $pdf->RegularPolygon($next_line[0]+40,$next_line[1], 2, 4, 45, false, '', [], [3
 $pdf->setY($next_line[1]-1.7);
 ob_start();
 ?>
-    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Presto il consenso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nego il consenso</p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><?=$this->nbsp(6)?>Presto il consenso<?=$this->nbsp(17)?>Nego il consenso</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->SetY($pdf->GetY()-4);
