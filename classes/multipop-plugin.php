@@ -887,7 +887,7 @@ class MultipopPlugin {
             $pdf->setY(10);
             $pdf->setX(40);
             ob_start(); ?>
-            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">€&nbsp;<?=$options['name']?></span>
+            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['name']?></span>
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
