@@ -898,13 +898,13 @@ class MultipopPlugin {
                     if ($bp) {
                         $pdf->setPage(1);
                         $pdf->setY(49.5);
-                        $pdf->setX(28);
+                        $pdf->setX(28.5);
                         ob_start(); ?>
                         <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$bp['nome']?></span>
                         <?php
                         $pdf->writeHTML(ob_get_clean(),true, false, false, false);
                         $pdf->setY(49.5);
-                        $pdf->setX(150);
+                        $pdf->setX(153);
                         ob_start(); ?>
                         <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$bp['provincia']['sigla']?></span>
                         <?php
