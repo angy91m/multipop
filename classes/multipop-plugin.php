@@ -1053,8 +1053,8 @@ class MultipopPlugin {
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
         if (isset($options['sub_id']) && $options['sub_id']) {
-            save_test($pdf->getAliasNbPages());
-            $total_pages = intval($pdf->getAliasNbPages());
+            $total_pages = $pdf->getNumPages();
+            save_test($total_pages);
             $pdf->SetAutoPageBreak(false);
             $pdf->SetFont($pdf->config['font'], 'B', $pdf->config['font_size']);
             $pdf->Text(7,$pdf->getPageHeight()-$pdf->config['margin_bottom'],"ID RICHIESTA: $options[sub_id]");
