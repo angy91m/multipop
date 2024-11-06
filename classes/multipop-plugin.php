@@ -1036,7 +1036,7 @@ class MultipopPlugin {
         if (isset($options['mpop_marketing_agree']) && is_bool($options['mpop_marketing_agree'])) {
             $pdf->setPage(1);
             $pdf->setY(102);
-            $pdf->setX(0);
+            $pdf->setX(15);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">X</span>
             <?php
