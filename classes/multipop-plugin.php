@@ -1091,17 +1091,26 @@ class MultipopPlugin {
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
-        if (isset($options['sub_id']) && $options['sub_id']) {
+        if (isset($options['subscription_year']) && $options['subscription_year']) {
+            $pdf->setPage(1);
+            $pdf->setY(102);
+            $pdf->setX(120);
+            ob_start(); ?>
+            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['subscription_year']?></span>
+            <?php
+            $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+        }
+        if (isset($options['subscription_id']) && $options['subscription_id']) {
             $total_pages = $pdf->getNumPages();
             for($i=1;$i<=$total_pages;$i++) {
                 $pdf->setPage($i);
                 $pdf->SetAutoPageBreak(false);
                 $pdf->SetFont($pdf->config['font'], 'B', $pdf->config['font_size']);
-                $pdf->Text(7,$pdf->getPageHeight()-$pdf->config['margin_bottom'],"ID RICHIESTA: $options[sub_id]");
+                $pdf->Text(7,$pdf->getPageHeight()-$pdf->config['margin_bottom'],"ID RICHIESTA: $options[subscription_id]");
                 $pdf->SetAutoPageBreak(true, $pdf->config['margin_bottom']);
             }
             $pdf->SetFont($pdf->config['font'], '', $pdf->config['font_size']);
-        } 
+        }
         return $pdf;
     }
     public function nbsp(int $qnty = 1) {
