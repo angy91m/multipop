@@ -23,7 +23,10 @@ rpnjadnkjks',
     'mpop_billing_zip' => '00195',
     'mpop_phone' => '3239180',
     'email' => 'asdnjsad',
-    'sub_id' => 5
+    'sub_id' => 5,
+    'mpop_marketing_agree' => true,
+    'mpop_newsletter_agree' => false,
+    'mpop_publish_agree' => true
 ])->export_file());
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
