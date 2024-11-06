@@ -1035,7 +1035,7 @@ class MultipopPlugin {
         }
         if (isset($options['mpop_marketing_agree'])) {
             $pdf->setPage(1);
-            $pdf->setY(175.5);
+            $pdf->setY(175.7);
             if ($options['mpop_marketing_agree']) {
                 $pdf->setX(11.5);
             } else {
@@ -1048,7 +1048,7 @@ class MultipopPlugin {
         }
         if (isset($options['mpop_newsletter_agree'])) {
             $pdf->setPage(1);
-            $pdf->setY(212);
+            $pdf->setY(212.2);
             if ($options['mpop_newsletter_agree']) {
                 $pdf->setX(11.5);
             } else {
@@ -1061,7 +1061,7 @@ class MultipopPlugin {
         }
         if (isset($options['mpop_publish_agree'])) {
             $pdf->setPage(1);
-            $pdf->setY(251.8);
+            $pdf->setY(252);
             if ($options['mpop_publish_agree']) {
                 $pdf->setX(11.5);
             } else {
