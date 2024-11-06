@@ -898,7 +898,7 @@ class MultipopPlugin {
                     if ($bp) {
                         $pdf->setPage(1);
                         $pdf->setY(49.5);
-                        $pdf->setX(33);
+                        $pdf->setX(32.5);
                         ob_start(); ?>
                         <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$bp['nome']?></span>
                         <?php
@@ -916,7 +916,7 @@ class MultipopPlugin {
                 if ($country) {
                     $pdf->setPage(1);
                     $pdf->setY(49.5);
-                    $pdf->setX(33);
+                    $pdf->setX(32.5);
                     ob_start(); ?>
                     <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$country['name']?></span>
                     <?php
