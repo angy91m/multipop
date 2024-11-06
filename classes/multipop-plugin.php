@@ -1046,6 +1046,19 @@ class MultipopPlugin {
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
+        if (isset($options['mpop_newsletter_agree'])) {
+            $pdf->setPage(1);
+            $pdf->setY(196.5);
+            if ($options['mpop_newsletter_agree']) {
+                $pdf->setX(11.5);
+            } else {
+                $pdf->setX(51.7);
+            }
+            ob_start(); ?>
+            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">X</span>
+            <?php
+            $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+        }
         if (isset($options['quote']) && (is_int($options['quote']) || is_float($options['quote'])) && $options['quote'] > 0) {
             $options['quote'] = number_format($options['quote'],2, ',','');
             $pdf->setPage(1);
