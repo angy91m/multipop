@@ -1061,7 +1061,7 @@ class MultipopPlugin {
         }
         if (isset($options['mpop_publish_agree'])) {
             $pdf->setPage(1);
-            $pdf->setY(247.5);
+            $pdf->setY(250);
             if ($options['mpop_publish_agree']) {
                 $pdf->setX(11.5);
             } else {
