@@ -1054,18 +1054,13 @@ class MultipopPlugin {
         }
         if (isset($options['sub_id']) && $options['sub_id']) {
             $total_pages = $pdf->getNumPages();
-            save_test($total_pages);
-            $pdf->SetAutoPageBreak(false);
-            $pdf->SetFont($pdf->config['font'], 'B', $pdf->config['font_size']);
-            $pdf->Text(7,$pdf->getPageHeight()-$pdf->config['margin_bottom'],"ID RICHIESTA: $options[sub_id]");
-            $pdf->SetAutoPageBreak(true, $pdf->config['margin_bottom']);
-            // for($i=1;$i<=$total_pages;$i++) {
-            //     $pdf->setPage($i);
-            //     $pdf->SetAutoPageBreak(false);
-            //     $pdf->SetFont($pdf->config['font'], 'B', $pdf->config['font_size']);
-            //     $pdf->Text(7,$pdf->getPageHeight()-$pdf->config['margin_bottom'],"ID RICHIESTA: $options[sub_id]");
-            //     $pdf->SetAutoPageBreak(true, $pdf->config['margin_bottom']);
-            // }
+            for($i=1;$i<=$total_pages;$i++) {
+                $pdf->setPage($i);
+                $pdf->SetAutoPageBreak(false);
+                $pdf->SetFont($pdf->config['font'], 'B', $pdf->config['font_size']);
+                $pdf->Text(7,$pdf->getPageHeight()-$pdf->config['margin_bottom'],"ID RICHIESTA: $options[sub_id]");
+                $pdf->SetAutoPageBreak(true, $pdf->config['margin_bottom']);
+            }
         } 
         return $pdf;
     }
