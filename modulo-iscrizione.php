@@ -21,7 +21,7 @@ ob_start();
         email&nbsp;<u><?=$this->nbsp(121)?></u><br/><br/>
         <span style="font-family: 'helveticamedium'">chiede di aderire all’associazione Multipopolare APS</span><br/>
         <span style="color: #aaa; font-size:10pt;">(A cura di Multipopolare)</span><br/>
-        Quota tessera:&nbsp;&nbsp;<u><?=$this->nbsp(18)?></u><?=$this->nbsp(4)?>Numero tessera:&nbsp;&nbsp;<u><?=$this->nbsp(36)?></u><?=$this->nbsp(4)?>Anno tessera:&nbsp;&nbsp;<span style="font-family: 'helveticamedium'">2024</span><!--span style="font-family: 'helveticamedium'">W0000001/2024</span-->
+        Quota tessera:&nbsp;&nbsp;<u><?=$this->nbsp(18)?></u><?=$this->nbsp(4)?>Numero tessera:&nbsp;&nbsp;<u><?=$this->nbsp(36)?></u><?=$this->nbsp(4)?>Anno tessera:&nbsp;&nbsp;<<u><?=$this->nbsp(10)?></u>
     </p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: justify">Acquisite le informazioni fornite dal titolare del trattamento ai sensi dell’articolo 7 del Regolamento (UE) 2016/679 con la presente acconsente al trattamento dei propri dati personali da parte di MULTIPOPOLARE APS per le finalità esposte nell’informativa consegnatami <span style="font-family: 'helveticamedium'">ad esclusione delle attività di marketing</span>, iscrizione a newsletter automatizzata dell’associazione, pubblicazione su supporto cartaceo ed elettronico dei dati personali, di trasferimento dei dati personali in un paese extra UE.</p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">Luogo e data</p>
@@ -31,7 +31,7 @@ $pdf->SetY($pdf->GetY()-4);
 ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: right;">Firma<?=$this->nbsp(32)?></p>
-    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><u><?=$this->nbsp(31)?></u>&nbsp;(<u><?=$this->nbsp(7)?></u>), <u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(14)?></u></p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><u><?=$this->nbsp(45)?></u>&nbsp;(<u><?=$this->nbsp(9)?></u>), <u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(14)?></u></p>
     <p style="line-height:15px"></p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: justify"><span style="font-family: 'helveticamedium'">Consenso a trattamenti ulteriori, consigliati ma non indispensabili per la continuazione del rapporto (selezionare le voci)</span><br/><br/>
         Presta il suo consenso e fino alla revoca dello stesso, per la proposizione di offerte, comunicazioni commerciali e per il successivo invio di materiale informativo pubblicitario e/o promozionale e/o sondaggi di opinione, ricerche di mercato, invio di newsletter di MULTIPOPOLARE APS (di seguito complessivamente definite “attività di propaganda”) del Titolare e/o da organizzazioni correlate. Il trattamento per attività di marketing avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea e/o chiamate da operatore), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo SMS e/o MMS, chiamate telefoniche senza l’intervento dell’operatore, posta elettronica, social network, newsletter, applicazioni interattive, notifiche push)
@@ -52,7 +52,7 @@ ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: right">Firma<?=$this->nbsp(32)?></p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">Luogo e data</p>
-    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><u><?=$this->nbsp(31)?></u>&nbsp;(<u><?=$this->nbsp(7)?></u>), <u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(14)?></u></p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><u><?=$this->nbsp(45)?></u>&nbsp;(<u><?=$this->nbsp(9)?></u>), <u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(14)?></u></p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: justify">Presta il suo consenso e fino alla revoca dello stesso, per la comunicazioni di iniziative ed attività di MULTIPOPOLARE APS (di seguito complessivamente definite “attività di informazione dell’associazione”) del Titolare e/o da organizzazioni correlate.<br/>Il trattamento per attività di informazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo posta elettronica)</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
@@ -70,7 +70,7 @@ ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: right">Firma<?=$this->nbsp(32)?></p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">Luogo e data</p>
-    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><u><?=$this->nbsp(31)?></u>&nbsp;(<u><?=$this->nbsp(7)?></u>), <u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(14)?></u></p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><u><?=$this->nbsp(45)?></u>&nbsp;(<u><?=$this->nbsp(9)?></u>), <u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(14)?></u></p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: justify">Presta il suo consenso e fino alla revoca dello stesso, per la pubblicazione del suo nominativo su riviste, cataloghi, brochure, annuari, siti, ecc. di MULTIPOPOLARE APS (di seguito complessivamente definite “attività di pubblicazione dell’associazione”) del Titolare e/o da organizzazioni correlate. Il trattamento per attività di pubblicazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo pubblicazioni cartacee), ovvero mediante sistemi “elettronici” (a titolo esemplificativo pubblicazioni elettroniche, social network, sito, blog, ecc.)</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
@@ -88,7 +88,7 @@ ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: right">Firma<?=$this->nbsp(32)?></p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">Luogo e data</p>
-    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><u><?=$this->nbsp(31)?></u>&nbsp;(<u><?=$this->nbsp(7)?></u>), <u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(14)?></u></p>
+    <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><u><?=$this->nbsp(45)?></u>&nbsp;(<u><?=$this->nbsp(9)?></u>), <u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(7)?></u>/<u><?=$this->nbsp(14)?></u></p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->AddPage();
