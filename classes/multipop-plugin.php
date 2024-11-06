@@ -1053,11 +1053,11 @@ class MultipopPlugin {
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
         if (isset($options['sub_id']) && $options['sub_id']) {
-            $this->SetAutoPageBreak(false);
+            $pdf->SetAutoPageBreak(false);
             $total_pages = intval($pdf->getAliasNbPages());
             $pdf->setY(-$pdf->config['margin_bottom']);
-            $this->Cell(0, $pdf->config['margin_footer'], $options['sub_id'], 0, false, 'C', 0, '', 0, false, 'T', 'M');
-            $this->SetAutoPageBreak(true, $config['margin_bottom']);
+            $pdf->Cell(0, $pdf->config['margin_footer'], $options['sub_id'], 0, false, 'C', 0, '', 0, false, 'T', 'M');
+            $pdf->SetAutoPageBreak(true, $config['margin_bottom']);
         } 
         return $pdf;
     }
