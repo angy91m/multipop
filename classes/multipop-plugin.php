@@ -1094,7 +1094,7 @@ class MultipopPlugin {
         if (isset($options['subscription_year']) && $options['subscription_year']) {
             $pdf->setPage(1);
             $pdf->setY(102);
-            $pdf->setX(140);
+            $pdf->setX(160);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['subscription_year']?></span>
             <?php
