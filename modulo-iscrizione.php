@@ -21,7 +21,7 @@ ob_start();
         email&nbsp;<u><?=$this->nbsp(121)?></u><br/><br/>
         <span style="font-family: 'helveticamedium'">chiede di aderire all’associazione Multipopolare APS</span><br/>
         <span style="color: #aaa; font-size:10pt;">(A cura di Multipopolare)</span><br/>
-        Quota tessera:&nbsp;&nbsp;<u><?=$this->nbsp(18)?></u><?=$this->nbsp(4)?>Numero tessera:&nbsp;&nbsp;<u><?=$this->nbsp(36)?></u><?=$this->nbsp(4)?>Anno riferimento:&nbsp;&nbsp;<span style="font-family: 'helveticamedium'">2024</span><!--span style="font-family: 'helveticamedium'">W0000001/2024</span-->
+        Quota tessera:&nbsp;&nbsp;<u><?=$this->nbsp(18)?></u><?=$this->nbsp(4)?>Numero tessera:&nbsp;&nbsp;<u><?=$this->nbsp(36)?></u><?=$this->nbsp(4)?>Anno tessera:&nbsp;&nbsp;<span style="font-family: 'helveticamedium'">2024</span><!--span style="font-family: 'helveticamedium'">W0000001/2024</span-->
     </p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: justify">Acquisite le informazioni fornite dal titolare del trattamento ai sensi dell’articolo 7 del Regolamento (UE) 2016/679 con la presente acconsente al trattamento dei propri dati personali da parte di MULTIPOPOLARE APS per le finalità esposte nell’informativa consegnatami <span style="font-family: 'helveticamedium'">ad esclusione delle attività di marketing</span>, iscrizione a newsletter automatizzata dell’associazione, pubblicazione su supporto cartaceo ed elettronico dei dati personali, di trasferimento dei dati personali in un paese extra UE.</p>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';">Luogo e data</p>
