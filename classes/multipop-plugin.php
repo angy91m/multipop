@@ -1048,7 +1048,7 @@ class MultipopPlugin {
         }
         if (isset($options['mpop_newsletter_agree'])) {
             $pdf->setPage(1);
-            $pdf->setY(196.5);
+            $pdf->setY(220);
             if ($options['mpop_newsletter_agree']) {
                 $pdf->setX(11.5);
             } else {
