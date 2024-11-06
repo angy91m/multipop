@@ -1056,7 +1056,7 @@ class MultipopPlugin {
             $pdf->SetAutoPageBreak(false);
             $total_pages = intval($pdf->getAliasNbPages());
             $pdf->SetFont($pdf->config['font'], 'B', $pdf->config['font_size']);
-            $pdf->Text(30,$pdf->config['margin_bottom']+$pdf->config['margin_footer'],'CIAO', 0, false, true, 0,0,'',false, '', 0, false, 'B');
+            $pdf->Text(30,0,'CIAO', 0, false, true, 0,0,'',false, '', 0, false, 'B');
             //$pdf->Cell(0, , $options['sub_id'], 0, false, 'C', 0, '', 0, false, 'T', 'M');
             $pdf->SetAutoPageBreak(true, $pdf->config['margin_bottom']);
         } 
