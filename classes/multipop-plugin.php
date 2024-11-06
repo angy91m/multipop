@@ -1039,7 +1039,7 @@ class MultipopPlugin {
             if ($options['mpop_marketing_agree']) {
                 $pdf->setX(11.5);
             } else {
-                $pdf->setX(50);
+                $pdf->setX(51.5);
             }
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">X</span>
