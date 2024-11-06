@@ -24,9 +24,9 @@ rpnjadnkjks',
     'mpop_phone' => '3239180',
     'email' => 'asdnjsad',
     'sub_id' => 5,
-    'mpop_marketing_agree' => false,
-    'mpop_newsletter_agree' => false,
-    'mpop_publish_agree' => true
+    'mpop_marketing_agree' => true,
+    'mpop_newsletter_agree' => true,
+    'mpop_publish_agree' => false
 ])->export_file());
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
