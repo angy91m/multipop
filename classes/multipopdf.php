@@ -25,7 +25,7 @@ class MultipoPDF extends \setasign\Fpdi\Tcpdf\Fpdi
         'margin_right' => 11,
         'mpop_import' => false
     ];
-    private array $config = [];
+    public array $config = [];
     private static array $tagvs = [
         'div' => [
             0 => ['h' => 0, 'n' => 0],
