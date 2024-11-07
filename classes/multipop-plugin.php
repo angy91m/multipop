@@ -4095,8 +4095,6 @@ class MultipopPlugin {
         return false;
     }
     public function discourse_bypass_invited_users($user_id, $user) {
-        $user = get_user_by('ID', $user_id);
-        if (!$user) return false;
         return $user->mpop_invited;
     }
 }
