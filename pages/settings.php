@@ -8,6 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_REQUEST['mpop-admin-settings
     require('post/settings.php');
 }
 $comuni_update_errors = $this->check_update_comuni();
+$this->add_admin_notice('prova');
 foreach($comuni_update_errors as $err) {
     $this->add_admin_notice($err);
 }
