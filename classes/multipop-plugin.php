@@ -1396,7 +1396,7 @@ class MultipopPlugin {
                 continue;
             }
             if (isset($comune['cap'])) {
-                $errors[] = "CAP mancate/i per il comune di $comune[nome] (" . $comune['provicia']['sigla'] . ") ($comune[codiceCatastale])";
+                $errors[] = "CAP mancate/i per il comune di $comune[nome] (" . $comune['provincia']['sigla'] . ") ($comune[codiceCatastale])";
             }
         }
         return $errors;
