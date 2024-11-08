@@ -1395,8 +1395,14 @@ class MultipopPlugin {
             if ($comune['soppresso']){
                 continue;
             }
-            if (isset($comune['cap'])) {
+            if (!isset($comune['cap'])) {
                 $errors[] = "CAP mancate/i per il comune di $comune[nome] (" . $comune['provincia']['sigla'] . ") ($comune[codiceCatastale])";
+            } else {
+                foreach ($comune['cap'] as $cap) {
+                    if (!$cap) {
+                        $errors[] = "CAP mancate/i per il comune di $comune[nome] (" . $comune['provincia']['sigla'] . ") ($comune[codiceCatastale])";
+                    }
+                }
             }
         }
         return $errors;
