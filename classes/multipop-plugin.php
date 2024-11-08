@@ -1206,7 +1206,7 @@ class MultipopPlugin {
         global $wpdb;
         $q = "SHOW COLUMNS FROM " . $this::db_prefix('plugin_settings') . ";";
         $column_names = implode(',', array_map( function($c) {return "`$c`";}, array_filter( $wpdb->get_col($q), function($c) {return $c !== 'master_doc_key';} ) ));
-        $columns = $column_names . ',`master_doc_key` IS NOT NULL as `master_doc_key`';
+        $columns = $column_names . ',`master_doc_key` IS NOT NULL AND `master_doc_key` != "" as `master_doc_key`';
         $q = "SELECT $columns FROM " . $this::db_prefix('plugin_settings') . " WHERE `id` = 1;";
         $settings = $wpdb->get_row($q, ARRAY_A);
         if (!$settings) {
@@ -1385,6 +1385,21 @@ class MultipopPlugin {
             }
         }
         exec(MULTIPOP_PLUGIN_PATH . 'comuni/comuni-update.sh --skip-on-error=attivi,soppressi,multicap --flush=2 > /dev/null &');
+    }
+    
+    private function check_update_comuni() {
+        $comuni = $this->get_comuni_all();
+        if (empty($comuni)) return ['Nessun comune presente'];
+        $errors = [];
+        foreach ($comuni as $comune) {
+            if ($comune['soppresso']){
+                continue;
+            }
+            if (isset($comune['cap'])) {
+                $errors[] = "CAP mancate/i per il comune di $comune[nome] (" . $comune['provicia']['sigla'] . ") ($comune[codiceCatastale])";
+            }
+        }
+        return $errors;
     }
 
     // LOGOUT AND REDIRECT TO URL OR HOME
@@ -3976,7 +3991,7 @@ class MultipopPlugin {
         if (isset($user->roles[0])) {
             if ($user->roles[0] == 'administrator') {
                 $groups[] = ['name' => 'mp_wp_admins', 'full_name' => 'Amministratori Wordpress', 'owner' => false];
-            } else if ($user->roles[0] == 'multipopolare_friend') {
+            } else if ($user->roles[0] == 'multipopolare_friend' || ($user->roles[0] == 'multipopolano' && !$user->mpop_mail_to_confirm && !$user->mpop_card_active)) {
                 $groups[] = ['name' => 'mp_friends', 'full_name' => 'Amici di Multipopolare', 'owner' => false];
             } else if ($user->mpop_card_active && in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
                 if ($user->mpop_billing_state) {
@@ -4095,6 +4110,9 @@ class MultipopPlugin {
         return false;
     }
     public function discourse_bypass_invited_users($user_id, $user) {
+        if (!is_object($user)) {
+            return true;
+        }
         return $user->mpop_invited;
     }
 }

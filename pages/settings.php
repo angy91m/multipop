@@ -7,6 +7,10 @@ if ( !$this->current_user_is_admin() ) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_REQUEST['mpop-admin-settings-nonce'])) {
     require('post/settings.php');
 }
+$comuni_update_errors = $this->check_update_comuni();
+foreach($comuni_update_errors as $err) {
+    $this->add_admin_notice($err);
+}
 do_action('mpop_settings_notices', $this->get_settings());
 ?>
 <form method="POST" id="mpop_settings_form">
