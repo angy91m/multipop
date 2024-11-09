@@ -4130,7 +4130,7 @@ class MultipopPlugin {
         ])[0];
         $unauthorized = [
             'ID' => "0",
-            'username' => 'unauthorized',
+            'user_login' => 'unauthorized',
             'unauthorized' => 1
         ];
         switch($service->post_name) {
