@@ -4133,15 +4133,15 @@ class MultipopPlugin {
         ];
         switch($service->post_name) {
             case 'wikipopolare':
-                if ($user_data['user_roles'][0] != 'administrator') {
+                if ($user_data['user_roles'][0] == 'administrator') {
+                    $user_data['groups'] = ['writer'];
+                } else {
                     $user = get_user_by('ID', $user_data['ID']);
                     if ($user->mpop_wiki_writer) {
                         $user_data['groups'] = ['writer'];
                     } else {
                         return $unauthorized;
                     }
-                } else {
-                    $user_data['groups'] = ['writer'];
                 }
                 break;
         }
