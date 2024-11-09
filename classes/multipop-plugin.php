@@ -4136,12 +4136,12 @@ class MultipopPlugin {
                 if ($user_data['user_roles'][0] != 'administrator') {
                     $user = get_user_by('ID', $user_data['ID']);
                     if ($user->mpop_wiki_writer) {
-                        $user_data['groups'] = 'writer';
+                        $user_data['groups'] = ['writer'];
                     } else {
                         return $unauthorized;
                     }
                 } else {
-                    $user_data['groups'] = 'writer';
+                    $user_data['groups'] = ['writer'];
                 }
                 break;
         }
