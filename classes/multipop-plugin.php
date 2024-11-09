@@ -4129,8 +4129,6 @@ class MultipopPlugin {
             'meta_value' => $token['client_id']
         ])[0];
         $unauthorized = [
-            'ID' => "0",
-            'user_login' => 'unauthorized',
             'unauthorized' => 1
         ];
         switch($service->post_name) {
