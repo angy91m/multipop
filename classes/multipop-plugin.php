@@ -4124,7 +4124,7 @@ class MultipopPlugin {
     }
     public function oauth_filter_login($user_data, $token) {
         save_test($user_data);
-        save_test($token);
+        //save_test($token, 1);
         return $user_data;
     }
 }
