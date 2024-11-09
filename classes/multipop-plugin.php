@@ -4128,7 +4128,7 @@ class MultipopPlugin {
             'meta_key' => 'client_id',
             'meta_value' => $token['client_id']
         ])[0];
-        save_test($service);
+        save_test($user_data['user_roles'][0]);
         $unauthorized = ['unauthorized' => 1];
         switch($service['post_name']) {
             case 'wikipopolare':
