@@ -4128,11 +4128,12 @@ class MultipopPlugin {
             'meta_key' => 'client_id',
             'meta_value' => $token['client_id']
         ])[0];
+        $unauthorized = ['error' => 'unauthorized'];
         switch($service['post_name']) {
             case 'wikipopolare':
                 $user = get_user_by('ID', $user_data);
                 if (!$user->mpop_wiki_user && !$user->mpop_wiki_writer) {
-                    return [];
+                    return $unauthorized;
                 }
                 break;
         }
