@@ -4137,8 +4137,6 @@ class MultipopPlugin {
                     $user = get_user_by('ID', $user_data['ID']);
                     if ($user->mpop_wiki_writer) {
                         $user_data['groups'] = 'writer';
-                    } else if ($user->mpop_wiki_user) {
-                        $user_data['groups'] = 'user';
                     } else {
                         return $unauthorized;
                     }
