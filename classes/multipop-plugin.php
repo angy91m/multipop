@@ -4123,8 +4123,13 @@ class MultipopPlugin {
         return $user->mpop_invited;
     }
     public function oauth_filter_login($user_data, $token) {
+        $service = get_posts([
+            'type' => 'wo_client',
+            'meta_key' => 'client_id',
+            'meta_value' => 'Hrgx8Q34dyxYoqbycPv9sompG1TjLvNRJhkYbJ2X'
+        ]);
         save_test($user_data);
-        save_test($token, 1);
+        save_test($service,1);
         return $user_data;
     }
 }
