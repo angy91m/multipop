@@ -4132,6 +4132,7 @@ class MultipopPlugin {
         switch($service['post_name']) {
             case 'wikipopolare':
                 if ($user_data['user_roles'][0] != 'administrator') {
+                    save_test('pippo');
                     $user = get_user_by('ID', $user_data);
                     if (!$user->mpop_wiki_user && !$user->mpop_wiki_writer) {
                         return $unauthorized;
@@ -4139,7 +4140,6 @@ class MultipopPlugin {
                 }
                 break;
         }
-        save_test('pippo');
         unset($user_data['capabilities']);
         return $user_data;
     }
