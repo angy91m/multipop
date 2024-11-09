@@ -309,7 +309,7 @@ class MultipopPlugin {
         add_action('wpdc_sso_provider_before_sso_redirect', [$this, 'discourse_filter_login'], 10, 2 );
         add_filter('wpdc_sso_params', [$this, 'discourse_user_params'], 10, 2);
         add_filter('wpdc_bypass_sync_sso', [$this, 'discourse_bypass_invited_users'], 10, 2);
-        add_filter('wo_me_resource_return', [$this, 'oauth_filter_login'], 10, 2);
+        //add_filter('wo_me_resource_return', [$this, 'oauth_filter_login'], 10, 2);
         $this->delayed_action = isset($GLOBALS['mpop_delayed_action']) ? $GLOBALS['mpop_delayed_action'] : false;
         $this->delayed_scripts = [
             'updateDiscourseGroupsByUser' => function($user_id) {
