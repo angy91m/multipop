@@ -4133,12 +4133,18 @@ class MultipopPlugin {
         ];
         switch($service->post_name) {
             case 'wikipopolare':
-                // if ($user_data['user_roles'][0] != 'administrator') {
+                if ($user_data['user_roles'][0] != 'administrator') {
                     $user = get_user_by('ID', $user_data['ID']);
-                    if (!$user->mpop_wiki_user && !$user->mpop_wiki_writer) {
+                    if ($user->mpop_wiki_writer) {
+                        $user_data['groups'] = 'writer';
+                    } else if ($user->mpop_wiki_user) {
+                        $user_data['groups'] = 'user';
+                    } else {
                         return $unauthorized;
                     }
-                // }
+                } else {
+                    $user_data['groups'] = 'writer';
+                }
                 break;
         }
         unset($user_data['capabilities']);
