@@ -4128,6 +4128,7 @@ class MultipopPlugin {
             'meta_key' => 'client_id',
             'meta_value' => $token['client_id']
         ])[0];
+        save_test($service);
         $unauthorized = ['unauthorized' => 1];
         switch($service['post_name']) {
             case 'wikipopolare':
@@ -4140,7 +4141,6 @@ class MultipopPlugin {
                 break;
         }
         unset($user_data['capabilities']);
-        save_test($user_data);
         return $user_data;
     }
 }
