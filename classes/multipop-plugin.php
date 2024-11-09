@@ -4129,15 +4129,14 @@ class MultipopPlugin {
             'meta_value' => $token['client_id']
         ])[0];
         $unauthorized = ['unauthorized' => 1];
-        switch($service['post_name']) {
+        switch($service->post_name) {
             case 'wikipopolare':
-                if ($user_data['user_roles'][0] != 'administrator') {
-                    save_test('pippo');
-                    $user = get_user_by('ID', $user_data);
+                // if ($user_data['user_roles'][0] != 'administrator') {
+                    $user = get_user_by('ID', $user_data['ID']);
                     if (!$user->mpop_wiki_user && !$user->mpop_wiki_writer) {
                         return $unauthorized;
                     }
-                }
+                // }
                 break;
         }
         unset($user_data['capabilities']);
