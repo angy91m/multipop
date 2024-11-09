@@ -4124,7 +4124,7 @@ class MultipopPlugin {
     }
     public function oauth_filter_login($user_data, $token) {
         $service = get_posts([
-            'type' => 'wo_client',
+            'post_type' => 'wo_client',
             'meta_key' => 'client_id',
             'meta_value' => 'Hrgx8Q34dyxYoqbycPv9sompG1TjLvNRJhkYbJ2X'
         ]);
