@@ -4126,10 +4126,17 @@ class MultipopPlugin {
         $service = get_posts([
             'post_type' => 'wo_client',
             'meta_key' => 'client_id',
-            'meta_value' => 'Hrgx8Q34dyxYoqbycPv9sompG1TjLvNRJhkYbJ2X'
-        ]);
-        save_test($user_data);
-        save_test($service,1);
+            'meta_value' => $token['client_id']
+        ])[0];
+        switch($service['post_name']) {
+            case 'wikipopolare':
+                $user = get_user_by('ID', $user_data);
+                if (!$user->mpop_wiki_user && !$user->mpop_wiki_writer) {
+                    return [];
+                }
+                break;
+        }
+        unset($user_data['capabilities']);
         return $user_data;
     }
 }
