@@ -44,7 +44,7 @@ $pdf->SetY(18.3);
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->SetY(32);
 $next_line = [$pdf->GetX()+2, $pdf->GetY()+5];
-$pdf->Rect(150, 30, 20, 6);
+$pdf->Rect(145, 33, 35, 6);
 //$pdf->RegularPolygon($next_line[0]+15, $next_line[1], 2, 4, 45, false, '', [], [50, 34, 34]);
 $pdf->SetY($next_line[1]-1.7);
 ob_start();
