@@ -30,25 +30,27 @@ $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->SetY($pdf->GetY()-4);
 // START RENEW CHECK
 $old_line = [$pdf->GetX(), $pdf->GetY()];
-$pdf->SetX(15);
-$pdf->SetY(15);
-$next_line = [$pdf->GetX()+2, $pdf->GetY()+5];
-$pdf->RegularPolygon($next_line[0], $next_line[1], 2, 4, 45, false, '', [], [34, 34, 34]);
-$pdf->SetY($next_line[1]-1.7);
 ob_start();
+$pdf->SetY(18.3);
 ?>
     <style type="text/css">
         h2 {color: #222; line-height: 8px;}
         span.sugg {font-size: 9pt;}
     </style>
     <span style="font-family: 'helveticatitle'">
-        <h2><?=$pdf->GetY()?>MODULO CONSENSO SOCIO</h2>
+        <h2>MODULO CONSENSO SOCIO</h2>
     </span>
+<?php
+$pdf->WriteHTML(ob_get_clean(), true, false, true);
+$pdf->SetY(30);
+$next_line = [$pdf->GetX()+2, $pdf->GetY()+5];
+$pdf->RegularPolygon($next_line[0], $next_line[1], 2, 4, 45, false, '', [], [34, 34, 34]);
+$pdf->SetY($next_line[1]-1.7);
+ob_start();
+?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight';"><?=$this->nbsp(10)?>In caso di rinnovo, per motivi indicare un dato non cambiato dall'a</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
-
-
 $pdf->SetX($old_line[0]);
 $pdf->SetY($old_line[1]);
 
