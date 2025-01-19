@@ -151,8 +151,8 @@ ob_start();
         <br/><?=$this->nbsp(4)?>a) l’aggiornamento, la rettificazione ovvero, quando vi ha interesse, l’integrazione dei dati;
         <br/><?=$this->nbsp(4)?>b) la cancellazione, la trasformazione in forma anonima o il blocco dei dati trattati in violazione di legge, compresi quelli di cui non è necessaria la
         <br/><?=$this->nbsp(8)?>conservazione in relazione agli scopi per i quali i dati sono stati raccolti o successivamente trattati;
-        <br/><?=$this->nbsp(4)?>c) l’attestazione che le operazioni di cui alle lettere a) e b) sono state portate a conoscenza, anche per quanto riguarda il loro contenuto, di coloro ai quali
-        <br/><?=$this->nbsp(8)?>i dati sono stati comunicati o diffusi, eccettuato il caso in cui tale adempimento si rivela impossibile o comporta un impiego di mezzi manifestamente
+        <br/><?=$this->nbsp(4)?>c) l’attestazione che le operazioni di cui alle lettere a) e b) sono state portate a conoscenza, anche per quanto riguarda il loro contenuto, di coloro ai qua-
+        <br/><?=$this->nbsp(8)?>li i dati sono stati comunicati o diffusi, eccettuato il caso in cui tale adempimento si rivela impossibile o comporta un impiego di mezzi manifestamente
         <br/><?=$this->nbsp(8)?>sproporzionato rispetto al diritto tutelato;
         <br/><?=$this->nbsp(4)?>d) la portabilità dei dati.
         <br/>4) L’interessato ha diritto di opporsi, in tutto o in parte:
