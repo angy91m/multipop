@@ -1071,6 +1071,15 @@ class MultipopPlugin {
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
+        if (isset($options['card_number']) && is_string($options['card_number']) && $options['card_number']) {
+            $pdf->setPage(1);
+            $pdf->setY(102);
+            $pdf->setX(99);
+            ob_start(); ?>
+            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['card_number']?></span>
+            <?php
+            $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+        }
         if (isset($options['subscription_year']) && $options['subscription_year']) {
             $pdf->setPage(1);
             $pdf->setY(102);
@@ -1471,7 +1480,7 @@ class MultipopPlugin {
             if ($user->mpop_mail_to_confirm || $user->_new_email) {
                 if (
                     isset($_REQUEST['mpop_mail_token'])
-                    && preg_match('/^[a-f0-9]{32}$/', $_REQUEST['mpop_mail_token'])
+                    && preg_match('/^[a-f0-9]{96}$/', $_REQUEST['mpop_mail_token'])
                 ) {
                     $user_id = $this->verify_temp_token($_REQUEST['mpop_mail_token'], 'email_confirmation_link');
                     if ($user_id == $user->ID) {
