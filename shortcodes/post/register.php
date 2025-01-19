@@ -97,7 +97,7 @@ $user_id = wp_insert_user([
         // 'mpop_newsletter_agree' => false,
         // 'mpop_publish_agree' => false,
         // 'mpop_org_role' => false,
-        // 'mpop_invited' => true
+        // 'mpop_invited' => false
     ]
 ]);
 

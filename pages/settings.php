@@ -34,6 +34,11 @@ do_action('mpop_settings_notices', $this->get_settings());
     <br><br>
     <button class="button" id="force_comuni_update_button">Forza aggiornamento</button>
     <hr>
+    <h3>Discourse</h3>
+    <input type="hidden" id="force_discourse_groups_reload" name="force_discourse_groups_reload" value="" />
+    <br><br>
+    <button class="button" id="force_discourse_groups_reload_button">Ricarica cache gruppi</button>
+    <hr>
     <h3>Configurazione e-mail</h3>
     <h4>Host</h4>
     <input type="text" name="mail_host" value="<?=$this->settings['mail_host']?>" />

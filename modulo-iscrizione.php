@@ -28,6 +28,17 @@ ob_start();
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->SetY($pdf->GetY()-4);
+// START RENEW CHECK
+
+$old_y = $pdf->GetY();
+ob_start();
+?>
+    <p style="font-family: 'helveticalight'; font-size: 12pt; line-height: 15px;"><?=$old_y?></p>
+<?php
+$pdf->WriteHTML(ob_get_clean(), true, false, true);
+//$pdf->SetY($old_y);
+
+// END RENEW CHECK
 ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: right;">Firma<?=$this->nbsp(32)?></p>

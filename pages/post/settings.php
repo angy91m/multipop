@@ -9,6 +9,14 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
     } else if ($_REQUEST['force_comuni_update'] == '1') {
         $this->update_comuni(true);
         $this->add_admin_notice("Aggiornamento in corso", 'success');
+    } else if ($_REQUEST['force_discourse_groups_reload'] == '1') {
+        $disc_utils = $this->discourse_utilities();
+        if (!$disc_utils) {
+            $this->add_admin_notice("Plugin per Discourse non presente");
+        } else {
+            $disc_utils->get_discourse_groups(true);
+            $this->add_admin_notice("Cache gruppi Discourse ricaricata", 'success');
+        }
     } else if (!empty(trim($_REQUEST['send_test_mail']))) {
         if (!$this->is_valid_email(trim($_REQUEST['send_test_mail']), false, true)) {
             $this->add_admin_notice("Indirizzo e-mail non valido");
