@@ -44,7 +44,7 @@ $pdf->SetY(18.3);
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->SetY(32);
 $next_line = [$pdf->GetX()+2, $pdf->GetY()+5];
-$pdf->Rect(144, 34, 40, 6);
+$pdf->Rect(144, 35, 45, 6);
 $pdf->SetY($next_line[1]-1.7);
 ob_start();
 ?>
