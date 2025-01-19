@@ -10,23 +10,23 @@ if (
 }
 $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 file_put_contents( MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_compile($this->pdf_import($this->pdf_create([])), [
-    'quote' => 1000,
-    'name' => 'Angelo Burzi',
-    'mpop_birthplace_country' => 'arg',
-    'mpop_birthplace' => 'D843',
-    'mpop_birthdate' => '1991-10-09',
-    'mpop_billing_country' => 'arg',
-    'mpop_billing_city' => 'H501',
-    'mpop_billing_address' => 'Via prova
-rpnjadnkjks',
-    'mpop_billing_zip' => '00195',
-    'mpop_phone' => '3239180',
-    'email' => 'asdnjsad',
-    'subscription_id' => 5,
-    'subscription_year' => 2024,
-    'mpop_marketing_agree' => true,
-    'mpop_newsletter_agree' => true,
-    'mpop_publish_agree' => false
+//     'quote' => 1000,
+//     'name' => 'Angelo Burzi',
+//     'mpop_birthplace_country' => 'arg',
+//     'mpop_birthplace' => 'D843',
+//     'mpop_birthdate' => '1991-10-09',
+//     'mpop_billing_country' => 'arg',
+//     'mpop_billing_city' => 'H501',
+//     'mpop_billing_address' => 'Via prova
+// rpnjadnkjks',
+//     'mpop_billing_zip' => '00195',
+//     'mpop_phone' => '3239180',
+//     'email' => 'asdnjsad',
+//     'subscription_id' => 5,
+    'subscription_year' => 2025,
+    // 'mpop_marketing_agree' => true,
+    // 'mpop_newsletter_agree' => true,
+    // 'mpop_publish_agree' => false
 ])->export_file());
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
