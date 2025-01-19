@@ -44,12 +44,12 @@ $pdf->SetY(18.3);
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->SetY(32);
 $next_line = [$pdf->GetX()+2, $pdf->GetY()+5];
-$pdf->Rect(150, 30, 15, 4);
+$pdf->Rect(150, 30, 20, 6);
 //$pdf->RegularPolygon($next_line[0]+15, $next_line[1], 2, 4, 45, false, '', [], [50, 34, 34]);
 $pdf->SetY($next_line[1]-1.7);
 ob_start();
 ?>
-    <p style="font-size: 7pt; line-height: 9px; font-family: 'helveticalight';"><?=$this->nbsp(6)?>In caso di rinnovo, oltre ad indicare nome, cognome ed eventuali dati cambiati,<br/><?=$this->nbsp(6)?>inserire un dato non cambiato (indirizzo e-mail o telefono) nel seguente spazio:</p>
+    <p style="font-size: 7pt; line-height: 9px; font-family: 'helveticalight';"><?=$this->nbsp(70)?>In caso di rinnovo, oltre ad indicare nome, cognome ed eventuali dati cambiati,<br/><?=$this->nbsp(70)?>inserire un dato non cambiato (indirizzo e-mail o telefono) nel seguente spazio:</p>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->SetX($old_line[0]);
