@@ -42,9 +42,9 @@ $pdf->SetY(18.3);
     </span>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
-$pdf->SetY(30);
+$pdf->SetY(32);
 $next_line = [$pdf->GetX()+2, $pdf->GetY()+5];
-$pdf->RegularPolygon($next_line[0]+15, $next_line[1], 15, 4, 45, false, '', [], [34, 34, 34]);
+$pdf->RegularPolygon($next_line[0]+15, $next_line[1], 2, 4, 45, false, '', [], [50, 34, 34]);
 $pdf->SetY($next_line[1]-1.7);
 ob_start();
 ?>
