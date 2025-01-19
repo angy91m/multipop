@@ -1,4 +1,5 @@
 <?php
+defined('ABSPATH') || exit;
 
 class WikipopClient {
     private array $cookieJar = [];
@@ -7,14 +8,14 @@ class WikipopClient {
     private string $password = '';
     private bool $authenticated = false;
     private array $managedGroups = [];
-    private bool $debug = false;
+    private bool $sslDebug = false;
 
-    function __construct(string $baseURL, string $username, string $password, array $managedGroups = [], $debug = false) {
+    function __construct(string $baseURL, string $username, string $password, array $managedGroups = [], $sslDebug = false) {
         $this->baseURL = $baseURL;
         $this->username = $username;
         $this->password = $password;
         $this->managedGroups = $managedGroups;
-        $this->debug = $debug;
+        $this->sslDebug = $sslDebug;
     }
     private function getCookies() {
         $res = '';
@@ -32,7 +33,7 @@ class WikipopClient {
             CURLOPT_NOSIGNAL => true,
             CURLOPT_TIMEOUT => 5
         ];
-        if ($this->debug) {
+        if ($this->sslDebug) {
             $settings += [
                 CURLOPT_SSL_VERIFYHOST => false,
                 CURLOPT_SSL_VERIFYPEER => false
@@ -145,7 +146,7 @@ class WikipopClient {
         }
         $this->authenticate();
         $token = $this->getTokens()['csrftoken'];
-        $curlObj = $this->curlInit($this->baseURL . "/api.php?action=block&allowusertalk=false&noemail=true&format=json&user=" . urlencode($wikiUser['name']) . ($reason? 'reason=' . urlencode($reason) : ''));
+        $curlObj = $this->curlInit($this->baseURL . "/api.php?action=block&allowusertalk=false&format=json&user=" . urlencode($wikiUser['name']) . ($reason? 'reason=' . urlencode($reason) : ''));
         curl_setopt($curlObj, CURLOPT_POST, true);
         curl_setopt($curlObj, CURLOPT_POSTFIELDS, "token=" . urlencode($token));
         return $this->execWithCookies($curlObj);
@@ -170,6 +171,3 @@ class WikipopClient {
         return $this->execWithCookies($curlObj);
     }
 }
-
-$wikiClient = new WikipopClient('https://wiki.test.mpop', 'Wp system@wp_system', 'he0tevt3gdagf6a4roj03iuhh7ul2j93', ['writer'], true);
-var_dump($wikiClient->blockUser('wp_system'));

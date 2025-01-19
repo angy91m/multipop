@@ -11,7 +11,6 @@ if (
 $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 file_put_contents( MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_compile($this->pdf_import($this->pdf_create([])), [
     'quote' => 1000,
-    'card_number'=> 'W000000',
     'name' => 'Angelo Burzi',
     'mpop_birthplace_country' => 'arg',
     'mpop_birthplace' => 'D843',
@@ -335,7 +334,7 @@ rpnjadnkjks',
                     <h4 v-if="profile.mpop_card_active">La tua tessera è attiva</h4>
                     <div>
                         <ul v-if="nearActiveSub">
-                            <li>Codice tessera: {{nearActiveSub.card_number ? nearActiveSub.card_number : 'Da assegnare'}}</li>
+                            <li>ID tesserato: {{profile.ID}}</li>
                             <li>Stato attivazione: {{showSubscriptionStatus(nearActiveSub)}}</li>
                             <li>Anno: {{nearActiveSub.year}}</li>
                             <li>ID richiesta: {{nearActiveSub.id}}</li>

@@ -256,9 +256,7 @@ class MultipopPlugin {
         register_activation_hook(MULTIPOP_PLUGIN_PATH . '/multipop.php', [$this, 'activate']);
         // DEACTIVATION HOOK
         register_deactivation_hook(MULTIPOP_PLUGIN_PATH . '/multipop.php', [$this, 'deactivate']);
-        // TEMPLATE REDIRECT HOOK
-        // add_action('template_redirect', [$this, 'template_redirect'] );
-        // CONNECT wp_mail to $this->send_mail()
+
         add_filter('pre_wp_mail', function ($res, $atts) {
             if ($res) return $res;
             $plugin_setts = $this->get_settings();
@@ -279,7 +277,7 @@ class MultipopPlugin {
         // LOGIN
         // ADD ELEMENTS TO LOGIN PAGE
         // CHECK AFTER LOGIN
-        //add_action('wp_login', [$this,'filter_login'], 10, 2);
+
         add_filter('authenticate', [$this, 'filter_login'], 21, 1);
 
         // SHOW USER NOTICES
@@ -303,13 +301,23 @@ class MultipopPlugin {
         // SAVE USER META IN ADMIN EDIT USER PAGE
         add_action('user_profile_update_errors', [$this, 'user_profile_update_errors'], 10, 3);
         add_action('personal_options_update', [$this, 'personal_options_update']);
+
+        // BYPASS SYMBOLS CONVERSION " WITH “
         add_filter('run_wptexturize', [$this, 'run_wptexturize']);
+        // ADD DISCOURSE CA TO VERIFY
         add_filter('https_ssl_verify', [$this,'discourse_req_ca'], 10, 2 );
+        // BYPASS DISCOURSE EMAIL VERIFICATION
         add_filter('discourse_email_verification', function() {return false;} );
+        // FILTER LOGIN TO DISCOURSE
         add_action('wpdc_sso_provider_before_sso_redirect', [$this, 'discourse_filter_login'], 10, 2 );
+        // FILTER PARAMS TO DISCOURSE SSO
         add_filter('wpdc_sso_params', [$this, 'discourse_user_params'], 10, 2);
+        // BYPASS DISCOURSE SSO FOR NOT CONFIRMED USERS
         add_filter('wpdc_bypass_sync_sso', [$this, 'discourse_bypass_invited_users'], 10, 2);
+        // FILTER OAUTH LOGIN
         add_filter('wo_me_resource_return', [$this, 'oauth_filter_login'], 10, 2);
+
+
         $this->delayed_action = isset($GLOBALS['mpop_delayed_action']) ? $GLOBALS['mpop_delayed_action'] : false;
         $this->delayed_scripts = [
             'updateDiscourseGroupsByUser' => function($user_id) {
@@ -630,14 +638,6 @@ class MultipopPlugin {
         ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
         dbDelta( $q );
 
-        // WEBCARD NUMBERS TABLE
-        $q = "CREATE TABLE IF NOT EXISTS " . $this::db_prefix('webcard_numbers') . " (
-            `year` SMALLINT UNSIGNED NOT NULL,
-            `last` BIGINT UNSIGNED NOT NULL,
-            PRIMARY KEY (`year`)
-        )";
-        dbDelta( $q );
-
         // TOKEN TABLE
         $q = "CREATE TABLE IF NOT EXISTS " . $this::db_prefix('temp_tokens') . " (
             `id` CHAR(32) NOT NULL,
@@ -651,7 +651,6 @@ class MultipopPlugin {
         // SUBSCRIPTIONS TABLE
         $q = "CREATE TABLE IF NOT EXISTS " . $this::db_prefix('subscriptions') . " (
             `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-            `card_number` VARCHAR(255) NULL,
             `filename` VARCHAR(255) NULL,
             `user_id` BIGINT UNSIGNED NOT NULL,
             `year` SMALLINT UNSIGNED NOT NULL,
@@ -669,8 +668,7 @@ class MultipopPlugin {
             `completer_id` BIGINT UNSIGNED NULL,
             `completer_ip` VARCHAR(255) NULL,
             `notes` TEXT NULL,
-            PRIMARY KEY (`id`),
-            UNIQUE (`card_number`, `year`)
+            PRIMARY KEY (`id`)
         ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
         dbDelta( $q );
     
@@ -847,16 +845,6 @@ class MultipopPlugin {
     private function send_invitation_mail($token, $to) {
         $confirmation_link = get_permalink($this->settings['myaccount_page']);
         return wp_mail($to,'Multipopolare - Invito iscrizione','Sei stato invitato a iscriverti su Multipopolare.it. Clicca sul link per completare l\'iscrizione: <a href="'. $confirmation_link . '?mpop_invite_token=' . $token . '" target="_blank">'. $confirmation_link . '?mpop_invite_token=' . $token . '</a>');
-    }
-
-    private function get_last_webcard_number(int $year) {
-        global $wpdb;
-        return intval($wpdb->get_var("SELECT `last` FROM " . $this::db_prefix('webcard_numbers') . " WHERE `year` = $year LIMIT 1;"));
-    }
-
-    private function increment_last_webcard_number(int $year) {
-        global $wpdb;
-        $wpdb->query("UPDATE " . $this::db_prefix('webcard_numbers') . " SET `last` = `last` + 1 WHERE `year` = $year;");
     }
 
     // CREATE PDF
@@ -1080,15 +1068,6 @@ class MultipopPlugin {
             $pdf->setX(40);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">€&nbsp;<?=$options['quote']?></span>
-            <?php
-            $pdf->writeHTML(ob_get_clean(),true, false, false, false);
-        }
-        if (isset($options['card_number']) && is_string($options['card_number']) && $options['card_number']) {
-            $pdf->setPage(1);
-            $pdf->setY(102);
-            $pdf->setX(99);
-            ob_start(); ?>
-            <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['card_number']?></span>
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
@@ -2560,12 +2539,6 @@ class MultipopPlugin {
             if (!$sub_id) {
                 return false;
             }
-        } else if ($getby == 'card_number') {
-            $sub_id = trim($sub_id);
-            if (!$sub_id || !$year) {
-                return false;
-            }
-            $search_format = '%s';
         } else {
             return false;
         }
@@ -2594,7 +2567,7 @@ class MultipopPlugin {
                 completers.user_login AS completer_login,
                 fn.meta_value AS first_name, 
                 ln.meta_value AS last_name
-                $q_from WHERE s.$getby = $search_format ". ($getby == 'card_number' ? "AND s.year = $year" : '') ." LIMIT 1;",
+                $q_from WHERE s.$getby = $search_format LIMIT 1;",
                 [$sub_id]
             ),
             'ARRAY_A'
@@ -2622,26 +2595,15 @@ class MultipopPlugin {
 
     private function complete_subscription(
         $sub_id,
-        string $card_number = '',
         $signed_at = 0,
         $paypal = false
     ) {
-        $webcard = false;
         $sub = $this->get_subscription_by('id', $sub_id);
         if (!$sub) {
             throw new Exception('Invalid subscription');
         }
         if ($sub['status'] != 'seen') {
             throw new Exception("Invalid subscription status: $sub[status]");
-        }
-        if ($card_number) {
-            $card_number = trim($card_number);
-            if ($this->get_subscription_by('card_number', $card_number, $sub['year'])) {
-                throw new Exception("Duplicated card_number");
-            }
-        } else {
-            $webcard = true;
-            $card_number = 'W'. $this->zerofill($this->get_last_webcard_number($sub['year'])+1);
         }
         $date_now = date_create('now', new DateTimeZone( current_time('e')));
         $now_ts = $date_now->getTimestamp();
@@ -2665,8 +2627,7 @@ class MultipopPlugin {
         }
         global $wpdb;
         if(!$wpdb->query($wpdb->prepare(
-            "UPDATE " . $this::db_prefix('subscriptions') . " SET 
-                card_number = %s,
+            "UPDATE " . $this::db_prefix('subscriptions') . " SET
                 status = 'completed',
                 updated_at = $now_ts,
                 completed_at = $now_ts,
@@ -2676,15 +2637,11 @@ class MultipopPlugin {
                 ".($paypal ? '' : ", pp_order_id = NULL")."
             WHERE id = $sub_id;",
             [
-                $card_number,
                 get_current_user_id(),
                 $this::get_client_ip()
             ]
         ))) {
             throw new Exception("Error while saving on DB");
-        }
-        if ($webcard) {
-            $this->increment_last_webcard_number();
         }
         if (intval(current_time('Y')) <= $sub['year']){
             $meta_input = [
@@ -2921,21 +2878,6 @@ class MultipopPlugin {
                 throw new Exception('Invalid year in mpop_subscription_date');
             }
         }
-        if (
-            !isset($row['mpop_subscription_card_number'])
-            || !is_string($row['mpop_subscription_card_number'])
-            || !trim($row['mpop_subscription_card_number'])
-        ) {
-            throw new Exception('Invalid mpop_subscription_card_number');
-        } else {
-            $row['mpop_subscription_card_number'] = trim( mb_strtoupper( $row['mpop_subscription_card_number'], 'UTF-8'));
-            if (str_starts_with($row['mpop_subscription_card_number'], 'W')) {
-                throw new Exception('mpop_subscription_card_number cannot start with W');
-            }
-            if (!empty($this::get_subscription_by('card_number',$row['mpop_subscription_card_number'], $subscription_date->format('Y')))) {
-                throw new Exception('Duplicated mpop_subscription_card_number');
-            }
-        }
         $mpop_friend = isset($row['mpop_friend']) ? boolval($row['mpop_friend']) : false;
         $user_input = [
             'user_pass' => bin2hex(openssl_random_pseudo_bytes(16)),
@@ -3165,7 +3107,7 @@ class MultipopPlugin {
                 throw new Exception('Error while saving subscription');
             }
             try {
-                $this->complete_subscription($sub_id,$row['mpop_subscription_card_number'],$subscription_date->getTimestamp());
+                $this->complete_subscription($sub_id,$subscription_date->getTimestamp());
             } catch(Exception $e) {
                 throw new Exception('Error while completing subscription: ' . $e->getMessage());
             }
@@ -3284,7 +3226,6 @@ class MultipopPlugin {
         $mpop_billing_city_reg = '/^[A-Z]\d{3}$/';
         $allowed_sorts = [
             'id',
-            'card_number',
             'user_login',
             'login',
             'user_email',
@@ -3444,8 +3385,7 @@ class MultipopPlugin {
         if ($options['txt']) {
             $sanitized_value = '%' . $wpdb->esc_like($options['txt']) . '%';
             $append_to_where($wpdb->prepare(
-                "( s.card_number LIKE %s
-                OR users.user_login LIKE %s
+                "( users.user_login LIKE %s
                 OR users.user_email LIKE %s
                 OR fn.meta_value LIKE %s
                 OR ln.meta_value LIKE %s )",
