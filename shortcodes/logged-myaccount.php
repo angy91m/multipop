@@ -9,7 +9,7 @@ if (
     exit;
 }
 $parsed_user = $this->myaccount_get_profile($current_user, true, true);
-file_put_contents(MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_create(['renew_check']));
+file_put_contents(MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_create(['renew_check' => true]));
 // file_put_contents( MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_compile($this->pdf_import($this->pdf_create([])), [
 //     'quote' => 1000,
 //     'name' => 'Angelo Burzi',
