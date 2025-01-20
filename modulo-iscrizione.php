@@ -28,7 +28,7 @@ ob_start();
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
 $pdf->SetY($pdf->GetY()-4);
-// START RENEW CHECK
+// START ADD "MODULO CONSENSO SOCIO" 
 $old_line = [$pdf->GetX(), $pdf->GetY()];
 ob_start();
 $pdf->SetY(18.3);
@@ -42,19 +42,22 @@ $pdf->SetY(18.3);
     </span>
 <?php
 $pdf->WriteHTML(ob_get_clean(), true, false, true);
-$pdf->SetY(32);
-$next_line = [$pdf->GetX()+2, $pdf->GetY()+5];
-$pdf->Rect(145, 35.5, 52, 6);
-$pdf->SetY($next_line[1]-1.7);
-ob_start();
-?>
-    <p style="font-size: 7pt; line-height: 9px; font-family: 'helveticalight';"><?=$this->nbsp(70)?><span style="font-family: 'helveticamedium';">In caso di rinnovo</span>, oltre ad indicare nome, cognome ed eventuali dati cambiati,<br/><?=$this->nbsp(70)?>inserire un dato non cambiato (indirizzo e-mail o telefono) nel seguente spazio:</p>
-<?php
-$pdf->WriteHTML(ob_get_clean(), true, false, true);
+// START RENEW CHECK
+if (isset($pdf_config['renew_check']) && $pdf_config['renew_check']) {
+    $pdf->SetY(33);
+    $next_line = [$pdf->GetX()+2, $pdf->GetY()+5];
+    $pdf->Rect(145, 36.5, 52, 6);
+    $pdf->SetY($next_line[1]-1.7);
+    ob_start();
+    ?>
+        <p style="font-size: 7pt; line-height: 9px; font-family: 'helveticalight';"><?=$this->nbsp(70)?><span style="font-family: 'helveticamedium';">In caso di rinnovo</span>, oltre ad indicare nome, cognome ed eventuali dati cambiati,<br/><?=$this->nbsp(70)?>inserire un dato non cambiato (indirizzo e-mail o telefono) nel seguente spazio:</p>
+    <?php
+    $pdf->WriteHTML(ob_get_clean(), true, false, true);
+}
+// END RENEW CHECK
 $pdf->SetX($old_line[0]);
 $pdf->SetY($old_line[1]);
-
-// END RENEW CHECK
+// END ADD "MODULO CONSENSO SOCIO"
 ob_start();
 ?>
     <p style="font-size: 9pt; line-height: 9px; font-family: 'helveticalight'; text-align: right;">Firma<?=$this->nbsp(32)?></p>

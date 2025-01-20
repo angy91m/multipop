@@ -9,7 +9,8 @@ if (
     exit;
 }
 $parsed_user = $this->myaccount_get_profile($current_user, true, true);
-file_put_contents( MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_compile($this->pdf_import($this->pdf_create([])), [
+file_put_contents(MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_create([]));
+// file_put_contents( MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_compile($this->pdf_import($this->pdf_create([])), [
 //     'quote' => 1000,
 //     'name' => 'Angelo Burzi',
 //     'mpop_birthplace_country' => 'arg',
@@ -23,11 +24,11 @@ file_put_contents( MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_com
 //     'mpop_phone' => '3239180',
 //     'email' => 'asdnjsad',
 //     'subscription_id' => 5,
-    'subscription_year' => 2025,
-    // 'mpop_marketing_agree' => true,
-    // 'mpop_newsletter_agree' => true,
-    // 'mpop_publish_agree' => false
-])->export_file());
+//     'subscription_year' => 2025,
+//     'mpop_marketing_agree' => true,
+//     'mpop_newsletter_agree' => true,
+//     'mpop_publish_agree' => false
+// ])->export_file());
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-tel-input.css">

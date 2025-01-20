@@ -359,7 +359,7 @@ createApp({
                         action: 'admin_import_rows',
                         rows: csvUsers.map(row => ({
                             ...row,
-                            mpop_subscription_quote: parseFloat(row.mpop_subscription_quote.replace('€', '').replaceAll(',', '.').replaceAll(' ', '')),
+                            mpop_subscription_quote: parseFloat(row.mpop_subscription_quote.replace('€', '').replaceAll(/ |\./g, '').replaceAll(',', '.')),
                             mpop_subscription_marketing_agree: boolVal(row.mpop_subscription_marketing_agree),
                             mpop_subscription_newsletter_agree: boolVal(row.mpop_subscription_newsletter_agree),
                             mpop_subscription_publish_agree: boolVal(row.mpop_subscription_publish_agree)

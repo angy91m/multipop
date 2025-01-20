@@ -2848,16 +2848,29 @@ class MultipopPlugin {
             throw new Exception('Invalid email');
         }
         $row['email'] = strtolower($row['email']);
-        if (
-            get_user_by('email', $row['email'])
-            || !empty(get_users([
+        $old_user = get_user_by('email', $row['email']);
+        if (!$old_user) {
+            $old_user = get_users([
                 'meta_key' => '_new_email',
                 'meta_value' => $row['email'],
                 'meta_compare' => '='
-            ]))
-        ) {
-            throw new Exception('Duplicated email');
+            ]);
+            if (!empty($old_user)) {
+                $old_user = $old_user[0];
+            } else {
+                $old_user = false;
+            }
         }
+        // if (
+        //     get_user_by('email', $row['email'])
+        //     || !empty(get_users([
+        //         'meta_key' => '_new_email',
+        //         'meta_value' => $row['email'],
+        //         'meta_compare' => '='
+        //     ]))
+        // ) {
+        //     throw new Exception('Duplicated email');
+        // }
         if (!isset($row['mpop_subscription_quote']) || (!is_float($row['mpop_subscription_quote']) && !is_int($row['mpop_subscription_quote'])) ) {
             throw new Exception('Invalid mpop_subscription_quote');
         }
