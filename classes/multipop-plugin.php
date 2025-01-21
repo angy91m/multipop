@@ -2935,6 +2935,10 @@ class MultipopPlugin {
                 }
             }
 
+            $sub_notes = isset($row['mpop_subscription_notes']) ? trim(strval($row['mpop_subscription_notes'])) : '';
+            $marketing_agree = isset($row['mpop_subscription_marketing_agree']) ? boolval($row['mpop_subscription_marketing_agree']) : false;
+            $newsletter_agree = isset($row['mpop_subscription_newsletter_agree']) ? boolval($row['mpop_subscription_newsletter_agree']) : false;
+            $publish_agree = isset($row['mpop_subscription_publish_agree']) ? boolval($row['mpop_subscription_publish_agree']) : false;
             if ($old_user) {
                 $others = $this->get_subscriptions([
                     'user_id' => [$old_user->ID],
@@ -2996,13 +3000,11 @@ class MultipopPlugin {
                         $user_input['meta_input']['mpop_old_card_number'] = $row['mpop_old_card_number'];
                     }
                 }
-                $sub_notes = isset($row['mpop_subscription_notes']) ? trim(strval($row['mpop_subscription_notes'])) : '';
-                $marketing_agree = isset($row['mpop_subscription_marketing_agree']) ? boolval($row['mpop_subscription_marketing_agree']) : false;
-                $newsletter_agree = isset($row['mpop_subscription_newsletter_agree']) ? boolval($row['mpop_subscription_newsletter_agree']) : false;
-                $publish_agree = isset($row['mpop_subscription_publish_agree']) ? boolval($row['mpop_subscription_publish_agree']) : false;
-                $user_input['meta_input']['mpop_marketing_agree'] = $marketing_agree;
-                $user_input['meta_input']['mpop_newsletter_agree'] = $newsletter_agree;
-                $user_input['meta_input']['mpop_publish_agree'] = $publish_agree;
+                if ($subscription_year == current_time('Y')) {
+                    $user_input['meta_input']['mpop_marketing_agree'] = $marketing_agree;
+                    $user_input['meta_input']['mpop_newsletter_agree'] = $newsletter_agree;
+                    $user_input['meta_input']['mpop_publish_agree'] = $publish_agree;
+                }
                 if (isset($row['first_name']) && $row['first_name']) {
                     if (!$this::is_valid_name($row['first_name'])) {
                         throw new Exception('Invalid first_name');
