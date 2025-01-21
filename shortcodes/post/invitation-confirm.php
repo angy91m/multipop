@@ -176,7 +176,7 @@ switch( $post_data['action'] ) {
             'meta_input' => $meta_input
         ];
         if ($user->roles[0] != 'multipopolare_friend') {
-            $sub = array_pop($this->search_subscriptions(['user_id' => [$user->ID], 'pagination' => false], 1));
+            $sub = array_pop($this->get_subscriptions(['user_id' => [$user->ID]], 1));
             if (!$sub) {
                 $res_data['error'] = ['subscription'];
                 http_response_code( 400 );

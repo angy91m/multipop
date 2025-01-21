@@ -327,7 +327,7 @@ class MultipopPlugin {
             'flushSubscriptions' => function() {
                 $this->flush_subscriptions();
             },
-            'sendMultipleInvitation' => function($file_name) {
+            'sendMultipleMail' => function($file_name) {
                 $file_path = MULTIPOP_PLUGIN_PATH . '/private';
                 if (file_exists($file_path . '/' . $file_name)) {
                     $file_name = $file_path . '/' . $file_name;
@@ -336,7 +336,16 @@ class MultipopPlugin {
                     if ($mails && is_array($mails)) {
                         $this->get_settings();
                         foreach($mails as $m) {
-                            if(!$this->send_invitation_mail($m['token'], $m['to'])) {
+                            if (isset($m['type'])) {
+                                if ($m['type'] === 'renew_confirm') {
+                                    $send_res = $this->send_renew_confirm_mail($m['to']);
+                                } elseif ( $m['type'] === 'invitation') {
+                                    $send_res = $this->send_invitation_mail($m['token'], $m['to']);
+                                }
+                            }
+                            if (!isset($send_res)) {
+                                $errors[] = ['to' => $m['to'], 'error' => '"type" not found'];
+                            } elseif( !$send_res ) {
                                 $errors[] = ['to' => $m['to'], 'error' => $this->last_mail_error];
                             }
                             sleep(5);
@@ -845,6 +854,10 @@ class MultipopPlugin {
     private function send_invitation_mail($token, $to) {
         $confirmation_link = get_permalink($this->settings['myaccount_page']);
         return wp_mail($to,'Multipopolare - Invito iscrizione','Sei stato invitato a iscriverti su Multipopolare.it. Clicca sul link per completare l\'iscrizione: <a href="'. $confirmation_link . '?mpop_invite_token=' . $token . '" target="_blank">'. $confirmation_link . '?mpop_invite_token=' . $token . '</a>');
+    }
+
+    private function send_renew_confirm_mail($to) {
+        return wp_mail($to,'Multipopolare - Conferma rinnovo iscrizione','La tua iscrizione a Multipopolare.it è stata rinnovata.');
     }
 
     // CREATE PDF
@@ -2415,7 +2428,7 @@ class MultipopPlugin {
             throw new Exception('Empty agrees');
         }
         if ($quote < 0 || (!$force_quote && $quote < $this->settings['min_subscription_payment'])) {
-            throw new Exception('Invalid year');
+            throw new Exception('Invalid quote');
         }
         $quote = round($quote, 2);
         if (
@@ -2428,18 +2441,17 @@ class MultipopPlugin {
             throw new Exception('Invalid year');
         }
         if (!$ignore_others) {
-            $others = $this->search_subscriptions([
+            $others = $this->get_subscriptions([
                 'user_id' => [$user_id],
-                'year' => [$year],
+                'year' => "$year,$year",
                 'status' => [
                     'tosee',
                     'seen',
                     'completed'
-                ],
-                'pagination' => false
-            ], -1);
+                ]
+            ], 1);
             if (count($others)) {
-                throw new Exception('User has got open subscription(s) yet: ' . implode( ',', array_map(function($o) {return $o['id'];}, $others)));
+                throw new Exception('User has got an open subscription yet: ' . implode( ',', array_map(function($o) {return $o['id'];}, $others)));
             }
         }
         if (is_object($user_id)) {
@@ -2652,18 +2664,15 @@ class MultipopPlugin {
         ))) {
             throw new Exception("Error while saving on DB");
         }
-        if (intval(current_time('Y')) <= $sub['year']){
-            $meta_input = [
-                'mpop_marketing_agree' => $sub['marketing_agree'],
-                'mpop_newsletter_agree' => $sub['newsletter_agree'],
-                'mpop_publish_agree' => $sub['publish_agree']
-            ];
-            if (current_time('Y') == $sub['year']) {
-                $meta_input['mpop_card_active'] = true;
-            }
+        if (current_time('Y') == $sub['year']) {
             wp_update_user([
                 'ID' => $sub['user_id'],
-                'meta_input' => $meta_input
+                'meta_input' => [
+                    'mpop_marketing_agree' => $sub['marketing_agree'],
+                    'mpop_newsletter_agree' => $sub['newsletter_agree'],
+                    'mpop_publish_agree' => $sub['publish_agree'],
+                    'mpop_card_active' => true
+                ]
             ]);
             $this->sync_discourse_record($sub['user_id']);
         }
@@ -2844,10 +2853,13 @@ class MultipopPlugin {
         return $found;
     }
     private function row_import(array $row, $force_year = false, $force_quote = false, &$comuni = [], &$mails = []) {
+        // EMAIL CHECK
         if (!isset($row['email']) || !$this->is_valid_email($row['email'])) {
             throw new Exception('Invalid email');
         }
         $row['email'] = strtolower($row['email']);
+
+        // SEARCH FOR OLD USER BY EMAIL
         $old_user = get_user_by('email', $row['email']);
         if (!$old_user) {
             $old_user = get_users([
@@ -2861,169 +2873,134 @@ class MultipopPlugin {
                 $old_user = false;
             }
         }
-        // if (
-        //     get_user_by('email', $row['email'])
-        //     || !empty(get_users([
-        //         'meta_key' => '_new_email',
-        //         'meta_value' => $row['email'],
-        //         'meta_compare' => '='
-        //     ]))
-        // ) {
-        //     throw new Exception('Duplicated email');
-        // }
-        if (!isset($row['mpop_subscription_quote']) || (!is_float($row['mpop_subscription_quote']) && !is_int($row['mpop_subscription_quote'])) ) {
-            throw new Exception('Invalid mpop_subscription_quote');
+
+        // MPOP FRIEND LOGIN CHECK
+        if (isset($row['mpop_friend']) && is_string($row['mpop_friend'])) {
+            $row['mpop_friend'] = trim($row['mpop_friend']);
         }
-        if (!$force_quote) {
-            if (!$this->settings['min_subscription_payment']) {
-                throw new Exception('min_subscription_payment not setted in settings');
+        if ($row['mpop_friend']) {
+            // IF MPOP FRIEND LOGIN
+            if ($old_user) {
+                throw new Exception('Duplicated username: '. $old_user->user_email );
             }
-            if ($row['mpop_subscription_quote'] < $this->settigs['min_subscription_payment']) {
-                throw new Exception('mpop_subscription_quote too little. Min: ' . $this->settigs['min_subscription_payment']);
+            $row['mpop_friend'] = strtolower($row['mpop_friend']);
+            if(!$this::is_valid_username($row['mpop_friend'])) {
+                throw new Exception('Invalid username: '. $row['mpop_friend'] );
             }
+            if (get_user_by('login', $row['mpop_friend'])) {
+                throw new Exception('Duplicated username: '. $row['mpop_friend'] );
+            }
+            $user_input = [
+                'user_login' => $row['mpop_friend'],
+                'user_pass' => bin2hex(openssl_random_pseudo_bytes(16)),
+                'user_email' => $row['email'],
+                'role' => 'multipopolare_friend',
+                'locate' => 'it_IT',
+                'meta_input' => [
+                    'mpop_invited' => true
+                ]
+            ];
         } else {
-            if ($row['mpop_subscription_quote'] <= 0) {
-                throw new Exception('mpop_subscription_quote too little');
+            if (!isset($row['mpop_subscription_date'])) {
+                throw new Exception('Invalid mpop_subscription_quote');
             }
-        }
-        if (!isset($row['mpop_subscription_date'])) {
-            throw new Exception('Invalid mpop_subscription_quote');
-        }
-        $subscription_date = '';
-        try {
-            $subscription_date = $this::validate_date($row['mpop_subscription_date']);
-        } catch (Exception $e) {
-            throw new Exception('Invalid mpop_subscription_date');
-        }
-        if (!$force_year) {
-            if (!in_array(intval($subscription_date->format('Y')),$this->settings['authorized_subscription_years'])) {
-                throw new Exception('Invalid year in mpop_subscription_date');
+            $subscription_date = '';
+            try {
+                $subscription_date = $this::validate_date($row['mpop_subscription_date']);
+            } catch (Exception $e) {
+                throw new Exception('Invalid mpop_subscription_date');
             }
-        }
-        $mpop_friend = isset($row['mpop_friend']) ? boolval($row['mpop_friend']) : false;
-        $user_input = [
-            'user_pass' => bin2hex(openssl_random_pseudo_bytes(16)),
-            'user_email' => $row['email'],
-            'role' => $mpop_friend ? 'multipopolare_friend' : 'multipopolano',
-            'locate' => 'it_IT',
-            'meta_input' => [
-                'mpop_invited' => true
-            ]
-        ];
-        if ($mpop_friend) {
-            if (!isset($row['login']) || !is_string($row['login']) || !strlen($row['login'])) {
-                throw new Exception('Invalid login');
+            $subscription_year = intval($subscription_date->format('Y'));
+            if (!$force_year) {
+                if (!in_array($subscription_year,$this->settings['authorized_subscription_years'])) {
+                    throw new Exception('Invalid year in mpop_subscription_date');
+                }
             }
-            $row['login'] = strtolower($row['login']);
-            if (!$this::is_valid_username($row['login'])) {
-                throw new Exception('Invalid login');
+    
+            if (!isset($row['mpop_subscription_quote']) || (!is_float($row['mpop_subscription_quote']) && !is_int($row['mpop_subscription_quote'])) || $row['mpop_subscription_quote'] < 0 ) {
+                throw new Exception('Invalid mpop_subscription_quote');
             }
-            if (get_user_by('login', $row['login'])) {
-                throw new Exception('Duplicated login');
+            if (!$force_quote) {
+                if (!$this->settings['min_subscription_payment']) {
+                    throw new Exception('min_subscription_payment not setted in settings');
+                }
+                if ($row['mpop_subscription_quote'] < $this->settigs['min_subscription_payment']) {
+                    throw new Exception('mpop_subscription_quote too little. Min: ' . $this->settigs['min_subscription_payment']);
+                }
+            } else {
+                if ($row['mpop_subscription_quote'] < 0) {
+                    throw new Exception('mpop_subscription_quote too little');
+                }
             }
-            $user_input['user_login'] = $row['login'];
-        } else {
-            if (isset($row['mpop_org_role'])) {
-                if (in_array($row['mpop_org_role'],self::SINGLE_ORG_ROLES)) {
+
+            if ($old_user) {
+                $others = $this->get_subscriptions([
+                    'user_id' => [$old_user->ID],
+                    'year' => "$subscription_year,$subscription_year",
+                    'status' => [
+                        'tosee',
+                        'seen',
+                        'completed'
+                    ]
+                ], 1);
+                if (!empty($others)) {
+                    throw new Exception('User has got an open subscription yet: ' . implode( ',', array_map(function($o) {return $o['id'];}, $others)));
+                }
+            } else {
+                if (!isset($row['mpop_phone']) || !is_string($row['mpop_phone']) || !$this::is_valid_phone($row['mpop_phone'])) {
+                    $row['mpop_phone'] = '';
+                }
+
+                if ($row['mpop_phone']) {
                     if (!empty(get_users([
-                        'meta_key' => 'mpop_org_role',
-                        'meta_value' => $row['mpop_org_role'],
+                        'meta_key' => 'mpop_phone',
+                        'meta_value' => $row['mpop_phone'],
                         'meta_compare' => '='
                     ]))) {
-                        throw new Exception($row['mpop_org_role'] . ' mpop_org_role yet assigned');
+                        throw new Exception('Duplicated phone: ' . $row['mpop_phone']);
                     }
-                } else {
-                    throw new Exception('Invalid mpop_org_role');
                 }
-                $user_input['meta_input']['mpop_org_role'] = $row['mpop_org_role'];
-            }
-            $sub_notes = isset($row['mpop_subscription_notes']) ? trim(strval($row['mpop_subscription_notes'])) : '';
-            $marketing_agree = isset($row['mpop_subscription_marketing_agree']) ? boolval($row['mpop_subscription_marketing_agree']) : false;
-            $newsletter_agree = isset($row['mpop_subscription_newsletter_agree']) ? boolval($row['mpop_subscription_newsletter_agree']) : false;
-            $publish_agree = isset($row['mpop_subscription_publish_agree']) ? boolval($row['mpop_subscription_publish_agree']) : false;
-            $user_input['meta_input']['mpop_marketing_agree'] = $marketing_agree;
-            $user_input['meta_input']['mpop_newsletter_agree'] = $newsletter_agree;
-            $user_input['meta_input']['mpop_publish_agree'] = $publish_agree;
-            if (isset($row['login']) && is_string($row['login']) && strlen($row['login'])) {
-                $row['login'] = strtolower($row['login']);
-                if (!$this::is_valid_username($row['login'])) {
-                    throw new Exception('Invalid login');
-                }
-                if (get_user_by('login', $row['login'])) {
-                    throw new Exception('Duplicated login');
-                }
-                $user_input['user_login'] = $row['login'];
-                if (!isset($row['first_name']) || !$this::is_valid_name($row['first_name'])) {
-                    throw new Exception('Invalid first_name');
-                }
-                $user_input['meta_input']['first_name'] = mb_strtoupper($row['first_name'], 'UTF-8');
-                if (!isset($row['last_name']) || !$this::is_valid_name($row['last_name'])) {
-                    throw new Exception('Invalid last_name');
-                }
-                $user_input['meta_input']['last_name'] = mb_strtoupper($row['last_name'], 'UTF-8');
-                if (!isset($row['mpop_birthdate'])) {
-                    throw new Exception('Invalid mpop_birthdate');
-                }
-                try {
-                    $row['mpop_birthdate'] = $this::validate_birthdate($row['mpop_birthdate']);
-                } catch (Exception $e) {
-                    throw new Exception('Invalid mpop_birthdate');
-                }
-                if (!isset($row['mpop_birthplace_country']) || !$this->get_country_by_code($row['mpop_birthplace_country'])) {
-                    throw new Exception('Invalid mpop_birthplace_country');
-                }
-                $user_input['meta_input']['mpop_birthplace_country'] = $row['mpop_birthplace_country'];
-                if ($row['mpop_birthplace_country'] == 'ita') {
-                    if (!isset($row['mpop_birthplace'])) {
-                        throw new Exception('Invalid mpop_birthplace');
-                    }
-                    try {
-                        $birthdate = $this->validate_birthplace($row['mpop_birthdate'], $row['mpop_birthplace']);
-                        $user_input['meta_input']['mpop_birthdate'] = $birthdate;
-                        $user_input['meta_input']['mpop_birthplace'] = $row['mpop_birthplace'];
-                    } catch (Exception $e) {
-                        throw new Exception('Invalid ' . $e->getMessage());
-                    }
-                } else {
-                    $user_input['meta_input']['mpop_birthdate'] = $row['mpop_birthdate']->format('Y-m-d');
-                }
-                if (!isset($row['mpop_billing_address']) || !is_string($row['mpop_billing_address']) || mb_strlen(trim($row['mpop_billing_address']), 'UTF-8') < 2) {
-                    throw new Exception('Invalid mpop_billing_address');
-                }
-                $user_input['meta_input']['mpop_billing_address'] = $row['mpop_billing_address'];
-                if (!isset($row['mpop_billing_country']) || !$this->get_country_by_code($row['mpop_billing_country']) ) {
-                    throw new Exception('Invalid mpop_billing_country');
-                } elseif ($row['mpop_billing_country'] == 'ita') {
-                    if (!isset($row['mpop_billing_city']) || !is_string($row['mpop_billing_city']) ) {
-                        throw new Exception('Invalid mpop_billing_city');
-                    }
-                    if (!isset($row['mpop_billing_zip']) || !is_string($row['mpop_billing_zip']) ) {
-                        throw new Exception('Invalid mpop_billing_zip');
-                    }
-                    if (empty($comuni)) {
-                        $comuni = $this->get_comuni_all();
-                    }
-                    $comune = $this->get_comune_by_catasto($row['mpop_billing_city'], false, $comuni);
-                    if (!$comune) {
-                        throw new Exception('Invalid mpop_billing_city');
-                    }
-                    if (!in_array($row['mpop_billing_zip'], $comune['cap'])) {
-                        throw new Exception('Invalid mpop_billing_zip');
-                    }
-                    $user_input['meta_input']['mpop_billing_state'] = $comune['provincia']['sigla'];
-                    $user_input['meta_input']['mpop_billing_city'] = $row['mpop_billing_city'];
-                    $user_input['meta_input']['mpop_billing_zip'] = $row['mpop_billing_zip'];
-                }
-                $user_input['meta_input']['mpop_billing_country'] = $row['mpop_billing_country'];
-                if (!isset($row['mpop_phone']) || !is_string($row['mpop_phone']) || !$this::is_valid_phone($row['mpop_phone'])) {
-                    throw new Exception('Invalid mpop_phone');
-                }
-                $user_input['meta_input']['mpop_phone'] = $row['mpop_phone'];
-            } else {
+                $user_input = [
+                    'user_pass' => bin2hex(openssl_random_pseudo_bytes(16)),
+                    'user_email' => $row['email'],
+                    'role' => 'multipopolano',
+                    'locate' => 'it_IT',
+                    'meta_input' => [
+                        'mpop_invited' => true,
+                        'mpop_phone' => $row['mpop_phone']
+                    ]
+                ];
                 do {
-                    $row['login'] = 'mp_' . bin2hex(openssl_random_pseudo_bytes(16));
-                } while(get_user_by('login', $row['login']));
-                $user_input['user_login'] = $row['login'];
+                    $user_login = 'mp_' . bin2hex(openssl_random_pseudo_bytes(16));
+                } while(get_user_by('login', $user_login));
+                $user_input['user_login'] = $user_login;
+                if (isset($row['mpop_org_role'])) {
+                    if (in_array($row['mpop_org_role'],self::SINGLE_ORG_ROLES)) {
+                        if (!empty(get_users([
+                            'meta_key' => 'mpop_org_role',
+                            'meta_value' => $row['mpop_org_role'],
+                            'meta_compare' => '='
+                        ]))) {
+                            throw new Exception($row['mpop_org_role'] . ' mpop_org_role yet assigned');
+                        }
+                    } else {
+                        throw new Exception('Invalid mpop_org_role');
+                    }
+                    $user_input['meta_input']['mpop_org_role'] = $row['mpop_org_role'];
+                }
+                if (isset($row['mpop_old_card_number']) && is_string($row['mpop_old_card_number'])) {
+                    $row['mpop_old_card_number'] = trim($row['mpop_old_card_number']);
+                    if ($row['mpop_old_card_number']) {
+                        $user_input['meta_input']['mpop_old_card_number'] = $row['mpop_old_card_number'];
+                    }
+                }
+                $sub_notes = isset($row['mpop_subscription_notes']) ? trim(strval($row['mpop_subscription_notes'])) : '';
+                $marketing_agree = isset($row['mpop_subscription_marketing_agree']) ? boolval($row['mpop_subscription_marketing_agree']) : false;
+                $newsletter_agree = isset($row['mpop_subscription_newsletter_agree']) ? boolval($row['mpop_subscription_newsletter_agree']) : false;
+                $publish_agree = isset($row['mpop_subscription_publish_agree']) ? boolval($row['mpop_subscription_publish_agree']) : false;
+                $user_input['meta_input']['mpop_marketing_agree'] = $marketing_agree;
+                $user_input['meta_input']['mpop_newsletter_agree'] = $newsletter_agree;
+                $user_input['meta_input']['mpop_publish_agree'] = $publish_agree;
                 if (isset($row['first_name']) && $row['first_name']) {
                     if (!$this::is_valid_name($row['first_name'])) {
                         throw new Exception('Invalid first_name');
@@ -3091,24 +3068,248 @@ class MultipopPlugin {
                         }
                     }
                 }
-                if (isset($row['mpop_phone']) && is_string($row['mpop_phone']) && $row['mpop_phone']) {
-                    if (!$this::is_valid_phone($row['mpop_phone'])) {
-                        throw new Exception('Invalid mpop_phone');
-                    }
-                    $user_input['meta_input']['mpop_phone'] = $row['mpop_phone'];
-                }
             }
         }
-        $user_id = wp_insert_user($user_input);
-        if (is_wp_error($user_id)) {
-            throw new Exception('Error during user save: ' . $user_id->get_error_message());
+        
+
+        ///////////
+
+        // if (!isset($row['mpop_phone']) || !is_string($row['mpop_phone']) || !$this::is_valid_phone($row['mpop_phone'])) {
+        //     $row['mpop_phone'] = '';
+        // }
+        // if ($old_user) {
+        //     if ($row['mpop_phone']) {
+        //         if (!empty(get_users(
+        //             'meta_key' => 'mpop_phone',
+        //             'meta_value' => $row['mpop_phone'],
+        //             'meta_compare' => '=',
+        //             'login__not_in' => $old_user->user_login
+        //         ))) {
+        //             throw new Exception('Duplicated phone');
+        //         }
+        //     }
+        // }
+        // // if (
+        // //     get_user_by('email', $row['email'])
+        // //     || !empty(get_users([
+        // //         'meta_key' => '_new_email',
+        // //         'meta_value' => $row['email'],
+        // //         'meta_compare' => '='
+        // //     ]))
+        // // ) {
+        // //     throw new Exception('Duplicated email');
+        // // }
+        // $mpop_friend = isset($row['mpop_friend']) ? boolval($row['mpop_friend']) : false;
+        // $user_input = [
+        //     'user_pass' => bin2hex(openssl_random_pseudo_bytes(16)),
+        //     'user_email' => $row['email'],
+        //     'role' => $mpop_friend ? 'multipopolare_friend' : 'multipopolano',
+        //     'locate' => 'it_IT',
+        //     'meta_input' => [
+        //         'mpop_invited' => true
+        //     ]
+        // ];
+        // if ($mpop_friend) {
+        //     if (!isset($row['login']) || !is_string($row['login']) || !strlen($row['login'])) {
+        //         throw new Exception('Invalid login');
+        //     }
+        //     $row['login'] = strtolower($row['login']);
+        //     if (!$this::is_valid_username($row['login'])) {
+        //         throw new Exception('Invalid login');
+        //     }
+        //     if (get_user_by('login', $row['login'])) {
+        //         throw new Exception('Duplicated login');
+        //     }
+        //     $user_input['user_login'] = $row['login'];
+        // } else {
+        //     if (isset($row['mpop_org_role'])) {
+        //         if (in_array($row['mpop_org_role'],self::SINGLE_ORG_ROLES)) {
+        //             if (!empty(get_users([
+        //                 'meta_key' => 'mpop_org_role',
+        //                 'meta_value' => $row['mpop_org_role'],
+        //                 'meta_compare' => '='
+        //             ]))) {
+        //                 throw new Exception($row['mpop_org_role'] . ' mpop_org_role yet assigned');
+        //             }
+        //         } else {
+        //             throw new Exception('Invalid mpop_org_role');
+        //         }
+        //         $user_input['meta_input']['mpop_org_role'] = $row['mpop_org_role'];
+        //     }
+        //     $sub_notes = isset($row['mpop_subscription_notes']) ? trim(strval($row['mpop_subscription_notes'])) : '';
+        //     $marketing_agree = isset($row['mpop_subscription_marketing_agree']) ? boolval($row['mpop_subscription_marketing_agree']) : false;
+        //     $newsletter_agree = isset($row['mpop_subscription_newsletter_agree']) ? boolval($row['mpop_subscription_newsletter_agree']) : false;
+        //     $publish_agree = isset($row['mpop_subscription_publish_agree']) ? boolval($row['mpop_subscription_publish_agree']) : false;
+        //     $user_input['meta_input']['mpop_marketing_agree'] = $marketing_agree;
+        //     $user_input['meta_input']['mpop_newsletter_agree'] = $newsletter_agree;
+        //     $user_input['meta_input']['mpop_publish_agree'] = $publish_agree;
+        //     if (isset($row['login']) && is_string($row['login']) && strlen($row['login'])) {
+        //         $row['login'] = strtolower($row['login']);
+        //         if (!$this::is_valid_username($row['login'])) {
+        //             throw new Exception('Invalid login');
+        //         }
+        //         if (get_user_by('login', $row['login'])) {
+        //             throw new Exception('Duplicated login');
+        //         }
+        //         $user_input['user_login'] = $row['login'];
+        //         if (!isset($row['first_name']) || !$this::is_valid_name($row['first_name'])) {
+        //             throw new Exception('Invalid first_name');
+        //         }
+        //         $user_input['meta_input']['first_name'] = mb_strtoupper($row['first_name'], 'UTF-8');
+        //         if (!isset($row['last_name']) || !$this::is_valid_name($row['last_name'])) {
+        //             throw new Exception('Invalid last_name');
+        //         }
+        //         $user_input['meta_input']['last_name'] = mb_strtoupper($row['last_name'], 'UTF-8');
+        //         if (!isset($row['mpop_birthdate'])) {
+        //             throw new Exception('Invalid mpop_birthdate');
+        //         }
+        //         try {
+        //             $row['mpop_birthdate'] = $this::validate_birthdate($row['mpop_birthdate']);
+        //         } catch (Exception $e) {
+        //             throw new Exception('Invalid mpop_birthdate');
+        //         }
+        //         if (!isset($row['mpop_birthplace_country']) || !$this->get_country_by_code($row['mpop_birthplace_country'])) {
+        //             throw new Exception('Invalid mpop_birthplace_country');
+        //         }
+        //         $user_input['meta_input']['mpop_birthplace_country'] = $row['mpop_birthplace_country'];
+        //         if ($row['mpop_birthplace_country'] == 'ita') {
+        //             if (!isset($row['mpop_birthplace'])) {
+        //                 throw new Exception('Invalid mpop_birthplace');
+        //             }
+        //             try {
+        //                 $birthdate = $this->validate_birthplace($row['mpop_birthdate'], $row['mpop_birthplace']);
+        //                 $user_input['meta_input']['mpop_birthdate'] = $birthdate;
+        //                 $user_input['meta_input']['mpop_birthplace'] = $row['mpop_birthplace'];
+        //             } catch (Exception $e) {
+        //                 throw new Exception('Invalid ' . $e->getMessage());
+        //             }
+        //         } else {
+        //             $user_input['meta_input']['mpop_birthdate'] = $row['mpop_birthdate']->format('Y-m-d');
+        //         }
+        //         if (!isset($row['mpop_billing_address']) || !is_string($row['mpop_billing_address']) || mb_strlen(trim($row['mpop_billing_address']), 'UTF-8') < 2) {
+        //             throw new Exception('Invalid mpop_billing_address');
+        //         }
+        //         $user_input['meta_input']['mpop_billing_address'] = $row['mpop_billing_address'];
+        //         if (!isset($row['mpop_billing_country']) || !$this->get_country_by_code($row['mpop_billing_country']) ) {
+        //             throw new Exception('Invalid mpop_billing_country');
+        //         } elseif ($row['mpop_billing_country'] == 'ita') {
+        //             if (!isset($row['mpop_billing_city']) || !is_string($row['mpop_billing_city']) ) {
+        //                 throw new Exception('Invalid mpop_billing_city');
+        //             }
+        //             if (!isset($row['mpop_billing_zip']) || !is_string($row['mpop_billing_zip']) ) {
+        //                 throw new Exception('Invalid mpop_billing_zip');
+        //             }
+        //             if (empty($comuni)) {
+        //                 $comuni = $this->get_comuni_all();
+        //             }
+        //             $comune = $this->get_comune_by_catasto($row['mpop_billing_city'], false, $comuni);
+        //             if (!$comune) {
+        //                 throw new Exception('Invalid mpop_billing_city');
+        //             }
+        //             if (!in_array($row['mpop_billing_zip'], $comune['cap'])) {
+        //                 throw new Exception('Invalid mpop_billing_zip');
+        //             }
+        //             $user_input['meta_input']['mpop_billing_state'] = $comune['provincia']['sigla'];
+        //             $user_input['meta_input']['mpop_billing_city'] = $row['mpop_billing_city'];
+        //             $user_input['meta_input']['mpop_billing_zip'] = $row['mpop_billing_zip'];
+        //         }
+        //         $user_input['meta_input']['mpop_billing_country'] = $row['mpop_billing_country'];
+        //         if (!isset($row['mpop_phone']) || !is_string($row['mpop_phone']) || !$this::is_valid_phone($row['mpop_phone'])) {
+        //             throw new Exception('Invalid mpop_phone');
+        //         }
+        //         $user_input['meta_input']['mpop_phone'] = $row['mpop_phone'];
+        //     } else {
+        //         do {
+        //             $row['login'] = 'mp_' . bin2hex(openssl_random_pseudo_bytes(16));
+        //         } while(get_user_by('login', $row['login']));
+        //         $user_input['user_login'] = $row['login'];
+        //         if (isset($row['first_name']) && $row['first_name']) {
+        //             if (!$this::is_valid_name($row['first_name'])) {
+        //                 throw new Exception('Invalid first_name');
+        //             }
+        //             $user_input['meta_input']['first_name'] = mb_strtoupper($row['first_name'], 'UTF-8');
+        //         }
+        //         if (isset($row['last_name']) && $row['last_name']) {
+        //             if (!$this::is_valid_name($row['last_name'])) {
+        //                 throw new Exception('Invalid last_name');
+        //             }
+        //             $user_input['meta_input']['last_name'] = mb_strtoupper($row['last_name'], 'UTF-8');
+        //         }
+        //         $birthdate = '';
+        //         if (isset($row['mpop_birthdate']) && $row['mpop_birthdate']) {
+        //             try {
+        //                 $birthdate = $this::validate_birthdate($row['mpop_birthdate']);
+        //             } catch (Exception $e) {
+        //                 throw new Exception('Invalid mpop_birthdate');
+        //             }
+        //             $user_input['meta_input']['mpop_birthdate'] = $birthdate->format('Y-m-d');
+        //         }
+        //         if (isset($row['mpop_birthplace_country']) && $row['mpop_birthplace_country']) {
+        //             if (!$this->get_country_by_code($row['mpop_birthplace_country'])) {
+        //                 throw new Exception('Invalid mpop_birthplace_country');
+        //             }
+        //             $user_input['meta_input']['mpop_birthplace_country'] = $row['mpop_birthplace_country'];
+        //             if ($row['mpop_birthplace_country'] == 'ita') {
+        //                 if (isset($row['mpop_birthplace']) && $row['mpop_birthplace']) {
+        //                     try {
+        //                         $this->validate_birthplace($birthdate, $row['mpop_birthplace']);
+        //                         $user_input['meta_input']['mpop_birthplace'] = $row['mpop_birthplace'];
+        //                     } catch (Exception $e) {
+        //                         throw new Exception('Invalid ' . $e->getMessage());
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //         if (isset($row['mpop_billing_address']) && is_string($row['mpop_billing_address'])) {
+        //             $user_input['meta_input']['mpop_billing_address'] = $row['mpop_billing_address'];
+        //         }
+        //         if (isset($row['mpop_billing_country']) && $row['mpop_billing_country']) {
+        //             if (!$this->get_country_by_code($row['mpop_billing_country'])) {
+        //                 throw new Exception('Invalid mpop_billing_country');
+        //             }
+        //             $user_input['meta_input']['mpop_billing_country'] = $row['mpop_billing_country'];
+        //             if ($row['mpop_billing_country'] == 'ita') {
+        //                 if (isset($row['mpop_billing_city']) && $row['mpop_billing_city'] ) {
+        //                     if (empty($comuni)) {
+        //                         $comuni = $this->get_comuni_all();
+        //                     }
+        //                     $comune = $this->get_comune_by_catasto($row['mpop_billing_city'], false, $comuni);
+        //                     if (!$comune) {
+        //                         throw new Exception('Invalid mpop_billing_city');
+        //                     }
+        //                     $user_input['meta_input']['mpop_billing_state'] = $comune['provincia']['sigla'];
+        //                     $user_input['meta_input']['mpop_billing_city'] = $row['mpop_billing_city'];
+        //                     if (isset($row['mpop_billing_zip']) && $row['mpop_billing_zip'] ) {
+        //                         if (!in_array($row['mpop_billing_zip'], $comune['cap'])) {
+        //                             throw new Exception('Invalid mpop_billing_zip');
+        //                         }
+        //                         $user_input['meta_input']['mpop_billing_zip'] = $row['mpop_billing_zip'];
+        //                     } else if (count($comune['cap']) == 1) {
+        //                         $user_input['meta_input']['mpop_billing_zip'] = $comune['cap'][0];
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //         if (isset($row['mpop_phone']) && is_string($row['mpop_phone']) && $row['mpop_phone']) {
+        //             if (!$this::is_valid_phone($row['mpop_phone'])) {
+        //                 throw new Exception('Invalid mpop_phone');
+        //             }
+        //             $user_input['meta_input']['mpop_phone'] = $row['mpop_phone'];
+        //         }
+        //     }
+        // }
+        if (isset($user_input)) {
+            $user_id = wp_insert_user($user_input);
+            if (is_wp_error($user_id)) {
+                throw new Exception('Error during user save: ' . $user_id->get_error_message());
+            }
         }
-        if (!$mpop_friend) {
-            $sub_id = false;
+        $sub_id = 0;
+        if (!$row['mpop_friend']) {
             try {
                 $sub_id = $this->create_subscription(
-                    $user_id,
-                    intval($subscription_date->format('Y')),
+                    $old_user ? $old_user->ID : $user_id,
+                    $subscription_year,
                     $row['mpop_subscription_quote'],
                     $marketing_agree,
                     $newsletter_agree,
@@ -3120,7 +3321,8 @@ class MultipopPlugin {
                     '',
                     $sub_notes,
                     $force_year,
-                    $force_quote
+                    $force_quote,
+                    true
                 );
             } catch(Exception $e) {
                 throw new Exception('Error while saving subscription: ' . $e->getMessage());
@@ -3134,15 +3336,27 @@ class MultipopPlugin {
                 throw new Exception('Error while completing subscription: ' . $e->getMessage());
             }
         }
-        $token = $this->create_temp_token($user_id,'invite_link',3600*24*30);
-        if (is_array($mails)) {
-            $mails[] = ['token' => $token, 'to' => $row['email']];
+        if (!$old_user) {
+            $token = $this->create_temp_token($user_id,'invite_link',3600*24*30);
+            if (is_array($mails)) {
+                $mails[] = ['type' => 'invitation', 'token' => $token, 'to' => $row['email']];
+            } else {
+                if(!$this->send_invitation_mail($token, $row['email'])) {
+                    throw new Exception("Error while sending mail" . ($this->last_mail_error ? ': ' . $this->last_mail_error : ''));
+                }
+            }
         } else {
-            if(!$this->send_invitation_mail($token, $row['email'])) {
-                throw new Exception("Error while sending mail" . ($this->last_mail_error ? ': ' . $this->last_mail_error : ''));
+            if ($subscription_year == current_time('Y')) {
+                if (is_array($mails)) {
+                    $mails[] = ['type' => 'renew_confirm', 'to' => $row['email']];
+                } else {
+                    if(!$this->send_renew_confirm_mail($row['email'])) {
+                        throw new Exception("Error while sending mail" . ($this->last_mail_error ? ': ' . $this->last_mail_error : ''));
+                    }
+                }
             }
         }
-        return ['user_id'=> $user_id, 'sub_id' => $sub_id];
+        return ['user_id'=> $old_user ? $old_user->ID : $user_id, 'sub_id' => $sub_id];
     }
     private function change_user_login($user_id, string $new_login, string $display_name = '') {
         if (!$this::is_valid_username($new_login)) {
@@ -3218,11 +3432,11 @@ class MultipopPlugin {
         unset($res['completer_ip']);
         return $res;
     }
-    private function search_subscriptions(array $options = [], $limit = 100, ) { 
+    private function search_subscriptions(array $options = [], $limit = 100 ) { 
         $options = $options + [
             'txt' => '',
             'user_id' => [],
-            'year' => [], 
+            'year' => ',',
             'quote' => ',',
             'marketing_agree' => null,
             'newsletter_agree' => null,
@@ -3274,10 +3488,11 @@ class MultipopPlugin {
         if (
             !is_string($options['txt'])
             || !is_array($options['user_id'])
-            || !is_array($options['year'])
             || !is_string($options['quote'])
             || !preg_match($quote_interval_reg, $options['quote'])
             || !is_array($options['status'])
+            || !is_string($options['year'])
+            || !preg_match($time_interval_reg, $options['year'])
             || !is_string($options['created_at'])
             || !preg_match($time_interval_reg, $options['created_at'])
             || !is_string($options['updated_at'])
@@ -3297,6 +3512,7 @@ class MultipopPlugin {
         ) {
             return $res;
         }
+        $options['year'] = explode(',', $options['year']);
         $options['quote'] = explode(',', $options['quote']);
         $options['created_at'] = explode(',', $options['created_at']);
         $options['updated_at'] = explode(',', $options['updated_at']);
@@ -3304,6 +3520,11 @@ class MultipopPlugin {
         $options['completed_at'] = explode(',', $options['completed_at']);
         if (
             (
+                strlen($options['year'][0])
+                && strlen($options['year'][1])
+                && intval($options['year'][0]) > intval($options['year'][1])
+            )
+            || (
                 strlen($options['quote'][0])
                 && strlen($options['quote'][1])
                 && ((double) $options['quote'][0]) > ((double) $options['quote'][1])
@@ -3334,7 +3555,6 @@ class MultipopPlugin {
         $options['user_id'] = array_values(array_unique(array_filter($options['user_id'], function($y) {return is_int($y) && $y > 0;})));
         $options['author_id'] = array_values(array_unique(array_filter($options['author_id'], function($id) {return is_int($id) && $id > 0;})));
         $options['completer_id'] = array_values(array_unique(array_filter($options['completer_id'], function($id) {return is_int($id) && $id > 0;})));
-        $options['year'] = array_values(array_unique(array_filter($options['year'], function($y) {return is_int($y) && $y > 0;})));
         $options['status'] = array_values(array_unique(array_filter($options['status'], function($s) {return in_array($s, MultipopPlugin::SUBS_STATUSES);})));
         $options['mpop_billing_country'] = array_values(array_unique(array_filter($options['mpop_billing_country'], function($s) use ($mpop_billing_country_reg) {return preg_match($mpop_billing_country_reg, $s);})));
         $options['mpop_billing_state'] = array_values(array_unique(array_filter($options['mpop_billing_state'], function($s) use ($mpop_billing_state_reg) {return preg_match($mpop_billing_state_reg, $s);})));
@@ -3421,8 +3641,11 @@ class MultipopPlugin {
         if (count($options['user_id'])) {
             $append_to_where("s.user_id IN ( " . implode(',',$options['user_id']) . " )");
         }
-        if (count($options['year'])) {
-            $append_to_where("s.year IN ( " . implode(',', $options['year']) . " )");
+        if ($options['year'][0]) {
+            $append_to_where("s.year >= " . $options['year'][0]);
+        }
+        if ($options['year'][1]) {
+            $append_to_where("s.year <= " . $options['year'][1]);
         }
         if ($options['quote'][0]) {
             $append_to_where("s.quote >= " . $options['quote'][0]);
@@ -3560,6 +3783,9 @@ class MultipopPlugin {
         $res['pages'] = $pages;
         $res['page'] = $options['page'];
         return $res;
+    }
+    private function get_subscriptions(array $options = [], $limit = -1 ) {
+        return $this->search_subscriptions($options + ['pagination' => false], $limit);
     }
     public function user_search_pre_user_query($q) {
         global $wpdb;

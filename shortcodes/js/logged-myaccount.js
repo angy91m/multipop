@@ -71,7 +71,6 @@ foundUsersColumns = [
     return col;
 }),
 userCsvFields = [
-    'login',
     'email',
     'first_name',
     'last_name',
@@ -88,6 +87,7 @@ userCsvFields = [
     'mpop_subscription_marketing_agree',
     'mpop_subscription_newsletter_agree',
     'mpop_subscription_publish_agree',
+    'mpop_renew',
     'mpop_org_role',
     'mpop_friend',
     'mpop_subscription_notes',
@@ -362,7 +362,8 @@ createApp({
                             mpop_subscription_quote: parseFloat(row.mpop_subscription_quote.replace('€', '').replaceAll(/ |\./g, '').replaceAll(',', '.')),
                             mpop_subscription_marketing_agree: boolVal(row.mpop_subscription_marketing_agree),
                             mpop_subscription_newsletter_agree: boolVal(row.mpop_subscription_newsletter_agree),
-                            mpop_subscription_publish_agree: boolVal(row.mpop_subscription_publish_agree)
+                            mpop_subscription_publish_agree: boolVal(row.mpop_subscription_publish_agree),
+                            mpop_renew: boolVal(row.mpop_renew)
                         })),
                         ...csvImportOptions
                     });

@@ -418,7 +418,7 @@ switch( $post_data['action'] ) {
             $file_name = 'mail_to_send_'. bin2hex(openssl_random_pseudo_bytes(8)) . '.txt';
             $file_path = MULTIPOP_PLUGIN_PATH . '/private';
             file_put_contents($file_path . '/' . $file_name, json_encode($invitation_to_send, JSON_PRETTY_PRINT));
-            $this->delay_script('sendMultipleInvitation', $file_name);
+            $this->delay_script('sendMultipleMail', $file_name);
         }
         $res_data['data'] = $res_rows;
         break;

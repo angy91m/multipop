@@ -57,7 +57,7 @@ passwordRegex = {
     },
     acceptedSymbols: "| \\ ! \" £ $ % & / ( ) = ? ' ^ , . ; : _ @ ° # * + [ ] { } _ -"
 },
-{requireProps, role} = JSON.parse(document.getElementById('invitation-props').innerText),
+{role} = JSON.parse(document.getElementById('invitation-props').innerText),
 maxBirthDate = new Date();
 maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
 let triggerSearchTimeout;
@@ -101,7 +101,7 @@ createApp({
         requesting = ref(false),
         isValidBirthPlace = computed(()=>user.mpop_birthplace_country && (user.mpop_birthplace_country != 'ita' || user.mpop_birthplace)),
         isValidBillingPlace = computed(()=>user.mpop_billing_country && (user.mpop_billing_country != 'ita' || (user.mpop_billing_city && user.mpop_billing_state && user.mpop_billing_zip))),
-        isValidForm = computed( () => requireProps ?
+        isValidForm = computed( () => role == 'multipopolano' ?
                 isValidUsername()
                 && isValidPassword()
                 && isValidPasswordConfirm()
@@ -135,7 +135,7 @@ createApp({
             e.preventDefault();
             requesting.value = true;
             let reqObj;
-            if (requireProps) {
+            if (role == 'multipopolano') {
                 reqObj = {
                     ...user,
                     username: user.username.trim(),
@@ -284,7 +284,7 @@ createApp({
             if (role == 'multipopolano') {
                 const profileRes = await serverReq({action: 'get_profile'}),
                 {data: {profile}} = await profileRes.json();
-                if (requireProps){
+                if (role == 'multipopolano'){
                     user.first_name = profile.first_name || '';
                     user.last_name = profile.last_name || '';
                     user.mpop_birthdate = profile.mpop_birthdate || undefined;
@@ -326,7 +326,6 @@ createApp({
             parsePhone,
             searchOpen,
             addSuppressToLabel,
-            requireProps,
             marketingAgreeShow,
             newsletterAgreeShow,
             publishAgreeShow,
