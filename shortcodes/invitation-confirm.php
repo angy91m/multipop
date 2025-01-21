@@ -83,7 +83,7 @@ $invitation_props = [
             </template>
         </v-select>
     </p>
-    <p v-if="role == 'multipopolano' && user.mpop_birthplace_country && user.mpop_birthplace_country != 'ita'" class="mpop-form-row">
+    <p v-if="role == 'multipopolano' && user.mpop_birthplace_country && user.mpop_birthplace_country == 'ita'" class="mpop-form-row">
         <label for="birthplace-select">Comune di nascita</label><br>
         <v-select
             id="birthplace-select"
@@ -143,7 +143,7 @@ $invitation_props = [
             </template>
         </v-select>
     </p>
-    <template v-if="user.mpop_billing_country && user.mpop_billing_country != 'ita'">
+    <template v-if="user.mpop_billing_country && user.mpop_billing_country == 'ita'">
         <p v-if="role == 'multipopolano'" class="mpop-form-row">
             <label for="billingCity-select">Comune di residenza</label><br>
             <v-select
