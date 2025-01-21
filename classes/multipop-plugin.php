@@ -2675,7 +2675,9 @@ class MultipopPlugin {
                 ]
             ]);
             $this->sync_discourse_record($sub['user_id']);
+            return true;
         }
+        return false;
     }
     private static function validate_date($date_string = '') {
         if ( !is_string($date_string) || strlen(trim($date_string)) != 10) {
@@ -4143,12 +4145,6 @@ class MultipopPlugin {
         ) {
             wp_redirect(get_permalink($this->settings['myaccount_page']));
             exit;
-        }
-        if (!in_array($user->roles[0], ['administrator', 'multipopolare_friend'])) {
-            if (!$user->mpop_card_active) {
-                wp_redirect(get_permalink($this->settings['myaccount_page']));
-                exit;
-            }
         }
     }
     private function discourse_utilities() {
