@@ -1247,8 +1247,15 @@ class MultipopPlugin {
         global $wpdb;
         $q = "DELETE FROM " . $this::db_prefix('temp_tokens') . " WHERE expiration <= " . time() . ";";
         $wpdb->query($q);
-        if (!$this->delayed_action) {
-            $this->delay_script('flushSubscriptions');
+
+        if ( isset( $this->settings ) && is_array( $this->settings )) {
+            $this_year = intval(current_time('Y'));
+            if ( $this_year > $this->settings['last_year_checked']
+                && !$this->delayed_action
+                && !file_exists(MULTIPOP_PLUGIN_PATH . 'private/.flushing_subs')
+            ) {
+                $this->delay_script('flushSubscriptions');
+            }
         }
     }
 
@@ -1295,36 +1302,25 @@ class MultipopPlugin {
     }
 
     private function flush_subscriptions() {
-        if ( isset( $this->settings ) && is_array( $this->settings )) {
-            $this_year = intval(current_time('Y'));
-            if ( $this_year > $this->settings['last_year_checked'] ) {
-                global $wpdb;
-                $users_to_enable = $wpdb->get_results("SELECT `user_id`, `marketing_agree`, `newsletter_agree`, `publish_agree` FROM " . $this::db_prefix('subscriptions') . " WHERE `status` = 'completed' AND `year` = $this_year;", 'ARRAY_A');
-                $users_enabled = [];
-                foreach($users_to_enable as $u) {
-                    $this->enable_user_card($u['user_id'], $u['marketing_agree'], $u['newsletter_agree'], $u['publish_agree']);
-                    $users_enabled[] = $u['user_id'];
-                }
-                $users_to_disable = $wpdb->get_col(
-                    "SELECT `user_id` FROM " . $this::db_prefix('subscriptions') . " WHERE `status` = 'completed' AND `year` < $this_year" . (!empty($users_enabled) ? " AND `user_id` NOT IN ( " . implode(',' ,$users_enabled) . " )" : '') . ";"
-                );
-                foreach ($users_to_disable as $u) {
-                    $this->disable_user_card($u);
-                }
-                $wpdb->query("UPDATE " . $this::db_prefix('subscriptions') . " SET `status` = 'canceled' WHERE `year` < $this_year AND `status` IN ('tosee','seen');");
-
-                // SET NEW YEAR
-                $wpdb->query("UPDATE " . $this::db_prefix('plugin_settings') . " SET `last_year_checked` = $this_year WHERE `id` = 1 ;");
-
-                // CHECK FOR CURRENT USER
-                $cu = wp_get_current_user();
-                if ($cu && $cu->ID && in_array(strval($cu->ID), $users_to_disable)) {
-                    $id = $cu->ID;
-                    wp_set_current_user(0);
-                    wp_set_current_user($id);
-                }
-            }
+        file_put_contents(MULTIPOP_PLUGIN_PATH . 'private/.flushing_subs', '');
+        global $wpdb;
+        $users_to_enable = $wpdb->get_results("SELECT `user_id`, `marketing_agree`, `newsletter_agree`, `publish_agree` FROM " . $this::db_prefix('subscriptions') . " WHERE `status` = 'completed' AND `year` = $this_year;", 'ARRAY_A');
+        $users_enabled = [];
+        foreach($users_to_enable as $u) {
+            $this->enable_user_card($u['user_id'], $u['marketing_agree'], $u['newsletter_agree'], $u['publish_agree']);
+            $users_enabled[] = $u['user_id'];
         }
+        $users_to_disable = $wpdb->get_col(
+            "SELECT `user_id` FROM " . $this::db_prefix('subscriptions') . " WHERE `status` = 'completed' AND `year` < $this_year" . (!empty($users_enabled) ? " AND `user_id` NOT IN ( " . implode(',' ,$users_enabled) . " )" : '') . ";"
+        );
+        foreach ($users_to_disable as $u) {
+            $this->disable_user_card($u);
+        }
+        $wpdb->query("UPDATE " . $this::db_prefix('subscriptions') . " SET `status` = 'canceled' WHERE `year` < $this_year AND `status` IN ('tosee','seen');");
+
+        // SET NEW YEAR
+        $wpdb->query("UPDATE " . $this::db_prefix('plugin_settings') . " SET `last_year_checked` = $this_year WHERE `id` = 1 ;");
+        unlink(MULTIPOP_PLUGIN_PATH . 'private/.flushing_subs');
     }
 
     private function enable_user_card($user, $marketing_agree = false, $newsletter_agree = false, $publish_agree = false) {
