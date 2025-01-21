@@ -4233,6 +4233,8 @@ class MultipopPlugin {
         }
         if(empty($groups)) {
             $groups[] = ['name' => 'mp_disabled_users', 'full_name' => 'Utenti Wordpress disabilitati', 'owner' => false];
+        } else {
+            $groups[] = ['name' => 'mp_enabled_users', 'full_name' => 'Utenti Wordpress abilitati', 'owner' => false];
         }
         return array_values($groups);
     }
