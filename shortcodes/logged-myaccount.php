@@ -103,6 +103,10 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                 </template>
                 <table id="mpop-profile-table">
                     <tr>
+                        <td><strong>ID Tesserato:</strong></td>
+                        <td>{{profile.ID}}</td>
+                    </tr>
+                    <tr>
                         <td><strong>E-mail:</strong></td>
                         <td v-if="!profileEditing">{{profile.email}}<template v-if="profile._new_email"><br>Da confermare: {{profile._new_email}}</template></td>
                         <td v-else><input type="text" :class="savingProfileErrors.includes('email') ? 'bad-input' : ''" v-model="profileInEditing.email"/></td>
