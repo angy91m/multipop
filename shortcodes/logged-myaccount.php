@@ -9,6 +9,13 @@ if (
     exit;
 }
 $parsed_user = $this->myaccount_get_profile($current_user, true, true);
+$discourse_url = null;
+if ($this->discourse_utilities()) {
+    $discourse_connect_options = get_option('discourse_connect');
+    if (is_array($discourse_connect_options) && isset($discourse_connect_options['url']) && $discourse_connect_options['url']) {
+        $discourse_url = $discourse_connect_options['url'] . '/login';
+    }
+}
 //file_put_contents(MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_create([]));
 // file_put_contents( MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_compile($this->pdf_import($this->pdf_create([])), [
 //     'quote' => 1000,
@@ -64,7 +71,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                 <q-list>
 
                     <template v-for="(menuItem, index) in menuItems" :key="index">
-                        <q-item v-if="!menuItem.admin" clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
+                        <q-item v-if="!menuItem.admin" clickable @click="if(menuItem.url) {window.open(menuItem.url);} else {selectTab(menuItem);}" :active="menuItem.name === selectedTab.name" v-ripple>
                             <q-item-section avatar>
                             <!-- <q-icon :name="menuItem.icon" /> -->
                             </q-item-section>
@@ -887,7 +894,8 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
 </div>
 <?php wp_nonce_field( 'mpop-logged-myaccount', 'mpop-logged-myaccount-nonce' ); ?>
 <script type="application/json" id="__MULTIPOP_DATA__">{
-    "user": <?=json_encode($parsed_user)?>
+    "user": <?=json_encode($parsed_user)?>,
+    "discourseUrl" <?=json_encode($discourse_url)?>
 }</script>
 <script src="<?=plugins_url()?>/multipop/js/vue.global.min.js"></script>
 <script src="<?=plugins_url()?>/multipop/js/quasar.umd.prod.js"></script>

@@ -93,28 +93,6 @@ userCsvFields = [
     'mpop_subscription_notes',
     'esito'
 ].map(col => ({name: col, label: col, align: 'left', field: col})),
-menuItems = [{
-    name: 'summary',
-    label: 'Riepilogo'
-}, {
-    name: 'passwordChange',
-    label: 'Cambio password'
-}, {
-    name: 'card',
-    label: 'Tessera'
-}, {
-    name: 'users',
-    label: 'Utenti',
-    admin: true
-}, {
-    name: 'subscriptions',
-    label: 'Tessere',
-    admin: true
-}, {
-    name: 'uploadUserCsv',
-    label: 'Carica CSV Utenti',
-    admin: true
-}],
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value,
 userSearchSelectableSubYears = [],
 thisYear  = new Date().getFullYear(),
@@ -154,6 +132,28 @@ createApp({
             name: 'summary',
             label: 'Riepilogo'
         }),
+        menuItems = reactive([{
+            name: 'summary',
+            label: 'Riepilogo'
+        }, {
+            name: 'passwordChange',
+            label: 'Cambio password'
+        }, {
+            name: 'card',
+            label: 'Tessera'
+        }, {
+            name: 'users',
+            label: 'Utenti',
+            admin: true
+        }, {
+            name: 'subscriptions',
+            label: 'Tessere',
+            admin: true
+        }, {
+            name: 'uploadUserCsv',
+            label: 'Carica CSV Utenti',
+            admin: true
+        }]),
         displayNav = ref(false),
         profile = reactive({}),
         profileInEditing = reactive({}),
@@ -1115,7 +1115,10 @@ createApp({
             });
         }
         onBeforeMount(()=> {
-            const {user: parsedUser} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
+            const {user: parsedUser, discourseUrl} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
+            if (discourseUrl) {
+                menuItems.push({name: 'discourseUrl', url: discourseUrl, label: 'Accedi a Discourse'});
+            }
             Object.assign(profile, parsedUser);
             generateNotices();
             if (['administrator', 'multipopolare_resp'].includes(profile.role)) {
