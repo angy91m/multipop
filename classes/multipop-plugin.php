@@ -3170,6 +3170,26 @@ class MultipopPlugin {
         clean_user_cache($user->ID);
         update_user_caches(get_user_by('ID', $user->ID));
     }
+    private function parse_subs(array &$subs, array $unset = ['filename', 'completer_ip']) {
+        foreach($subs as &$sub) {
+            foreach($unset as $u) {
+                unset($sub[$u]);
+            }
+            $sub['id'] = intval($sub['id']);
+            $sub['user_id'] = intval($sub['user_id']);
+            $sub['year'] = intval($sub['year']);
+            $sub['quote'] = (double) $sub['quote'];
+            $sub['marketing_agree'] = boolval($sub['marketing_agree']);
+            $sub['newsletter_agree'] = boolval($sub['newsletter_agree']);
+            $sub['publish_agree'] = boolval($sub['publish_agree']);
+            $sub['created_at'] = intval($sub['created_at']);
+            $sub['updated_at'] = intval($sub['updated_at']);
+            $sub['signed_at'] = intval($sub['signed_at']);
+            $sub['completed_at'] = intval($sub['completed_at']);
+            $sub['author_id'] = intval($sub['author_id']);
+            $sub['completer_id'] = intval($sub['completer_id']);
+        }
+    }
     private function get_my_subscriptions($user_id) {
         if (is_object($user_id)) {
             $user_id = $user_id->ID;
@@ -3179,31 +3199,31 @@ class MultipopPlugin {
         }
         global $wpdb;
         $res = $wpdb->get_results("SELECT * FROM " . $this->db_prefix('subscriptions') . " WHERE user_id = $user_id ORDER BY updated_at DESC;");
-        foreach ($res as $k => &$v) {
-            if (in_array($k, [
-                'id',
-                'user_id',
-                'year',
-                'created_at',
-                'updated_at',
-                'signed_at',
-                'completed_at',
-                'author_id',
-                'completer_id'
-            ])) {
-                $v = intval($v);
-            } else if (in_array($k, [
-                'marketing_agree',
-                'newsletter_agree',
-                'publish_agree',
-            ])) {
-                $v = boolval($v);
-            } else if ($k == 'quote') {
-                $v = (double) $v;
-            }
-        }
-        unset($res['completer_ip']);
-        return $res;
+        // foreach ($res as $k => &$v) {
+        //     if (in_array($k, [
+        //         'id',
+        //         'user_id',
+        //         'year',
+        //         'created_at',
+        //         'updated_at',
+        //         'signed_at',
+        //         'completed_at',
+        //         'author_id',
+        //         'completer_id'
+        //     ])) {
+        //         $v = intval($v);
+        //     } else if (in_array($k, [
+        //         'marketing_agree',
+        //         'newsletter_agree',
+        //         'publish_agree',
+        //     ])) {
+        //         $v = boolval($v);
+        //     } else if ($k == 'quote') {
+        //         $v = (double) $v;
+        //     }
+        // }
+        
+        return $this->parse_subs($res);
     }
     private function search_subscriptions(array $options = [], $limit = 100 ) { 
         $options = $options + [
@@ -3532,23 +3552,7 @@ class MultipopPlugin {
             $q_from " . ($q_where ? "WHERE $q_where" : '') . " $q_limit;";
         $res = [];
         $res['subscriptions'] = $wpdb->get_results($q, 'ARRAY_A');
-        foreach($res['subscriptions'] as &$sub) {
-            unset($sub['filename']);
-            $sub['id'] = intval($sub['id']);
-            $sub['user_id'] = intval($sub['user_id']);
-            $sub['year'] = intval($sub['year']);
-            $sub['quote'] = (double) $sub['quote'];
-            $sub['marketing_agree'] = boolval($sub['marketing_agree']);
-            $sub['newsletter_agree'] = boolval($sub['newsletter_agree']);
-            $sub['publish_agree'] = boolval($sub['publish_agree']);
-            $sub['created_at'] = intval($sub['created_at']);
-            $sub['updated_at'] = intval($sub['updated_at']);
-            $sub['signed_at'] = intval($sub['signed_at']);
-            $sub['completed_at'] = intval($sub['completed_at']);
-            $sub['author_id'] = intval($sub['author_id']);
-            $sub['completer_id'] = intval($sub['completer_id']);
-            unset($sub['completer_ip']);
-        }
+        $this->parse_subs($res['subscriptions']);
         if (!$options['pagination']) {
             return $res['subscriptions'];
         }
