@@ -886,7 +886,7 @@ createApp({
                 foundUsers.length = 0;
                 const reqObj = {
                     action: 'admin_search_users',
-                    ...userSearch.value,
+                    ...userSearch,
                     mpop_billing_country: [],
                     mpop_billing_state: [],
                     mpop_billing_city: [],
