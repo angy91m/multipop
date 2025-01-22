@@ -186,4 +186,31 @@ class MpopDiscourseUtilities extends WPDiscourse\Utilities\Utilities {
 		}
 		return true;
 	}
+    public static function create_category( array $body ) {
+        $res = static::discourse_request(
+            "/categories.json",
+            [
+                'method' => 'POST',
+                'body' => $body + [
+                    'permissions' => [
+                        // 1: Create
+                        // 2: Reply
+                        // 3: Read
+                        'mp_enabled_users' => 2
+                    ]
+                ]
+            ]
+        );
+		return $res;
+    }
+    public static function update_category( int $id, array $body ) {
+        $res = static::discourse_request(
+            "/categories/$id",
+            [
+                'method' => 'PUT',
+                'body' => $body
+            ]
+        );
+		return $res;
+    }
 }
