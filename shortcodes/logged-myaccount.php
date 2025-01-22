@@ -405,22 +405,24 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                 </div>
                 <div class="mpop-user-search-field">
                     <q-select
+                        style="width: 250px"
                         filled
                         v-model="userSearch.sub_years"
                         multiple
                         :options="userSearchSelectableSubYears"
                         label="Sottoscrizioni negli anni"
-                        @update:model-value="(v) => {console.log(v);console.log(userSearch.sub_years);}"
+                        @update:model-value="triggerSearchUsers"
                     ></q-select>
                 </div>
                 <div class="mpop-user-search-field">
                     <q-select
+                        style="width: 250px"
                         filled
                         v-model="userSearch.sub_statuses"
                         multiple
                         :options="userSearchSelectableSubStatuses"
                         label="Sottoscrizioni con stato"
-                        @update:model-value="(v) => {console.log(v);console.log(userSearch.sub_statuses);}"
+                        @update:model-value="triggerSearchUsers"
                         map-options
                     ></q-select>
                 </div>
