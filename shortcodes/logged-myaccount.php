@@ -410,7 +410,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         multiple
                         :options="userSearchSelectableSubYears"
                         label="Sottoscrizioni negli anni"
-                        @update:model-value="(v) => {console.log(v);console.log(userSearch.sub_statuses);}"
+                        @update:model-value="(v) => {console.log(v);console.log(userSearch.sub_years);}"
                     ></q-select>
                 </div>
                 <div class="mpop-user-search-field">
