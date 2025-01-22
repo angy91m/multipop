@@ -3222,8 +3222,8 @@ class MultipopPlugin {
         //         $v = (double) $v;
         //     }
         // }
-        
-        return $this->parse_subs($res);
+        $this->parse_subs($res);
+        return $res;
     }
     private function search_subscriptions(array $options = [], $limit = 100 ) { 
         $options = $options + [
