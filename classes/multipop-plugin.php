@@ -3199,29 +3199,6 @@ class MultipopPlugin {
         }
         global $wpdb;
         $res = $wpdb->get_results("SELECT * FROM " . $this->db_prefix('subscriptions') . " WHERE user_id = $user_id ORDER BY updated_at DESC;", 'ARRAY_A');
-        // foreach ($res as $k => &$v) {
-        //     if (in_array($k, [
-        //         'id',
-        //         'user_id',
-        //         'year',
-        //         'created_at',
-        //         'updated_at',
-        //         'signed_at',
-        //         'completed_at',
-        //         'author_id',
-        //         'completer_id'
-        //     ])) {
-        //         $v = intval($v);
-        //     } else if (in_array($k, [
-        //         'marketing_agree',
-        //         'newsletter_agree',
-        //         'publish_agree',
-        //     ])) {
-        //         $v = boolval($v);
-        //     } else if ($k == 'quote') {
-        //         $v = (double) $v;
-        //     }
-        // }
         $this->parse_subs($res);
         return $res;
     }
