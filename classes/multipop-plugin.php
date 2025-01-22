@@ -3635,7 +3635,6 @@ class MultipopPlugin {
         if ($sub_search) {
             $q->query_from .= " INNER JOIN " . $this::db_prefix('subscriptions') . " AS subs ON $wpdb->users.ID = subs.user_id ";
         }
-        save_test($q);
         remove_action('pre_user_query', [$this, 'user_search_pre_user_query']);
     }
     private function parse_requested_roles($roles = true) {
@@ -3701,7 +3700,6 @@ class MultipopPlugin {
         if (!is_array($roles)) {
             return $res;
         }
-        save_test($subs_years, 1);
         add_action('pre_user_query', [$this, 'user_search_pre_user_query']);
         if (is_string($subs_years) && $subs_years) {
             $query['mpop_subs_year'] = $subs_years;
