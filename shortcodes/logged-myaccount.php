@@ -109,12 +109,12 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     </tr>
                     <tr>
                         <td><strong>Nome:</strong></td>
-                        <td v-if="!profileEditing">{{profile.first_name}}</td>
+                        <td v-if="!profileEditing || (goodSubscriptions.length && profile.role != 'administrator')">{{profile.first_name}}</td>
                         <td v-else><input type="text" :class="savingProfileErrors.includes('first_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="profileInEditing.first_name"/></td>
                     </tr>
                     <tr>
                         <td><strong>Cognome:</strong></td>
-                        <td v-if="!profileEditing">{{profile.last_name}}</td>
+                        <td v-if="!profileEditing || (goodSubscriptions.length && profile.role != 'administrator')">{{profile.last_name}}</td>
                         <td v-else><input type="text" :class="savingProfileErrors.includes('last_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="profileInEditing.last_name"/></td>
                     </tr>
                     <tr>
@@ -123,7 +123,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     </tr>
                     <tr>
                         <td><strong>Data di nascita:</strong></td>
-                        <td v-if="!profileEditing">{{displayLocalDate(profile.mpop_birthdate)}}</td>
+                        <td v-if="!profileEditing || (goodSubscriptions.length && profile.role != 'administrator')">{{displayLocalDate(profile.mpop_birthdate)}}</td>
                         <td v-else>
                             <input type="date"
                                 :class="savingProfileErrors.includes('mpop_birthdate') ? 'bad-input' : ''"
@@ -135,7 +135,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     </tr>
                     <tr>
                         <td><strong>Nazione di nascita:</strong></td>
-                        <td v-if="!profileEditing">{{showCountryName(profile.mpop_birthplace_country)}}</td>
+                        <td v-if="!profileEditing || (goodSubscriptions.length && profile.role != 'administrator')">{{showCountryName(profile.mpop_birthplace_country)}}</td>
                         <td v-else>
                             <v-select
                                 id="birthplaceCountry-select"
@@ -160,7 +160,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     </tr>
                     <tr v-if="(profileEditing ? profileInEditing : profile).mpop_birthplace_country == 'ita'">
                         <td><strong>Comune di nascita:</strong></td>
-                        <td v-if="!profileEditing">{{profile.mpop_birthplace ? (profile.mpop_birthplace.nome + ' (' + profile.mpop_birthplace.provincia.sigla +')' + addSuppressToLabel(profile.mpop_birthplace) ) : ''}}</td>
+                        <td v-if="!profileEditing || (goodSubscriptions.length && profile.role != 'administrator')">{{profile.mpop_birthplace ? (profile.mpop_birthplace.nome + ' (' + profile.mpop_birthplace.provincia.sigla +')' + addSuppressToLabel(profile.mpop_birthplace) ) : ''}}</td>
                         <td v-else>
                             <v-select
                                 id="birthplace-select"
@@ -592,12 +592,12 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     </tr>
                     <tr>
                         <td><strong>Nome:</strong></td>
-                        <td v-if="!userEditing || goodSubscriptions.length">{{userInView.first_name}}</td>
+                        <td v-if="!userEditing">{{userInView.first_name}}</td>
                         <td v-else><input type="text" :class="savingProfileErrors.includes('first_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="userInEditing.first_name"/></td>
                     </tr>
                     <tr>
                         <td><strong>Cognome:</strong></td>
-                        <td v-if="!userEditing || goodSubscriptions.length">{{userInView.last_name}}</td>
+                        <td v-if="!userEditing">{{userInView.last_name}}</td>
                         <td v-else><input type="text" :class="savingProfileErrors.includes('last_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="userInEditing.last_name"/></td>
                     </tr>
                     <tr>
@@ -656,7 +656,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     </tr>
                     <tr>
                         <td><strong>Data di nascita:</strong></td>
-                        <td v-if="!userEditing || goodSubscriptions.length">{{displayLocalDate(userInView.mpop_birthdate)}}</td>
+                        <td v-if="!userEditing">{{displayLocalDate(userInView.mpop_birthdate)}}</td>
                         <td v-else>
                             <input type="date"
                                 :class="savingProfileErrors.includes('mpop_birthdate') ? 'bad-input' : ''"
@@ -668,7 +668,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     </tr>
                     <tr>
                         <td><strong>Nazione di nascita:</strong></td>
-                        <td v-if="!userEditing || goodSubscriptions.length">{{showCountryName(userInView.mpop_birthplace_country)}}</td>
+                        <td v-if="!userEditing">{{showCountryName(userInView.mpop_birthplace_country)}}</td>
                         <td v-else>
                             <v-select
                                 id="birthplaceCountry-select"
@@ -693,7 +693,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     </tr>
                     <tr v-if="(userEditing ? userInEditing : userInView).mpop_birthplace_country == 'ita'">
                         <td><strong>Comune di nascita:</strong></td>
-                        <td v-if="!userEditing || goodSubscriptions.length">{{userInView.mpop_birthplace ? (userInView.mpop_birthplace.nome + ' (' + userInView.mpop_birthplace.provincia.sigla +')' + addSuppressToLabel(userInView.mpop_birthplace) ) : ''}}</td>
+                        <td v-if="!userEditing">{{userInView.mpop_birthplace ? (userInView.mpop_birthplace.nome + ' (' + userInView.mpop_birthplace.provincia.sigla +')' + addSuppressToLabel(userInView.mpop_birthplace) ) : ''}}</td>
                         <td v-else>
                             <v-select
                                 id="birthplace-select"
