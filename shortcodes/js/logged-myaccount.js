@@ -329,6 +329,7 @@ createApp({
             return profile.mpop_card_active && (!nearActiveSub.value || nearActiveSub.value.year != thisYear) ? [] : authorizedSubscriptionYears.filter(y => y >= thisYear && !activeCardForYear(profile.mpop_my_subscritions || [], y));
         }),
         otherSubscriptions = computed(() => (profile.mpop_my_subscriptions || []).filter(c => nearActiveSub.value ? nearActiveSub.value.id !== c.id : true)),
+        goodSubscriptions = computed(() => (profile.mpop_my_subscriptions || []).filter(s => ['completed', 'tosee', 'seen'].includes( s.status ))),
         maxBirthDate = new Date();
         maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
         function fuseSearch(options, search) {
@@ -1239,6 +1240,7 @@ createApp({
             addSuppressToLabel,
             showSubscriptionStatus,
             otherSubscriptions,
+            goodSubscriptions,
             nearActiveSub,
             availableYearsToOrder,
             isProfileCompleted,

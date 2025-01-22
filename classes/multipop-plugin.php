@@ -2439,7 +2439,7 @@ class MultipopPlugin {
         if (!$ignore_others) {
             $others = $this->get_subscriptions([
                 'user_id' => [$user_id],
-                'year' => "$year,$year",
+                'year_in' => [$year],
                 'status' => [
                     'tosee',
                     'seen',
@@ -2938,7 +2938,7 @@ class MultipopPlugin {
             if ($old_user) {
                 $others = $this->get_subscriptions([
                     'user_id' => [$old_user->ID],
-                    'year' => "$subscription_year,$subscription_year",
+                    'year_in' => [$subscription_year],
                     'status' => [
                         'tosee',
                         'seen',
@@ -3207,6 +3207,7 @@ class MultipopPlugin {
             'txt' => '',
             'user_id' => [],
             'year' => ',',
+            'year_in' => [],
             'quote' => ',',
             'marketing_agree' => null,
             'newsletter_agree' => null,
@@ -3258,6 +3259,7 @@ class MultipopPlugin {
         if (
             !is_string($options['txt'])
             || !is_array($options['user_id'])
+            || !is_array($options['year_in'])
             || !is_string($options['quote'])
             || !preg_match($quote_interval_reg, $options['quote'])
             || !is_array($options['status'])
@@ -3323,6 +3325,7 @@ class MultipopPlugin {
             return $res;
         }
         $options['user_id'] = array_values(array_unique(array_filter($options['user_id'], function($y) {return is_int($y) && $y > 0;})));
+        $options['year_in'] = array_values(array_unique(array_filter($options['year_in'], function($y) {return is_int($y) && $y > 0;})));
         $options['author_id'] = array_values(array_unique(array_filter($options['author_id'], function($id) {return is_int($id) && $id > 0;})));
         $options['completer_id'] = array_values(array_unique(array_filter($options['completer_id'], function($id) {return is_int($id) && $id > 0;})));
         $options['status'] = array_values(array_unique(array_filter($options['status'], function($s) {return in_array($s, MultipopPlugin::SUBS_STATUSES);})));
@@ -3410,6 +3413,9 @@ class MultipopPlugin {
         }
         if (count($options['user_id'])) {
             $append_to_where("s.user_id IN ( " . implode(',',$options['user_id']) . " )");
+        }
+        if (count($options['year_in'])) {
+            $append_to_where("s.year IN ( " . implode(',',$options['year_in']) . " )");
         }
         if ($options['year'][0]) {
             $append_to_where("s.year >= " . $options['year'][0]);

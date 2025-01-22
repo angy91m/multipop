@@ -95,7 +95,7 @@ switch ($post_data['action']) {
     case 'update_profile':
         $comuni = false;
         $found_caps = [];
-        $has_subs = !empty($this->get_subscriptions(['user_id' => [$current_user->ID]], 1));
+        $has_subs = !empty($this->get_subscriptions(['user_id' => [$current_user->ID], 'status' => ['completed', 'seen', 'tosee']], 1));
         if (!isset($post_data['email']) || !is_string($post_data['email']) || !$this->is_valid_email(trim($post_data['email']), true)) {
             $res_data['error'] = ['email'];
         } else {
