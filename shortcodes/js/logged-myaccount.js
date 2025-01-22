@@ -118,14 +118,25 @@ menuItems = [{
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value,
 userSearchSelectableSubYears = [],
 thisYear  = new Date().getFullYear(),
-userSearchSelectableSubStatuses = [
-    'tosee',
-    'seen',
-    'refused',
-    'canceled',
-    'completed',
-    'refunded'
-];
+userSearchSelectableSubStatuses = [{
+    label: 'Da controllare',
+    value: 'tosee'
+}, {
+    label: 'Visto',
+    value: 'seen'
+}, {
+    label: 'Completato',
+    value: 'completed'
+}, {
+    label: 'Rifiutato',
+    value: 'refused'
+}, {
+    label: 'Annullato',
+    value: 'canceled'
+}, {
+    label: 'Rimborsato',
+    value: 'refunded'
+}];
 userSearchSelectableSubYears.push(thisYear+1, thisYear);
 for (let i = thisYear-1; i >= 2020; i--) userSearchSelectableSubYears.push(i);
 let searchUsersTimeout, triggerSearchTimeout;

@@ -421,6 +421,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         :options="userSearchSelectableSubStatuses"
                         label="Sottoscrizioni con stato"
                         @update:model-value="(v) => {console.log(v);console.log(userSearch.sub_statuses);}"
+                        map-options
                     ></q-select>
                 </div>
                 <div>
