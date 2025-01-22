@@ -3198,7 +3198,7 @@ class MultipopPlugin {
             return [];
         }
         global $wpdb;
-        $res = $wpdb->get_results("SELECT * FROM " . $this->db_prefix('subscriptions') . " WHERE user_id = $user_id ORDER BY updated_at DESC;");
+        $res = $wpdb->get_results("SELECT * FROM " . $this->db_prefix('subscriptions') . " WHERE user_id = $user_id ORDER BY updated_at DESC;", 'ARRAY_A');
         // foreach ($res as $k => &$v) {
         //     if (in_array($k, [
         //         'id',
