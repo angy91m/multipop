@@ -3701,6 +3701,7 @@ class MultipopPlugin {
         if (!is_array($roles)) {
             return $res;
         }
+        save_test($subs_years, 1);
         add_action('pre_user_query', [$this, 'user_search_pre_user_query']);
         if (is_string($subs_years) && $subs_years) {
             $query['mpop_subs_year'] = $subs_years;
