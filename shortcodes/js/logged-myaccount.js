@@ -895,6 +895,7 @@ createApp({
                         [newPagination.sortBy]: !newPagination.descending
                     }
                 };
+                reqObj.subs_statuses = reqObj.subs_statuses.map(v => v.value);
                 if (userSearchTablePagination.value.sortBy != newPagination.sortBy) {
                     userSearchTablePagination.value.secondSortBy = {[userSearchTablePagination.value.sortBy]: !userSearchTablePagination.value.descending};
                 }
