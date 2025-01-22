@@ -12,16 +12,16 @@ if (!$current_user->ID) {
     }
 } else {
     // LOGGED IN
-    if (isset($current_user->roles[0]) && $current_user->roles[0] != 'administrator') {
-        $redirect_url = '/';
-        if (isset($current_user->roles[0]) && in_array( $current_user->roles[0], ['multipopolano', 'multipopolare_friend', 'multipopolare_resp'] )) {
-            $discourse_connect_options = get_option('discourse_connect');
-            if (is_array($discourse_connect_options) && isset($discourse_connect_options['url']) && $discourse_connect_options['url']) {
-                $redirect_url = $discourse_connect_options['url'] . '/login';
-            }
-        }
-        header('Location: ' . $redirect_url);
-        exit;
-    }
+    // if (isset($current_user->roles[0]) && $current_user->roles[0] != 'administrator') {
+    //     $redirect_url = '/';
+    //     if (isset($current_user->roles[0]) && in_array( $current_user->roles[0], ['multipopolano', 'multipopolare_friend', 'multipopolare_resp'] )) {
+    //         $discourse_connect_options = get_option('discourse_connect');
+    //         if (is_array($discourse_connect_options) && isset($discourse_connect_options['url']) && $discourse_connect_options['url']) {
+    //             $redirect_url = $discourse_connect_options['url'] . '/login';
+    //         }
+    //     }
+    //     header('Location: ' . $redirect_url);
+    //     exit;
+    // }
     require('logged-myaccount.php');
 }
