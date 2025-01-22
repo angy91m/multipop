@@ -410,7 +410,8 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         multiple
                         :options="userSearchSelectableSubYears"
                         label="Sottoscrizioni negli anni"
-                        style="width: 250px"
+                        
+                        @change="triggerSearchUsers"
                     ></q-select>
                 </div>
                 <div class="mpop-user-search-field">
@@ -420,7 +421,8 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         multiple
                         :options="userSearchSelectableSubStatuses"
                         label="Sottoscrizioni con stato"
-                        style="width: 250px"
+                        
+                        @change="triggerSearchUsers"
                     ></q-select>
                 </div>
                 <div>
