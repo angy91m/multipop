@@ -895,7 +895,7 @@ if ($this->discourse_utilities()) {
 <?php wp_nonce_field( 'mpop-logged-myaccount', 'mpop-logged-myaccount-nonce' ); ?>
 <script type="application/json" id="__MULTIPOP_DATA__">{
     "user": <?=json_encode($parsed_user)?>,
-    "discourseUrl" <?=json_encode($discourse_url)?>
+    "discourseUrl": <?=json_encode($discourse_url)?>
 }</script>
 <script src="<?=plugins_url()?>/multipop/js/vue.global.min.js"></script>
 <script src="<?=plugins_url()?>/multipop/js/quasar.umd.prod.js"></script>
