@@ -407,7 +407,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     <q-select
                         style="width: 250px"
                         filled
-                        v-model="userSearch.sub_years"
+                        v-model="userSearch.subs_years"
                         multiple
                         :options="userSearchSelectableSubYears"
                         label="Sottoscrizioni negli anni"
@@ -418,7 +418,7 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                     <q-select
                         style="width: 250px"
                         filled
-                        v-model="userSearch.sub_statuses"
+                        v-model="userSearch.subs_statuses"
                         multiple
                         :options="userSearchSelectableSubStatuses"
                         label="Sottoscrizioni con stato"
