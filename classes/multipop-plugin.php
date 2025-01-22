@@ -3589,6 +3589,52 @@ class MultipopPlugin {
             );
             $q->query_from .= " INNER JOIN $wpdb->usermeta AS search_first_name ON ( $wpdb->users.ID = search_first_name.user_id ) INNER JOIN $wpdb->usermeta AS search_last_name ON ( $wpdb->users.ID = search_last_name.user_id )";
         }
+        $sub_search = false;
+        if (isset($q->query_vars['mpop_subs_year']) && is_string($q->query_vars['mpop_subs_year']) && preg_match('/^\d*,\d*$/', $q->query_vars['mpop_subs_year'])) {
+            $years = array_map( 'intval', explode(',', $q->query_vars['mpop_subs_year']));
+            if ($years[0] || $years[1]) {
+                $sub_search = true;
+                if ($years[0]) {
+                    $q->query_where .= " AND $years[0] <= subs.year";
+                }
+                if ($years[1]) {
+                    $q->query_where .= " AND $years[1] >= subs.year";
+                }
+            }
+        }
+        if (isset($q->query_vars['mpop_subs_year_in']) && is_array($q->query_vars['mpop_subs_year_in'])) {
+            $filtered_years = [];
+            foreach($q->query_vars['mpop_subs_year_in'] as $y) {
+                $y = intval($y);
+                if ($y > 0 && !in_array($y, $filtered_years)) {
+                    $filtered_years[] = $y;
+                }
+            }
+            if (!empty($filtered_years)) {
+                $sub_search = true;
+                $q->query_where .= " AND subs.year IN (". implode( ',', $filtered_years ).")";
+            } 
+        }
+        if (isset($q->query_vars['mpop_subs_status_in']) && is_array($q->query_vars['mpop_subs_status_in'])) {
+            $filtered_status = [];
+            $w_status = '';
+            foreach($q->query_vars['mpop_subs_status_in'] as $s) {
+                if (in_array($s, MultipopPlugin::SUBS_STATUSES) && !in_array($s, $filtered_status)) {
+                    $filtered_status[] = $s;
+                    if ($w_status) {
+                        $w_status .= ',';
+                    }
+                    $w_status .= '%s';
+                }
+            }
+            if (!empty($filtered_status)) {
+                $sub_search = true;
+                $q->query_where .= $wpdb->prepare(" AND subs.status IN ( $w_status ) ", ...$filtered_status);
+            } 
+        }
+        if ($sub_search) {
+            $q->query_from .= " INNER JOIN " . $this::db_prefix('subscriptions') . " AS subs ON $wpdb->users.ID = subs.user_id ";
+        }
         remove_action('pre_user_query', [$this, 'user_search_pre_user_query']);
     }
     private function parse_requested_roles($roles = true) {
@@ -3617,6 +3663,8 @@ class MultipopPlugin {
         array $mpop_resp_zones = [],
         $mpop_card_active = null,
         $mpop_mail_to_confirm = null,
+        $subs_years = [],
+        array $subs_statuses = [],
         $page = 1,
         $sort_by = ['ID' => true],
         $limit = 100
@@ -3653,6 +3701,14 @@ class MultipopPlugin {
             return $res;
         }
         add_action('pre_user_query', [$this, 'user_search_pre_user_query']);
+        if (is_string($subs_years) && $subs_years) {
+            $query['mpop_subs_year'] = $subs_years;
+        } else if (is_array($subs_years) && !empty($subs_years)) {
+            $query['mpop_subs_year_in'] = $subs_years;
+        }
+        if (is_array($subs_statuses) && !empty($subs_statuses)) {
+            $query['mpop_subs_status_in'] = $subs_statuses;
+        }
         $meta_q = [
             'relation' => 'AND',
             'role' => [

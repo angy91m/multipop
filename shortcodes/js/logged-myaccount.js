@@ -115,8 +115,21 @@ menuItems = [{
     label: 'Carica CSV Utenti',
     admin: true
 }],
-loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value;
+loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value,
+userSearchSelectableSubYears = [],
+thisYear  = new Date().getFullYear(),
+userSearchSelectableSubStatuses = [
+    'tosee',
+    'seen',
+    'refused',
+    'canceled',
+    'completed',
+    'refunded'
+];
+userSearchSelectableSubYears.push(thisYear+1, thisYear);
+for (let i = thisYear-1; i >= 2020; i--) userSearchSelectableSubYears.push(i);
 let searchUsersTimeout, triggerSearchTimeout;
+
 createApp({
     components: {
         'v-select': defineAsyncComponent(() => vSel),
@@ -184,7 +197,9 @@ createApp({
             zones: [],
             resp_zones: [],
             mpop_card_active: null,
-            mpop_mail_to_confirm: null
+            mpop_mail_to_confirm: null,
+            subs_years: [],
+            subs_statuses: []
         }),
         userSearching = ref(false),
         zoneSearch = reactive({
@@ -1231,7 +1246,9 @@ createApp({
             intPhoneInstance,
             resendInvitationMail,
             countries,
-            showCountryName
+            showCountryName,
+            userSearchSelectableSubYears,
+            userSearchSelectableSubStatuses
         };
     }
 })

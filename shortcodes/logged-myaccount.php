@@ -403,6 +403,26 @@ $parsed_user = $this->myaccount_get_profile($current_user, true, true);
                         </select>
                     </label>
                 </div>
+                <div class="mpop-user-search-field">
+                    <q-select
+                        filled
+                        v-model="userSearch.sub_years"
+                        multiple
+                        :options="userSearchSelectableSubYears"
+                        label="Sottoscrizioni negli anni"
+                        style="width: 250px"
+                    ></q-select>
+                </div>
+                <div class="mpop-user-search-field">
+                    <q-select
+                        filled
+                        v-model="userSearch.sub_statuses"
+                        multiple
+                        :options="userSearchSelectableSubStatuses"
+                        label="Sottoscrizioni con stato"
+                        style="width: 250px"
+                    ></q-select>
+                </div>
                 <div>
                     <div class="mpop-user-search-field mpop-50-wid">
                         <label for="userSearchZone-select">Residenza&nbsp;
