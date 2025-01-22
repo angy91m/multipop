@@ -1090,7 +1090,9 @@ createApp({
             const {user: parsedUser} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
             Object.assign(profile, parsedUser);
             generateNotices();
-            searchUsers();
+            if (['administrator', 'multipopolare_resp'].includes(profile.role)) {
+                searchUsers();
+            }
             window.addEventListener('popstate', onPopState);
             const url = new URL(location);
             if (url.searchParams.has('view-user') && profile.role == 'administrator') {
