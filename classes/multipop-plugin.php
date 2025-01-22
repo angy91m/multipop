@@ -3541,6 +3541,9 @@ class MultipopPlugin {
     private function get_subscriptions(array $options = [], $limit = -1 ) {
         return $this->search_subscriptions($options + ['pagination' => false], $limit);
     }
+    public function search_distinct() {
+        return "DISTINCT";
+    }
     public function user_search_pre_user_query($q) {
         global $wpdb;
         $extra_from = [];
@@ -3700,6 +3703,7 @@ class MultipopPlugin {
         if (!is_array($roles)) {
             return $res;
         }
+        add_filter('posts_distinct', [$this,'search_distinct']);
         add_action('pre_user_query', [$this, 'user_search_pre_user_query']);
         if (is_string($subs_years) && $subs_years) {
             $query['mpop_subs_year'] = $subs_years;
@@ -3892,6 +3896,7 @@ class MultipopPlugin {
         $user_query = new WP_User_Query($query);
         $total = $user_query->get_total();
         $res = $user_query->get_results();
+        remove_filter('posts_distinct', [$this,'search_distinct']);
         $comuni_all = false;
         if (count($res)) {
             $comuni_all = $this->get_comuni_all();
