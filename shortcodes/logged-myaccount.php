@@ -71,7 +71,7 @@ if ($this->discourse_utilities()) {
                 <q-list>
 
                     <template v-for="(menuItem, index) in menuItems" :key="index">
-                        <q-item v-if="!menuItem.admin" clickable @click="if(menuItem.url) {window.open(menuItem.url);} else {selectTab(menuItem);}" :active="menuItem.name === selectedTab.name" v-ripple>
+                        <q-item v-if="!menuItem.admin" clickable @click="if(menuItem.url) {openExternalUrl(menuItem.url);} else {selectTab(menuItem);}" :active="menuItem.name === selectedTab.name" v-ripple>
                             <q-item-section avatar>
                             <!-- <q-icon :name="menuItem.icon" /> -->
                             </q-item-section>

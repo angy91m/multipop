@@ -114,7 +114,8 @@ userSearchSelectableSubStatuses = [{
 }, {
     label: 'Rimborsato',
     value: 'refunded'
-}];
+}],
+openExternalUrl = url => window.open(url, '_blank');
 userSearchSelectableSubYears.push(thisYear+1, thisYear);
 for (let i = thisYear-1; i >= 2020; i--) userSearchSelectableSubYears.push(i);
 let searchUsersTimeout, triggerSearchTimeout;
@@ -1265,7 +1266,8 @@ createApp({
             countries,
             showCountryName,
             userSearchSelectableSubYears,
-            userSearchSelectableSubStatuses
+            userSearchSelectableSubStatuses,
+            openExternalUrl
         };
     }
 })
