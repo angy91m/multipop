@@ -226,6 +226,16 @@ createApp({
             authorizedSubscriptionYears: [],
             authorizedSubscriptionQuote: 0
         }),
+        newSubscription = reactive({
+            year: mainOptions.authorizedSubscriptionYears.length ? mainOptions.authorizedSubscriptionYears[0] : null,
+            quote: mainOptions.authorizedSubscriptionQuote,
+            mpop_marketing_agree: false,
+            mpop_newsletter_agree: false,
+            mpop_publish_agree: false
+        }),
+        marketingAgreeShow = ref(false),
+        newsletterAgreeShow = ref(false),
+        publishAgreeShow = ref(false),
         countries = reactive([]),
         saving = ref(false),
         savingProfileErrors = reactive([]),
@@ -1353,7 +1363,11 @@ createApp({
             userSearchSelectableSubStatuses,
             openExternalUrl,
             subscriptionColumns,
-            mainOptions
+            mainOptions,
+            newSubscription,
+            marketingAgreeShow,
+            newsletterAgreeShow,
+            publishAgreeShow
         };
     }
 })
