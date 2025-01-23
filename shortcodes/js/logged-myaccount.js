@@ -123,7 +123,7 @@ currencyFormatter = new Intl.NumberFormat('en-US', {
     currencyDisplay: 'symbol',
 });
 currencyFormatter.custFormat = function(v) {
-    return this.format(v).replaceAll('.', '');
+    return this.format(v).replaceAll(',', '').replace('.', ',').replace('€', '€ ');
 };
 const subscriptionColumns = [{
     name: 'id',
