@@ -487,6 +487,7 @@ switch ($post_data['action']) {
         break;
     case 'generate_subscription_pdf':
         $sub = $this->get_subscription_by('id', $post_data['sub_id']);
+        save_test($sub);
         if (!isset($sub['user_id']) || $sub['user_id'] !== $current_user->ID || !isset($sub['status']) || $sub['status'] !== 'open') {
             if (!isset( $res_data['error'])) {
                 $res_data['error'] = [];
