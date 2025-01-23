@@ -32,7 +32,6 @@ if (str_starts_with($post_data['action'], 'admin_')) {
     exit;
 }
 if (str_starts_with($post_data['action'], 'resp_')) {
-    $current_user = wp_get_current_user();
     if (isset($current_user->roles[0]) && in_array($current_user->roles[0], ['administrator', 'multipopolare_resp']) ) {
         require('resp-actions.php');
     } else {
@@ -43,6 +42,23 @@ if (str_starts_with($post_data['action'], 'resp_')) {
 switch ($post_data['action']) {
     case 'get_countries':
         $res_data['data'] = ['countries' => $this->get_countries_all()];
+        break;
+    case 'get_main_options':
+        $years = [];
+        $quote = 0;
+        if ( isset($this->settings['master_doc_key']) && $this->settings['master_doc_key'] ) {
+            if (isset($this->settings['authorized_subscription_years'])) {
+                $years = $this->settings['authorized_subscription_years'];
+            }
+            if (isset($this->settings['authorized_subscription_years']) && (is_int($this->settings['authorized_subscription_years']) || is_float($this->settings['authorized_subscription_years'])) && $this->settings['authorized_subscription_years']) {
+                $quote = $this->settings['authorized_subscription_years'];
+            }
+        }
+        $main_options = [
+            'authorizedSubscriptionYears' => $years,
+            'authorizedSubscriptionQuote' => $quote
+        ];
+        $res_data['data'] = $main_options;
         break;
     case 'get_authorized_subscription_years':
         $years = [];
@@ -392,6 +408,89 @@ switch ($post_data['action']) {
             $res_data['notices'] = [];
         }
         $res_data['notices'][] = ['type'=>'success', 'msg' => 'Password modificata correttamente'];
+        break;
+    case 'new_subscription':
+        $years = [];
+        if ( isset($this->settings['master_doc_key']) && $this->settings['master_doc_key'] && isset($this->settings['authorized_subscription_years'])) {
+            $years = $this->settings['authorized_subscription_years'];
+        }
+        if (!isset($post_data['year']) || !is_int($post_data['year']) || !in_array($post_data['year'], $years)) {
+            if (!isset( $res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'year';
+       
+        }
+        if (!isset($post_data['quote']) || (!is_int($post_data['quote']) && !is_float($post_data['quote'])) || !$this->settings['min_subscription_payment'] || $post_data['quote'] < $this->settings['min_subscription_payment']) {
+            if (!isset( $res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'quote';
+        }
+        if (!isset($post_data['mpop_marketing_agree']) || !is_bool($post_data['mpop_marketing_agree'])) {
+            if (!isset( $res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'mpop_marketing_agree';
+        }
+        if (!isset($post_data['mpop_newsletter_agree']) || !is_bool($post_data['mpop_newsletter_agree'])) {
+            if (!isset( $res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'mpop_newsletter_agree';
+        }
+        if (!isset($post_data['mpop_publish_agree']) || !is_bool($post_data['mpop_publish_agree'])) {
+            if (!isset( $res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'mpop_publish_agree';
+        }
+        if (!empty($this->get_subscriptions(['user_id' => [$current_user->ID], 'year_in' => [$post_data['year']], 'status' => ['completed', 'tosee', 'seen']], 1))) {
+            if (!isset( $res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'active_subscription';
+        }
+        if (isset($res_data['error']) && !empty($res_data['error'])) {
+            if (!isset( $res_data['notices'])) {
+                $res_data['notices'] = [];
+            }
+            $res_data['notices'][] = ['type' => 'error', 'msg' => 'Errore nei dati di input'];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $sub_id = $this->create_subscription(
+            $current_user->ID,
+            $post_data['year'],
+            $post_data['quote'],
+            $post_data['mpop_marketing_agree'],
+            $post_data['mpop_newsletter_agree'],
+            $post_data['mpop_publish_agree'],
+            '',
+            true,
+            true,
+            true,
+            true
+        );
+        $res_data['data']['sub_id'] = $sub_id;
+        // $res_data['data']['pdf'] = $this->pdf_compile($this->pdf_create([], false), [
+        //     'name' => $current_user->first_name . ' ' . $current_user->last_name,
+        //     'quote' => $post_data['quote'],
+        //     'mpop_birthplace_country' => $current_user->mpop_birthplace_country,
+        //     'mpop_birthplace' => $current_user->mpop_birthplace,
+        //     'mpop_birthdate' => $current_user->mpop_birthdate,
+        //     'mpop_billing_country' => $current_user->mpop_billing_country,
+        //     'mpop_billing_city' => $current_user->mpop_billing_city,
+        //     'mpop_billing_address' => $current_user->mpop_billing_address,
+        //     'mpop_billing_zip' => $current_user->mpop_billing_zip,
+        //     'mpop_phone' => $current_user->mpop_phone,
+        //     'email' => $current_user->email,
+        //     'subscription_year' => $post_data['year'],
+        //     'mpop_marketing_agree' => boolval(  ),
+        //     'mpop_newsletter_agree' => $post_data['mpop_newsletter_agree'],
+        //     'mpop_publish_agree' => $post_data['mpop_publish_agree']
+        // ])->export_file();
         break;
     default:
         $res_data['error'] = ['action'];

@@ -102,10 +102,10 @@ loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').va
 userSearchSelectableSubYears = [],
 thisYear  = new Date().getFullYear(),
 userSearchSelectableSubStatuses = [{
-    label: 'Da controllare',
+    label: 'Da approvare',
     value: 'tosee'
 }, {
-    label: 'Vista',
+    label: 'In attesa di pagamento',
     value: 'seen'
 }, {
     label: 'Completata',
@@ -119,6 +119,9 @@ userSearchSelectableSubStatuses = [{
 }, {
     label: 'Rimborsata',
     value: 'refunded'
+}, {
+    label: 'Aperta',
+    value: 'open'
 }],
 currencyFormatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -219,7 +222,10 @@ createApp({
         userSearchZoneOpen = ref(false),
         userSearchRespZoneOpen = ref(false),
         userEditingRespZoneOpen = ref(false),
-        authorizedSubscriptionYears = reactive([]),
+        mainOptions = reactive({
+            authorizedSubscriptionYears: [],
+            authorizedSubscriptionQuote: 0
+        }),
         countries = reactive([]),
         saving = ref(false),
         savingProfileErrors = reactive([]),
@@ -359,8 +365,8 @@ createApp({
         nearActiveSub = computed(() => {
             let res, i = 0;
             const thisYear = (new Date()).getFullYear();
-            while(!res && i < authorizedSubscriptionYears.length) {
-                if (authorizedSubscriptionYears[i] >= thisYear) res = activeCardForYear(profile.mpop_my_subscritions || [], authorizedSubscriptionYears[i]);
+            while(!res && i < mainOptions.authorizedSubscriptionYears.length) {
+                if (mainOptions.authorizedSubscriptionYears[i] >= thisYear) res = activeCardForYear(profile.mpop_my_subscritions || [], mainOptions.authorizedSubscriptionYears[i]);
                 i++;
             }
             return res;
@@ -377,7 +383,7 @@ createApp({
         ? true : false ),
         availableYearsToOrder = computed(() => {
             const thisYear = (new Date()).getFullYear();
-            return profile.mpop_card_active && (!nearActiveSub.value || nearActiveSub.value.year != thisYear) ? [] : authorizedSubscriptionYears.filter(y => y >= thisYear && !activeCardForYear(profile.mpop_my_subscritions || [], y));
+            return profile.mpop_card_active && (!nearActiveSub.value || nearActiveSub.value.year != thisYear) ? [] : mainOptions.authorizedSubscriptionYears.filter(y => y >= thisYear && !activeCardForYear(profile.mpop_my_subscritions || [], y));
         }),
         otherSubscriptions = computed(() => (profile.mpop_my_subscriptions || []).filter(c => nearActiveSub.value ? nearActiveSub.value.id !== c.id : true)),
         goodSubscriptions = computed(() => (profile.mpop_my_subscriptions || []).filter(s => ['completed', 'tosee', 'seen'].includes( s.status ))),
@@ -901,17 +907,16 @@ createApp({
                 saving.value = false;
             }
         }
-        async function getAuthorizedSubscriptionYears() {
-            if ( !isCachedProp('authorizedSubscriptionYears') ) {
+        async function getMainOptions() {
+            if ( !isCachedProp('mainOptions') ) {
                 const res = await serverReq({
-                    action: 'get_authorized_subscription_years'
+                    action: 'get_main_options'
                 });
                 if (res.ok) {
                     const resData = await res.json();
-                    if (resData.data && resData.data.years) {
-                        authorizedSubscriptionYears.length = 0;
-                        authorizedSubscriptionYears.push(...resData.data.years.sort());
-                        saveCachedProp('authorizedSubscriptionYears');
+                    if (resData.data) {
+                        Object.assign(mainOptions, resData.data)
+                        saveCachedProp('mainOptions');
                     } else {
                         console.error('Unknown error');
                     }
@@ -929,8 +934,38 @@ createApp({
                     }
                 }
             }
-            return authorizedSubscriptionYears;
+            return mainOptions;
         }
+        // async function getAuthorizedSubscriptionYears() {
+        //     if ( !isCachedProp('authorizedSubscriptionYears') ) {
+        //         const res = await serverReq({
+        //             action: 'get_authorized_subscription_years'
+        //         });
+        //         if (res.ok) {
+        //             const resData = await res.json();
+        //             if (resData.data && resData.data.years) {
+        //                 authorizedSubscriptionYears.length = 0;
+        //                 authorizedSubscriptionYears.push(...resData.data.years.sort());
+        //                 saveCachedProp('authorizedSubscriptionYears');
+        //             } else {
+        //                 console.error('Unknown error');
+        //             }
+        //             generateNotices(resData.notices || []);
+        //         } else {
+        //             try {
+        //                 const {error} = await res.json();
+        //                 if (error) {
+        //                     console.error(error);
+        //                 } else {
+        //                     console.error('Unknown error');
+        //                 }
+        //             } catch {
+        //                 console.error('Unknown error');
+        //             }
+        //         }
+        //     }
+        //     return authorizedSubscriptionYears;
+        // }
         async function searchUsers(options) {
             const newPagination = options ? options.pagination : userSearchTablePagination.value;
             try {
@@ -1129,6 +1164,7 @@ createApp({
                 } else if (url.searchParams.has('view-user')) {
                     viewUser(url.searchParams.get('view-user'), popstate);
                 }
+                // FOR FAST DATA REFRESH UNCOMMENT FOLLOWING
                 // if (tab.name == 'card') {
                 //     getAuthorizedSubscriptionYears();
                 //     getProfile();
@@ -1167,7 +1203,7 @@ createApp({
                 menuItems.push({name: 'discourseUrl', url: discourseUrl, label: 'Accedi a Discourse'});
             }
             Object.assign(profile, parsedUser);
-            getAuthorizedSubscriptionYears();
+            getMainOptions();
             generateNotices();
             if (['administrator', 'multipopolare_resp'].includes(profile.role)) {
                 searchUsers();
@@ -1315,7 +1351,8 @@ createApp({
             userSearchSelectableSubYears,
             userSearchSelectableSubStatuses,
             openExternalUrl,
-            subscriptionColumns
+            subscriptionColumns,
+            mainOptions
         };
     }
 })
