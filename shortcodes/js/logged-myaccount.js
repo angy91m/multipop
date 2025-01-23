@@ -115,6 +115,32 @@ userSearchSelectableSubStatuses = [{
     label: 'Rimborsato',
     value: 'refunded'
 }],
+subscriptionColumns = [{
+    name: 'id',
+    label: 'ID',
+    field: 'id',
+    sortable: true
+}, {
+    name: 'year',
+    label: 'Anno',
+    field: 'year',
+    sortable: true
+}, {
+    name: 'status',
+    label: 'Stato',
+    field: 'status',
+    sortable: true
+}, {
+    name: 'quote',
+    label: 'Quota annuale',
+    field: 'quote',
+    sortable: true
+}, {
+    name: 'pp_order_id',
+    label: 'PayPal',
+    field: 'pp_order_id',
+    sortable: true
+}],
 openExternalUrl = url => window.open(url, '_blank');
 userSearchSelectableSubYears.push(thisYear+1, thisYear);
 for (let i = thisYear-1; i >= 2020; i--) userSearchSelectableSubYears.push(i);

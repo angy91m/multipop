@@ -369,19 +369,13 @@ if ($this->discourse_utilities()) {
                         </div>
                         <template v-if="otherSubscriptions.length">
                             <hr>
-                            <h5 class="text-h5">Altre richieste</h5>
-                            <table id="mpop-other-subscriptions">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="card in otherSubscriptions" :key="card.id">
-                                        <td>{{card.id}}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <q-table
+                                title="Altre richieste"
+                                :rows="otherSubscriptions"
+                                :columns="subscriptionColumns"
+                                row-key="id"
+                            >
+                            </q-table>
                         </template>
                     </div>
                 </template>
