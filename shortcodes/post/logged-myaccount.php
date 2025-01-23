@@ -467,23 +467,6 @@ switch ($post_data['action']) {
             true
         );
         $res_data['data']['sub_id'] = $sub_id;
-        // $res_data['data']['pdf'] = $this->pdf_compile($this->pdf_create([], false), [
-        //     'name' => $current_user->first_name . ' ' . $current_user->last_name,
-        //     'quote' => $post_data['quote'],
-        //     'mpop_birthplace_country' => $current_user->mpop_birthplace_country,
-        //     'mpop_birthplace' => $current_user->mpop_birthplace,
-        //     'mpop_birthdate' => $current_user->mpop_birthdate,
-        //     'mpop_billing_country' => $current_user->mpop_billing_country,
-        //     'mpop_billing_city' => $current_user->mpop_billing_city,
-        //     'mpop_billing_address' => $current_user->mpop_billing_address,
-        //     'mpop_billing_zip' => $current_user->mpop_billing_zip,
-        //     'mpop_phone' => $current_user->mpop_phone,
-        //     'email' => $current_user->email,
-        //     'subscription_year' => $post_data['year'],
-        //     'mpop_marketing_agree' => boolval(  ),
-        //     'mpop_newsletter_agree' => $post_data['mpop_newsletter_agree'],
-        //     'mpop_publish_agree' => $post_data['mpop_publish_agree']
-        // ])->export_file();
         break;
     case 'generate_subscription_pdf':
         $sub = $this->get_subscription_by('id', $post_data['sub_id']);

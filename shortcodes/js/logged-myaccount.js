@@ -1017,36 +1017,6 @@ createApp({
                 generatingSubscriptionPdf.value = !generatingSubscriptionPdf.value;
             }
         }
-        // async function getAuthorizedSubscriptionYears() {
-        //     if ( !isCachedProp('authorizedSubscriptionYears') ) {
-        //         const res = await serverReq({
-        //             action: 'get_authorized_subscription_years'
-        //         });
-        //         if (res.ok) {
-        //             const resData = await res.json();
-        //             if (resData.data && resData.data.years) {
-        //                 authorizedSubscriptionYears.length = 0;
-        //                 authorizedSubscriptionYears.push(...resData.data.years.sort());
-        //                 saveCachedProp('authorizedSubscriptionYears');
-        //             } else {
-        //                 console.error('Unknown error');
-        //             }
-        //             generateNotices(resData.notices || []);
-        //         } else {
-        //             try {
-        //                 const {error} = await res.json();
-        //                 if (error) {
-        //                     console.error(error);
-        //                 } else {
-        //                     console.error('Unknown error');
-        //                 }
-        //             } catch {
-        //                 console.error('Unknown error');
-        //             }
-        //         }
-        //     }
-        //     return authorizedSubscriptionYears;
-        // }
         async function searchUsers(options) {
             const newPagination = options ? options.pagination : userSearchTablePagination.value;
             try {

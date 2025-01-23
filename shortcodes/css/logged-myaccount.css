@@ -16,6 +16,9 @@
 h3 {
     margin: 20px 0;
 }
+h6.text-h6 {
+    margin: 0;
+}
 span.mpop-app-notice {
     border: solid 1px #aaa;
     display: block;
