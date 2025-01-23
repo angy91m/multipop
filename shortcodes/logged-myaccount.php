@@ -332,7 +332,7 @@ if ($this->discourse_utilities()) {
                                 <li>Stato attivazione: {{userSearchSelectableSubStatuses.find(s => s.value == nearActiveSub.status).label}}</li>
                                 <li>Anno: {{nearActiveSub.year}}</li>
                                 <li>Quota annuale: {{currencyFormatter.custFormat(nearActiveSub.quote)}}</li>
-                                <button v-if="nearActiveSub.status == 'open'" class="mpop-button" @click="generateSubscriptionPdf(nearActiveSub.id)" :disabled="generatingSubscriptionPdf">Genera modulo iscrizione</button>
+                                <button v-if="nearActiveSub.status == 'open'" class="mpop-button" @click="generateSubscriptionPdf(nearActiveSub.id)" :disabled="generatingSubscriptionPdf.find(nearActiveSub.id)">Genera modulo iscrizione</button>
                                 <template v-if="nearActiveSub.pp_order_id">
                                     <li>PayPal ID: {{nearActiveSub.pp_order_id}}</li>
                                     <li v-if="nearActiveSub.status == 'seen'">Paga</li>
@@ -412,6 +412,7 @@ if ($this->discourse_utilities()) {
                                                 size="sm"
                                                 label="Genera modulo"
                                                 @click="generateSubscriptionPdf(props.row.id)"
+                                                :disabled="generatingSubscriptionPdf.find(props.row.id)"
                                                 style="margin-bottom: 2px;"
                                             ></q-btn><br>
                                             <q-btn

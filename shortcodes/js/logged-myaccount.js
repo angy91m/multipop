@@ -234,7 +234,7 @@ createApp({
             mpop_publish_agree: false
         }),
         requestingNewSubscription = ref(false),
-        generatingSubscriptionPdf = ref(false),
+        generatingSubscriptionPdf = reactive([]),
         marketingAgreeShow = ref(false),
         newsletterAgreeShow = ref(false),
         publishAgreeShow = ref(false),
@@ -984,7 +984,7 @@ createApp({
             }
         }
         async function generateSubscriptionPdf(id) {
-            generatingSubscriptionPdf.value = !generatingSubscriptionPdf.value;
+            generatingSubscriptionPdf.push(id);
             try {
                 const res = await serverReq({
                     action: 'generate_subscription_pdf',
@@ -1014,7 +1014,7 @@ createApp({
                     }
                 }
             } finally {
-                generatingSubscriptionPdf.value = !generatingSubscriptionPdf.value;
+                generatingSubscriptionPdf.splice( generatingSubscriptionPdf.findIndex(v => v == id), 1);
             }
         }
         async function searchUsers(options) {
