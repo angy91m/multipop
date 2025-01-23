@@ -1211,6 +1211,10 @@ createApp({
             intPhoneInstance.value.instance.setNumber(p);
             return parsePhone(intPhoneInstance.value);
         }
+        function mytest(args) {
+            console.log(args);
+            return args;
+        }
         return {
             selectedTab,
             profile,
@@ -1294,7 +1298,8 @@ createApp({
             userSearchSelectableSubYears,
             userSearchSelectableSubStatuses,
             openExternalUrl,
-            subscriptionColumns
+            subscriptionColumns,
+            mytest
         };
     }
 })
