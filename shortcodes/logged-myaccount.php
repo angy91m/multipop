@@ -361,12 +361,12 @@ if ($this->discourse_utilities()) {
                                 <p>
                                     Richiedi la tua tessera per l'anno:&nbsp;
                                     <select v-model="newSubscription.year">
-                                        <option v-for="y in availableYearsToOrder" :key="y" :value="y">{{y}}</option>
+                                        <option v-for="y in availableYearsToOrder" :key="y">{{y}}</option>
                                     </select>
                                 </p>
                                 <p>
                                     Quota annuale:&nbsp;
-                                    <input type="number" :min="mainOptions.authorizedSubscriptionQuote" step=".01" :value="mainOptions.authorizedSubscriptionQuote" v-model="newSubscription.quote" />
+                                    <input type="number" :min="mainOptions.authorizedSubscriptionQuote" step=".01" v-model="newSubscription.quote" />
                                 </p>
                                 <p>
                                     <strong>Consensi facoltativi</strong>
