@@ -412,7 +412,8 @@ if ($this->discourse_utilities()) {
                                                 size="sm"
                                                 label="Genera modulo"
                                                 @click="generateSubscriptionPdf(props.row.id)"
-                                            ></q-btn><br><br>
+                                                style="margin-bottom: 2px;"
+                                            ></q-btn><br>
                                             <q-btn
                                                 dense
                                                 color="primary"
