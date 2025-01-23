@@ -402,8 +402,11 @@ if ($this->discourse_utilities()) {
                             >
                                 <template v-slot:body-cell="props">
                                     <q-td :props="props">
-                                        <template v-if="props.name == 'status' && props.value == 'open'">
-                                            CIAO
+                                        <template v-if="props.name == 'status'">
+                                            <template v-if="props.value.value == 'open'">
+                                                CIAO
+                                            </template>
+                                            <template v-else>{{props.value.label}}</template>
                                         </template>
                                         <template v-else>{{props.value}}</template>
                                     </q-td>
