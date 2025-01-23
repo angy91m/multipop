@@ -233,6 +233,7 @@ createApp({
             mpop_newsletter_agree: false,
             mpop_publish_agree: false
         }),
+        requestingNewSubscription = ref(false),
         marketingAgreeShow = ref(false),
         newsletterAgreeShow = ref(false),
         publishAgreeShow = ref(false),
@@ -951,6 +952,37 @@ createApp({
             }
             return mainOptions;
         }
+        async function requestNewSubscription() {
+            requestingNewSubscription.value = !requestingNewSubscription.value;
+            try {
+                const res = await serverReq({
+                    action: 'new_subscription',
+                    ...newSubscription
+                });
+                if (res.ok) {
+                    const resData = await res.json();
+                    if (resData.data) {
+                        await getProfile();
+                    } else {
+                        console.error('Unknown error');
+                    }
+                    generateNotices(resData.notices || []);
+                } else {
+                    try {
+                        const {error} = await res.json();
+                        if (error) {
+                            console.error(error);
+                        } else {
+                            console.error('Unknown error');
+                        }
+                    } catch {
+                        console.error('Unknown error');
+                    }
+                }
+            } finally {
+                requestingNewSubscription.value = !requestingNewSubscription.value;
+            }
+        }
         // async function getAuthorizedSubscriptionYears() {
         //     if ( !isCachedProp('authorizedSubscriptionYears') ) {
         //         const res = await serverReq({
@@ -1371,7 +1403,8 @@ createApp({
             newSubscription,
             marketingAgreeShow,
             newsletterAgreeShow,
-            publishAgreeShow
+            publishAgreeShow,
+            requestNewSubscription
         };
     }
 })
