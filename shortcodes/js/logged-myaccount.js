@@ -115,7 +115,7 @@ userSearchSelectableSubStatuses = [{
     label: 'Rimborsato',
     value: 'refunded'
 }],
-currencyFormatter = new Intl.NumberFormat('it-IT', {
+currencyFormatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'EUR',
     minimumFractionDigits: 2,
