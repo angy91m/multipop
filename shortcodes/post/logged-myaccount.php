@@ -50,8 +50,8 @@ switch ($post_data['action']) {
             if (isset($this->settings['authorized_subscription_years'])) {
                 $years = $this->settings['authorized_subscription_years'];
             }
-            if (isset($this->settings['authorized_subscription_years']) && (is_int($this->settings['authorized_subscription_years']) || is_float($this->settings['authorized_subscription_years'])) && $this->settings['authorized_subscription_years']) {
-                $quote = $this->settings['authorized_subscription_years'];
+            if (isset($this->settings['min_subscription_payment']) && (is_int($this->settings['min_subscription_payment']) || is_float($this->settings['min_subscription_payment'])) && $this->settings['min_subscription_payment']) {
+                $quote = $this->settings['min_subscription_payment'];
             }
         }
         $main_options = [
@@ -59,13 +59,6 @@ switch ($post_data['action']) {
             'authorizedSubscriptionQuote' => $quote
         ];
         $res_data['data'] = $main_options;
-        break;
-    case 'get_authorized_subscription_years':
-        $years = [];
-        if ( isset($this->settings['master_doc_key']) && $this->settings['master_doc_key'] && isset($this->settings['authorized_subscription_years'])) {
-            $years = $this->settings['authorized_subscription_years'];
-        }
-        $res_data['data'] = ['years' => $years];
         break;
     case 'get_birth_cities':
         if (!isset($post_data['mpop_birthplace'])) {
