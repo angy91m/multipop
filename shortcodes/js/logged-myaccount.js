@@ -155,7 +155,7 @@ createApp({
             label: 'Carica CSV Utenti',
             admin: true
         }]),
-        displayNav = ref(false),
+        displayNav = ref(true),
         profile = reactive({}),
         profileInEditing = reactive({}),
         userInEditing = reactive({}),
