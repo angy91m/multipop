@@ -361,6 +361,7 @@ if ($this->discourse_utilities()) {
                                 <select>
                                     <option v-for="y in availableYearsToOrder" :key="y" :value="y">{{y}}</option>
                                 </select>
+                                <input type="number" min="mainOptions.authorizedSubscriptionQuote" step=".01"/>
                             </p>
                             <p v-else>Per richiedere una nuova tessera è necessario completare i tuoi dati del profilo</p>
                         </div>
