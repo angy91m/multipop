@@ -926,7 +926,11 @@ createApp({
                 if (res.ok) {
                     const resData = await res.json();
                     if (resData.data) {
-                        Object.assign(mainOptions, resData.data)
+                        Object.assign(mainOptions, resData.data);
+                        if (availableYearsToOrder.value.length) {
+                            newSubscription.year = availableYearsToOrder.value[0];
+                        }
+                        newSubscription.quote = mainOptions.quote;
                         saveCachedProp('mainOptions');
                     } else {
                         console.error('Unknown error');
