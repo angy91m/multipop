@@ -360,8 +360,8 @@ if ($this->discourse_utilities()) {
                                 <h5 class="text-h5">Richiesta tessera</h5>
                                 <p>
                                     Richiedi la tua tessera per l'anno:&nbsp;
-                                    <select>
-                                        <option v-for="y in availableYearsToOrder" :key="y" :value="y" v-model="newSubscription.year">{{y}}</option>
+                                    <select v-model="newSubscription.year">
+                                        <option v-for="y in availableYearsToOrder" :key="y" :value="y">{{y}}</option>
                                     </select>
                                 </p>
                                 <p>
