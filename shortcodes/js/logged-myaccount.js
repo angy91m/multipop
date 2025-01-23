@@ -1404,7 +1404,8 @@ createApp({
             marketingAgreeShow,
             newsletterAgreeShow,
             publishAgreeShow,
-            requestNewSubscription
+            requestNewSubscription,
+            requestingNewSubscription
         };
     }
 })
