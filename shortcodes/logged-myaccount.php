@@ -364,7 +364,7 @@ if ($this->discourse_utilities()) {
                                     </select>
                                 </p>
                                 <p>
-                                    Quota iscrizione:&nbsp;
+                                    Quota annuale:&nbsp;
                                     <input type="number" min="mainOptions.authorizedSubscriptionQuote" step=".01" :value="mainOptions.authorizedSubscriptionQuote"/>
                                 </p>
                             </template>
