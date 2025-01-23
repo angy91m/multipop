@@ -378,7 +378,7 @@ createApp({
             let res, i = 0;
             const thisYear = (new Date()).getFullYear();
             while(!res && i < mainOptions.authorizedSubscriptionYears.length) {
-                if (mainOptions.authorizedSubscriptionYears[i] >= thisYear) res = activeCardForYear(profile.mpop_my_subscritions || [], mainOptions.authorizedSubscriptionYears[i]);
+                if (mainOptions.authorizedSubscriptionYears[i] >= thisYear) res = activeCardForYear(profile.mpop_my_subscriptions || [], mainOptions.authorizedSubscriptionYears[i]);
                 i++;
             }
             return res;
@@ -396,7 +396,7 @@ createApp({
         availableYearsToOrder = computed(() => {
             if (!mainOptions.authorizedSubscriptionQuote) return [];
             const thisYear = (new Date()).getFullYear();
-            return profile.mpop_card_active && (!nearActiveSub.value || nearActiveSub.value.year != thisYear) ? [] : mainOptions.authorizedSubscriptionYears.filter(y => y >= thisYear && !activeCardForYear(profile.mpop_my_subscritions || [], y));
+            return profile.mpop_card_active && (!nearActiveSub.value || nearActiveSub.value.year != thisYear) ? [] : mainOptions.authorizedSubscriptionYears.filter(y => y >= thisYear && !activeCardForYear(profile.mpop_my_subscriptions || [], y));
         }),
         otherSubscriptions = computed(() => (profile.mpop_my_subscriptions || []).filter(c => nearActiveSub.value ? nearActiveSub.value.id !== c.id : true)),
         goodSubscriptions = computed(() => (profile.mpop_my_subscriptions || []).filter(s => ['completed', 'tosee', 'seen', 'open'].includes( s.status ))),
