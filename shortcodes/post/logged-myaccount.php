@@ -104,7 +104,7 @@ switch ($post_data['action']) {
     case 'update_profile':
         $comuni = false;
         $found_caps = [];
-        $has_subs = !empty($this->get_subscriptions(['user_id' => [$current_user->ID], 'status' => ['completed', 'seen', 'tosee']], 1));
+        $has_subs = !empty($this->get_subscriptions(['user_id' => [$current_user->ID], 'status' => ['completed', 'seen', 'tosee','open']], 1));
         if (!isset($post_data['email']) || !is_string($post_data['email']) || !$this->is_valid_email(trim($post_data['email']), true)) {
             $res_data['error'] = ['email'];
         } else {
@@ -438,7 +438,7 @@ switch ($post_data['action']) {
             }
             $res_data['error'][] = 'mpop_publish_agree';
         }
-        if (!empty($this->get_subscriptions(['user_id' => [$current_user->ID], 'year_in' => [$post_data['year']], 'status' => ['completed', 'tosee', 'seen']], 1))) {
+        if (!empty($this->get_subscriptions(['user_id' => [$current_user->ID], 'year_in' => [$post_data['year']], 'status' => ['completed', 'tosee', 'seen', 'open']], 1))) {
             if (!isset( $res_data['error'])) {
                 $res_data['error'] = [];
             }

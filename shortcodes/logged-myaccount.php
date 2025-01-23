@@ -347,7 +347,7 @@ if ($this->discourse_utilities()) {
                     <div>
                         <ul v-if="nearActiveSub">
                             <li>ID tesserato: {{profile.ID}}</li>
-                            <li>Stato attivazione: {{showSubscriptionStatus(nearActiveSub)}}</li>
+                            <li>Stato attivazione: {{userSearchSelectableSubStatuses.find(s => s.value == nearActiveSub.status).label}}</li>
                             <li>Anno: {{nearActiveSub.year}}</li>
                             <li>ID richiesta: {{nearActiveSub.id}}</li>
                             <template v-if="nearActiveSub.pp_order_id">

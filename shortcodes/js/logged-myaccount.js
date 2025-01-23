@@ -180,7 +180,7 @@ createApp({
     },
     setup() {
         function activeCardForYear(cards = [], year) {
-            return cards.filter(c => c.year == year && ['completed', 'tosee', 'seen'].includes(c.status)).sort((a,b) => a.status == b.status ? (a.status == 'completed' ? b.completed_at-a.completed_at : b.updated_at_at-a.updated_at_at) : (a.status == 'completed' ? -1 : (b.status == 'completed' ? 1 : b.updated_at_at-a.updated_at_at) ) ).shift();
+            return cards.filter(c => c.year == year && ['completed', 'tosee', 'seen', 'open'].includes(c.status)).sort((a,b) => a.status == b.status ? (a.status == 'completed' ? b.completed_at-a.completed_at : b.updated_at_at-a.updated_at_at) : (a.status == 'completed' ? -1 : (b.status == 'completed' ? 1 : b.updated_at_at-a.updated_at_at) ) ).shift();
         }
         const selectedTab = ref({
             name: 'summary',
@@ -398,7 +398,7 @@ createApp({
             return profile.mpop_card_active && (!nearActiveSub.value || nearActiveSub.value.year != thisYear) ? [] : mainOptions.authorizedSubscriptionYears.filter(y => y >= thisYear && !activeCardForYear(profile.mpop_my_subscritions || [], y));
         }),
         otherSubscriptions = computed(() => (profile.mpop_my_subscriptions || []).filter(c => nearActiveSub.value ? nearActiveSub.value.id !== c.id : true)),
-        goodSubscriptions = computed(() => (profile.mpop_my_subscriptions || []).filter(s => ['completed', 'tosee', 'seen'].includes( s.status ))),
+        goodSubscriptions = computed(() => (profile.mpop_my_subscriptions || []).filter(s => ['completed', 'tosee', 'seen', 'open'].includes( s.status ))),
         maxBirthDate = new Date();
         maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
         function fuseSearch(options, search) {
@@ -592,11 +592,7 @@ createApp({
                     status = 'In attesa di approvazione';
                     break;
                 case 'seen':
-                    if (card.pp_order_id) {
-                        status = 'In attesa di pagamento';
-                    } else {
-                        status = 'In attesa di approvazione';
-                    }
+                    status = 'In attesa di pagamento';
                     break;
                 case 'refused':
                     status = 'Rifiutata';
@@ -606,6 +602,9 @@ createApp({
                     break;
                 case 'refunded':
                     status = 'Rimborsata';
+                    break;
+                case 'open':
+                    status = 'Aperta';
                     break;
             }
             return status;

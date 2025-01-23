@@ -2445,7 +2445,8 @@ class MultipopPlugin {
                 'status' => [
                     'tosee',
                     'seen',
-                    'completed'
+                    'completed',
+                    'open'
                 ]
             ], 1);
             if (count($others)) {
@@ -2944,7 +2945,8 @@ class MultipopPlugin {
                     'status' => [
                         'tosee',
                         'seen',
-                        'completed'
+                        'completed',
+                        'open'
                     ]
                 ], 1);
                 if (!empty($others)) {
