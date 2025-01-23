@@ -343,7 +343,7 @@ if ($this->discourse_utilities()) {
             <!--CARD-->
             <div v-if="selectedTab.name == 'card'">
                 <template v-if="profile.mpop_my_subscriptions">
-                    <h4 v-if="profile.mpop_card_active">La tua tessera è attiva</h4>
+                    <h5 class="text-h5" v-if="profile.mpop_card_active">La tua tessera è attiva!</h5>
                     <div>
                         <ul v-if="nearActiveSub">
                             <li>ID tesserato: {{profile.ID}}</li>
@@ -357,6 +357,7 @@ if ($this->discourse_utilities()) {
                         </ul>
                         <div v-if="availableYearsToOrder.length" id="mpop-avail-years-to-order">
                             <template v-if="isProfileCompleted">
+                                <h5 class="text-h5">Richiesta tessera</h5>
                                 <p>
                                     Richiedi la tua tessera per l'anno:&nbsp;
                                     <select>
@@ -398,6 +399,7 @@ if ($this->discourse_utilities()) {
                                     <button class="mpop-button" @click="publishAgreeShow = false">Chiudi</button><br>
                                     Presta il mio consenso e fino alla revoca dello stesso, per la pubblicazione del mio nominativo su riviste, cataloghi, brochure, annuari, siti, ecc. (di seguito complessivamente definite “attività di pubblicazione dell’associazione”) di MULTIPOPOLARE APS e/o da organizzazioni correlate. Il trattamento per attività di pubblicazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo pubblicazioni cartacee), ovvero mediante sistemi “elettronici” (a titolo esemplificativo pubblicazioni elettroniche, social network, sito, blog, ecc.).
                                 </p>
+                                <button class="mpop-button" @click="console.log('ciao')">Richiedi</button>
                             </template>
                             <p v-else>Per richiedere una nuova tessera è necessario completare i tuoi dati del profilo</p>
                         </div>
