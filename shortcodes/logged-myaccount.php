@@ -377,7 +377,7 @@ if ($this->discourse_utilities()) {
                             >
                                 <template v-slot:body-cell="props">
                                     <q-td :props="props" v-if="props.name == 'status'">{{userSearchSelectableSubStatuses.find(s => s.value == props.value).label}}</q-td>
-                                    <q-td :props="props" v-else>{{props.value}}</q-td>
+                                    <q-td :props="props" v-else>{{() => { console.log(props); return props.value;} }}</q-td>
                                 </template>
                             </q-table>
                         </template>
