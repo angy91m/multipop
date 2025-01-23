@@ -357,7 +357,6 @@ if ($this->discourse_utilities()) {
                                 </template>
                             </ul>
                         </template>
-                        <ul>
                         <div v-if="availableYearsToOrder.length" id="mpop-avail-years-to-order">
                             <template v-if="isProfileCompleted">
                                 <h5 class="text-h5">Richiesta tessera</h5>
