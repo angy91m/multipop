@@ -356,13 +356,18 @@ if ($this->discourse_utilities()) {
                             </template>
                         </ul>
                         <div v-if="availableYearsToOrder.length" id="mpop-avail-years-to-order">
-                            <p v-if="isProfileCompleted">
-                                Richiedi la tua tessera per l'anno:&nbsp;
-                                <select>
-                                    <option v-for="y in availableYearsToOrder" :key="y" :value="y">{{y}}</option>
-                                </select>
-                                <input type="number" min="mainOptions.authorizedSubscriptionQuote" step=".01"/>
-                            </p>
+                            <template v-if="isProfileCompleted">
+                                <p>
+                                    Richiedi la tua tessera per l'anno:&nbsp;
+                                    <select>
+                                        <option v-for="y in availableYearsToOrder" :key="y" :value="y">{{y}}</option>
+                                    </select>
+                                </p>
+                                <p>
+                                    Quota iscrizione:&nbsp;
+                                    <input type="number" min="mainOptions.authorizedSubscriptionQuote" step=".01" :value="mainOptions.authorizedSubscriptionQuote"/>
+                                </p>
+                            </template>
                             <p v-else>Per richiedere una nuova tessera è necessario completare i tuoi dati del profilo</p>
                         </div>
                         <div v-if="!profile.mpop_card_active && !availableYearsToOrder.length" id="mpop-avail-years-to-order">
