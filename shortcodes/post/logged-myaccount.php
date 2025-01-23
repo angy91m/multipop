@@ -487,7 +487,6 @@ switch ($post_data['action']) {
         break;
     case 'generate_subscription_pdf':
         $sub = $this->get_subscription_by('id', $post_data['sub_id']);
-        save_test($sub);
         if (!isset($sub['user_id']) || $sub['user_id'] !== $current_user->ID || !isset($sub['status']) || $sub['status'] !== 'open') {
             if (!isset( $res_data['error'])) {
                 $res_data['error'] = [];
@@ -503,7 +502,7 @@ switch ($post_data['action']) {
             echo json_encode( $res_data );
             exit;
         }
-        $res_data['data']['pdf'] = 'data://application/pdf;base64,'. base64_encode( $this->pdf_compile($this->pdf_create([], false), [
+        $res_data['data']['pdf'] = 'data:application/pdf;base64,'. base64_encode( $this->pdf_compile($this->pdf_create([], false), [
             'name' => $current_user->first_name . ' ' . $current_user->last_name,
             'quote' => $sub['quote'],
             'mpop_birthplace_country' => $current_user->mpop_birthplace_country,
