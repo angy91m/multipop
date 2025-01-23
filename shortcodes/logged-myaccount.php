@@ -375,6 +375,7 @@ if ($this->discourse_utilities()) {
                                 :columns="subscriptionColumns"
                                 row-key="id"
                                 :pagination="{page:1,rowsPerPage:0}"
+                                :hide-pagination="true"
                             >
                             </q-table>
                         </template>
