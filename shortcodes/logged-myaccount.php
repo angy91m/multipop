@@ -338,6 +338,7 @@ if ($this->discourse_utilities()) {
                                     <li v-if="nearActiveSub.status == 'seen'">Paga</li>
                                 </template>
                             </ul>
+                            <hr>
                         </template>
                         <div v-if="availableYearsToOrder.length" id="mpop-avail-years-to-order">
                             <template v-if="isProfileCompleted">
@@ -387,7 +388,7 @@ if ($this->discourse_utilities()) {
                             </template>
                             <p v-else>Per richiedere una nuova tessera è necessario completare i tuoi dati del profilo</p>
                         </div>
-                        <div v-if="!profile.mpop_card_active && !availableYearsToOrder.length" id="mpop-avail-years-to-order">
+                        <div v-if="!nearActiveSub && !availableYearsToOrder.length" id="mpop-avail-years-to-order">
                             <p>Al momento non è possibile richiedere nuove tessere</p>
                         </div>
                         <template v-if="otherSubscriptions.length">
