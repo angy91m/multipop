@@ -365,7 +365,7 @@ if ($this->discourse_utilities()) {
                                 </p>
                                 <p>
                                     Quota annuale:&nbsp;
-                                    <input type="number" min="mainOptions.authorizedSubscriptionQuote" step=".01" :value="mainOptions.authorizedSubscriptionQuote"/>
+                                    <input type="number" :min="mainOptions.authorizedSubscriptionQuote" step=".01" :value="mainOptions.authorizedSubscriptionQuote"/>
                                 </p>
                             </template>
                             <p v-else>Per richiedere una nuova tessera è necessario completare i tuoi dati del profilo</p>
