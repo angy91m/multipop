@@ -234,6 +234,7 @@ createApp({
             mpop_publish_agree: false
         }),
         requestingNewSubscription = ref(false),
+        generatingSubscriptionPdf = ref(false),
         marketingAgreeShow = ref(false),
         newsletterAgreeShow = ref(false),
         publishAgreeShow = ref(false),
@@ -983,32 +984,37 @@ createApp({
             }
         }
         async function generateSubscriptionPdf(id) {
-            const res = await serverReq({
-                action: 'generate_subscription_pdf',
-                sub_id: id
-            });
-            if (res.ok) {
-                const resData = await res.json();
-                if (resData.data && resData.data.pdf) {
-                    Object.assign(document.createElement('a'), {
-                        href: resData.data.pdf,
-                        download: 'Modulo Multipopolare.pdf'
-                    }).click();
-                } else {
-                    console.error('Unknown error');
-                }
-                generateNotices(resData.notices || []);
-            } else {
-                try {
-                    const {error} = await res.json();
-                    if (error) {
-                        console.error(error);
+            generatingSubscriptionPdf.value = !generatingSubscriptionPdf.value;
+            try {
+                const res = await serverReq({
+                    action: 'generate_subscription_pdf',
+                    sub_id: id
+                });
+                if (res.ok) {
+                    const resData = await res.json();
+                    if (resData.data && resData.data.pdf) {
+                        Object.assign(document.createElement('a'), {
+                            href: resData.data.pdf,
+                            download: 'Modulo Multipopolare.pdf'
+                        }).click();
                     } else {
                         console.error('Unknown error');
                     }
-                } catch {
-                    console.error('Unknown error');
+                    generateNotices(resData.notices || []);
+                } else {
+                    try {
+                        const {error} = await res.json();
+                        if (error) {
+                            console.error(error);
+                        } else {
+                            console.error('Unknown error');
+                        }
+                    } catch {
+                        console.error('Unknown error');
+                    }
                 }
+            } finally {
+                generatingSubscriptionPdf.value = !generatingSubscriptionPdf.value;
             }
         }
         // async function getAuthorizedSubscriptionYears() {
@@ -1435,7 +1441,8 @@ createApp({
             requestNewSubscription,
             requestingNewSubscription,
             currencyFormatter,
-            generateSubscriptionPdf
+            generateSubscriptionPdf,
+            generatingSubscriptionPdf
         };
     }
 })
