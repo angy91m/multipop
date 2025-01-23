@@ -501,7 +501,8 @@ switch ($post_data['action']) {
             'mpop_marketing_agree' => $sub['mpop_marketing_agree'],
             'mpop_newsletter_agree' => $sub['mpop_newsletter_agree'],
             'mpop_publish_agree' => $sub['mpop_publish_agree'],
-            'subscription_id' => $post_data['sub_id']
+            'subscription_id' => $post_data['sub_id'],
+            'card_number' => $current_user->ID
         ])->export_file() );
         break;
     default:
