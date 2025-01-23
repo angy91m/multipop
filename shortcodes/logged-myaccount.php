@@ -375,6 +375,10 @@ if ($this->discourse_utilities()) {
                                 :columns="subscriptionColumns"
                                 row-key="id"
                             >
+                                <template v-slot:body-cell="props">
+                                    <q-td :props="props" v-if="props.name == 'status'">{{userSearchSelectableSubStatuses.find(s => s.value == props.value).label}}</q-td>
+                                    <q-td :props="props" v-else>{{props.value}}</q-td>
+                                </template>
                             </q-table>
                         </template>
                     </div>
