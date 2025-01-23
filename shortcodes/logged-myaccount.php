@@ -338,9 +338,9 @@ if ($this->discourse_utilities()) {
                                     <li v-if="nearActiveSub.status == 'seen'">Paga</li>
                                 </template>
                             </ul>
-                            <hr>
                         </template>
                         <div v-if="availableYearsToOrder.length" id="mpop-avail-years-to-order">
+                            <hr v-if="nearActiveSub">
                             <template v-if="isProfileCompleted">
                                 <h5 class="text-h5">Richiesta tessera</h5>
                                 <p>
