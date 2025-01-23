@@ -45,6 +45,11 @@ boolVal = v => {
     }
     return false;
 },
+displayLocalDate = (dt) => {
+    if (!dt) return '';
+    if (typeof dt === 'string') dt = new Date(dt);
+    return ('0' + dt.getDate()).slice(-2) + '/' + ('0' + (dt.getMonth() + 1)).slice(-2) + '/' + dt.getFullYear();
+},
 userRoles = [
     'multipopolano',
     'multipopolare_resp',
@@ -1142,11 +1147,6 @@ createApp({
                     searchUsers();
                 }
             }
-        }
-        function displayLocalDate(dt) {
-            if (!dt) return '';
-            if (typeof dt === 'string') dt = new Date(dt);
-            return ('0' + dt.getDate()).slice(-2) + '/' + ('0' + (dt.getMonth() + 1)).slice(-2) + '/' + dt.getFullYear();
         }
         function serverReq(obj) {
             return fetch(location.origin + location.pathname, {
