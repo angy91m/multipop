@@ -500,7 +500,8 @@ switch ($post_data['action']) {
             'subscription_year' => $sub['year'],
             'mpop_marketing_agree' => $sub['mpop_marketing_agree'],
             'mpop_newsletter_agree' => $sub['mpop_newsletter_agree'],
-            'mpop_publish_agree' => $sub['mpop_publish_agree']
+            'mpop_publish_agree' => $sub['mpop_publish_agree'],
+            'subscription_id' => $post_data['sub_id']
         ])->export_file() );
         break;
     default:
