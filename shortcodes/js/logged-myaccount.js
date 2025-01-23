@@ -147,7 +147,7 @@ const subscriptionColumns = [{
     name: 'status',
     label: 'Stato',
     field: 'status',
-    format: v => userSearchSelectableSubStatuses.find(s => s.value == v),
+    format: v => userSearchSelectableSubStatuses.find(s => s.value == v).label,
     sortable: true
 }, {
     name: 'quote',
