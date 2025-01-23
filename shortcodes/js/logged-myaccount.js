@@ -990,7 +990,10 @@ createApp({
             if (res.ok) {
                 const resData = await res.json();
                 if (resData.data && resData.data.pdf) {
-                    console.log(resData.data);
+                    Object.assign(document.createElement('a'), {
+                        href: resData.data.pdf,
+                        download: 'Modulo Multipopolare.pdf'
+                    }).click();
                 } else {
                     console.error('Unknown error');
                 }
