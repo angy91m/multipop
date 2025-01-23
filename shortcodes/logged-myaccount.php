@@ -399,7 +399,7 @@ if ($this->discourse_utilities()) {
                                     <button class="mpop-button" @click="publishAgreeShow = false">Chiudi</button><br>
                                     Presta il mio consenso e fino alla revoca dello stesso, per la pubblicazione del mio nominativo su riviste, cataloghi, brochure, annuari, siti, ecc. (di seguito complessivamente definite “attività di pubblicazione dell’associazione”) di MULTIPOPOLARE APS e/o da organizzazioni correlate. Il trattamento per attività di pubblicazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo pubblicazioni cartacee), ovvero mediante sistemi “elettronici” (a titolo esemplificativo pubblicazioni elettroniche, social network, sito, blog, ecc.).
                                 </p>
-                                <button class="mpop-button" @click="requestNewSubscription">Richiedi</button>
+                                <button class="mpop-button" :disabled="requestingNewSubscription" @click="requestNewSubscription">Richiedi</button>
                             </template>
                             <p v-else>Per richiedere una nuova tessera è necessario completare i tuoi dati del profilo</p>
                         </div>
