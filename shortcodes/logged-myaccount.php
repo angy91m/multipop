@@ -410,7 +410,7 @@ if ($this->discourse_utilities()) {
                                                     color="primary"
                                                     size="sm"
                                                     label="Genera modulo"
-                                                    @click="generateSubscriptionPdf(props.row.status.id)"
+                                                    @click="generateSubscriptionPdf(props.row.id)"
                                                 ></q-btn>
                                             </template>
                                             <template v-else>{{props.value}}</template>
