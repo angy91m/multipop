@@ -404,7 +404,13 @@ if ($this->discourse_utilities()) {
                                     <q-td :props="props">
                                         <template v-if="props.col.name == 'status'">
                                             <template v-if="props.row.status == 'open'">
-                                                CIAO
+                                                {{props.value}}&nbsp;
+                                                <q-btn
+                                                    dense
+                                                    color="primary"
+                                                    :size="sm"
+                                                    :label="Genera modulo"
+                                                ></q-btn>
                                             </template>
                                             <template v-else>{{props.value}}</template>
                                         </template>
