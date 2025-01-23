@@ -408,7 +408,7 @@ if ($this->discourse_utilities()) {
                                             </template>
                                             <template v-else>{{props.value.label}}</template>
                                         </template>
-                                        <template v-else>{{props.value}}</template>
+                                        <template v-else>{{props}}</template>
                                     </q-td>
                                 </template>
                             </q-table>
