@@ -930,7 +930,7 @@ createApp({
                         if (availableYearsToOrder.value.length) {
                             newSubscription.year = availableYearsToOrder.value[0];
                         }
-                        newSubscription.quote = mainOptions.quote;
+                        newSubscription.quote = mainOptions.authorizedSubscriptionQuote;
                         saveCachedProp('mainOptions');
                     } else {
                         console.error('Unknown error');
