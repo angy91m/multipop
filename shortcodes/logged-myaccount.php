@@ -369,7 +369,7 @@ if ($this->discourse_utilities()) {
                         </div>
                         <template v-if="otherSubscriptions.length">
                             <hr>
-                            <h4>Altre richieste</h4>
+                            <h5 class="text-h5">Altre richieste</h5>
                             <table id="mpop-other-subscriptions">
                                 <thead>
                                     <tr>
