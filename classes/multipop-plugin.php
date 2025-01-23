@@ -2596,6 +2596,7 @@ class MultipopPlugin {
             return false;
         }
         $arr = [$res];
+        $this->parse_subs($arr);
         return $arr[0];
     }
 
