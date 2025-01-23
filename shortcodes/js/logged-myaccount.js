@@ -1404,7 +1404,8 @@ createApp({
             newsletterAgreeShow,
             publishAgreeShow,
             requestNewSubscription,
-            requestingNewSubscription
+            requestingNewSubscription,
+            currencyFormatter
         };
     }
 })

@@ -351,6 +351,7 @@ if ($this->discourse_utilities()) {
                                 <li>ID tesserato: {{profile.ID}}</li>
                                 <li>Stato attivazione: {{userSearchSelectableSubStatuses.find(s => s.value == nearActiveSub.status).label}}</li>
                                 <li>Anno: {{nearActiveSub.year}}</li>
+                                <li>Quota annuale: {{currencyFormatter.custFormat(nearActiveSub.quote)}}</li>
                                 <template v-if="nearActiveSub.pp_order_id">
                                     <li>PayPal ID: {{nearActiveSub.pp_order_id}}</li>
                                     <li v-if="nearActiveSub.status == 'seen'">Paga</li>
