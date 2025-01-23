@@ -982,6 +982,32 @@ createApp({
                 requestingNewSubscription.value = !requestingNewSubscription.value;
             }
         }
+        async function generateSubscriptionPdf(id) {
+            const res = await serverReq({
+                action: 'generate_subscription_pdf',
+                sub_id: id
+            });
+            if (res.ok) {
+                const resData = await res.json();
+                if (resData.data && resData.data.pdf) {
+                    openExternalUrl(resData.data.pdf);
+                } else {
+                    console.error('Unknown error');
+                }
+                generateNotices(resData.notices || []);
+            } else {
+                try {
+                    const {error} = await res.json();
+                    if (error) {
+                        console.error(error);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } catch {
+                    console.error('Unknown error');
+                }
+            }
+        }
         // async function getAuthorizedSubscriptionYears() {
         //     if ( !isCachedProp('authorizedSubscriptionYears') ) {
         //         const res = await serverReq({
@@ -1405,7 +1431,8 @@ createApp({
             publishAgreeShow,
             requestNewSubscription,
             requestingNewSubscription,
-            currencyFormatter
+            currencyFormatter,
+            generateSubscriptionPdf
         };
     }
 })

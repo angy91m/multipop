@@ -485,6 +485,47 @@ switch ($post_data['action']) {
         //     'mpop_publish_agree' => $post_data['mpop_publish_agree']
         // ])->export_file();
         break;
+    case 'generate_subscription_pdf':
+        if (!isset($post_data['sub_id']) || !is_int($post_data['sub_id']) || !$post_data['sub_id']) {
+            if (!isset( $res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'sub_id';
+        }
+        $sub = $this->get_subscription_by('id', $post_data['sub_id']);
+        if (isset($sub['user_id']) || $sub['user_id'] !== $current_user->ID || isset($sub['status']) || $sub['status'] !== 'open') {
+            if (!isset( $res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'sub_id';
+        }
+        if (isset($res_data['error']) && !empty($res_data['error'])) {
+            if (!isset( $res_data['notices'])) {
+                $res_data['notices'] = [];
+            }
+            $res_data['notices'][] = ['type' => 'error', 'msg' => 'Errore nei dati di input'];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $res_data['data']['pdf'] = 'data://application/pdf;base64,'. base64_encode( $this->pdf_compile($this->pdf_create([], false), [
+            'name' => $current_user->first_name . ' ' . $current_user->last_name,
+            'quote' => $sub['quote'],
+            'mpop_birthplace_country' => $current_user->mpop_birthplace_country,
+            'mpop_birthplace' => $current_user->mpop_birthplace,
+            'mpop_birthdate' => $current_user->mpop_birthdate,
+            'mpop_billing_country' => $current_user->mpop_billing_country,
+            'mpop_billing_city' => $current_user->mpop_billing_city,
+            'mpop_billing_address' => $current_user->mpop_billing_address,
+            'mpop_billing_zip' => $current_user->mpop_billing_zip,
+            'mpop_phone' => $current_user->mpop_phone,
+            'email' => $current_user->email,
+            'subscription_year' => $sub['year'],
+            'mpop_marketing_agree' => $sub['mpop_marketing_agree'],
+            'mpop_newsletter_agree' => $sub['mpop_newsletter_agree'],
+            'mpop_publish_agree' => $sub['mpop_publish_agree']
+        ])->export_file() );
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];

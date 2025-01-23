@@ -16,26 +16,6 @@ if ($this->discourse_utilities()) {
         $discourse_url = $discourse_connect_options['url'] . '/login';
     }
 }
-//file_put_contents(MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_create([]));
-// file_put_contents( MULTIPOP_PLUGIN_PATH . '/modulo-generato.pdf', $this->pdf_compile($this->pdf_import($this->pdf_create([])), [
-//     'quote' => 1000,
-//     'name' => 'Angelo Burzi',
-//     'mpop_birthplace_country' => 'arg',
-//     'mpop_birthplace' => 'D843',
-//     'mpop_birthdate' => '1991-10-09',
-//     'mpop_billing_country' => 'arg',
-//     'mpop_billing_city' => 'H501',
-//     'mpop_billing_address' => 'Via prova
-// rpnjadnkjks',
-//     'mpop_billing_zip' => '00195',
-//     'mpop_phone' => '3239180',
-//     'email' => 'asdnjsad',
-//     'subscription_id' => 5,
-//     'subscription_year' => 2025,
-//     'mpop_marketing_agree' => true,
-//     'mpop_newsletter_agree' => true,
-//     'mpop_publish_agree' => false
-// ])->export_file());
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-tel-input.css">
@@ -352,6 +332,7 @@ if ($this->discourse_utilities()) {
                                 <li>Stato attivazione: {{userSearchSelectableSubStatuses.find(s => s.value == nearActiveSub.status).label}}</li>
                                 <li>Anno: {{nearActiveSub.year}}</li>
                                 <li>Quota annuale: {{currencyFormatter.custFormat(nearActiveSub.quote)}}</li>
+                                <button v-if="nearActiveSub.status == 'open'" class="mpop-button" @click="generateSubscriptionPdf">Genera modulo iscrizione</button>
                                 <template v-if="nearActiveSub.pp_order_id">
                                     <li>PayPal ID: {{nearActiveSub.pp_order_id}}</li>
                                     <li v-if="nearActiveSub.status == 'seen'">Paga</li>

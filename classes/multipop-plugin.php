@@ -2595,21 +2595,8 @@ class MultipopPlugin {
         if (!$res) {
             return false;
         }
-        $res['id'] = intval($res['id']);
-        $res['user_id'] = intval($res['user_id']);
-        $res['year'] = intval($res['year']);
-        $res['quote'] = (double) $res['quote'];
-        $res['marketing_agree'] = boolval($res['marketing_agree']);
-        $res['newsletter_agree'] = boolval($res['newsletter_agree']);
-        $res['publish_agree'] = boolval($res['publish_agree']);
-        $res['created_at'] = intval($res['created_at']);
-        $res['updated_at'] = intval($res['updated_at']);
-        $res['signed_at'] = intval($res['signed_at']);
-        $res['completed_at'] = intval($res['completed_at']);
-        $res['author_id'] = intval($res['author_id']);
-        $res['completer_id'] = intval($res['completer_id']);
-        unset($res['completer_ip']);
-        return $res;
+        $arr = [$res];
+        return $arr[0];
     }
 
 
