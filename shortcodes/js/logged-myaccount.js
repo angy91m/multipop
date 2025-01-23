@@ -115,7 +115,17 @@ userSearchSelectableSubStatuses = [{
     label: 'Rimborsato',
     value: 'refunded'
 }],
-subscriptionColumns = [{
+currencyFormatter = new Intl.NumberFormat('it-IT', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    currencyDisplay: 'symbol',
+});
+currencyFormatter.custFormat = function(v) {
+    return this.format(v).replace(/\./g, '');
+};
+const subscriptionColumns = [{
     name: 'id',
     label: 'ID',
     field: 'id',
@@ -129,11 +139,13 @@ subscriptionColumns = [{
     name: 'status',
     label: 'Stato',
     field: 'status',
+    format: v => userSearchSelectableSubStatuses.find(s => s.value == v).label,
     sortable: true
 }, {
     name: 'quote',
     label: 'Quota annuale',
     field: 'quote',
+    format: v => currencyFormatter.custFormat(v),
     sortable: true
 }, {
     name: 'pp_order_id',
