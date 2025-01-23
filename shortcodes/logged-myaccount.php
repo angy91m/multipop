@@ -400,6 +400,14 @@ if ($this->discourse_utilities()) {
                                 :pagination="{page:1,rowsPerPage:0}"
                                 hide-bottom
                             >
+                                <template v-slot:body-cell="props">
+                                    <q-td :props="props">
+                                        <template v-if="props.name == 'status' && props.value == 'open'">
+                                            CIAO
+                                        </template>
+                                        <template v-else>{{props.value}}</template>
+                                    </q-td>
+                                </template>
                             </q-table>
                         </template>
                     </div>
