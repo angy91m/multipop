@@ -382,6 +382,7 @@ createApp({
             && profile.mpop_phone
         ? true : false ),
         availableYearsToOrder = computed(() => {
+            if (!mainOptions.authorizedSubscriptionQuote) return [];
             const thisYear = (new Date()).getFullYear();
             return profile.mpop_card_active && (!nearActiveSub.value || nearActiveSub.value.year != thisYear) ? [] : mainOptions.authorizedSubscriptionYears.filter(y => y >= thisYear && !activeCardForYear(profile.mpop_my_subscritions || [], y));
         }),
