@@ -1293,7 +1293,8 @@ createApp({
             showCountryName,
             userSearchSelectableSubYears,
             userSearchSelectableSubStatuses,
-            openExternalUrl
+            openExternalUrl,
+            subscriptionColumns
         };
     }
 })
