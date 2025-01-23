@@ -145,7 +145,13 @@ const subscriptionColumns = [{
     name: 'quote',
     label: 'Quota annuale',
     field: 'quote',
-    format: v => currencyFormatter.custFormat(v),
+    format: v => v ? currencyFormatter.custFormat(v) : '-',
+    sortable: true
+}, {
+    name: 'signed_at',
+    label: 'Data firma',
+    field: 'signed_at',
+    format: v => v ? displayLocalDate(new Date(v*1000)) : '-',
     sortable: true
 }, {
     name: 'pp_order_id',
