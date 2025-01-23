@@ -1129,12 +1129,13 @@ createApp({
                 } else if (url.searchParams.has('view-user')) {
                     viewUser(url.searchParams.get('view-user'), popstate);
                 }
-                if (tab.name == 'card') {
-                    getAuthorizedSubscriptionYears();
-                    //getProfile();
-                } else if(tab.name == 'summary') {
-                    //getProfile();
-                } else if (tab.name == 'uploadUserCsv') {
+                // if (tab.name == 'card') {
+                //     getAuthorizedSubscriptionYears();
+                //     getProfile();
+                // } else if(tab.name == 'summary') {
+                //     getProfile();
+                // } else
+                if (tab.name == 'uploadUserCsv') {
                     if(!document.getElementById('xlsx-loader')){
                         const xlsxLoader = document.createElement('script'),
                         loadedScripts = document.getElementById('loaded-scripts');
@@ -1166,6 +1167,7 @@ createApp({
                 menuItems.push({name: 'discourseUrl', url: discourseUrl, label: 'Accedi a Discourse'});
             }
             Object.assign(profile, parsedUser);
+            getAuthorizedSubscriptionYears();
             generateNotices();
             if (['administrator', 'multipopolare_resp'].includes(profile.role)) {
                 searchUsers();
