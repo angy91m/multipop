@@ -105,19 +105,19 @@ userSearchSelectableSubStatuses = [{
     label: 'Da controllare',
     value: 'tosee'
 }, {
-    label: 'Visto',
+    label: 'Vista',
     value: 'seen'
 }, {
-    label: 'Completato',
+    label: 'Completata',
     value: 'completed'
 }, {
-    label: 'Rifiutato',
+    label: 'Rifiutata',
     value: 'refused'
 }, {
-    label: 'Annullato',
+    label: 'Annullata',
     value: 'canceled'
 }, {
-    label: 'Rimborsato',
+    label: 'Rimborsata',
     value: 'refunded'
 }],
 currencyFormatter = new Intl.NumberFormat('en-US', {
@@ -1131,9 +1131,9 @@ createApp({
                 }
                 if (tab.name == 'card') {
                     getAuthorizedSubscriptionYears();
-                    getProfile();
+                    //getProfile();
                 } else if(tab.name == 'summary') {
-                    getProfile();
+                    //getProfile();
                 } else if (tab.name == 'uploadUserCsv') {
                     if(!document.getElementById('xlsx-loader')){
                         const xlsxLoader = document.createElement('script'),
