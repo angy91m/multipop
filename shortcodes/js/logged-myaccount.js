@@ -151,6 +151,7 @@ const subscriptionColumns = [{
     name: 'pp_order_id',
     label: 'PayPal',
     field: 'pp_order_id',
+    format: v => v ? 'Sì' : 'No',
     sortable: true
 }],
 openExternalUrl = url => window.open(url, '_blank');
@@ -1223,10 +1224,6 @@ createApp({
             intPhoneInstance.value.instance.setNumber(p);
             return parsePhone(intPhoneInstance.value);
         }
-        function mytest(args) {
-            console.log(args);
-            return args;
-        }
         return {
             selectedTab,
             profile,
@@ -1310,8 +1307,7 @@ createApp({
             userSearchSelectableSubYears,
             userSearchSelectableSubStatuses,
             openExternalUrl,
-            subscriptionColumns,
-            mytest
+            subscriptionColumns
         };
     }
 })
