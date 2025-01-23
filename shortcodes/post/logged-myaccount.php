@@ -486,12 +486,6 @@ switch ($post_data['action']) {
         // ])->export_file();
         break;
     case 'generate_subscription_pdf':
-        if (!isset($post_data['sub_id']) || !is_int($post_data['sub_id']) || !$post_data['sub_id']) {
-            if (!isset( $res_data['error'])) {
-                $res_data['error'] = [];
-            }
-            $res_data['error'][] = 'sub_id';
-        }
         $sub = $this->get_subscription_by('id', $post_data['sub_id']);
         if (isset($sub['user_id']) || $sub['user_id'] !== $current_user->ID || isset($sub['status']) || $sub['status'] !== 'open') {
             if (!isset( $res_data['error'])) {
