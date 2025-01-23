@@ -403,18 +403,22 @@ if ($this->discourse_utilities()) {
                             >
                                 <template v-slot:body-cell="props">
                                     <q-td :props="props">
-                                        <template v-if="props.col.name == 'status'">
-                                            <template v-if="props.row.status == 'open'">
-                                                {{props.value}}&nbsp;
-                                                <q-btn
-                                                    dense
-                                                    color="primary"
-                                                    size="sm"
-                                                    label="Genera modulo"
-                                                    @click="generateSubscriptionPdf(props.row.id)"
-                                                ></q-btn>
-                                            </template>
-                                            <template v-else>{{props.value}}</template>
+                                        <template v-if="props.col.name == 'status' && props.row.status == 'open'">
+                                            {{props.value}}
+                                            <br>
+                                            <q-btn
+                                                dense
+                                                color="primary"
+                                                size="sm"
+                                                label="Genera modulo"
+                                                @click="generateSubscriptionPdf(props.row.id)"
+                                            ></q-btn><br>
+                                            <q-btn
+                                                dense
+                                                color="primary"
+                                                size="sm"
+                                                label="Carica modulo"
+                                            ></q-btn>
                                         </template>
                                         <template v-else>{{props.value}}</template>
                                     </q-td>
