@@ -345,16 +345,19 @@ if ($this->discourse_utilities()) {
                 <template v-if="profile.mpop_my_subscriptions">
                     <h5 class="text-h5" v-if="profile.mpop_card_active">La tua tessera è attiva!</h5>
                     <div>
-                        <ul v-if="nearActiveSub">
-                            <li>ID tesserato: {{profile.ID}}</li>
-                            <li>Stato attivazione: {{userSearchSelectableSubStatuses.find(s => s.value == nearActiveSub.status).label}}</li>
-                            <li>Anno: {{nearActiveSub.year}}</li>
-                            <li>ID richiesta: {{nearActiveSub.id}}</li>
-                            <template v-if="nearActiveSub.pp_order_id">
-                                <li>PayPal ID: {{nearActiveSub.pp_order_id}}</li>
-                                <li v-if="nearActiveSub.status == 'seen'">Paga</li>
-                            </template>
-                        </ul>
+                        <template v-if="nearActiveSub">
+                            <h6 class="text-h6">ID richiesta: {{nearActiveSub.id}}</h6>
+                            <ul>
+                                <li>ID tesserato: {{profile.ID}}</li>
+                                <li>Stato attivazione: {{userSearchSelectableSubStatuses.find(s => s.value == nearActiveSub.status).label}}</li>
+                                <li>Anno: {{nearActiveSub.year}}</li>
+                                <template v-if="nearActiveSub.pp_order_id">
+                                    <li>PayPal ID: {{nearActiveSub.pp_order_id}}</li>
+                                    <li v-if="nearActiveSub.status == 'seen'">Paga</li>
+                                </template>
+                            </ul>
+                        </template>
+                        <ul>
                         <div v-if="availableYearsToOrder.length" id="mpop-avail-years-to-order">
                             <template v-if="isProfileCompleted">
                                 <h5 class="text-h5">Richiesta tessera</h5>

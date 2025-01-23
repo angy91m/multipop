@@ -180,7 +180,6 @@ createApp({
     },
     setup() {
         function activeCardForYear(cards = [], year) {
-            console.log(cards);
             return cards.filter(c => c.year == year && ['completed', 'tosee', 'seen', 'open'].includes(c.status)).sort((a,b) => a.status == b.status ? (a.status == 'completed' ? b.completed_at-a.completed_at : b.updated_at_at-a.updated_at_at) : (a.status == 'completed' ? -1 : (b.status == 'completed' ? 1 : b.updated_at_at-a.updated_at_at) ) ).shift();
         }
         const selectedTab = ref({
