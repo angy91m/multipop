@@ -990,7 +990,7 @@ createApp({
             if (res.ok) {
                 const resData = await res.json();
                 if (resData.data && resData.data.pdf) {
-                    openExternalUrl(resData.data.pdf);
+                    console.log(res.data);
                 } else {
                     console.error('Unknown error');
                 }
