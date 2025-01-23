@@ -409,7 +409,7 @@ if ($this->discourse_utilities()) {
                                                     dense
                                                     color="primary"
                                                     :size="sm"
-                                                    :label="Genera modulo"
+                                                    label="Genera modulo"
                                                 ></q-btn>
                                             </template>
                                             <template v-else>{{props.value}}</template>
