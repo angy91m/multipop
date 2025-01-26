@@ -882,6 +882,7 @@ class MultipopPlugin {
             $tpl = $pdf->importPage($i);
             $pdf->useTemplate($tpl);
         }
+        fclose($fd);
         return $pdf;
     }
     private function pdf_compile($pdf, $options = []) {

@@ -498,9 +498,9 @@ switch ($post_data['action']) {
             'mpop_phone' => $current_user->mpop_phone,
             'email' => $current_user->email,
             'subscription_year' => $sub['year'],
-            'mpop_marketing_agree' => $sub['mpop_marketing_agree'],
-            'mpop_newsletter_agree' => $sub['mpop_newsletter_agree'],
-            'mpop_publish_agree' => $sub['mpop_publish_agree'],
+            'mpop_marketing_agree' => $sub['marketing_agree'],
+            'mpop_newsletter_agree' => $sub['newsletter_agree'],
+            'mpop_publish_agree' => $sub['publish_agree'],
             'subscription_id' => $post_data['sub_id'],
             'card_number' => "$current_user->ID"
         ])->export_file() );
