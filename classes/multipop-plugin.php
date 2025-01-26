@@ -875,7 +875,7 @@ class MultipopPlugin {
         if (!$pdf) {
             $pdf = new MultipoPDF(['mpop_import' => true]);
         }
-        $fd = fopen('data:application/pdf;base64,'. base64_encode($pdf_file_string), 'rb');
+        $fd = fopen('data://application/pdf;base64,'. base64_encode($pdf_file_string), 'rb');
         // fwrite($fd, $pdf_file_string);
         // fseek($fd, 0);
         $pages_count = $pdf->setSourceFile($fd);
