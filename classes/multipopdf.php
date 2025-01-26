@@ -78,7 +78,9 @@ class MultipoPDF extends \setasign\Fpdi\Tcpdf\Fpdi
 
         //set auto page breaks
         $this->SetAutoPageBreak(true, $config['margin_bottom']);
-        $this->AddPage();
+        if (!$config['mpop_import']) {
+            $this->AddPage();
+        }
     }
     /**
      * Page header

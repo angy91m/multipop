@@ -16,6 +16,7 @@ if ($this->discourse_utilities()) {
         $discourse_url = $discourse_connect_options['url'] . '/login';
     }
 }
+$pdf = $this->pdf_import(file_get_contents( MULTIPOP_PLUGIN_PATH .'/modulo-generato.pdf'));
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-tel-input.css">
@@ -429,6 +430,43 @@ if ($this->discourse_utilities()) {
                         </template>
                     </div>
                 </template>
+            </div>
+            <!--MODULE_UPLOAD-->
+            <div v-if="selectedTab.name == 'moduleUpload' && moduleUploadData.sub">
+                <q-stepper
+                    v-model="moduleUploadData.step"
+                    vertical
+                    color="primary"
+                    animated
+                >
+                    <q-step
+                        :name="1"
+                        title="Carica il modulo firmato"
+                        icon="upload_file"
+                        :done="moduleUploadData.step > 1"
+                    >
+                    </q-step>
+                    <q-step
+                        :name="2"
+                        title="Carica il documento di identità"
+                        icon="upload_file"
+                        :done="moduleUploadData.step step > 2"
+                    >
+                    </q-step>
+                    <q-step
+                        :name="3"
+                        title="Invia i documenti"
+                        icon="send"
+                        :done="moduleUploadData.step step > 3"
+                    >
+                    </q-step>
+                    <q-step
+                        :name="4"
+                        title="Documenti inviati"
+                        icon="download_done"
+                    >
+                    </q-step>
+                </q-stepper>
             </div>
             <!--USER_SEARCH-->
             <div v-if="selectedTab.name == 'users'" id="mpop-user-search">

@@ -870,18 +870,24 @@ class MultipopPlugin {
     }
     
     // IMPORT PDF
-    private function pdf_import(string $pdf_file_string = '') {
+    private function pdf_import(string $pdf_file_string = '', &$pdf = null) {
         require_once(MULTIPOP_PLUGIN_PATH . '/classes/multipopdf.php');
-        $pdf = new MultipoPDF(['mpop_import' => true]);
-        $fd = fopen('data:application/pdf;base64,'. base64_encode($pdf_file_string), 'r');
+        if (!$pdf) {
+            $pdf = new MultipoPDF(['mpop_import' => true]);
+        }
+        $fd = fopen('php://memory', 'rw');
+        fwrite($fd, $pdf_file_string);
+        fseek($fd, 0);
         $pages_count = $pdf->setSourceFile($fd);
         for ($i=1; $i<=$pages_count; $i++) {
-            if ($i > 1) {
-                $pdf->AddPage();
-            }
+            $pdf->AddPage();
             $tpl = $pdf->importPage($i);
+            $specs = $pdf->getTemplateSize($tpl);
+            save_test($specs);
+            //$pdf->addPage($specs['h'] > $specs['w'] ? 'P' : 'L');
             $pdf->useTemplate($tpl);
         }
+        $pdf->cleanUp();
         fclose($fd);
         return $pdf;
     }

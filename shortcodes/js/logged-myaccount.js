@@ -393,6 +393,13 @@ createApp({
             && profile.mpop_billing_address
             && profile.mpop_phone
         ? true : false ),
+        moduleUploadData = reactive({
+            sub: null,
+            signedModuleFiles: [],
+            idCardFiles: [],
+            idCardType: null,
+            step: 1
+        }),
         availableYearsToOrder = computed(() => {
             if (!mainOptions.authorizedSubscriptionQuote) return [];
             const thisYear = (new Date()).getFullYear();
@@ -402,6 +409,13 @@ createApp({
         goodSubscriptions = computed(() => (profile.mpop_my_subscriptions || []).filter(s => ['completed', 'tosee', 'seen', 'open'].includes( s.status ))),
         maxBirthDate = new Date();
         maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
+        function cancelModuleUploadData() {
+            moduleUploadData.step = 1;
+            moduleUploadData.sub = null;
+            moduleUploadData.signedModuleFiles.length = 0;
+            moduleUploadData.idCardFiles.length = 0;
+            moduleUploadData.idCardType = null;
+        }
         function fuseSearch(options, search) {
             const fuse = new Fuse(options, {
                 keys: ['label'],
@@ -1204,6 +1218,7 @@ createApp({
             if (selectedTab.value.name != tab?.name) {
                 cancelEditProfile();
                 cancelEditUser();
+                cancelModuleUploadData();
                 const url = new URL(location);
                 tab = tab || {name: 'summary', label: 'Riepilogo'};
                 selectedTab.value = tab;
@@ -1412,7 +1427,8 @@ createApp({
             requestingNewSubscription,
             currencyFormatter,
             generateSubscriptionPdf,
-            generatingSubscriptionPdf
+            generatingSubscriptionPdf,
+            moduleUploadData
         };
     }
 })
