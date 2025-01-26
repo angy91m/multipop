@@ -450,14 +450,14 @@ $pdf = $this->pdf_import(file_get_contents( MULTIPOP_PLUGIN_PATH .'/modulo-gener
                         :name="2"
                         title="Carica il documento di identità"
                         icon="upload_file"
-                        :done="moduleUploadData.step step > 2"
+                        :done="moduleUploadData.step > 2"
                     >
                     </q-step>
                     <q-step
                         :name="3"
                         title="Invia i documenti"
                         icon="send"
-                        :done="moduleUploadData.step step > 3"
+                        :done="moduleUploadData.step > 3"
                     >
                     </q-step>
                     <q-step
