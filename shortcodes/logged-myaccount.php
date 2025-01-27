@@ -446,7 +446,7 @@ if ($this->discourse_utilities()) {
                         icon="upload_file"
                         :done="moduleUploadData.step > 1"
                     >
-                        <mpop-uploader id="prova-upload" v-model="moduleUploadData.signedModuleFiles" :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']" :binary="true" :formatter="v => {const f = {content: v.content, type: v.meta.type}; return f;}" @change="consoleLog(moduleUploadData.signedModuleFiles)">Carica</mpop-uploader>
+                        <mpop-uploader id="prova-upload" v-model="moduleUploadData.signedModuleFiles" :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']" :formatter="v => v.content" @change="consoleLog(moduleUploadData.signedModuleFiles)">Carica</mpop-uploader>
                     </q-step>
                     <q-step
                         :name="2"

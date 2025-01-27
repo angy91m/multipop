@@ -6,6 +6,9 @@
 </template>
 <script setup>
     import { ref, nextTick } from 'vue';
+    defineOptions({
+        inheritAttrs: false
+    });
     const model = defineModel({default: [], type: Array}),
     props = defineProps({
         acceptedMime: {
