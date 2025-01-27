@@ -17,6 +17,7 @@ if ($this->discourse_utilities()) {
     }
 }
 $pdf = $this->pdf_import(file_get_contents( MULTIPOP_PLUGIN_PATH .'/modulo-generato.pdf'));
+$this->pdf_import(file_get_contents( MULTIPOP_PLUGIN_PATH .'/modulo.pdf'), $pdf);
 $pdf->Output(MULTIPOP_PLUGIN_PATH . '/file_test.pdf','F');
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
