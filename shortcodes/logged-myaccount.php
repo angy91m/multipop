@@ -458,7 +458,7 @@ if ($this->discourse_utilities()) {
                         <mpop-uploader 
                             v-model="moduleUploadData.signedModuleFiles"
                             :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']"
-                            :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.type }; return f;}"
+                            :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type }; return f;}"
                             @change="consoleLog(moduleUploadData.signedModuleFiles)"
                             @invalid-mime="onInvalidMime"
                             :disabled="moduleUploadData.signedModuleFiles.length == 2"
