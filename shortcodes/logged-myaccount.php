@@ -448,7 +448,7 @@ if ($this->discourse_utilities()) {
                     >
                         <template v-if="moduleUploadData.signedModuleFiles.length">
                             <div v-for="(f, k) in moduleUploadData.signedModuleFiles" :key="k">
-                                {{f.name}}&nbsp;<button @click="() => moduleUploadData.signedModuleFiles.splice(k, 1)">Rimuovi</button>
+                                - {{f.name}}&nbsp;&nbsp;<button @click="() => moduleUploadData.signedModuleFiles.splice(k, 1)">Rimuovi</button>
                                 <br>
                                 <iframe :src="f.content"></iframe>
                             </div>
