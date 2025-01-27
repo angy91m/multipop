@@ -97,6 +97,14 @@ do_action('mpop_settings_notices', $this->get_settings());
     <h4>Quota minima d'iscrizione</h4>
     <input type="number" min="0.01" step="0.01" name="min_subscription_payment" value="<?=$this->settings['min_subscription_payment']?>" />
     <hr>
+    <h3>Consensi</h3>
+    <h4>Policy marketing</h4>
+    <h4>Policy newsletter</h4>
+    <h4>Policy pubblicazione</h4>
+    <textarea name="marketing_policy" style="width:98%; height:fit-content; margin-right: 10px;"><?=$this->settings['marketing_policy']?></textarea>
+    <textarea name="newsletter_policy" style="width:98%; height:fit-content; margin-right: 10px;"><?=$this->settings['newsletter_policy']?></textarea>
+    <textarea name="publish_policy" style="width:98%; height:fit-content; margin-right: 10px;"><?=$this->settings['publish_policy']?></textarea>
+    <hr>
     <?php wp_nonce_field( 'mpop-admin-settings', 'mpop-admin-settings-nonce' ); ?>
     <button class="button button-primary" id="mpop_settings_save">Salva</button>
 </form>

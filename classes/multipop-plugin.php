@@ -644,6 +644,9 @@ class MultipopPlugin {
             `pp_sandbox` TINYINT(1) NOT NULL,
             `register_page` BIGINT NOT NULL,
             `myaccount_page` BIGINT NOT NULL,
+            `marketing_policy` TEXT NOT NULL,
+            `newsletter_policy` TEXT NOT NULL,
+            `publish_policy` TEXT NOT NULL,
             PRIMARY KEY (`id`)
         ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
         dbDelta( $q );
@@ -702,7 +705,10 @@ class MultipopPlugin {
                     `min_subscription_payment`,
                     `pp_token_expiration`,
                     `pp_sandbox`,
-                    `temp_token_key`
+                    `temp_token_key`,
+                    `marketing_policy`,
+                    `newsletter_policy`,
+                    `publish_policy`
                 )"
                 . " VALUES (
                     1,
@@ -721,7 +727,15 @@ class MultipopPlugin {
                     15,
                     0,
                     1,
-                    '".base64_encode(openssl_random_pseudo_bytes(64))."'
+                    '".base64_encode(openssl_random_pseudo_bytes(64))."',
+                    ".
+                        $wpdb->prepare("%s, %s, %s",[
+                            'Presto il mio consenso e fino alla revoca dello stesso, per la proposizione di offerte, comunicazioni commerciali e per il successivo invio di materiale informativo pubblicitario e/o promozionale e/o sondaggi di opinione, ricerche di mercato, invio di newsletter (di seguito complessivamente definite “attività di propaganda”) di MULTIPOPOLARE APS e/o da organizzazioni correlate. Il trattamento per attività di marketing avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea e/o chiamate da operatore), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo SMS e/o MMS, chiamate telefoniche senza l’intervento dell’operatore, posta elettronica, social network, newsletter, applicazioni interattive, notifiche push).',
+                            'Presto il mio consenso e fino alla revoca dello stesso, per la comunicazioni di iniziative ed attività (di seguito complessivamente definite “attività di informazione dell’associazione”) di MULTIPOPOLARE APS e/o da organizzazioni correlate.
+Il trattamento per attività di informazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo posta elettronica).',
+                            'Presto il mio consenso e fino alla revoca dello stesso, per la pubblicazione del mio nominativo su riviste, cataloghi, brochure, annuari, siti, ecc. (di seguito complessivamente definite “attività di pubblicazione dell’associazione”) di MULTIPOPOLARE APS e/o da organizzazioni correlate. Il trattamento per attività di pubblicazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo pubblicazioni cartacee), ovvero mediante sistemi “elettronici” (a titolo esemplificativo pubblicazioni elettroniche, social network, sito, blog, ecc.).'
+                        ])
+                    ."
                 ) ;";
             $wpdb->query($q);
         }
