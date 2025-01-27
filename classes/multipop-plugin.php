@@ -882,7 +882,7 @@ class MultipopPlugin {
         for ($i=1; $i<=$pages_count; $i++) {
             $tpl = $pdf->importPage($i);
             $specs = $pdf->getTemplateSize($tpl);
-            $pdf->addPage($specs[1] > $specs[0] ? 'P' : 'L');
+            $pdf->AddPage($specs[1] > $specs[0] ? 'P' : 'L', [$specs[0], $specs[1]]);
             $pdf->useTemplate($tpl);
         }
         $pdf->cleanUp();
