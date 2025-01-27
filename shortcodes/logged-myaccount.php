@@ -16,9 +16,10 @@ if ($this->discourse_utilities()) {
         $discourse_url = $discourse_connect_options['url'] . '/login';
     }
 }
-$pdf = $this->pdf_import(file_get_contents( MULTIPOP_PLUGIN_PATH .'/modulo-generato.pdf'));
-$this->pdf_import(MULTIPOP_PLUGIN_PATH .'/modulo.pdf', $pdf, true);
-$pdf->Output(MULTIPOP_PLUGIN_PATH . '/file_test.pdf','F');
+$pdf = $this->empty_pdf();
+$this->pdf_import(MULTIPOP_PLUGIN_PATH . '/modulo.pdf', $pdf, true);
+$pdf->AddSingleImage(MULTIPOP_PLUGIN_PATH . '/old-logo-pdf.png', true);
+$pdf->Output(MULTIPOP_PLUGIN_PATH . '/new_test.pdf', 'F');
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-tel-input.css">

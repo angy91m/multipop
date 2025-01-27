@@ -62,24 +62,24 @@ class MultipoPDF extends \setasign\Fpdi\Tcpdf\Fpdi
         $this->setHtmlVSpace(self::$tagvs);
 
         if (isset($this->config['title']) && $this->config['title'] !== null) {
-            $this->SetTitle($this->config['title']);
-            $this->SetHeaderData('', '', $this->config['title'], '');
+            $this->setTitle($this->config['title']);
+            $this->setHeaderData('', '', $this->config['title'], '');
         }
 
-        $this->SetCreator('Multipopolare');
-        $this->SetAuthor('Multipopolare');
+        $this->setCreator('Multipopolare');
+        $this->setAuthor('Multipopolare');
 
-        $this->SetFont($config['font'], '', $config['font_size']);
+        $this->setFont($config['font'], '', $config['font_size']);
         $this->setHeaderFont([$config['font'], 'B', $config['font_size']]);
         $this->setFooterFont([$config['font'], 'B', $config['font_size']]);
 
         //set margins
-        $this->SetMargins($config['margin_left'], $config['margin_top'], $config['margin_right']);
-        $this->SetHeaderMargin($config['margin_header']);
-        $this->SetFooterMargin($config['margin_footer']);
+        $this->setMargins($config['margin_left'], $config['margin_top'], $config['margin_right'], true);
+        $this->setHeaderMargin($config['margin_header']);
+        $this->setFooterMargin($config['margin_footer']);
 
         //set auto page breaks
-        $this->SetAutoPageBreak(true, $config['margin_bottom']);
+        $this->setAutoPageBreak(true, $config['margin_bottom']);
         if (!$config['mpop_import']) {
             $this->AddPage();
         }
@@ -196,6 +196,36 @@ class MultipoPDF extends \setasign\Fpdi\Tcpdf\Fpdi
             $this->imported_fd[] = $fd;
         }
         return parent::setSourceFile($fd);
+    }
+
+    public function AddSingleImage(string $img = '', $path = false) {
+        $image = @imagecreatefromstring($path ? file_get_contents($img) : $img);
+        if (!$image) {
+            throw new Exception("Unable to load image");
+        }
+        $imgWidthPx = imagesx($image);
+        $imgHeightPx = imagesy($image);
+        $dpi = 72;
+        $imgWidthMm = $imgWidthPx / $dpi * 25.4;
+        $imgHeightMm = $imgHeightPx / $dpi * 25.4;
+        $orientation = $imgHeightPx > $imgWidthPx ? 'P' : 'L';
+        $pageWidth = $orientation === 'L' ? 297 : 210;
+        $pageHeight = $orientation === 'L' ? 210 : 297;
+        $margin = 10;
+        $usableWidth = $pageWidth - (2 * $margin);
+        $usableHeight = $pageHeight - (2 * $margin);
+        if ($imgWidthMm > $usableWidth || $imgHeightMm > $usableHeight) {
+            $scale = min($usableWidth / $imgWidthMm, $usableHeight / $imgHeightMm);
+            $newWidthMm = $imgWidthMm * $scale;
+            $newHeightMm = $imgHeightMm * $scale;
+        } else {
+            $newWidthMm = $imgWidthMm;
+            $newHeightMm = $imgHeightMm;
+        }
+        $x = ($pageWidth - $newWidthMm) / 2;
+        $y = ($pageHeight - $newHeightMm) / 2;
+        $this->AddPage($orientation, [$pageWidth, $pageHeight]);
+        $this->Image($path ? $img : "@$img", $x, $y, $newWidthMm, $newHeightMm, '', '', '', true, 300);
     }
 
     public function __destruct() {
