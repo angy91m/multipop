@@ -870,14 +870,18 @@ class MultipopPlugin {
     }
     
     // IMPORT PDF
-    private function pdf_import(string $pdf_file_string = '', &$pdf = null) {
+    private function pdf_import(string $pdf_file_string = '', &$pdf = null, $path = false) {
         require_once(MULTIPOP_PLUGIN_PATH . '/classes/multipopdf.php');
         if (!$pdf) {
             $pdf = new MultipoPDF(['mpop_import' => true]);
         }
-        $fd = fopen('php://memory', 'r+b');
-        fwrite($fd, $pdf_file_string);
-        rewind($fd);
+        if ($path) {
+            $fd = $pdf_file_string;
+        } else {
+            $fd = fopen('php://memory', 'r+b');
+            fwrite($fd, $pdf_file_string);
+            rewind($fd);
+        }
         $pages_count = $pdf->setSourceFile($fd);
         for ($i=1; $i<=$pages_count; $i++) {
             $tpl = $pdf->importPage($i);
