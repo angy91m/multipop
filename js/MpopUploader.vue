@@ -48,7 +48,7 @@
                     emit('change', fileRead);
                 }
             } finally {
-                nextTick(() => fileInput.value.value = '');
+                nextTick(() => {fileInput.value.value = ''; console.log(fileInput.value)});
             }
         }
     }
