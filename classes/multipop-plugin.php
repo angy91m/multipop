@@ -875,12 +875,12 @@ class MultipopPlugin {
         if (!$pdf) {
             $pdf = new MultipoPDF(['mpop_import' => true]);
         }
-        $fd = fopen('data://application/pdf;base64,'. base64_encode($pdf_file_string), 'rb');
-        // fwrite($fd, $pdf_file_string);
-        // fseek($fd, 0);
+        $fd = fopen('php://memory', 'r+b');
+        //$fd = fopen('data://application/pdf;base64,'. base64_encode($pdf_file_string), 'r+b');
+        fwrite($fd, $pdf_file_string);
+        rewind($fd);
         $pages_count = $pdf->setSourceFile($fd);
         for ($i=1; $i<=$pages_count; $i++) {
-            $pdf->AddPage();
             $tpl = $pdf->importPage($i);
             $specs = $pdf->getTemplateSize($tpl);
             $pdf->addPage($specs[1] > $specs[0] ? 'P' : 'L');
