@@ -462,7 +462,7 @@ if ($this->discourse_utilities()) {
                             @change="consoleLog(moduleUploadData.signedModuleFiles)"
                             @invalid-mime="onInvalidMime"
                             :disabled="moduleUploadData.signedModuleFiles.length == 2"
-                        >Seleziona file da caricare</mpop-uploader>
+                        >Seleziona file da caricare</mpop-uploader>&nbsp;&nbsp;<button :disabled="!moduleUploadData.signedModuleFiles.length" @click="()=>moduleUploadData.step++">Avanti</button>
                     </q-step>
                     <q-step
                         :name="2"
