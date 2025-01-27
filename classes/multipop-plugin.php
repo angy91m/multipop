@@ -880,7 +880,7 @@ class MultipopPlugin {
         //$fd = fopen('data://application/pdf;base64,'. base64_encode($pdf_file_string), 'r+b');
         fwrite($fd, $pdf_file_string);
         rewind($fd);
-        $pages_count = $pdf->setSourceFile($fd);
+        $pages_count = $pdf->setSourceFile(MULTIPOP_PLUGIN_PATH .'/modulo-generato.pdf');
         for ($i=1; $i<=$pages_count; $i++) {
             $tpl = $pdf->importPage($i);
             $specs = $pdf->getTemplateSize($tpl);
