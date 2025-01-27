@@ -487,7 +487,7 @@ if ($this->discourse_utilities()) {
                         >Seleziona file da caricare</mpop-uploader>
                         <br>
                         <select v-model="moduleUploadData.idCardType">
-                            <option disabled value="">Seleziona il tipo di documento</option>
+                            <option disabled :value="null">Seleziona il tipo di documento</option>
                             <option v-for="(t, k) in mainOptions.idCardTypes" :key="k">{{t}}</option>
                         </select>&nbsp;&nbsp;<button :disabled="!moduleUploadData.idCardFiles.length && mainOptions.idCardTypes !== null" @click="()=>{moduleUploadData.step++; consoleLog(moduleUploadData)}">Avanti</button>
                     </q-step>
