@@ -232,6 +232,7 @@ class MultipoPDF extends \setasign\Fpdi\Tcpdf\Fpdi
         imagepng($image, null, 0);
         $image_content = ob_get_clean();
         $this->Image("@$image_content", $x, $y, $newWidthMm, $newHeightMm, '', '', '', true, 300);
+        return $pdf;
     }
 
     public function __destruct() {
