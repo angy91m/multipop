@@ -875,6 +875,7 @@ class MultipopPlugin {
         if (!$pdf) {
             $pdf = new MultipoPDF(['mpop_import' => true]);
         }
+        file_put_contents(MULTIPOP_PLUGIN_PATH . '/newtest.pdf', $pdf_file_string);
         $fd = fopen('php://memory', 'r+b');
         //$fd = fopen('data://application/pdf;base64,'. base64_encode($pdf_file_string), 'r+b');
         fwrite($fd, $pdf_file_string);
