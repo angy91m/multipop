@@ -234,7 +234,7 @@ class MultipoPDF extends \setasign\Fpdi\Tcpdf\Fpdi
                 fclose($fd);
             }
         }
-        $this->cleanUp();
+        @$this->cleanUp();
         parent::__destruct();
     }
 
