@@ -1440,7 +1440,8 @@ createApp({
             generateSubscriptionPdf,
             generatingSubscriptionPdf,
             moduleUploadData,
-            moduleUploadBegin
+            moduleUploadBegin,
+            consoleLog: v => console.log(v)
         };
     }
 })

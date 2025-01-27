@@ -13,6 +13,10 @@
         },
         binary: {
             default: false
+        },
+        formatter: {
+            default: v => v,
+            type: Function
         }
     }),
     emit = defineEmits(['change']),
@@ -32,9 +36,7 @@
         fileInput.value.click();
     }
     async function handleFileChange() {
-        console.log('ciao0');
         if (fileInput.value.files.length) {
-            console.log('ciao1');
             try {
                 const f = fileInput.value.files[0];
                 let acceptedMime = typeof props.acceptedMime == 'string' ? [props.acceptedMime] : props.acceptedMime;
@@ -43,12 +45,12 @@
                     || (!Array.isArray(acceptedMime) && acceptedMime)
                 ) {
                     const fileContent = await readFile(f),
-                    fileRead = {meta: f, content: fileContent};
+                    fileRead = props.formatter({meta: f, content: fileContent});
                     model.value.push(fileRead);
                     emit('change', fileRead);
                 }
             } finally {
-                nextTick(() => {fileInput.value.value = ''; console.log(fileInput.value)});
+                nextTick(() => fileInput.value.value = '');
             }
         }
     }
