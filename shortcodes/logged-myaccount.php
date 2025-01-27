@@ -16,10 +16,6 @@ if ($this->discourse_utilities()) {
         $discourse_url = $discourse_connect_options['url'] . '/login';
     }
 }
-$pdf = $this->empty_pdf();
-$this->pdf_import(MULTIPOP_PLUGIN_PATH . '/modulo.pdf', $pdf, true);
-$pdf->AddSingleImage(file_get_contents(MULTIPOP_PLUGIN_PATH . '/old-logo-pdf.png'));
-$pdf->Output(MULTIPOP_PLUGIN_PATH . '/new_test.pdf', 'F');
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-tel-input.css">
@@ -424,6 +420,7 @@ $pdf->Output(MULTIPOP_PLUGIN_PATH . '/new_test.pdf', 'F');
                                                 color="primary"
                                                 size="sm"
                                                 label="Carica modulo"
+                                                @click="()=>console.log(props.row)"
                                             ></q-btn>
                                         </template>
                                         <template v-else>{{props.value}}</template>
@@ -448,6 +445,7 @@ $pdf->Output(MULTIPOP_PLUGIN_PATH . '/new_test.pdf', 'F');
                         icon="upload_file"
                         :done="moduleUploadData.step > 1"
                     >
+                    <input type="file" @change="e => console.log(e)"/>
                     </q-step>
                     <q-step
                         :name="2"

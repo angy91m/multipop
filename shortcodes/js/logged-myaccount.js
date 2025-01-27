@@ -906,6 +906,10 @@ createApp({
                 pushQueryParams({'view-user': ID});
             }
         }
+        function moduleUploadBegin(sub) {
+            moduleUploadData.sub = sub;
+            selectTab({name: 'moduleUpload', label: 'Carica modulo'});
+        }
         async function resendInvitationMail() {
             saving.value = true;
             try {
@@ -1218,9 +1222,15 @@ createApp({
             if (selectedTab.value.name != tab?.name) {
                 cancelEditProfile();
                 cancelEditUser();
-                cancelModuleUploadData();
                 const url = new URL(location);
                 tab = tab || {name: 'summary', label: 'Riepilogo'};
+                if (tab.name == 'moduleUpload') {
+                    if (!moduleUploadData.sub) {
+                        tab = {name: 'summary', label: 'Riepilogo'};
+                    }
+                } else {
+                    cancelModuleUploadData();
+                }
                 selectedTab.value = tab;
                 if (!popstate) {
                     if (tab.name != 'userView') {
@@ -1289,7 +1299,6 @@ createApp({
         function onPopState(e) {
             if (Array.isArray(e.state)){
                 selectTab(e.state[0], true);
-                historyTabs.length;
                 historyTabs.push(...e.state);
             }
         }
@@ -1428,7 +1437,8 @@ createApp({
             currencyFormatter,
             generateSubscriptionPdf,
             generatingSubscriptionPdf,
-            moduleUploadData
+            moduleUploadData,
+            moduleUploadBegin
         };
     }
 })
