@@ -333,6 +333,7 @@ if ($this->discourse_utilities()) {
                                 <li>Anno: {{nearActiveSub.year}}</li>
                                 <li>Quota annuale: {{currencyFormatter.custFormat(nearActiveSub.quote)}}</li>
                                 <button v-if="nearActiveSub.status == 'open'" class="mpop-button" @click="generateSubscriptionPdf(nearActiveSub.id)" :disabled="generatingSubscriptionPdf.find( v => v == nearActiveSub.id)">Genera modulo iscrizione</button>
+                                <button v-if="nearActiveSub.status == 'open'" class="mpop-button" @click="moduleUploadBegin(nearActiveSub)">Carica modulo</button>
                                 <template v-if="nearActiveSub.pp_order_id">
                                     <li>PayPal ID: {{nearActiveSub.pp_order_id}}</li>
                                     <li v-if="nearActiveSub.status == 'seen'">Paga</li>
@@ -420,7 +421,7 @@ if ($this->discourse_utilities()) {
                                                 color="primary"
                                                 size="sm"
                                                 label="Carica modulo"
-                                                @click="()=>console.log(props.row)"
+                                                @click="moduleUploadBegin(props.row)"
                                             ></q-btn>
                                         </template>
                                         <template v-else>{{props.value}}</template>
