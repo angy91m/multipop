@@ -225,7 +225,10 @@ class MultipoPDF extends \setasign\Fpdi\Tcpdf\Fpdi
         $x = ($pageWidth - $newWidthMm) / 2;
         $y = ($pageHeight - $newHeightMm) / 2;
         $this->AddPage($orientation, [$pageWidth, $pageHeight]);
-        $this->Image($path ? $img : "@$img", $x, $y, $newWidthMm, $newHeightMm, '', '', '', true, 300);
+        ob_start();
+        imagepng($image, null, 0);
+        $image_content = ob_get_clean();
+        $this->Image("@$image_content", $x, $y, $newWidthMm, $newHeightMm, '', '', '', true, 300);
     }
 
     public function __destruct() {
