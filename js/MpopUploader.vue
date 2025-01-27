@@ -22,7 +22,7 @@
             type: Function
         }
     }),
-    emit = defineEmits(['change']),
+    emit = defineEmits(['change', 'invalidMime']),
     fileInput = ref(null);
 
     function readFile(f) {
@@ -51,6 +51,8 @@
                     fileRead = props.formatter({meta: f, content: fileContent});
                     model.value.push(fileRead);
                     emit('change', fileRead);
+                } else {
+                    emit('invalidMime');
                 }
             } finally {
                 nextTick(() => fileInput.value.value = '');

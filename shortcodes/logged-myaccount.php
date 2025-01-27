@@ -450,15 +450,16 @@ if ($this->discourse_utilities()) {
                             <div v-for="(f, k) in moduleUploadData.signedModuleFiles" :key="k">
                                 - {{f.name}}&nbsp;&nbsp;<button @click="() => moduleUploadData.signedModuleFiles.splice(k, 1)">Rimuovi</button>
                                 <br>
-                                <iframe :src="f.content"></iframe>
+                                <iframe :src="f.content" width="100%"></iframe>
                             </div>
                         </template>
                         <div v-if="!moduleUploadData.signedModuleFiles.length">Nessun file selezionato</div>
                         <mpop-uploader 
                             v-model="moduleUploadData.signedModuleFiles"
                             :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']"
-                            :formatter="v => {const f = {content: v.content, name: v.meta.name }; return f;}"
+                            :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.type }; return f;}"
                             @change="consoleLog(moduleUploadData.signedModuleFiles)"
+                            @invalid-mime="onInvalidMime"
                             :disabled="moduleUploadData.signedModuleFiles.length == 2"
                         >Seleziona file da caricare</mpop-uploader>
                     </q-step>

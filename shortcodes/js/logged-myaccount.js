@@ -1345,6 +1345,9 @@ createApp({
             intPhoneInstance.value.instance.setNumber(p);
             return parsePhone(intPhoneInstance.value);
         }
+        function onInvalidMime() {
+            window.alert('Formato file non valido');
+        }
         return {
             selectedTab,
             profile,
@@ -1441,6 +1444,7 @@ createApp({
             generatingSubscriptionPdf,
             moduleUploadData,
             moduleUploadBegin,
+            onInvalidMime,
             consoleLog: v => console.log(v)
         };
     }
