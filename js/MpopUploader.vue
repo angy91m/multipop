@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <span>
         <input type="file" ref="fileInput" style="display: none" readonly @change="handleFileChange"/>
         <button v-bind="$attrs" @click="fileUploadBegin"><slot>Upload</slot></button>
-    </div>
+    </span>
 </template>
 <script setup>
     import { ref, nextTick } from 'vue';

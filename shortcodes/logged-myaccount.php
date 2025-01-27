@@ -446,7 +446,17 @@ if ($this->discourse_utilities()) {
                         icon="upload_file"
                         :done="moduleUploadData.step > 1"
                     >
-                        <mpop-uploader id="prova-upload" v-model="moduleUploadData.signedModuleFiles" :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']" :formatter="v => {const f = {content: v.content, name: v.meta.name }; return f;}" @change="consoleLog(moduleUploadData.signedModuleFiles)">Carica</mpop-uploader>
+                        <template v-if="moduleUploadData.signedModuleFiles.length">
+                            <div v-for="(f, k) in moduleUploadData.signedModuleFiles" :key="k">{{f.name}}&nbsp;<button @click="() => moduleUploadData.signedModuleFiles.splice(k, 1)">Rimuovi</button></div>
+                        </template>
+                        <div v-if="!moduleUploadData.signedModuleFiles.length">Nessun file selezionato</div>
+                        <mpop-uploader 
+                            v-model="moduleUploadData.signedModuleFiles"
+                            :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']"
+                            :formatter="v => {const f = {content: v.content, name: v.meta.name }; return f;}"
+                            @change="consoleLog(moduleUploadData.signedModuleFiles)"
+                            :disabled="moduleUploadData.signedModuleFiles.length == 2"
+                        >Seleziona file da caricare</mpop-uploader>
                     </q-step>
                     <q-step
                         :name="2"
