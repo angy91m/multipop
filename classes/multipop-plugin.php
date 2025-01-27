@@ -875,20 +875,18 @@ class MultipopPlugin {
         if (!$pdf) {
             $pdf = new MultipoPDF(['mpop_import' => true]);
         }
-        file_put_contents(MULTIPOP_PLUGIN_PATH . '/newtest.pdf', $pdf_file_string);
         $fd = fopen('php://memory', 'r+b');
-        //$fd = fopen('data://application/pdf;base64,'. base64_encode($pdf_file_string), 'r+b');
         fwrite($fd, $pdf_file_string);
         rewind($fd);
-        $pages_count = $pdf->setSourceFile(MULTIPOP_PLUGIN_PATH .'/modulo-generato.pdf');
+        $pages_count = $pdf->setSourceFile($fd);
         for ($i=1; $i<=$pages_count; $i++) {
             $tpl = $pdf->importPage($i);
             $specs = $pdf->getTemplateSize($tpl);
             $pdf->addPage($specs[1] > $specs[0] ? 'P' : 'L');
             $pdf->useTemplate($tpl);
         }
-        $pdf->cleanUp();
-        fclose($fd);
+        // $pdf->cleanUp();
+        // fclose($fd);
         return $pdf;
     }
     private function pdf_compile($pdf, $options = []) {
