@@ -447,7 +447,11 @@ if ($this->discourse_utilities()) {
                         :done="moduleUploadData.step > 1"
                     >
                         <template v-if="moduleUploadData.signedModuleFiles.length">
-                            <div v-for="(f, k) in moduleUploadData.signedModuleFiles" :key="k">{{f.name}}&nbsp;<button @click="() => moduleUploadData.signedModuleFiles.splice(k, 1)">Rimuovi</button></div>
+                            <div v-for="(f, k) in moduleUploadData.signedModuleFiles" :key="k">
+                                {{f.name}}&nbsp;<button @click="() => moduleUploadData.signedModuleFiles.splice(k, 1)">Rimuovi</button>
+                                <br>
+                                <iframe :src="f.content"></iframe>
+                            </div>
                         </template>
                         <div v-if="!moduleUploadData.signedModuleFiles.length">Nessun file selezionato</div>
                         <mpop-uploader 
