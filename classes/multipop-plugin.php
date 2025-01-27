@@ -885,8 +885,7 @@ class MultipopPlugin {
             $pdf->addPage($specs[1] > $specs[0] ? 'P' : 'L');
             $pdf->useTemplate($tpl);
         }
-        // $pdf->cleanUp();
-        fclose($fd);
+        $pdf->cleanUp();
         return $pdf;
     }
     private function pdf_compile($pdf, $options = []) {

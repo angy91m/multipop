@@ -45,6 +45,8 @@ class MultipoPDF extends \setasign\Fpdi\Tcpdf\Fpdi
         ]
     ];
 
+    private array $imported_fd = [];
+
     public function __construct(array $config = [])
     {
         $config += self::$default_config;
@@ -187,6 +189,22 @@ class MultipoPDF extends \setasign\Fpdi\Tcpdf\Fpdi
 
     public function export_file() {
         return $this->Output('', 'S');
+    }
+
+    public function setSourceFile($fd) {
+        if (is_resource($fd)) {
+            $this->imported_fd[] = $fd;
+        }
+        return parent::setSourceFile($fd);
+    }
+
+    public function __destruct() {
+        if (!empty($this->imported_fd)) {
+            foreach($this->imported_fd as $fd) {
+                fclose($fd);
+            }
+        }
+        parent::__destruct();
     }
 
     // public function setTotalCount($count)
