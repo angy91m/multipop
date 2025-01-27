@@ -19,7 +19,6 @@ if ($this->discourse_utilities()) {
 $pdf = $this->empty_pdf();
 $this->pdf_import(MULTIPOP_PLUGIN_PATH . '/modulo.pdf', $pdf, true);
 $pdf->AddSingleImage(file_get_contents(MULTIPOP_PLUGIN_PATH . '/old-logo-pdf.png'));
-$pdf->AddSingleImage(MULTIPOP_PLUGIN_PATH . '/prova.png', true);
 $pdf->Output(MULTIPOP_PLUGIN_PATH . '/new_test.pdf', 'F');
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
