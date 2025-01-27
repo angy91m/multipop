@@ -478,7 +478,7 @@ if ($this->discourse_utilities()) {
                             </div>
                         </template>
                         <div v-if="!moduleUploadData.idCardFiles.length">Nessun file selezionato</div>
-                        <mpop-uploader 
+                        <button @click="()=>moduleUploadData.step--">Indietro</button>&nbsp;&nbsp;<mpop-uploader 
                             v-model="moduleUploadData.idCardFiles"
                             :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']"
                             :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type }; return f;}"
