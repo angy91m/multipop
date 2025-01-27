@@ -863,7 +863,8 @@ class MultipopPlugin {
 
     // CREATE PDF
     private function empty_pdf() {
-        return $this->pdf_create([
+        require_once(MULTIPOP_PLUGIN_PATH . '/classes/multipopdf.php');
+        return new MultipoPDF([
             'margin_left' => 10,
             'margin_right' => 10,
             'margin_top' => 10,
@@ -871,7 +872,7 @@ class MultipopPlugin {
             'margin_header' => 0,
             'margin_footer' => 0,
             'mpop_import' => true
-        ], false);
+        ]);
     }
 
     private function pdf_create(array $pdf_config = [], $export = true) {
