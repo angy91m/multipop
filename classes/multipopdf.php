@@ -225,6 +225,9 @@ class MultipoPDF extends \setasign\Fpdi\Tcpdf\Fpdi
         $x = ($pageWidth - $newWidthMm) / 2;
         $y = ($pageHeight - $newHeightMm) / 2;
         $this->AddPage($orientation, [$pageWidth, $pageHeight]);
+        imagesavealpha($image, true);
+        $transparentBg = imagecolorallocatealpha($image, 0, 0, 0, 127);
+        imagefill($image, 0, 0, $transparentBg);
         ob_start();
         imagepng($image, null, 0);
         $image_content = ob_get_clean();
