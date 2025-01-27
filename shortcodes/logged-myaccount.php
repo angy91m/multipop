@@ -450,7 +450,8 @@ if ($this->discourse_utilities()) {
                             <div v-for="(f, k) in moduleUploadData.signedModuleFiles" :key="k">
                                 - {{f.name}}&nbsp;&nbsp;<button @click="() => moduleUploadData.signedModuleFiles.splice(k, 1)">Rimuovi</button>
                                 <br>
-                                <iframe :src="f.content" width="100%"></iframe>
+                                <iframe v-if="f.type == 'application/pdf'" :src="f.content" style="width:100%; max-height:250px;"></iframe>
+                                <image v-if="f.type != 'application/pdf'" :src="f.content" style="width:100%; max-height:250px;" />
                             </div>
                         </template>
                         <div v-if="!moduleUploadData.signedModuleFiles.length">Nessun file selezionato</div>
