@@ -886,7 +886,7 @@ class MultipopPlugin {
             $pdf->useTemplate($tpl);
         }
         // $pdf->cleanUp();
-        // fclose($fd);
+        fclose($fd);
         return $pdf;
     }
     private function pdf_compile($pdf, $options = []) {
