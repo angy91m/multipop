@@ -20,6 +20,7 @@ loadVueModule = (...modules) => {
     return loaded;
 },
 [vSel] = loadVueModule('vue-select.js'),
+[mpopUploader] = loadVueModule('MpopUploader.vue'),
 mailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/s,
 passwordRegex = {
     rr: [
@@ -176,7 +177,8 @@ let searchUsersTimeout, triggerSearchTimeout;
 createApp({
     components: {
         'v-select': defineAsyncComponent(() => vSel),
-        'v-intl-phone': IntlTelInput
+        'v-intl-phone': IntlTelInput,
+        'mpop-uploader': defineAsyncComponent(() => mpopUploader)
     },
     setup() {
         function activeCardForYear(cards = [], year) {

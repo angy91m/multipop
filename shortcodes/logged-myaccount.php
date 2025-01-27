@@ -446,7 +446,7 @@ if ($this->discourse_utilities()) {
                         icon="upload_file"
                         :done="moduleUploadData.step > 1"
                     >
-                    <input type="file" @change="e => console.log(e)"/>
+                        <mpop-uploader id="prova-upload" v-model="moduleUploadData.signedModuleFiles">Carica</mpop-uploader>
                     </q-step>
                     <q-step
                         :name="2"
