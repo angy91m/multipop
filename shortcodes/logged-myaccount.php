@@ -459,7 +459,6 @@ if ($this->discourse_utilities()) {
                             v-model="moduleUploadData.signedModuleFiles"
                             :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']"
                             :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type }; return f;}"
-                            @change="consoleLog(moduleUploadData.signedModuleFiles)"
                             @invalid-mime="onInvalidMime"
                             :disabled="moduleUploadData.signedModuleFiles.length == 2"
                         >Seleziona file da caricare</mpop-uploader>&nbsp;&nbsp;<button :disabled="!moduleUploadData.signedModuleFiles.length" @click="()=>moduleUploadData.step++">Avanti</button>
@@ -470,6 +469,27 @@ if ($this->discourse_utilities()) {
                         icon="upload_file"
                         :done="moduleUploadData.step > 2"
                     >
+                        <template v-if="moduleUploadData.idCardFiles.length">
+                            <div v-for="(f, k) in moduleUploadData.idCardFiles" :key="k">
+                                - {{f.name}}&nbsp;&nbsp;<button @click="() => moduleUploadData.idCardFiles.splice(k, 1)">Rimuovi</button>
+                                <br>
+                                <iframe v-if="f.type == 'application/pdf'" :src="f.content" style="width:100%; max-height:250px;"></iframe>
+                                <image v-if="f.type != 'application/pdf'" :src="f.content" style="max-height:250px;" />
+                            </div>
+                        </template>
+                        <div v-if="!moduleUploadData.idCardFiles.length">Nessun file selezionato</div>
+                        <mpop-uploader 
+                            v-model="moduleUploadData.idCardFiles"
+                            :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']"
+                            :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type }; return f;}"
+                            @invalid-mime="onInvalidMime"
+                            :disabled="moduleUploadData.idCardFiles.length == 2"
+                        >Seleziona file da caricare</mpop-uploader>
+                        <br>
+                        <select v-model="moduleUploadData.idCardType">
+                            <option disabled value="">Seleziona il tipo di documento</option>
+                            <option v-for="(t, k) in mainOptions.idCardTypes" :key="k">{{t}}</option>
+                        </select>&nbsp;&nbsp;<button :disabled="!moduleUploadData.idCardFiles.length && mainOptions.idCardTypes !== null" @click="()=>{moduleUploadData.step++; consoleLog(moduleUploadData)}">Avanti</button>
                     </q-step>
                     <q-step
                         :name="3"

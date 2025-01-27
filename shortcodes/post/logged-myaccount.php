@@ -56,7 +56,8 @@ switch ($post_data['action']) {
         }
         $main_options = [
             'authorizedSubscriptionYears' => $years,
-            'authorizedSubscriptionQuote' => $quote
+            'authorizedSubscriptionQuote' => $quote,
+            'idCardTypes' => $this->id_card_types
         ];
         $res_data['data'] = $main_options;
         break;

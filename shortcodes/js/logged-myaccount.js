@@ -226,7 +226,8 @@ createApp({
         userEditingRespZoneOpen = ref(false),
         mainOptions = reactive({
             authorizedSubscriptionYears: [],
-            authorizedSubscriptionQuote: 0
+            authorizedSubscriptionQuote: 0,
+            idCardTypes: []
         }),
         newSubscription = reactive({
             year: mainOptions.authorizedSubscriptionYears.length ? mainOptions.authorizedSubscriptionYears[0] : null,
