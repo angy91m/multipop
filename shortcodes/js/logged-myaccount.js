@@ -919,6 +919,7 @@ createApp({
             selectTab({name: 'moduleUpload', label: 'Carica modulo'});
         }
         async function moduleUploadDataSend() {
+            console.log(moduleUploadData);
             if (
                 moduleUploadData.sub
                 && moduleUploadData.sub.id
