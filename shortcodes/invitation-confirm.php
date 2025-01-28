@@ -237,7 +237,7 @@ $invitation_props = [
             </label>
         </p>
         <p class="mpop-form-row" v-show="marketingAgreeShow">
-            <button class="mpop-button" @click="marketingAgreeShow = false">Chiudi</button><br><?=nl2br($this->settings['marketing_agree'])?>
+            <button class="mpop-button" @click="marketingAgreeShow = false">Chiudi</button><br><?=nl2br($this->settings['marketing_policy'])?>
         </p>
         <p class="mpop-form-row">
             <label><span class="mpop-click" @click="e => {e.preventDefault(); newsletterAgreeShow = !newsletterAgreeShow}">Accetto le condizioni della newsletter</span>&nbsp;
@@ -245,7 +245,7 @@ $invitation_props = [
             </label>
         </p>
         <p class="mpop-form-row" v-show="newsletterAgreeShow">
-            <button class="mpop-button" @click="newsletterAgreeShow = false">Chiudi</button><br><?=nl2br($this->settings['newsletter_agree'])?>
+            <button class="mpop-button" @click="newsletterAgreeShow = false">Chiudi</button><br><?=nl2br($this->settings['newsletter_policy'])?>
         </p>
         <p class="mpop-form-row">
             <label><span class="mpop-click" @click="e => {e.preventDefault(); publishAgreeShow = !publishAgreeShow}">Accetto le condizioni di pubblicazione</span>&nbsp;
@@ -253,7 +253,7 @@ $invitation_props = [
             </label>
         </p>
         <p class="mpop-form-row" v-show="publishAgreeShow">
-            <button class="mpop-button" @click="publishAgreeShow = false">Chiudi</button><br><?=nl2br($this->settings['publish_agree'])?>
+            <button class="mpop-button" @click="publishAgreeShow = false">Chiudi</button><br><?=nl2br($this->settings['publish_policy'])?>
         </p>
     </template>
     <p class="mpop-form-row">
