@@ -496,6 +496,10 @@ if ($this->discourse_utilities()) {
                         icon="send"
                         :done="moduleUploadData.step > 3"
                     >
+                        <label>Accetto le <a @click="e => {e.preventDefault(); if (mainOptions.privacyPolicyUrl) openExternalUrl();}">condizioni del sito sul trattamento dati</a>&nbsp;
+                            <input type="checkbox"/>
+                        </label>
+                        <button>Invia</button>
                     </q-step>
                     <q-step
                         :name="4"
@@ -1014,7 +1018,8 @@ if ($this->discourse_utilities()) {
 <?php wp_nonce_field( 'mpop-logged-myaccount', 'mpop-logged-myaccount-nonce' ); ?>
 <script type="application/json" id="__MULTIPOP_DATA__">{
     "user": <?=json_encode($parsed_user)?>,
-    "discourseUrl": <?=json_encode($discourse_url)?>
+    "discourseUrl": <?=json_encode($discourse_url)?>,
+    "privacyPolicyUrl": <?=json_encode(get_privacy_policy_url())?>
 }</script>
 <script src="<?=plugins_url()?>/multipop/js/vue.global.min.js"></script>
 <script src="<?=plugins_url()?>/multipop/js/quasar.umd.prod.js"></script>

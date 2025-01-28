@@ -228,7 +228,8 @@ createApp({
             authorizedSubscriptionYears: [],
             authorizedSubscriptionQuote: 0,
             idCardTypes: [],
-            policies: {}
+            policies: {},
+            privacyPolicyUrl: ''
         }),
         newSubscription = reactive({
             year: mainOptions.authorizedSubscriptionYears.length ? mainOptions.authorizedSubscriptionYears[0] : null,
@@ -1278,10 +1279,11 @@ createApp({
             });
         }
         onBeforeMount(()=> {
-            const {user: parsedUser, discourseUrl} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
+            const {user: parsedUser, discourseUrl, privacyPolicyUrl} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
             if (discourseUrl) {
                 menuItems.push({name: 'discourseUrl', url: discourseUrl, label: 'Accedi a Discourse'});
             }
+            mainOptions.privacyPolicyUrl = privacyPolicyUrl;
             Object.assign(profile, parsedUser);
             getMainOptions();
             generateNotices();
