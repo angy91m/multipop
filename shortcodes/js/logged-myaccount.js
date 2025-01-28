@@ -403,8 +403,10 @@ createApp({
             signedModuleFiles: [],
             idCardFiles: [],
             idCardType: null,
+            generalPolicyAccept: false,
             step: 1
         }),
+        moduleUploadDataSending = ref(false),
         availableYearsToOrder = computed(() => {
             if (!mainOptions.authorizedSubscriptionQuote) return [];
             const thisYear = (new Date()).getFullYear();
@@ -420,6 +422,7 @@ createApp({
             moduleUploadData.signedModuleFiles.length = 0;
             moduleUploadData.idCardFiles.length = 0;
             moduleUploadData.idCardType = null;
+            moduleUploadData.generalPolicyAccept = false;
         }
         function fuseSearch(options, search) {
             const fuse = new Fuse(options, {
@@ -914,6 +917,39 @@ createApp({
         function moduleUploadBegin(sub) {
             moduleUploadData.sub = sub;
             selectTab({name: 'moduleUpload', label: 'Carica modulo'});
+        }
+        async function moduleUploadDataSend() {
+            if (
+                moduleUploadData.sub
+                && moduleUploadData.sub.id
+                && moduleUploadData.signedModuleFiles.length
+                && moduleUploadData.idCardFiles.length
+                && moduleUploadData.idCardType
+                && moduleUploadData.generalPolicyAccept
+            ) {
+                moduleUploadDataSending.value = true;
+                // const res = await serverReq({
+                //     action: 'module_upload',
+                //     id: moduleUploadData.sub.id,
+                //     signedModuleFiles: moduleUploadData.signedModuleFiles.map(v => {delete v['name']}),
+                //     idCardFiles: moduleUploadData.idCardFiles.map(v => {delete v['name']}),
+                //     idCardType: moduleUploadData.idCardType
+                //  });
+                console.log(JSON.stringify({
+                    action: 'module_upload',
+                    id: moduleUploadData.sub.id,
+                    signedModuleFiles: moduleUploadData.signedModuleFiles.map(v => {delete v['name']}),
+                    idCardFiles: moduleUploadData.idCardFiles.map(v => {delete v['name']}),
+                    idCardType: moduleUploadData.idCardType
+                }).length);
+                try {
+
+                } catch (err) {
+
+                } finally {
+                    moduleUploadDataSending.value = true;
+                }
+            }
         }
         async function resendInvitationMail() {
             saving.value = true;
@@ -1449,6 +1485,7 @@ createApp({
             moduleUploadData,
             moduleUploadBegin,
             onInvalidMime,
+            moduleUploadDataSend,
             consoleLog: v => console.log(v)
         };
     }

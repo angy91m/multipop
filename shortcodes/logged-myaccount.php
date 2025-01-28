@@ -488,7 +488,7 @@ if ($this->discourse_utilities()) {
                         <select v-model="moduleUploadData.idCardType">
                             <option disabled :value="null">Seleziona il tipo di documento</option>
                             <option v-for="(t, k) in mainOptions.idCardTypes" :key="k">{{t}}</option>
-                        </select>&nbsp;&nbsp;<button :disabled="!moduleUploadData.idCardFiles.length && mainOptions.idCardTypes !== null" @click="()=>{moduleUploadData.step++; consoleLog(moduleUploadData)}">Avanti</button>
+                        </select>&nbsp;&nbsp;<button :disabled="!moduleUploadData.idCardFiles.length && mainOptions.idCardTypes !== null" @click="()=>moduleUploadData.step++">Avanti</button>
                     </q-step>
                     <q-step
                         :name="3"
@@ -497,9 +497,10 @@ if ($this->discourse_utilities()) {
                         :done="moduleUploadData.step > 3"
                     >
                         <label>Accetto le <a @click="e => {e.preventDefault(); if (mainOptions.privacyPolicyUrl) openExternalUrl();}">condizioni del sito sul trattamento dati</a>&nbsp;
-                            <input type="checkbox"/>
+                            <input type="checkbox" v-model="moduleUploadData.generalPolicyAccept"/>
                         </label>
-                        <button>Invia</button>
+                        <br>
+                        <button :disabled="!moduleUploadData.generalPolicyAccept || moduleUploadDataSending" @click="moduleUploadDataSend">Invia</button>
                     </q-step>
                     <q-step
                         :name="4"
