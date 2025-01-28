@@ -227,7 +227,8 @@ createApp({
         mainOptions = reactive({
             authorizedSubscriptionYears: [],
             authorizedSubscriptionQuote: 0,
-            idCardTypes: []
+            idCardTypes: [],
+            policies: {}
         }),
         newSubscription = reactive({
             year: mainOptions.authorizedSubscriptionYears.length ? mainOptions.authorizedSubscriptionYears[0] : null,

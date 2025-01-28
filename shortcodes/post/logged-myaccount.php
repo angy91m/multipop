@@ -57,7 +57,12 @@ switch ($post_data['action']) {
         $main_options = [
             'authorizedSubscriptionYears' => $years,
             'authorizedSubscriptionQuote' => $quote,
-            'idCardTypes' => $this->id_card_types
+            'idCardTypes' => $this->id_card_types,
+            'policies' => [
+                'marketing' => nl2br($this->settings['marketing_policy']),
+                'newsletter' => nl2br($this->settings['newsletter_policy']),
+                'publish' => nl2br($this->settings['publish_policy'])
+            ]
         ];
         $res_data['data'] = $main_options;
         break;

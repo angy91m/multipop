@@ -143,8 +143,23 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
         if (is_string($_REQUEST['pp_client_secret'])) {
             $edits['pp_client_secret'] = trim($_REQUEST['pp_client_secret']);
         }
-        if (is_string($_REQUEST['marketing_policy']) && $_REQUEST['marketing_policy']) {
-            save_test(trim($_REQUEST['marketing_policy']));
+        if (is_string($_REQUEST['marketing_policy']) ) {
+            $mk_policy = trim($_REQUEST['marketing_policy']);
+            if ($mk_policy) {
+                $edits['marketing_policy'] = $mk_policy;
+            }
+        }
+        if (is_string($_REQUEST['newsletter_policy']) ) {
+            $nl_policy = trim($_REQUEST['newsletter_policy']);
+            if ($nl_policy) {
+                $edits['newsletter_policy'] = $nl_policy;
+            }
+        }
+        if (is_string($_REQUEST['publish_policy']) ) {
+            $pb_policy = trim($_REQUEST['publish_policy']);
+            if ($pb_policy) {
+                $edits['publish_policy'] = $pb_policy;
+            }
         }
         $first_master_key = false;
         if (trim($_REQUEST['master_doc_key'])) {
