@@ -143,22 +143,13 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
         if (is_string($_REQUEST['pp_client_secret'])) {
             $edits['pp_client_secret'] = trim($_REQUEST['pp_client_secret']);
         }
-        if (is_string($_REQUEST['marketing_policy']) ) {
-            $mk_policy = trim($_REQUEST['marketing_policy']);
-            if ($mk_policy) {
-                $edits['marketing_policy'] = $mk_policy;
-            }
-        }
-        if (is_string($_REQUEST['newsletter_policy']) ) {
-            $nl_policy = trim($_REQUEST['newsletter_policy']);
-            if ($nl_policy) {
-                $edits['newsletter_policy'] = $nl_policy;
-            }
-        }
-        if (is_string($_REQUEST['publish_policy']) ) {
-            $pb_policy = trim($_REQUEST['publish_policy']);
-            if ($pb_policy) {
-                $edits['publish_policy'] = $pb_policy;
+        $policies = ['marketing', 'newsletter', 'publish'];
+        foreach ($policies as $p) {
+            if (is_string($_REQUEST[$p.'_policy']) ) {
+                $policy = trim($_REQUEST[$p.'_policy']);
+                if ($policy) {
+                    $edits[$p.'_policy'] = $policy;
+                }
             }
         }
         $first_master_key = false;
