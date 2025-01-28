@@ -500,7 +500,7 @@ if ($this->discourse_utilities()) {
                             <input type="checkbox" v-model="moduleUploadData.generalPolicyAccept"/>
                         </label>
                         <br>
-                        <button :disabled="!moduleUploadData.generalPolicyAccept || moduleUploadDataSending" @click="moduleUploadDataSend">Invia</button>
+                        <button @click="()=>moduleUploadData.step--">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.generalPolicyAccept || moduleUploadDataSending" @click="moduleUploadDataSend">Invia</button>
                     </q-step>
                     <q-step
                         :name="4"
