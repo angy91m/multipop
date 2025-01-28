@@ -939,8 +939,8 @@ createApp({
                 console.log(JSON.stringify({
                     action: 'module_upload',
                     id: moduleUploadData.sub.id,
-                    signedModuleFiles: moduleUploadData.signedModuleFiles.map(v => {delete v['name']}),
-                    idCardFiles: moduleUploadData.idCardFiles.map(v => {delete v['name']}),
+                    signedModuleFiles: moduleUploadData.signedModuleFiles.map(v => {delete v['name']; return v;}),
+                    idCardFiles: moduleUploadData.idCardFiles.map(v => {delete v['name']; return v;}),
                     idCardType: moduleUploadData.idCardType
                 }).length);
                 try {
@@ -948,7 +948,7 @@ createApp({
                 } catch (err) {
 
                 } finally {
-                    moduleUploadDataSending.value = true;
+                    moduleUploadDataSending.value = false;
                 }
             }
         }
