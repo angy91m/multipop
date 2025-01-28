@@ -1486,6 +1486,7 @@ createApp({
             moduleUploadBegin,
             onInvalidMime,
             moduleUploadDataSend,
+            moduleUploadDataSending,
             consoleLog: v => console.log(v)
         };
     }
