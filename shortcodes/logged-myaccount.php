@@ -433,7 +433,7 @@ if ($this->discourse_utilities()) {
             </div>
             <!--MODULE_UPLOAD-->
             <div v-if="selectedTab.name == 'moduleUpload' && moduleUploadData.sub">
-                <q-stepper
+                <!-- <q-stepper
                     v-model="moduleUploadData.step"
                     vertical
                     color="primary"
@@ -515,7 +515,7 @@ if ($this->discourse_utilities()) {
                         icon="download_done"
                     >
                     </q-step>
-                </q-stepper>
+                </q-stepper> -->
             </div>
             <!--USER_SEARCH-->
             <div v-if="selectedTab.name == 'users'" id="mpop-user-search">
