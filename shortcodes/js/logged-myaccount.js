@@ -938,7 +938,7 @@ createApp({
                 && moduleUploadData.sub.id
                 && moduleUploadData.signedModuleFiles.length
                 && (
-                    !moduleUploadRequireIdCard.value
+                    isValidIdCard.value
                     || (
                         moduleUploadData.idCardFiles.length
                         && moduleUploadData.idCardType !== null
