@@ -403,9 +403,20 @@ createApp({
             signedModuleFiles: [],
             idCardFiles: [],
             idCardType: null,
+            idCardNumber: null,
+            idCardExpiration: null,
             generalPolicyAccept: false,
             step: 1
         }),
+        isValidIdCard = computed(()=> {
+            if (!profile.mpop_id_card_expiration) return false;
+            const d = new Date(profile.mpop_id_card_expiration);
+            if (isNaN(date)) return false;
+            if ((d.getFullYear() + '-' + ('0'+ (d.getMonth()+1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2)) != profile.mpop_id_card_expiration ) return false;
+            if(Date.now() > d.getTime()) return false;
+            return true;
+        }),
+        moduleUploadRequireIdCard = computed(() => !isValidIdCard.value),
         moduleUploadDataSending = ref(false),
         availableYearsToOrder = computed(() => {
             if (!mainOptions.authorizedSubscriptionQuote) return [];
@@ -414,14 +425,18 @@ createApp({
         }),
         otherSubscriptions = computed(() => (profile.mpop_my_subscriptions || []).filter(c => nearActiveSub.value ? nearActiveSub.value.id !== c.id : true)),
         goodSubscriptions = computed(() => (profile.mpop_my_subscriptions || []).filter(s => ['completed', 'tosee', 'seen', 'open'].includes( s.status ))),
-        maxBirthDate = new Date();
+        maxBirthDate = new Date(),
+        maxIdCardDate = new Date();
         maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
+        maxIdCardDate.setDate(maxIdCardDate.getDate()+1);
         function cancelModuleUploadData() {
             moduleUploadData.step = 1;
             moduleUploadData.sub = null;
             moduleUploadData.signedModuleFiles.length = 0;
             moduleUploadData.idCardFiles.length = 0;
             moduleUploadData.idCardType = null;
+            moduleUploadData.idCardNumber = null;
+            moduleUploadData.idCardExpiration = null;
             moduleUploadData.generalPolicyAccept = false;
         }
         function fuseSearch(options, search) {
@@ -919,37 +934,60 @@ createApp({
             selectTab({name: 'moduleUpload', label: 'Carica modulo'});
         }
         async function moduleUploadDataSend() {
-            console.log(moduleUploadData);
             if (
                 moduleUploadData.sub
                 && moduleUploadData.sub.id
                 && moduleUploadData.signedModuleFiles.length
-                && moduleUploadData.idCardFiles.length
-                && moduleUploadData.idCardType
+                && (
+                    !moduleUploadRequireIdCard.value
+                    || (
+                        moduleUploadData.idCardFiles.length
+                        && moduleUploadData.idCardType !== null
+                        && moduleUploadData.idCardNumber
+                        && moduleUploadData.idCardExpiration
+                    )
+                )
                 && moduleUploadData.generalPolicyAccept
             ) {
                 moduleUploadDataSending.value = true;
+                console.log({
+                    action: 'module_upload',
+                    id: moduleUploadData.sub.id,
+                    signedModuleFiles: moduleUploadData.signedModuleFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
+                    idCardFiles: moduleUploadData.idCardFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
+                    idCardType: moduleUploadData.idCardType,
+                    idCardNumber: moduleUploadData.idCardNumber,
+                    idCardExpiration: moduleUploadData.idCardExpiration
+                });
                 // const res = await serverReq({
                 //     action: 'module_upload',
                 //     id: moduleUploadData.sub.id,
-                //     signedModuleFiles: moduleUploadData.signedModuleFiles.map(v => {delete v['name']}),
-                //     idCardFiles: moduleUploadData.idCardFiles.map(v => {delete v['name']}),
-                //     idCardType: moduleUploadData.idCardType
-                //  });
-                console.log(JSON.stringify({
-                    action: 'module_upload',
-                    id: moduleUploadData.sub.id,
-                    signedModuleFiles: moduleUploadData.signedModuleFiles.map(v => {delete v['name']; return v;}),
-                    idCardFiles: moduleUploadData.idCardFiles.map(v => {delete v['name']; return v;}),
-                    idCardType: moduleUploadData.idCardType
-                }).length);
-                try {
-
-                } catch (err) {
-
-                } finally {
-                    moduleUploadDataSending.value = false;
-                }
+                //     signedModuleFiles: moduleUploadData.signedModuleFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
+                //     idCardFiles: moduleUploadData.idCardFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
+                //     idCardType: moduleUploadData.idCardType,
+                //     idCardNumber: moduleUploadData.idCardNumber,
+                //     idCardExpiration: moduleUploadData.idCardExpiration
+                // });
+                // if (res.ok) {
+                //     const resJson = await res.json();
+                //     if (resJson.data) {
+                //         // OK
+                //     }
+                //     generateNotices(resJson.notices || []);
+                // } else {
+                //     try {
+                //         const {error, notices} = await res.json();
+                //         if (error) {
+                //             console.error(error);
+                //             generateNotices(notices || []);
+                //         } else {
+                //             console.error('Unknown error');
+                //         }
+                //     } catch {
+                //         console.error('Unknown error');
+                //     }
+                // }
+                moduleUploadDataSending.value = false;
             }
         }
         async function resendInvitationMail() {
@@ -1453,6 +1491,7 @@ createApp({
             availableYearsToOrder,
             isProfileCompleted,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2),
+            maxIdCardDate: maxIdCardDate.getFullYear() + '-' + ('0' + (maxIdCardDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxIdCardDate.getDate()).slice(-2),
             csvUsers,
             loadUsersFromCsv,
             userCsvFields,
@@ -1488,6 +1527,7 @@ createApp({
             onInvalidMime,
             moduleUploadDataSend,
             moduleUploadDataSending,
+            moduleUploadRequireIdCard,
             consoleLog: v => console.log(v)
         };
     }

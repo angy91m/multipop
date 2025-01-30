@@ -460,9 +460,10 @@ if ($this->discourse_utilities()) {
                             :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type }; return f;}"
                             @invalid-mime="onInvalidMime"
                             :disabled="moduleUploadData.signedModuleFiles.length == 2"
-                        >Seleziona file da caricare</mpop-uploader>&nbsp;&nbsp;<button :disabled="!moduleUploadData.signedModuleFiles.length" @click="()=>moduleUploadData.step++">Avanti</button>
+                        >Seleziona file da caricare</mpop-uploader>&nbsp;&nbsp;<button :disabled="!moduleUploadData.signedModuleFiles.length" @click="()=>moduleUploadData.step+= (moduleUploadRequireIdCard ? 1 : 2)">Avanti</button>
                     </q-step>
                     <q-step
+                        v-if="moduleUploadRequireIdCard"
                         :name="2"
                         title="Carica il documento di identità"
                         icon="upload_file"
@@ -477,7 +478,7 @@ if ($this->discourse_utilities()) {
                             </div>
                         </template>
                         <div v-if="!moduleUploadData.idCardFiles.length">Nessun file selezionato</div>
-                        <button @click="()=>moduleUploadData.step--">Indietro</button>&nbsp;&nbsp;<mpop-uploader 
+                        <mpop-uploader 
                             v-model="moduleUploadData.idCardFiles"
                             :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']"
                             :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type }; return f;}"
@@ -487,8 +488,14 @@ if ($this->discourse_utilities()) {
                         <br>
                         <select v-model="moduleUploadData.idCardType">
                             <option disabled :value="null">Seleziona il tipo di documento</option>
-                            <option v-for="(t, k) in mainOptions.idCardTypes" :key="k">{{t}}</option>
-                        </select>&nbsp;&nbsp;<button :disabled="!moduleUploadData.idCardFiles.length && mainOptions.idCardTypes !== null" @click="()=>moduleUploadData.step++">Avanti</button>
+                            <option v-for="(t, k) in mainOptions.idCardTypes" :key="k" :value="k">{{t}}</option>
+                        </select>
+                        <br>
+                        <label>Numero documento:&nbsp;&nbsp;<input type="text" v-module="moduleUploadData.idCardNumber"/></label>
+                        <br>
+                        <label>Data di scadenza documento:&nbsp;&nbsp;<input type="date" :min="maxIdCardDate" v-module="moduleUploadData.idCardExpiration"/></label>
+                        <br>
+                        <button @click="()=>moduleUploadData.step--">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.idCardFiles.length && mainOptions.idCardTypes !== null" @click="()=>moduleUploadData.step++">Avanti</button>
                     </q-step>
                     <q-step
                         :name="3"
@@ -500,7 +507,7 @@ if ($this->discourse_utilities()) {
                             <input type="checkbox" v-model="moduleUploadData.generalPolicyAccept"/>
                         </label>
                         <br>
-                        <button @click="()=>moduleUploadData.step--">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.generalPolicyAccept || moduleUploadDataSending" @click="moduleUploadDataSend">Invia</button>
+                        <button @click="()=>moduleUploadData.step-= (moduleUploadRequireIdCard ? 1 : 2)">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.generalPolicyAccept || moduleUploadDataSending" @click="moduleUploadDataSend">Invia</button>
                     </q-step>
                     <q-step
                         :name="4"

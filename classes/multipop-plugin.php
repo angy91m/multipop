@@ -1358,7 +1358,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         unlink(MULTIPOP_PLUGIN_PATH . 'private/.flushing_subs');
     }
 
-    private function enable_user_card($user, $marketing_agree = false, $newsletter_agree = false, $publish_agree = false) {
+    private function enable_user_card($user, $marketing_agree = false, $newsletter_agree = false, $publish_agree = false, $force_sync = false) {
         if (is_string($user) || is_int($user)) {
             $user = get_user_by('ID', intval($user));
         }
@@ -1368,22 +1368,20 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $marketing_agree = boolval($marketing_agree);
         $newsletter_agree = boolval($newsletter_agree);
         $publish_agree = boolval($publish_agree);
-        if (
-            !$user->mpop_card_active
-            || boolval($user->mpop_marketing_agree) != $marketing_agree
-            || boolval($user->mpop_newsletter_agree) != $newsletter_agree
-            || boolval($user->mpop_publish_agree) != $publish_agree
-        ) {
-            wp_update_user([
-                'ID' => $user->ID,
-                'meta_input' => [
-                    'mpop_card_active' => true,
-                    'mpop_marketing_agree' => $marketing_agree,
-                    'mpop_newsletter_agree' => $newsletter_agree,
-                    'mpop_publish_agree' => $publish_agree
-                ]
-            ]);
-            if ($user->discourse_sso_user_id && isset($user->roles[0]) && in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
+        $user_input = [];
+        $meta_input = [];
+        if(!empty($user->roles) && !in_array($user->roles[0], ['multipopolano', 'multipopolare_resp', 'administrator'])) {
+            $user_input += ['role' => 'multipopolano'];
+        }
+
+        if (!$user->mpop_card_active) $meta_input += ['mpop_card_active' => true];
+        if (boolval($user->mpop_marketing_agree) != $marketing_agree) $meta_input += ['mpop_marketing_agree' => true];
+        if (boolval($user->mpop_newsletter_agree) != $newsletter_agree) $meta_input += ['mpop_newsletter_agree' => true];
+        if (boolval($user->mpop_publish_agree) != $publish_agree) $meta_input += ['mpop_publish_agree' => true];
+        if (!empty($meta_input)) $user_input += ['meta_input' => $meta_input];
+        if (!empty($user_input)) {
+            wp_update_user($user_input + ['ID' => $user->ID]);
+            if ($force_sync || ($user->discourse_sso_user_id && !empty($user->roles))) {
                 $this->sync_discourse_record($user);
             }
         }
@@ -2251,6 +2249,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             'mpop_org_role' => $user->mpop_org_role,
             'mpop_invited' => boolval($user->mpop_invited),
             'mpop_resp_zones' => [],
+            'mpop_id_card_expiration' => $user->mpop_id_card_expiration,
             'mpop_my_subscriptions' => $this->get_my_subscriptions($user->ID)
         ];
         if (in_array($parsed_user['role'], ['administrator', 'multipopolare_resp'])) {
@@ -2686,16 +2685,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             throw new Exception("Error while saving on DB");
         }
         if (current_time('Y') == $sub['year']) {
-            wp_update_user([
-                'ID' => $sub['user_id'],
-                'meta_input' => [
-                    'mpop_marketing_agree' => $sub['marketing_agree'],
-                    'mpop_newsletter_agree' => $sub['newsletter_agree'],
-                    'mpop_publish_agree' => $sub['publish_agree'],
-                    'mpop_card_active' => true
-                ]
-            ]);
-            $this->sync_discourse_record($sub['user_id']);
+            $this->enable_user_card($sub['user_id'], $sub['marketing_agree'], $sub['newsletter_agree'], $sub['publish_agree'], true);
             return true;
         }
         return false;
@@ -2904,7 +2894,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if ($row['mpop_friend']) {
             // IF MPOP FRIEND LOGIN
             if ($old_user) {
-                throw new Exception('Duplicated username: '. $old_user->user_email );
+                throw new Exception('Duplicated email: '. $old_user->user_email );
             }
             $row['mpop_friend'] = strtolower($row['mpop_friend']);
             if(!$this::is_valid_username($row['mpop_friend'])) {
@@ -2961,6 +2951,12 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $newsletter_agree = isset($row['mpop_subscription_newsletter_agree']) ? boolval($row['mpop_subscription_newsletter_agree']) : false;
             $publish_agree = isset($row['mpop_subscription_publish_agree']) ? boolval($row['mpop_subscription_publish_agree']) : false;
             if ($old_user) {
+                if (count($old_user->roles) == 1 && !in_array( $old_user->roles[0], ['administrator', 'multipopolano', 'multipopolare_resp'])) {
+                    wp_update_user([
+                        'ID' => $old_user->ID,
+                        'role' => 'multipopolano'
+                    ]);
+                }
                 $others = $this->get_subscriptions([
                     'user_id' => [$old_user->ID],
                     'year_in' => [$subscription_year],
@@ -3118,8 +3114,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                     // 0,
                     // '',
                     // '',
-                    false,
                     $sub_notes,
+                    false,
                     $force_year,
                     $force_quote,
                     true
