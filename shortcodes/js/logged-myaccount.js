@@ -416,7 +416,6 @@ createApp({
             if(Date.now() > d.getTime()) return false;
             return true;
         }),
-        moduleUploadRequireIdCard = computed(() => !isValidIdCard.value),
         moduleUploadDataSending = ref(false),
         availableYearsToOrder = computed(() => {
             if (!mainOptions.authorizedSubscriptionQuote) return [];
@@ -1527,7 +1526,7 @@ createApp({
             onInvalidMime,
             moduleUploadDataSend,
             moduleUploadDataSending,
-            moduleUploadRequireIdCard,
+            isValidIdCard,
             consoleLog: v => console.log(v)
         };
     }

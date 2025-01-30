@@ -460,10 +460,10 @@ if ($this->discourse_utilities()) {
                             :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type }; return f;}"
                             @invalid-mime="onInvalidMime"
                             :disabled="moduleUploadData.signedModuleFiles.length == 2"
-                        >Seleziona file da caricare</mpop-uploader>&nbsp;&nbsp;<button :disabled="!moduleUploadData.signedModuleFiles.length" @click="()=>moduleUploadData.step+= (moduleUploadRequireIdCard ? 1 : 2)">Avanti</button>
+                        >Seleziona file da caricare</mpop-uploader>&nbsp;&nbsp;<button :disabled="!moduleUploadData.signedModuleFiles.length" @click="()=>moduleUploadData.step+= (isValidIdCard ? 2 : 1)">Avanti</button>
                     </q-step>
                     <q-step
-                        v-if="moduleUploadRequireIdCard"
+                        v-if="!isValidIdCard"
                         :name="2"
                         title="Carica il documento di identità"
                         icon="upload_file"
@@ -507,7 +507,7 @@ if ($this->discourse_utilities()) {
                             <input type="checkbox" v-model="moduleUploadData.generalPolicyAccept"/>
                         </label>
                         <br>
-                        <button @click="()=>moduleUploadData.step-= (moduleUploadRequireIdCard ? 1 : 2)">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.generalPolicyAccept || moduleUploadDataSending" @click="moduleUploadDataSend">Invia</button>
+                        <button @click="()=>moduleUploadData.step-= (isValidIdCard ? 2 : 1)">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.generalPolicyAccept || moduleUploadDataSending" @click="moduleUploadDataSend">Invia</button>
                     </q-step>
                     <q-step
                         :name="4"
