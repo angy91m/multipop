@@ -420,7 +420,7 @@ if ($this->discourse_utilities()) {
                                                 color="primary"
                                                 size="sm"
                                                 label="Carica modulo"
-                                                @click="consoleLog(props)"
+                                                @click="moduleUploadBegin(otherSubscriptions.find(s => s.id == props.row.id))"
                                             ></q-btn>
                                         </template>
                                         <template v-else>{{props.value}}</template>
