@@ -164,7 +164,7 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
                     $edits['master_doc_pubkey'] = base64_encode($asym_keys['pub']);
                     $edits['master_doc_key'] = base64_encode(
                         $this->encrypt_with_password(
-                            base64_encode( openssl_random_pseudo_bytes(32, true) . $asym_keys['priv'] ),
+                            base64_encode( openssl_random_pseudo_bytes(32) . $asym_keys['priv'] ),
                             $_REQUEST['master_doc_key']
                         )
                     );

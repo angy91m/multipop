@@ -729,7 +729,7 @@ class MultipopPlugin {
                     15,
                     0,
                     1,
-                    '".base64_encode(openssl_random_pseudo_bytes(64, true))."',
+                    '".base64_encode(openssl_random_pseudo_bytes(64))."',
                     ".
                         $wpdb->prepare("%s, %s, %s",[
                             'Presto il mio consenso e fino alla revoca dello stesso, per la proposizione di offerte, comunicazioni commerciali e per il successivo invio di materiale informativo pubblicitario e/o promozionale e/o sondaggi di opinione, ricerche di mercato, invio di newsletter (di seguito complessivamente definite “attività di propaganda”) di MULTIPOPOLARE APS e/o da organizzazioni correlate. Il trattamento per attività di marketing avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea e/o chiamate da operatore), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo SMS e/o MMS, chiamate telefoniche senza l’intervento dell’operatore, posta elettronica, social network, newsletter, applicazioni interattive, notifiche push).',
@@ -1226,7 +1226,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $row = true;
         $token = '';
         while( $row ) {
-            $token = bin2hex(openssl_random_pseudo_bytes(16, true));
+            $token = bin2hex(openssl_random_pseudo_bytes(16));
             $q = "SELECT * FROM " . $this::db_prefix('temp_tokens') . " WHERE `id` = '$token' LIMIT 1;";
             $row = $wpdb->get_row( $q, ARRAY_A );
         }
@@ -1729,7 +1729,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             string $iv = ''
     ) {
         if (empty($iv)) {
-            $iv = openssl_random_pseudo_bytes(16, true);
+            $iv = openssl_random_pseudo_bytes(16);
         } else if (strlen($iv) != 16) {
             throw new Exception('Invalid IV');
         }
@@ -1759,7 +1759,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         int $iterations = 900000,
         int $salt_length = 32
     ) {
-        $salt = openssl_random_pseudo_bytes($salt_length, true);
+        $salt = openssl_random_pseudo_bytes($salt_length);
         return $iterations . '#' . $salt . $this->encrypt(
             $data,
             hash_pbkdf2( 'sha3-512', $password, $salt, $iterations, 32, true ),
@@ -1775,7 +1775,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         #[\SensitiveParameter]
             string $pub_key = ''
     ) {
-        $symkey = openssl_random_pseudo_bytes(32, true);
+        $symkey = openssl_random_pseudo_bytes(32);
         $pub_key = openssl_pkey_get_public( "-----BEGIN PUBLIC KEY-----\n". base64_encode($pub_key) . "\n-----END PUBLIC KEY-----");
         openssl_public_encrypt($symkey, $enc_key, $pub_key, OPENSSL_PKCS1_OAEP_PADDING);
         return strlen($enc_key) . '#' . $enc_key . $this->encrypt($data,$symkey);
@@ -3021,7 +3021,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             }
             $user_input = [
                 'user_login' => $row['mpop_friend'],
-                'user_pass' => bin2hex(openssl_random_pseudo_bytes(16, true)),
+                'user_pass' => bin2hex(openssl_random_pseudo_bytes(16)),
                 'user_email' => $row['email'],
                 'role' => 'multipopolare_friend',
                 'locate' => 'it_IT',
@@ -3102,7 +3102,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                     }
                 }
                 $user_input = [
-                    'user_pass' => bin2hex(openssl_random_pseudo_bytes(16, true)),
+                    'user_pass' => bin2hex(openssl_random_pseudo_bytes(16)),
                     'user_email' => $row['email'],
                     'role' => 'multipopolano',
                     'locate' => 'it_IT',
@@ -3112,7 +3112,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                     ]
                 ];
                 do {
-                    $user_login = 'mp_' . bin2hex(openssl_random_pseudo_bytes(16, true));
+                    $user_login = 'mp_' . bin2hex(openssl_random_pseudo_bytes(16));
                 } while(get_user_by('login', $user_login));
                 $user_input['user_login'] = $user_login;
                 if (isset($row['mpop_org_role'])) {
