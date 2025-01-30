@@ -411,7 +411,7 @@ createApp({
         isValidIdCard = computed(()=> {
             if (!profile.mpop_id_card_expiration) return false;
             const d = new Date(profile.mpop_id_card_expiration);
-            if (isNaN(date)) return false;
+            if (isNaN(d)) return false;
             if ((d.getFullYear() + '-' + ('0'+ (d.getMonth()+1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2)) != profile.mpop_id_card_expiration ) return false;
             if(Date.now() > d.getTime()) return false;
             return true;
