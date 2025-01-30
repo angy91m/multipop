@@ -955,7 +955,7 @@ createApp({
                     signedModuleFiles: moduleUploadData.signedModuleFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
                     idCardFiles: moduleUploadData.idCardFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
                     idCardType: moduleUploadData.idCardType,
-                    idCardNumber: moduleUploadData.idCardNumber ? moduleUploadData.idCardNumber.toUppercase() : null,
+                    idCardNumber: moduleUploadData.idCardNumber ? moduleUploadData.idCardNumber.toUpperCase() : null,
                     idCardExpiration: moduleUploadData.idCardExpiration
                 });
                 // const res = await serverReq({
