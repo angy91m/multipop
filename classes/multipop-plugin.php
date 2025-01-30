@@ -2487,9 +2487,17 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 throw new Exception('Invalid idCardNumber');
             }
             if (!empty(get_users([
-                'meta_key' => 'mpop_id_card_number',
-                'meta_value' => $post_data['idCardNumber'],
-                'meta_compare' => '=',
+                'meta_query' => [
+                    [
+                        'key' => 'mpop_id_card_number',
+                        'value' => $post_data['idCardNumber']
+                    ],
+                    [
+                        'key' => 'mpop_id_card_confirmed',
+                        'value' => '1',
+                        'type' => 'NUMERIC'
+                    ]
+                ],
                 'login__not_in' => [$user->user_login],
                 'number' => 1
             ]))) {
