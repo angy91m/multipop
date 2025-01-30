@@ -493,13 +493,13 @@ if ($this->discourse_utilities()) {
                         </select>
                         <br>
                         <br>
-                        <label>Numero documento:&nbsp;&nbsp;<input type="text" v-model="moduleUploadData.idCardNumber"/></label>
+                        <label>Numero documento:&nbsp;&nbsp;<input type="text" style="text-transform: uppercase;" v-model="moduleUploadData.idCardNumber"/></label>
                         <br>
                         <br>
                         <label>Data di scadenza documento:&nbsp;&nbsp;<input type="date" :min="maxIdCardDate" v-model="moduleUploadData.idCardExpiration"/></label>
                         <br>
                         <br>
-                        <button @click="()=>moduleUploadData.step--">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.idCardFiles.length && mainOptions.idCardTypes !== null" @click="()=>moduleUploadData.step++">Avanti</button>
+                        <button @click="()=>moduleUploadData.step--">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.idCardFiles.length || mainOptions.idCardTypes === null || !moduleUploadData.idCardNumber || !moduleUploadData.idCardExpiration" @click="()=>moduleUploadData.step++">Avanti</button>
                     </q-step>
                     <q-step
                         :name="3"
