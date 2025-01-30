@@ -119,7 +119,8 @@ if (!$errors->has_errors()) {
                                     $duplicated = get_users([
                                         'meta_key' => '_new_email',
                                         'meta_value' => $user->user_email,
-                                        'meta_compare' => '='
+                                        'meta_compare' => '=',
+                                        'number' => 1
                                     ]);
                                     if (count($duplicated)) {
                                         $errors->add(400, $error_head . "E-mail $user->user_email già registrata. Scegline un'altra.");

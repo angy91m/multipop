@@ -434,6 +434,7 @@ if ($this->discourse_utilities()) {
             <!--MODULE_UPLOAD-->
             <div v-if="selectedTab.name == 'moduleUpload' && moduleUploadData.sub">
                 <q-stepper
+                    v-if="moduleUploadData.sub.status == 'open'"
                     v-model="moduleUploadData.step"
                     vertical
                     color="primary"
@@ -520,6 +521,9 @@ if ($this->discourse_utilities()) {
                     >
                     </q-step>
                 </q-stepper>
+                <p v-if="moduleUploadData.sub.status != 'open'">
+                    Modulo correttamente caricato. Stai per essere reindirizzato...
+                </p>
             </div>
             <!--USER_SEARCH-->
             <div v-if="selectedTab.name == 'users'" id="mpop-user-search">

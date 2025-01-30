@@ -172,7 +172,8 @@ switch ($post_data['action']) {
                 'meta_key' => 'mpop_phone',
                 'meta_value' => $post_data['mpop_phone'],
                 'meta_compare' => '=',
-                'login__not_in' => [$current_user->user_login]
+                'login__not_in' => [$current_user->user_login],
+                'number' => 1
         ]))) {
             if (!isset($res_data['error'])) {
                 $res_data['error'] = [];
@@ -273,7 +274,8 @@ switch ($post_data['action']) {
                 'meta_key' => '_new_email',
                 'meta_value' => $post_data['email'],
                 'meta_compare' => '=',
-                'login__not_in' => [$current_user->user_login]
+                'login__not_in' => [$current_user->user_login],
+                'number' => 1
             ]);
             if (count($duplicated)) {
                 $res_data['error'] = ['email'];
@@ -475,12 +477,12 @@ switch ($post_data['action']) {
         $res_data['data']['sub_id'] = $sub_id;
         break;
     case 'generate_subscription_pdf':
-        $sub = $this->get_subscription_by('id', $post_data['sub_id']);
-        if (!isset($sub['user_id']) || $sub['user_id'] !== $current_user->ID || !isset($sub['status']) || $sub['status'] !== 'open') {
+        $sub = $this->get_subscription_by('id', $post_data['id']);
+        if (!$sub || !isset($sub['user_id']) || $sub['user_id'] !== $current_user->ID || !isset($sub['status']) || $sub['status'] !== 'open') {
             if (!isset( $res_data['error'])) {
                 $res_data['error'] = [];
             }
-            $res_data['error'][] = 'sub_id';
+            $res_data['error'][] = 'id';
         }
         if (isset($res_data['error']) && !empty($res_data['error'])) {
             if (!isset( $res_data['notices'])) {
@@ -507,9 +509,21 @@ switch ($post_data['action']) {
             'mpop_marketing_agree' => $sub['marketing_agree'],
             'mpop_newsletter_agree' => $sub['newsletter_agree'],
             'mpop_publish_agree' => $sub['publish_agree'],
-            'subscription_id' => $post_data['sub_id'],
+            'subscription_id' => $post_data['id'],
             'card_number' => "$current_user->ID"
         ])->export_file() );
+        break;
+    case 'module_upload':
+        try {
+            $this->module_upload($post_data, $current_user);
+            $res_data['data'] = true;
+        } catch (Exception $err) {
+            $res_data['error'] = $err->getMessage();
+            $res_data['notices'] = $err->getMessage();
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
         break;
     default:
         $res_data['error'] = ['action'];

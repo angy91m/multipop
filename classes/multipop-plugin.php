@@ -407,17 +407,19 @@ class MultipopPlugin {
                     $this->delete_temp_token($_REQUEST['mpop_mail_token']);
                     $duplicated = get_users([
                         'search' => $current_user->_new_email,
-                        'search_columns' => ['user_email']
+                        'search_columns' => ['user_email'],
+                        'number' => 1
                     ]);
-                    if (!count($duplicated)) {
+                    if (empty($duplicated)) {
                         $duplicated = get_users([
                             'meta_key' => '_new_email',
                             'meta_value' => $current_user->_new_email,
                             'meta_compare' => '=',
-                            'login__not_in' => [$current_user->user_login]
+                            'login__not_in' => [$current_user->user_login],
+                            'number' => 1
                         ]);
                     }
-                    if (count($duplicated)) {
+                    if (!empty($duplicated)) {
                         wp_update_user([
                             'ID' => $user_id,
                             'meta_input' => [
@@ -727,7 +729,7 @@ class MultipopPlugin {
                     15,
                     0,
                     1,
-                    '".base64_encode(openssl_random_pseudo_bytes(64))."',
+                    '".base64_encode(openssl_random_pseudo_bytes(64, true))."',
                     ".
                         $wpdb->prepare("%s, %s, %s",[
                             'Presto il mio consenso e fino alla revoca dello stesso, per la proposizione di offerte, comunicazioni commerciali e per il successivo invio di materiale informativo pubblicitario e/o promozionale e/o sondaggi di opinione, ricerche di mercato, invio di newsletter (di seguito complessivamente definite “attività di propaganda”) di MULTIPOPOLARE APS e/o da organizzazioni correlate. Il trattamento per attività di marketing avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea e/o chiamate da operatore), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo SMS e/o MMS, chiamate telefoniche senza l’intervento dell’operatore, posta elettronica, social network, newsletter, applicazioni interattive, notifiche push).',
@@ -894,6 +896,36 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $pdf = new MultipoPDF($pdf_config+['logo'=> MULTIPOP_PLUGIN_PATH . '/logo-pdf.png']);
         require_once(MULTIPOP_PLUGIN_PATH . '/modulo-iscrizione.php');
         return $export ? $pdf->export_file() : $pdf;
+    }
+
+    // MERGE PDF
+    private function merge_pdf_from_array(array &$data = [], $accepted_mime = ['application/pdf', 'image/jpeg', 'image/png']) {
+        if (!is_array($data) || empty($data)) {
+            throw new Exception('Invalid or empty data');
+        }
+        $pdf = $this->empty_pdf();
+        foreach ($data as &$f) {
+            if (!isset($f['content']) || !is_string($f['content']) || !$f['content']) {
+                throw new Exception('Invalid content');
+            }
+            $comma_pos = strpos($f['content'], ',');
+            if ($comma_pos === false) {
+                throw new Exception('Invalid content');
+            }
+            $fs = base64_decode( substr($f['content'], $comma_pos+1), true);
+            $mime = $this->check_mime_type($fs, $accepted_mime);
+            if (!$mime) {
+                throw new Exception('Invalid content');
+            }
+            switch ($mime) {
+                case 'application/pdf':
+                    $this->pdf_import($fs, $pdf);
+                    break;
+                default:
+                    $pdf->AddSingleImage($fs);
+            }
+        }
+        return $pdf;
     }
     
     // IMPORT PDF
@@ -1194,7 +1226,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $row = true;
         $token = '';
         while( $row ) {
-            $token = bin2hex(openssl_random_pseudo_bytes(16));
+            $token = bin2hex(openssl_random_pseudo_bytes(16, true));
             $q = "SELECT * FROM " . $this::db_prefix('temp_tokens') . " WHERE `id` = '$token' LIMIT 1;";
             $row = $wpdb->get_row( $q, ARRAY_A );
         }
@@ -1530,14 +1562,16 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                         if ($user->_new_email) {
                             $duplicated = get_users([
                                 'search' => $user->_new_email,
-                                'search_columns' => ['user_email']
+                                'search_columns' => ['user_email'],
+                                'number' => 1
                             ]);
                             if (!count($duplicated)) {
                                 $duplicated = get_users([
                                     'meta_key' => '_new_email',
                                     'meta_value' => $user->_new_email,
                                     'meta_compare' => '=',
-                                    'login__not_in' => [$user->user_login]
+                                    'login__not_in' => [$user->user_login],
+                                    'number' => 1
                                 ]);
                             }
                             if (count($duplicated)) {
@@ -1695,7 +1729,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             string $iv = ''
     ) {
         if (empty($iv)) {
-            $iv = openssl_random_pseudo_bytes(16);
+            $iv = openssl_random_pseudo_bytes(16, true);
         } else if (strlen($iv) != 16) {
             throw new Exception('Invalid IV');
         }
@@ -1725,7 +1759,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         int $iterations = 900000,
         int $salt_length = 32
     ) {
-        $salt = openssl_random_pseudo_bytes($salt_length);
+        $salt = openssl_random_pseudo_bytes($salt_length, true);
         return $iterations . '#' . $salt . $this->encrypt(
             $data,
             hash_pbkdf2( 'sha3-512', $password, $salt, $iterations, 32, true ),
@@ -1741,7 +1775,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         #[\SensitiveParameter]
             string $pub_key = ''
     ) {
-        $symkey = openssl_random_pseudo_bytes(32);
+        $symkey = openssl_random_pseudo_bytes(32, true);
         $pub_key = openssl_pkey_get_public( "-----BEGIN PUBLIC KEY-----\n". base64_encode($pub_key) . "\n-----END PUBLIC KEY-----");
         openssl_public_encrypt($symkey, $enc_key, $pub_key, OPENSSL_PKCS1_OAEP_PADDING);
         return strlen($enc_key) . '#' . $enc_key . $this->encrypt($data,$symkey);
@@ -2433,6 +2467,83 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         return $mime;
     }
+    private function module_upload(array &$post_data, $user) {
+        if (!$this->settings['master_doc_pubkey']) {
+            throw new Exception('Server not ready to get subscriptions');
+        }
+        $sub = $this->get_subscription_by('id', $post_data['id']);
+        if (!$sub || !isset($sub['user_id']) || $sub['user_id'] !== $user->ID || !isset($sub['status']) || $sub['status'] !== 'open') {
+            throw new Exception('Invalid id');
+        }
+        $require_id_card = true;
+        if ($user->mpop_id_card_expiration) {
+            $ex_date = date_create_from_format('Y-m-dHis e', $user->mpop_id_card_expiration . '000000 Europe/Rome');
+            if ( time() < $ex_date->getTimestamp() ) {
+                $require_id_card = false;
+            }
+        }
+        if ($require_id_card) {
+            if (!isset($post_data['idCardNumber']) || !is_string($post_data['idCardNumber']) || !preg_match('/^[A-Z0-9]{7,}$/', $post_data['idCardNumber'])) {
+                throw new Exception('Invalid idCardNumber');
+            }
+            if (!empty(get_users([
+                'meta_key' => 'mpop_id_card_number',
+                'meta_value' => $post_data['idCardNumber'],
+                'meta_compare' => '=',
+                'login__not_in' => [$user->user_login],
+                'number' => 1
+            ]))) {
+                throw new Exception('Duplicated ID card number');
+            }
+            if (!isset($post_data['idCardType']) || !is_int($post_data['idCardType']) || !in_array($post_data['idCardType'],$this->id_card_types)) {
+                throw new Exception('Invalid idCardType');
+            }
+            if (!isset($post_data['idCardExpiration']) || !is_string($post_data['idCardExpiration'])) {
+                throw new Exception('Invalid idCardExpiration');
+            }
+            $ex_date = null;
+            try {
+                $ex_date = static::validate_date($post_data['idCardExpiration']);
+            } catch (Exception $err) {
+                throw new Exception('Invalid idCardExpiration');
+            }
+            if (!isset($post_data['idCardFiles']) || !is_array($post_data['idCardFiles']) || empty($post_data['idCardFiles']) || count($post_data['idCardFiles']) > 2 ) {
+                throw new Exception('Invalid idCardFiles');
+            }
+            $id_card_pdf = null;
+            try {
+                $id_card_pdf = $this->merge_pdf_from_array($post_data['idCardFiles']);
+            } catch (Exception $err) {
+                throw new Exception('Invalid idCardFiles');
+            }
+        }
+        if (!isset($post_data['signedModuleFiles']) || !is_array($post_data['signedModuleFiles']) || empty($post_data['signedModuleFiles']) || count($post_data['signedModuleFiles']) > 2 ) {
+            throw new Exception('Invalid signedModuleFiles');
+        }
+        $signed_module_pdf = null;
+        try {
+            $signed_module_pdf = $this->merge_pdf_from_array($post_data['signedModuleFiles']);
+        } catch (Exception $err) {
+            throw new Exception('Invalid signedModuleFiles');
+        }
+        $date_now = date_create('now', new DateTimeZone(current_time('e')));
+        $rand_file_name = $date_now->format('YmdHis');
+        if ($require_id_card) {
+            file_put_contents( MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $rand_file_name . '-idcard-' . $post_data['id'] . '-' . $user->ID .'.pdf.enc', $this->encrypt_asym( $id_card_pdf->export_file(), base64_decode($this->settings['master_doc_pubkey'], true)));
+        }
+        file_put_contents( MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $rand_file_name . '-sub-' . $post_data['id'] . '-' . $user->ID .'.pdf.enc', $this->encrypt_asym( $signed_module_pdf->export_file(), base64_decode($this->settings['master_doc_pubkey'], true)));
+        global $wpdb;
+        return $wpdb->update(
+            $wpdb->prefix . 'mpop_subscriptions',
+            [
+                'status' => 'tosee',
+                'filename' => $rand_file_name
+            ],
+            [
+                'id' => $post_data['id']
+            ]
+        );
+    }
     private function create_subscription(
         int $user_id,
         int $year,
@@ -2494,7 +2605,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             throw new Exception('Invalid user');
         }
         $date_now = date_create('now', new DateTimeZone(current_time('e')));
-        $rand_file_name = $date_now->format('YmdHis');
         // $from_user_web_form = false;
         // if ($pdf_b64) {
         //     $from_user_web_form = true;
@@ -2569,9 +2679,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $notes = trim($notes);
         if ($notes) {
             $insert_data[] = ['notes', $notes, '%s'];
-        }
-        if ($from_user_web_form) {
-            $insert_data[] = ['filename', $rand_file_name, '%s'];
         }
         global $wpdb;
         if ($wpdb->insert(
@@ -2878,7 +2985,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $old_user = get_users([
                 'meta_key' => '_new_email',
                 'meta_value' => $row['email'],
-                'meta_compare' => '='
+                'meta_compare' => '=',
+                'number' => 1
             ]);
             if (!empty($old_user)) {
                 $old_user = $old_user[0];
@@ -2905,7 +3013,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             }
             $user_input = [
                 'user_login' => $row['mpop_friend'],
-                'user_pass' => bin2hex(openssl_random_pseudo_bytes(16)),
+                'user_pass' => bin2hex(openssl_random_pseudo_bytes(16, true)),
                 'user_email' => $row['email'],
                 'role' => 'multipopolare_friend',
                 'locate' => 'it_IT',
@@ -2979,13 +3087,14 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                     if (!empty(get_users([
                         'meta_key' => 'mpop_phone',
                         'meta_value' => $row['mpop_phone'],
-                        'meta_compare' => '='
+                        'meta_compare' => '=',
+                        'number' => 1
                     ]))) {
                         throw new Exception('Duplicated phone: ' . $row['mpop_phone']);
                     }
                 }
                 $user_input = [
-                    'user_pass' => bin2hex(openssl_random_pseudo_bytes(16)),
+                    'user_pass' => bin2hex(openssl_random_pseudo_bytes(16, true)),
                     'user_email' => $row['email'],
                     'role' => 'multipopolano',
                     'locate' => 'it_IT',
@@ -2995,7 +3104,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                     ]
                 ];
                 do {
-                    $user_login = 'mp_' . bin2hex(openssl_random_pseudo_bytes(16));
+                    $user_login = 'mp_' . bin2hex(openssl_random_pseudo_bytes(16, true));
                 } while(get_user_by('login', $user_login));
                 $user_input['user_login'] = $user_login;
                 if (isset($row['mpop_org_role'])) {

@@ -955,37 +955,38 @@ createApp({
                     signedModuleFiles: moduleUploadData.signedModuleFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
                     idCardFiles: moduleUploadData.idCardFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
                     idCardType: moduleUploadData.idCardType,
-                    idCardNumber: moduleUploadData.idCardNumber ? moduleUploadData.idCardNumber.toUpperCase() : null,
+                    idCardNumber: moduleUploadData.idCardNumber ? moduleUploadData.idCardNumber.toUpperCase().trim() : null,
                     idCardExpiration: moduleUploadData.idCardExpiration
                 });
-                // const res = await serverReq({
-                //     action: 'module_upload',
-                //     id: moduleUploadData.sub.id,
-                //     signedModuleFiles: moduleUploadData.signedModuleFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
-                //     idCardFiles: moduleUploadData.idCardFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
-                //     idCardType: moduleUploadData.idCardType,
-                //     idCardNumber: moduleUploadData.idCardNumber,
-                //     idCardExpiration: moduleUploadData.idCardExpiration
-                // });
-                // if (res.ok) {
-                //     const resJson = await res.json();
-                //     if (resJson.data) {
-                //         // OK
-                //     }
-                //     generateNotices(resJson.notices || []);
-                // } else {
-                //     try {
-                //         const {error, notices} = await res.json();
-                //         if (error) {
-                //             console.error(error);
-                //             generateNotices(notices || []);
-                //         } else {
-                //             console.error('Unknown error');
-                //         }
-                //     } catch {
-                //         console.error('Unknown error');
-                //     }
-                // }
+                const res = await serverReq({
+                    action: 'module_upload',
+                    id: moduleUploadData.sub.id,
+                    signedModuleFiles: moduleUploadData.signedModuleFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
+                    idCardFiles: moduleUploadData.idCardFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
+                    idCardType: moduleUploadData.idCardType,
+                    idCardNumber: moduleUploadData.idCardNumber ? moduleUploadData.idCardNumber.toUpperCase().trim() : null,
+                    idCardExpiration: moduleUploadData.idCardExpiration
+                });
+                if (res.ok) {
+                    const resJson = await res.json();
+                    if (resJson.data) {
+                        moduleUploadData.sub.status = 'tosee';
+                        setTimeout(() => location.reload(), 3000);
+                    }
+                    generateNotices(resJson.notices || []);
+                } else {
+                    try {
+                        const {error, notices} = await res.json();
+                        if (error) {
+                            console.error(error);
+                            generateNotices(notices || []);
+                        } else {
+                            console.error('Unknown error');
+                        }
+                    } catch {
+                        console.error('Unknown error');
+                    }
+                }
                 moduleUploadDataSending.value = false;
             }
         }
@@ -1085,7 +1086,7 @@ createApp({
             try {
                 const res = await serverReq({
                     action: 'generate_subscription_pdf',
-                    sub_id: id
+                    id
                 });
                 if (res.ok) {
                     const resData = await res.json();
