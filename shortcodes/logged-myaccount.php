@@ -433,7 +433,7 @@ if ($this->discourse_utilities()) {
             </div>
             <!--MODULE_UPLOAD-->
             <div v-if="selectedTab.name == 'moduleUpload' && moduleUploadData.sub">
-                <!-- <q-stepper
+                <q-stepper
                     v-model="moduleUploadData.step"
                     vertical
                     color="primary"
@@ -491,9 +491,9 @@ if ($this->discourse_utilities()) {
                             <option v-for="(t, k) in mainOptions.idCardTypes" :key="k" :value="k">{{t}}</option>
                         </select>
                         <br>
-                        <label>Numero documento:&nbsp;&nbsp;<input type="text" v-module="moduleUploadData.idCardNumber"/></label>
+                        <label>Numero documento:&nbsp;&nbsp;<input type="text" v-model="moduleUploadData.idCardNumber"/></label>
                         <br>
-                        <label>Data di scadenza documento:&nbsp;&nbsp;<input type="date" :min="maxIdCardDate" v-module="moduleUploadData.idCardExpiration"/></label>
+                        <label>Data di scadenza documento:&nbsp;&nbsp;<input type="date" :min="maxIdCardDate" v-model="moduleUploadData.idCardExpiration"/></label>
                         <br>
                         <button @click="()=>moduleUploadData.step--">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.idCardFiles.length && mainOptions.idCardTypes !== null" @click="()=>moduleUploadData.step++">Avanti</button>
                     </q-step>
@@ -515,7 +515,7 @@ if ($this->discourse_utilities()) {
                         icon="download_done"
                     >
                     </q-step>
-                </q-stepper> -->
+                </q-stepper>
             </div>
             <!--USER_SEARCH-->
             <div v-if="selectedTab.name == 'users'" id="mpop-user-search">
