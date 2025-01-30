@@ -486,14 +486,18 @@ if ($this->discourse_utilities()) {
                             :disabled="moduleUploadData.idCardFiles.length == 2"
                         >Seleziona file da caricare</mpop-uploader>
                         <br>
+                        <br>
                         <select v-model="moduleUploadData.idCardType">
                             <option disabled :value="null">Seleziona il tipo di documento</option>
                             <option v-for="(t, k) in mainOptions.idCardTypes" :key="k" :value="k">{{t}}</option>
                         </select>
                         <br>
+                        <br>
                         <label>Numero documento:&nbsp;&nbsp;<input type="text" v-model="moduleUploadData.idCardNumber"/></label>
                         <br>
+                        <br>
                         <label>Data di scadenza documento:&nbsp;&nbsp;<input type="date" :min="maxIdCardDate" v-model="moduleUploadData.idCardExpiration"/></label>
+                        <br>
                         <br>
                         <button @click="()=>moduleUploadData.step--">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.idCardFiles.length && mainOptions.idCardTypes !== null" @click="()=>moduleUploadData.step++">Avanti</button>
                     </q-step>
