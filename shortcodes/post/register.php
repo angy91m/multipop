@@ -89,6 +89,7 @@ $user_id = wp_insert_user([
         // 'mpop_billing_zip' => false,
         // 'mpop_billing_country' => false,
         // 'mpop_phone' => false,
+        // 'mpop_id_card_confirmed' => false,
         // 'mpop_id_card_type' => false,
         // 'mpop_id_card_number' => false,
         // 'mpop_id_card_expiration' => false,

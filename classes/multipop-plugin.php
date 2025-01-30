@@ -2283,7 +2283,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             'mpop_org_role' => $user->mpop_org_role,
             'mpop_invited' => boolval($user->mpop_invited),
             'mpop_resp_zones' => [],
-            'mpop_id_card_expiration' => $user->mpop_id_card_expiration,
+            'mpop_id_card_expiration' => $user->mpop_id_card_confirmed ? $user->mpop_id_card_expiration : '',
             'mpop_my_subscriptions' => $this->get_my_subscriptions($user->ID)
         ];
         if (in_array($parsed_user['role'], ['administrator', 'multipopolare_resp'])) {
