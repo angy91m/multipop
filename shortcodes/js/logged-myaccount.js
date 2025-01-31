@@ -1584,6 +1584,7 @@ createApp({
             moduleUploadDataSending,
             isValidIdCard,
             viewSub,
+            subInView,
             consoleLog: v => console.log(v)
         };
     }
