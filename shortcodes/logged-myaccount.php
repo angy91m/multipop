@@ -790,7 +790,7 @@ if ($this->discourse_utilities()) {
                             </ul>
                             <template v-if="typeof subInView.files[0] == 'string'">
                                 <br>
-                                <input type="password" @input="e => consoleLog(e)" v-model="documentsDecryptPassword" />
+                                <input type="password" @input="e => consoleLog(documentsDecryptPassword)" v-model="documentsDecryptPassword" />
                                 <button :disabled="!documentsDecryptPassword || documentsDecrypting" @click="documentsDecrypt">Sblocca documenti</button>
                             </template>
                         </td>
