@@ -1186,15 +1186,6 @@ createApp({
                 && moduleUploadData.generalPolicyAccept
             ) {
                 moduleUploadDataSending.value = true;
-                console.log({
-                    action: 'module_upload',
-                    id: moduleUploadData.sub.id,
-                    signedModuleFiles: moduleUploadData.signedModuleFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
-                    idCardFiles: moduleUploadData.idCardFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
-                    idCardType: moduleUploadData.idCardType,
-                    idCardNumber: moduleUploadData.idCardNumber ? moduleUploadData.idCardNumber.toUpperCase().trim() : null,
-                    idCardExpiration: moduleUploadData.idCardExpiration
-                });
                 const res = await serverReq({
                     action: 'module_upload',
                     id: moduleUploadData.sub.id,
@@ -1827,8 +1818,7 @@ createApp({
             documentsDecryptPassword,
             decryptPasswordSave,
             profileSubCancel,
-            subCancel,
-            consoleLog: v => console.log(v)
+            subCancel
         };
     }
 })
