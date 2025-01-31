@@ -496,6 +496,49 @@ switch( $post_data['action'] ) {
         unset($sub['filename']);
         $res_data['data'] = $sub + ['files' => $sub_files];
         break;
+    case 'admin_documents_decrypt':
+        if (!isset($post_data['id']) || !is_int($post_data['id'])) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip']);
+        if (!$sub) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        if (!isset($post_data['password']) || !is_string($post_data['password']) || !$post_data['password']) {
+            $res_data['error'] = ['password'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Password non valida']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        try {
+            $docs = $this->decrypt_module_documents($sub, $post_data['password']);
+            if (!$docs || !is_array($docs)) {
+                $res_data['error'] = ['password'];
+                $res_data['notices'] = [['type'=>'error', 'msg' => 'Password non valida']];
+                http_response_code( 400 );
+                echo json_encode( $res_data );
+                exit;
+            }
+            $res_data['data'] = $docs;
+        } catch(Exception $err) {
+            $res_data['error'] = ['password'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Password non valida']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+
+
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];

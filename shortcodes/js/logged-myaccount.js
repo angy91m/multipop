@@ -266,6 +266,8 @@ createApp({
         pwdChangeFields = reactive({}),
         pwdChanging = ref(false),
         csvUsers = reactive([]),
+        documentsDecrypting = ref(false),
+        documentsDecryptPassword = ref(''),
         csvImportOptions = reactive({
             forceQuote: false,
             forceYear: false,
@@ -856,6 +858,38 @@ createApp({
                 }
             }
             saving.value = false;
+        }
+        async function documentsDecrypt() {
+            documentsDecrypting.value = true;
+            if (documentsDecryptPassword.value) {
+                const res = await serverReq({
+                    action: 'admin_documents_decrypt',
+                    password: documentsDecryptPassword.value,
+                    id: subInView.id
+                });
+                if (res.ok) {
+                    const resData = await res.json();
+                    if (resData.data && Array.isArray(resData.data)) {
+                        console.log(resData.data);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                    generateNotices(resData.notices || []);
+                } else {
+                    try {
+                        const {error, notices} = await res.json();
+                        if (error) {
+                            staticPwdErrors.push(...error);
+                            generateNotices(notices || []);
+                        } else {
+                            console.error('Unknown error');
+                        }
+                    } catch {
+                        console.error('Unknown error');
+                    }
+                }
+                documentsDecrypting.value = false;
+            }
         }
         async function changePassword() {
             pwdChanging.value = true;
@@ -1496,8 +1530,13 @@ createApp({
             window.alert('Formato file non valido');
         }
         function formatSubFiles(files) {
-            console.log(files);
-            return files.map(f => subFilesType.find(sft => f == sft.name).label).join(', ');
+            return files.map(f => {
+                if (typeof f == 'string') {
+                    return subFilesType.find(sft => f == sft.name).label;
+                } else {
+                    return '<a href="' + f.content + '" target="_blank">' + subFilesType.find(sft => f.name == sft.name).label + '</a>';
+                }
+            }).join(', ');
         }
         return {
             selectedTab,
@@ -1605,6 +1644,9 @@ createApp({
             timestampToFullDatetimeString,
             subFilesType,
             formatSubFiles,
+            documentsDecrypt,
+            documentsDecrypting,
+            documentsDecryptPassword,
             consoleLog: v => console.log(v)
         };
     }
