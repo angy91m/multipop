@@ -201,11 +201,13 @@ createApp({
             name: 'users',
             label: 'Utenti',
             admin: true
-        }, {
-            name: 'subscriptions',
-            label: 'Tessere',
-            admin: true
-        }, {
+        },
+        // {
+        //     name: 'subscriptions',
+        //     label: 'Tessere',
+        //     admin: true
+        // },
+        {
             name: 'uploadUserCsv',
             label: 'Carica CSV Utenti',
             admin: true
@@ -215,6 +217,7 @@ createApp({
         profileInEditing = reactive({}),
         userInEditing = reactive({}),
         userInView = reactive({}),
+        subInView = reactive({}),
         profileEditing = ref(false),
         userEditing = ref(false),
         birthplaceCountryOpen = ref(false),
