@@ -683,7 +683,6 @@ class MultipopPlugin {
             `completer_id` BIGINT UNSIGNED NULL,
             `completer_ip` VARCHAR(255) NULL,
             `notes` TEXT NULL,
-            `user_payment_notes` TEXT NULL,
             PRIMARY KEY (`id`)
         ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
         dbDelta( $q );
@@ -3506,7 +3505,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             'mpop_billing_country' => [],
             'mpop_billing_state' => [],
             'mpop_billing_city' => [],
-            'user_payment_notes_not_null' => null,
             'page' => 1,
             'pagination' => true,
             'order_by' => ['s.updated_at' => false],
@@ -3689,11 +3687,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 "( users.user_login LIKE %s
                 OR users.user_email LIKE %s
                 OR fn.meta_value LIKE %s
-                OR ln.meta_value LIKE %s
-                OR s.notes LIKE %s
-                OR s.user_payment_notes %s )",
-                $sanitized_value,
-                $sanitized_value,
+                OR ln.meta_value LIKE %s )",
                 $sanitized_value,
                 $sanitized_value,
                 $sanitized_value,
@@ -3769,9 +3763,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         if (count($options['mpop_billing_city'])) {
             $append_to_where("comune.meta_value IN ( " . implode(',', array_map(function($s) {return "'$s'";}, $options['mpop_billing_city'])) . " )");
-        }
-        if (!is_null($options['user_payment_notes_not_null'])) {
-            $append_to_where("s.user_payment_notes IS " . ($options['user_payment_notes_not_null'] ? 'NOT' : '') . " NULL" );
         }
 
         $q_from = "FROM "
@@ -3931,11 +3922,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 $q->query_where .= $wpdb->prepare(" AND subs.status IN ( $w_status ) ", ...$filtered_status);
             } 
         }
-        if (isset($q->query_vars['user_payment_notes_not_null'])) {
-            $sub_search = true;
-            $user_payment_notes_not_null = $q->query_vars['user_payment_notes_not_null'] ? 'NOT' : '';
-            $q->query_where .= " AND subs.user_payment_notes IS $user_payment_notes_not_null NULL ";
-        }
         if ($sub_search) {
             $q->query_from .= " INNER JOIN " . $this::db_prefix('subscriptions') . " AS subs ON $wpdb->users.ID = subs.user_id ";
         }
@@ -3969,7 +3955,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $mpop_mail_to_confirm = null,
         $subs_years = [],
         array $subs_statuses = [],
-        $user_payment_notes_not_null = null,
         $page = 1,
         $sort_by = ['ID' => true],
         $limit = 100
@@ -4013,9 +3998,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         if (is_array($subs_statuses) && !empty($subs_statuses)) {
             $query['mpop_subs_status_in'] = $subs_statuses;
-        }
-        if (!is_null($user_payment_notes_not_null)) {
-            $query['user_payment_notes_not_null'] = boolval($user_payment_notes_not_null);
         }
         $meta_q = [
             'relation' => 'AND',

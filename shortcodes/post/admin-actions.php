@@ -13,7 +13,6 @@ switch( $post_data['action'] ) {
             $post_data['mpop_mail_to_confirm'],
             $post_data['subs_years'],
             $post_data['subs_statuses'],
-            $post_data['user_payment_notes_not_null'],
             $post_data['page'],
             $post_data['sortBy']
         );

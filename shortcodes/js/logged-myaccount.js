@@ -298,8 +298,7 @@ createApp({
             mpop_card_active: null,
             mpop_mail_to_confirm: null,
             subs_years: [],
-            subs_statuses: [],
-            user_payment_notes_not_null: null
+            subs_statuses: []
         }),
         userSearching = ref(false),
         zoneSearch = reactive({

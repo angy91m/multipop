@@ -350,6 +350,9 @@ if ($this->discourse_utilities()) {
                                 <button v-if="nearActiveSub.status == 'open'" class="mpop-button" @click="generateSubscriptionPdf(nearActiveSub.id)" :disabled="generatingSubscriptionPdf.find( v => v == nearActiveSub.id)">Genera modulo iscrizione</button>
                                 <button v-if="nearActiveSub.status == 'open'" class="mpop-button" @click="moduleUploadBegin(nearActiveSub)">Carica modulo</button>
                                 <button v-if="!['canceled', 'completed', 'refused'].includes(nearActiveSub.status)" class="mpop-button" @click="profileSubCancel(nearActiveSub)">Annulla richiesta</button>
+                                <li v-if="nearActiveSub.status == 'seen'"><strong>Pagamento con bonifico</strong><br>
+                                    Per pagare con bonifico, dopo aver effettuato il pagamento, invia una e-mail dall'indirizzo registrato sul sito a <?=$this->settings['mail_from']?> con gli eventuali riferimenti e scansione della ricevuta.
+                                </li>
                                 <template v-if="nearActiveSub.pp_order_id">
                                     <li>PayPal ID: {{nearActiveSub.pp_order_id}}</li>
                                     <li v-if="nearActiveSub.status == 'seen'">Paga</li>
@@ -602,15 +605,6 @@ if ($this->discourse_utilities()) {
                         @update:model-value="triggerSearchUsers"
                         map-options
                     ></q-select>
-                </div>
-                <div class="mpop-user-search-field">
-                    <label>Pagamento notificato dall'utente&nbsp;
-                        <select v-model="userSearch.user_payment_notes_not_null" @change="triggerSearchUsers">
-                            <option :value="null"></option>
-                            <option :value="true">Sì</option>
-                            <option :value="false">No</option>
-                        </select>
-                    </label>
                 </div>
                 <div>
                     <div class="mpop-user-search-field mpop-50-wid">
