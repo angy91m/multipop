@@ -471,7 +471,7 @@ switch( $post_data['action'] ) {
             echo json_encode( $res_data );
             exit;
         }
-        $sub = $this->get_subscription_by('id', $post_data['id']);
+        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip']);
         if (!$sub) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
@@ -490,10 +490,10 @@ switch( $post_data['action'] ) {
                 $sub_files[] = 'idCard';
             }
         }
-        save_test($this->get_filename_by_sub($sub));
         if (file_exists($this->get_filename_by_sub($sub)) || file_exists($this->get_filename_by_sub($sub, false, false))) {
             $sub_files[] = 'signedModule';
         }
+        unset($sub['filename']);
         $res_data['data'] = $sub + ['files' => $sub_files];
         break;
     default:
