@@ -2498,7 +2498,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             ]
         );
     }
-    private function refuse_module_documents($sub) {
+    private function refuse_subscription($sub) {
         $sub_user = get_user_by('ID', $sub);
         if ($sub_user && !$this->user_has_valid_id_card($sub_user)) {
             delete_user_meta($sub_user->ID, 'mpop_id_card_number');

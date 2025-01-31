@@ -582,6 +582,72 @@ switch( $post_data['action'] ) {
             exit;
         }
         break;
+    case 'admin_subscription_refuse':
+        if (!isset($post_data['id']) || !is_int($post_data['id'])) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip']);
+        if (!$sub || in_array( $sub['status'], ['refused', 'canceled', 'completed'])) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        try {
+            if (!$this->refuse_subscription($sub)) {
+                $res_data['error'] = ['unknown_error'];
+                $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
+                http_response_code( 400 );
+                echo json_encode( $res_data );
+                exit;
+            }
+            $res_data['data'] = true;
+        } catch (Exception $err) {
+            $res_data['error'] = [$err->getMessage()];
+            $res_data['notices'] = [['type'=>'error', 'msg'=>$err->getMessage()]];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        break;
+    case 'admin_payment_confirm':
+        if (!isset($post_data['id']) || !is_int($post_data['id'])) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip']);
+        if (!$sub || $sub['status'] != 'seen') {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        try {
+            if (!$this->complete_subscription($sub['id'])) {
+                $res_data['error'] = ['unknown_error'];
+                $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
+                http_response_code( 400 );
+                echo json_encode( $res_data );
+                exit;
+            }
+            $res_data['data'] = true;
+        } catch (Exception $err) {
+            $res_data['error'] = [$err->getMessage()];
+            $res_data['notices'] = [['type'=>'error', 'msg'=>$err->getMessage()]];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];

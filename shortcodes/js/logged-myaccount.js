@@ -863,7 +863,8 @@ createApp({
             documentsLoading.value = true;
             const res = await serverReq({
                 action: 'admin_documents_confirm',
-                id: subInView.id
+                id: subInView.id,
+                forceIdCard: subInView.forceIdCard
             });
             if (res.ok) {
                 const resData = await res.json();
@@ -889,7 +890,90 @@ createApp({
             documentsLoading.value = false;
         }
         async function subscriptionRefuse() {
-
+            documentsLoading.value = true;
+            const res = await serverReq({
+                action: 'admin_subscription_refuse',
+                id: subInView.id
+            });
+            if (res.ok) {
+                const resData = await res.json();
+                if (resData.data) {
+                    viewSub(subInView.id, true);
+                } else {
+                    console.error('Unknown error');
+                }
+                generateNotices(resData.notices || []);
+            } else {
+                try {
+                    const {error, notices} = await res.json();
+                    if (error) {
+                        staticPwdErrors.push(...error);
+                        generateNotices(notices || []);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } catch {
+                    console.error('Unknown error');
+                }
+            }
+            documentsLoading.value = false;
+        }
+        async function paymentConfirm() {
+            documentsLoading.value = true;
+            const res = await serverReq({
+                action: 'admin_payment_confirm',
+                id: subInView.id
+            });
+            if (res.ok) {
+                const resData = await res.json();
+                if (resData.data) {
+                    viewSub(subInView.id, true);
+                } else {
+                    console.error('Unknown error');
+                }
+                generateNotices(resData.notices || []);
+            } else {
+                try {
+                    const {error, notices} = await res.json();
+                    if (error) {
+                        staticPwdErrors.push(...error);
+                        generateNotices(notices || []);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } catch {
+                    console.error('Unknown error');
+                }
+            }
+            documentsLoading.value = false;
+        }
+        async function saveSubNotes() {
+            documentsLoading.value = true;
+            const res = await serverReq({
+                action: 'admin_save_sub_notes',
+                id: subInView.id,
+                notes: subInView.notes || ''
+            });
+            if (res.ok) {
+                const resData = await res.json();
+                if (!resData.data) {
+                    console.error('Unknown error');
+                }
+                generateNotices(resData.notices || []);
+            } else {
+                try {
+                    const {error, notices} = await res.json();
+                    if (error) {
+                        staticPwdErrors.push(...error);
+                        generateNotices(notices || []);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } catch {
+                    console.error('Unknown error');
+                }
+            }
+            documentsLoading.value = false;
         }
         async function documentsDecrypt() {
             if (documentsDecryptPassword.value) {
@@ -1028,6 +1112,7 @@ createApp({
                     cancelSubInView();
                     Object.assign(subInView, sub.data);
                     subInView.documentToShow = null;
+                    subInView.forceIdCard = false;
                 } else {
                     console.error('Unknown error');
                 }
@@ -1685,6 +1770,8 @@ createApp({
             documentsLoading,
             documentsConfirm,
             subscriptionRefuse,
+            paymentConfirm,
+            saveSubNotes,
             documentsDecryptPassword,
             decryptPasswordSave,
             consoleLog: v => console.log(v)

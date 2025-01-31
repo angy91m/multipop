@@ -773,7 +773,7 @@ if ($this->discourse_utilities()) {
                     </tr>
                     <tr>
                         <td><strong>Note:</strong></td>
-                        <td><textarea>{{subInView.notes || ''}}</textarea></td>
+                        <td><textarea >{{subInView.notes || ''}}</textarea><br><button @click="saveSubNotes">Salva note</button></td>
                     </tr>
                     <tr>
                         <td><strong>Ultima modifica:</strong></td>
@@ -808,9 +808,11 @@ if ($this->discourse_utilities()) {
                                 <button :disabled="!documentsDecryptPassword || documentsLoading" @click="documentsDecrypt">Sblocca documenti</button>
                             </template>
                             <template v-else>
-                                <button @click="documentsConfirm">Conferma i documenti</button>&nbsp;&nbsp;
-                                <button @click="subscriptionRefuse">Rifiuta la richiesta</button>
+                                <label><input v-if="!subInView.user_id_card_confirmed" type="checkbox" v-model="subInView.forceIdCard" />&nbsp;&nbsp;Forza documento d'identità</label>
+                                <button v-if="subInView.status == 'tosee'" :disabled="!subInView.user_id_card_confirmed && !subInView.forceIdCard" @click="documentsConfirm" style="margin-right:2px">Conferma i documenti</button>
                             </template>
+                            <button v-if="subInView.status == 'seen'" @click="paymentConfirm" style="margin-right:2px">Conferma pagamento</button>
+                            <button @click="subscriptionRefuse" v-if="!['canceled', 'refused', 'completed'].includes(subInView.status)" style="margin-right:2px">Rifiuta la richiesta</button>
                         </td>
                     </tr>
                 </table>
