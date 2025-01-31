@@ -720,7 +720,7 @@ if ($this->discourse_utilities()) {
                     </tr>
                     <tr>
                         <td><strong>Stato:</strong></td>
-                        <td>{{userSearchSelectableSubStatuses.find(s => s.value == subInView.status).label}}</td>
+                        <td>{{userSearchSelectableSubStatuses.find(s => s.value == subInView.status)?.label}}</td>
                     </tr>
                     <tr>
                         <td><strong>Quota annuale:</strong></td>
