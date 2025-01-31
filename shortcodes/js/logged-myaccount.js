@@ -868,8 +868,8 @@ createApp({
                     id: subInView.id
                 });
                 if (res.ok) {
-                    const resDataBytes = await res.bytes();
-                    console.log(resDataBytes);
+                    console.log(res);
+                    //const resDataBytes = await res.bytes();
                     // if (resData.data && Array.isArray(resData.data)) {
                     //     console.log(resData.data);
                     //     // subInView.files.length = 0;
