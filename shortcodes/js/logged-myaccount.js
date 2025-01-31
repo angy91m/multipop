@@ -889,7 +889,7 @@ createApp({
             documentsLoading.value = false;
         }
         async function subscriptionRefuse() {
-            
+
         }
         async function documentsDecrypt() {
             if (documentsDecryptPassword.value) {
@@ -1684,6 +1684,7 @@ createApp({
             documentsDecrypt,
             documentsLoading,
             documentsConfirm,
+            subscriptionRefuse,
             documentsDecryptPassword,
             decryptPasswordSave,
             consoleLog: v => console.log(v)
