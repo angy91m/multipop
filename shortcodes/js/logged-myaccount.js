@@ -1538,14 +1538,12 @@ createApp({
                 } else if (url.searchParams.has('view-sub')) {
                     viewSub(parseInt(url.searchParams.get('view-sub'), 10), popstate);
                 }
-                // FOR FAST DATA REFRESH UNCOMMENT FOLLOWING
-                // if (tab.name == 'card') {
-                //     getAuthorizedSubscriptionYears();
-                //     getProfile();
-                // } else if(tab.name == 'summary') {
-                //     getProfile();
-                // } else
-                if (tab.name == 'uploadUserCsv') {
+                if (tab.name == 'card') {
+                    getAuthorizedSubscriptionYears();
+                    getProfile();
+                } else if(tab.name == 'summary') {
+                    getProfile();
+                } else if (tab.name == 'uploadUserCsv') {
                     if(!document.getElementById('xlsx-loader')){
                         const xlsxLoader = document.createElement('script'),
                         loadedScripts = document.getElementById('loaded-scripts');
