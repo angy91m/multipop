@@ -433,6 +433,7 @@ if ($this->discourse_utilities()) {
                                                 size="sm"
                                                 label="Carica modulo"
                                                 @click="moduleUploadBegin(props.row)"
+                                                style="margin-bottom: 2px;"
                                             ></q-btn>
                                         </template>
                                         <template v-if="props.col.name == 'status' && !['canceled', 'refused', 'completed'].includes(props.row.status)">
