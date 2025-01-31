@@ -868,17 +868,18 @@ createApp({
                     id: subInView.id
                 });
                 if (res.ok) {
-                    const resData = await res.json();
-                    if (resData.data && Array.isArray(resData.data)) {
-                        console.log(resData.data);
-                        // subInView.files.length = 0;
-                        // for (const k in resData.data) {
-                        //     subInView.files.push({name: k, content: resData.data[k]});
-                        // }
-                    } else {
-                        console.error('Unknown error');
-                    }
-                    generateNotices(resData.notices || []);
+                    const resDataBytes = await res.bytes();
+                    console.log(resDataBytes);
+                    // if (resData.data && Array.isArray(resData.data)) {
+                    //     console.log(resData.data);
+                    //     // subInView.files.length = 0;
+                    //     // for (const k in resData.data) {
+                    //     //     subInView.files.push({name: k, content: resData.data[k]});
+                    //     // }
+                    // } else {
+                    //     console.error('Unknown error');
+                    // }
+                    // generateNotices(resData.notices || []);
                 } else {
                     try {
                         const {error, notices} = await res.json();
@@ -994,7 +995,6 @@ createApp({
                         delete subInView[k];
                     }
                     Object.assign(subInView, sub.data);
-                    console.log(subInView);
                 } else {
                     console.error('Unknown error');
                 }
