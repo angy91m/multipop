@@ -490,6 +490,7 @@ switch( $post_data['action'] ) {
                 $sub_files[] = 'idCard';
             }
         }
+        save_test($this->get_filename_by_sub($sub));
         if (file_exists($this->get_filename_by_sub($sub)) || file_exists($this->get_filename_by_sub($sub, false, false))) {
             $sub_files[] = 'signedModule';
         }
