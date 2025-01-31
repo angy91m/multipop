@@ -2468,7 +2468,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         return $mime;
     }
     private function get_filename_by_sub( &$sub, $id_card = false, $enc = true ) {
-        return MULIPOP_PLUGIN_PATH . '/privatedocs/' . $sub['filename'] . ($id_card ? '-idcard-' : '-sub-') . $sub['id'] . '-' . $sub['user_id'] . '.pdf' . ($enc ? '.enc' : '');
+        return MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $sub['filename'] . ($id_card ? '-idcard-' : '-sub-') . $sub['id'] . '-' . $sub['user_id'] . '.pdf' . ($enc ? '.enc' : '');
     }
     private function decrypt_module_documents($sub, string &$passphrase) {
         $current_user = wp_get_current_user();
