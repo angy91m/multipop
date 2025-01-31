@@ -700,7 +700,79 @@ if ($this->discourse_utilities()) {
             </div>
             <!--SUB_VIEW-->
             <div v-if="selectedTab.name == 'subView'" id="mpop-sub-view">
-                <h3>{{subInView.id}}</h3>
+                <h3>ID: {{subInView.id}} - Utente: {{subInView.user_login || subInView.user_id}}</h3>
+                <table id="mpop-sub-table">
+                    <tr>
+                        <td><strong>ID Tesserato:</strong></td>
+                        <td>{{subInView.user_id}}</td>
+                    </tr>
+                    <tr v-if="subInView.first_name">
+                        <td><strong>Nome:</strong></td>
+                        <td>{{subInView.first_name}}</td>
+                    </tr>
+                    <tr v-if="subInView.last_name">
+                        <td><strong>Cognome:</strong></td>
+                        <td>{{subInView.last_name}}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Anno riferimento:</strong></td>
+                        <td>{{subInView.year}}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Stato:</strong></td>
+                        <td>{{userSearchSelectableSubStatuses.find(s => s.value == subInView.status).label}}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Quota annuale:</strong></td>
+                        <td>{{subInView.quote ? currencyFormatter.custFormat(subInView.quote) : '-'}}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Creata da:</strong></td>
+                        <td>{{subInView.author_login || subInView.author_id}}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data creazione:</strong></td>
+                        <td>{{timestampToFullDatetimeString(subInView.created_at)}}</td>
+                    </tr>
+                    <template v-if="subInView.status == 'completed'">
+                        <tr>
+                            <td><strong>Completata da:</strong></td>
+                            <td>{{subInView.completer_login || subInView.completer_id}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data completamento:</strong></td>
+                            <td>{{timestampToFullDatetimeString(subInView.completed_at)}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data firma:</strong></td>
+                            <td>{{timestampToFullDatetimeString(subInView.signed_at)}}</td>
+                        </tr>
+                    </template>
+                    <tr>
+                        <td><strong>Consenso marketing:</strong></td>
+                        <td>{{subInView.marketing_agree ? 'Sì' : 'No'}}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Consenso newsletter:</strong></td>
+                        <td>{{subInView.newsletter_agree ? 'Sì' : 'No'}}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Consenso pubblicazione:</strong></td>
+                        <td>{{subInView.publish_agree ? 'Sì' : 'No'}}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Note:</strong></td>
+                        <td><textarea>{{subInView.notes || ''}}</textarea></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ultima modifica:</strong></td>
+                        <td>{{timestampToFullDatetimeString(subInView.updated_at)}}</td>
+                    </tr>
+                    <tr v-if="subInView.files && subInView.files.length">
+                        <td><strong>File sottoscrizione:</strong></td>
+                        <td>{{formatSubFiles(subInView.files)}}</td>
+                    </tr>
+                </table>
             </div>
             <!--USER_VIEW-->
             <div v-if="selectedTab.name == 'userView'" id="mpop-user-view"><template v-if="userInView">

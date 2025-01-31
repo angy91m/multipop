@@ -2760,7 +2760,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             return $wpdb->insert_id;
         }
     }
-    private function get_subscription_by($getby, $sub_id, $year = 0, array $unset = ['filename', 'completer_ip']) {
+    private function get_subscription_by($getby, $sub_id, $year = 0, array $unset = ['filename', 'completer_ip', 'notes']) {
         $search_format = '%d';
         if ($getby == 'id') {
             if (is_array($sub_id) && isset($sub_id['id'])) {
@@ -3373,7 +3373,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         clean_user_cache($user->ID);
         update_user_caches(get_user_by('ID', $user->ID));
     }
-    private function parse_subs(array &$subs, array $unset = ['filename', 'completer_ip']) {
+    private function parse_subs(array &$subs, array $unset = ['filename', 'completer_ip', 'notes']) {
         foreach($subs as &$sub) {
             foreach($unset as $u) {
                 unset($sub[$u]);
@@ -3393,7 +3393,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $sub['completer_id'] = intval($sub['completer_id']);
         }
     }
-    private function get_my_subscriptions($user_id, array $unset = ['filename', 'completer_ip']) {
+    private function get_my_subscriptions($user_id, array $unset = ['filename', 'completer_ip', 'notes']) {
         if (is_object($user_id)) {
             $user_id = $user_id->ID;
         }

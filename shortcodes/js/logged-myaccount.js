@@ -58,6 +58,19 @@ userRoles = [
     'administrator',
     'others'
 ],
+weekDays = [
+    'Domenica',
+    'Lunedì',
+    'Martedì',
+    'Mercoledì',
+    'Giovedì',
+    'Venerdì',
+    'Sabato'
+],
+subFilesType = [
+    {name: 'signedModule', label: 'Modulo firmato'},
+    {name: 'idCard', label: 'Documento d\'identità'}
+];
 historyTabs = [],
 cachedProps = {},
 foundUsersColumns = [
@@ -103,6 +116,7 @@ defaultQueryParams = {'view-user': null, 'view-sub': null},
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value,
 userSearchSelectableSubYears = [],
 thisYear  = new Date().getFullYear(),
+
 userSearchSelectableSubStatuses = [{
     label: 'In attesa di approvazione',
     value: 'tosee'
@@ -162,12 +176,6 @@ const subscriptionColumns = [{
     label: 'Data firma',
     field: 'signed_at',
     format: v => v ? displayLocalDate(new Date(v*1000)) : '-',
-    sortable: true
-}, {
-    name: 'pp_order_id',
-    label: 'PayPal',
-    field: 'pp_order_id',
-    format: v => v ? 'Sì' : 'No',
     sortable: true
 }],
 openExternalUrl = url => window.open(url, '_blank');
@@ -896,7 +904,6 @@ createApp({
             }
             historyTabs.unshift(selectedTab.value);
             const res = history.pushState(JSON.parse(JSON.stringify(historyTabs)), '', url.href);
-            console.log(history.state);
             return res;
         }
         async function viewUser(ID, popstate = false) {
@@ -1402,6 +1409,14 @@ createApp({
                 })
             });
         }
+        function timestampToFullDatetimeString(ts) {
+            if (!ts) return '';
+            ts = parseInt(ts, 10);
+            if (isNaN(ts) || !ts) return '';
+            ts = new Date(ts*1000);
+            if (isNaN(ts)) return '';
+            return weekDays[ts.getDay()].slice(0, 3) + ', ' + ('0' + ts.getDate()).slice(-2) + '/' + ('0' + (ts.getMonth()+1)).slice(-2) + '/' + ts.getFullYear() + ' alle ore ' + ('0' + ts.getHours()).slice(-2) + ':' + ('0' + ts.getMinutes()).slice(-2) + ':' + ('0' + ts.getSeconds()).slice(-2);
+        }
         onBeforeMount(()=> {
             const {user: parsedUser, discourseUrl, privacyPolicyUrl} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
             if (discourseUrl) {
@@ -1479,6 +1494,9 @@ createApp({
         }
         function onInvalidMime() {
             window.alert('Formato file non valido');
+        }
+        function formatSubFiles(files) {
+            return files.map(f => subFilesType.find(sft => f == sft.name).label).join(', ');
         }
         return {
             selectedTab,
@@ -1583,6 +1601,9 @@ createApp({
             isValidIdCard,
             viewSub,
             subInView,
+            timestampToFullDatetimeString,
+            subFilesType,
+            formatSubFiles,
             consoleLog: v => console.log(v)
         };
     }

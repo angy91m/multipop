@@ -479,7 +479,21 @@ switch( $post_data['action'] ) {
             echo json_encode( $res_data );
             exit;
         }
-        $res_data['data'] = $sub;
+        $sub_files = [];
+        if (in_array( $sub['status'], ['tosee', 'seen'])) {
+            $sub_user = get_user_by('ID', $sub['user_id']);
+            if ($sub_user && $this->user_has_valid_id_card($sub_user)) {
+                unlink($this->get_filename_by_sub($sub, true));
+                unlink($this->get_filename_by_sub($sub, true, false));
+            }
+            if (file_exists($this->get_filename_by_sub($sub, true)) || file_exists($this->get_filename_by_sub($sub, true, false))) {
+                $sub_files[] = 'idCard';
+            }
+        }
+        if (file_exists($this->get_filename_by_sub($sub)) || file_exists($this->get_filename_by_sub($sub, false, false))) {
+            $sub_files[] = 'signedModule';
+        }
+        $res_data['data'] = $sub + ['files' => $sub_files];
         break;
     default:
         $res_data['error'] = ['action'];
