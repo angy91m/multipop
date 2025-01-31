@@ -807,9 +807,9 @@ if ($this->discourse_utilities()) {
                                 <input type="password" @input="decryptPasswordSave" v-model="documentsDecryptPassword" />&nbsp;&nbsp;
                                 <button :disabled="!documentsDecryptPassword || documentsLoading" @click="documentsDecrypt">Sblocca documenti</button>
                             </template>
-                            <template v-else>
+                            <template v-else-if="subInView.status == 'tosee'">
                                 <label><input v-if="!subInView.user_id_card_confirmed" type="checkbox" v-model="subInView.forceIdCard" />&nbsp;&nbsp;Forza documento d'identità<br><br></label>
-                                <button v-if="subInView.status == 'tosee'" :disabled="!subInView.user_id_card_confirmed && !subInView.forceIdCard" @click="documentsConfirm" style="margin-right:5px">Conferma i documenti</button>
+                                <button :disabled="!subInView.user_id_card_confirmed && !subInView.forceIdCard" @click="documentsConfirm" style="margin-right:5px">Conferma i documenti</button>
                             </template>
                             <br>
                             <br>
