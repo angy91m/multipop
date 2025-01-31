@@ -113,6 +113,10 @@ if ($this->discourse_utilities()) {
                         <td>{{showRole(profile.role)}}</td>
                     </tr>
                     <tr>
+                        <td><strong>Tessera attiva:</strong></td>
+                        <td>{{profile.mpop_card_active ? 'Sì' : 'No'}}</td>
+                    </tr>
+                    <tr>
                         <td><strong>Data di nascita:</strong></td>
                         <td v-if="!profileEditing || (goodSubscriptions.length && profile.role != 'administrator')">{{displayLocalDate(profile.mpop_birthdate)}}</td>
                         <td v-else>
@@ -894,6 +898,10 @@ if ($this->discourse_utilities()) {
                     <tr>
                         <td><strong>Ruolo:</strong></td>
                         <td>{{showRole(userInView.role)}}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tessera attiva:</strong></td>
+                        <td>{{userInView.mpop_card_active ? 'Sì' : 'No'}}</td>
                     </tr>
                     <tr v-if="userInView.role == 'multipopolare_resp'">
                         <td><strong>Zone:</strong></td>
