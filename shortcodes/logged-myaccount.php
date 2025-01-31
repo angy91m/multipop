@@ -799,13 +799,17 @@ if ($this->discourse_utilities()) {
                             <ul>
                                 <li v-for="(f, k) in formatSubFiles(subInView.files)" :key="k">
                                     <template v-if="typeof subInView.files[k] == 'string'">{{f}}</template>
-                                    <template v-else><span class="mpop-click" style="text-decoration: underline" @click="subInView.documentToShow = subInView.files[k].content">{{f}}</span></template>
+                                    <template v-else><span class="mpop-click" style="text-decoration: underline" @click="subInView.documentToShow = subInView.files[k].content">{{f}}</template>
                                 </li>
                             </ul>
+                            <br>
                             <template v-if="typeof subInView.files[0] == 'string'">
-                                <br>
                                 <input type="password" @input="decryptPasswordSave" v-model="documentsDecryptPassword" />&nbsp;&nbsp;
-                                <button :disabled="!documentsDecryptPassword || documentsDecrypting" @click="documentsDecrypt">Sblocca documenti</button>
+                                <button :disabled="!documentsDecryptPassword || documentsLoading" @click="documentsDecrypt">Sblocca documenti</button>
+                            </template>
+                            <template v-else>
+                                <button @click="documentsConfirm">Conferma i documenti</button>
+                                <button @click="subscriptionRefuse">Rifiuta la richiesta</button>
                             </template>
                         </td>
                     </tr>

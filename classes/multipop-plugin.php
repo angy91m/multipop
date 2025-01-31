@@ -2470,6 +2470,56 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     private function get_filename_by_sub( &$sub, $id_card = false, $enc = true ) {
         return MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $sub['filename'] . ($id_card ? '-idcard-' : '-sub-') . $sub['id'] . '-' . $sub['user_id'] . '.pdf' . ($enc ? '.enc' : '');
     }
+    private function confirm_module_documents($sub, $force_id_card = false) {
+        $sub_user = get_user_by('ID', $sub);
+        if (!$sub_user) throw new Exception('Invalid user');
+        $meta_input = [];
+        if (!$force_id_card) {
+            if (!$this->user_has_valid_id_card($sub_user)) throw new Exception('Invalid ID card');
+            $meta_input['mpop_id_card_confirmed'] = true;
+        }
+        unlink($this->get_filename_by_sub($sub, true, false));
+        if (!empty($meta_input)) {
+            wp_update_user([
+                'ID' => $sub_user->ID,
+                'meta_input' => $meta_input
+            ]);
+        }
+        $date_now = date_create('now', new DateTimeZone(current_time('e')));
+        global $wpdb;
+        return $wpdb->update(
+            $wpdb->prefix . 'mpop_subscriptions',
+            [
+                'status' => 'seen',
+                'updated_at' => $date_now->getTimestamp()
+            ],
+            [
+                'id' => $sub['id']
+            ]
+        );
+    }
+    private function refuse_module_documents($sub) {
+        $sub_user = get_user_by('ID', $sub);
+        if ($sub_user && !$this->user_has_valid_id_card($sub_user)) {
+            delete_user_meta($sub_user->ID, 'mpop_id_card_number');
+            delete_user_meta($sub_user->ID, 'mpop_id_card_expiration');
+            delete_user_meta($sub_user->ID, 'mpop_id_card_type');
+            delete_user_meta($sub_user->ID, 'mpop_id_card_confirmed');
+        }
+        unlink($this->get_filename_by_sub($sub, true, false));
+        $date_now = date_create('now', new DateTimeZone(current_time('e')));
+        global $wpdb;
+        return $wpdb->update(
+            $wpdb->prefix . 'mpop_subscriptions',
+            [
+                'status' => 'refused',
+                'updated_at' => $date_now->getTimestamp()
+            ],
+            [
+                'id' => $sub['id']
+            ]
+        );
+    }
     private function decrypt_module_documents($sub, string &$passphrase) {
         $current_user = wp_get_current_user();
         if (!$current_user->mpop_personal_master_key) return false;
@@ -2525,10 +2575,12 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         return $result;
     }
     private function user_has_valid_id_card($user) {
-        if (!$user->mpop_id_card_expiration || !$user->mpop_id_card_confirmed ) return false;
-        $ex_date = date_create_from_format('Y-m-d His e', $user->mpop_id_card_expiration . ' 000000 '.current_time('e'));
-        if ( time() < $ex_date->getTimestamp()) {
-            return $ex_date;
+        if (!$user->mpop_id_card_confirmed ) return false;
+        if ( $user->mpop_id_card_expiration ) {
+            $ex_date = date_create_from_format('Y-m-d His e', $user->mpop_id_card_expiration . ' 000000 '.current_time('e'));
+            if ( time() < $ex_date->getTimestamp()) {
+                return $ex_date;
+            }
         }
         return false;
     }
@@ -2540,6 +2592,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if (!$sub || !isset($sub['user_id']) || $sub['user_id'] !== $user->ID || !isset($sub['status']) || $sub['status'] !== 'open') {
             throw new Exception('Invalid id');
         }
+        $date_now = date_create('now', new DateTimeZone(current_time('e')));
         $require_id_card = !$this->user_has_valid_id_card($user);
         if ($require_id_card) {
             if (!isset($post_data['idCardNumber']) || !is_string($post_data['idCardNumber']) || !preg_match('/^[A-Z0-9]{7,}$/', $post_data['idCardNumber'])) {
@@ -2571,6 +2624,9 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $ex_date = null;
             try {
                 $ex_date = static::validate_date($post_data['idCardExpiration']);
+                if ($date_now->getTimestamp() > $ex_date->getTimestamp()) {
+                    throw new Exception('Invalid idCardExpiration');
+                }
             } catch (Exception $err) {
                 throw new Exception('Invalid idCardExpiration');
             }
@@ -2593,7 +2649,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         } catch (Exception $err) {
             throw new Exception('Invalid signedModuleFiles');
         }
-        $date_now = date_create('now', new DateTimeZone(current_time('e')));
         $rand_file_name = $date_now->format('YmdHis');
         if ($require_id_card) {
             file_put_contents( MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $rand_file_name . '-idcard-' . $post_data['id'] . '-' . $user->ID .'.pdf.enc', $this->encrypt_asym( $id_card_pdf->export_file(), base64_decode($this->settings['master_doc_pubkey'], true)));
@@ -2612,7 +2667,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $wpdb->prefix . 'mpop_subscriptions',
             [
                 'status' => 'tosee',
-                'filename' => $rand_file_name
+                'filename' => $rand_file_name,
+                'updated_at' => $date_now->getTimestamp()
             ],
             [
                 'id' => $post_data['id']

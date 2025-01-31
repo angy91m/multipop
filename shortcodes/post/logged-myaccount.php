@@ -518,8 +518,8 @@ switch ($post_data['action']) {
             $this->module_upload($post_data, $current_user);
             $res_data['data'] = true;
         } catch (Exception $err) {
-            $res_data['error'] = $err->getMessage();
-            $res_data['notices'] = $err->getMessage();
+            $res_data['error'] = [$err->getMessage()];
+            $res_data['notices'] = [['type' =>'error', 'msg' => $err->getMessage()]];
             http_response_code( 400 );
             echo json_encode( $res_data );
             exit;

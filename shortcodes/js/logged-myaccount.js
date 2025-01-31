@@ -266,7 +266,7 @@ createApp({
         pwdChangeFields = reactive({}),
         pwdChanging = ref(false),
         csvUsers = reactive([]),
-        documentsDecrypting = ref(false),
+        documentsLoading = ref(false),
         documentsDecryptPassword = ref(''),
         csvImportOptions = reactive({
             forceQuote: false,
@@ -859,9 +859,41 @@ createApp({
             }
             saving.value = false;
         }
+        async function documentsConfirm() {
+            documentsLoading.value = true;
+            const res = await serverReq({
+                action: 'admin_documents_confirm',
+                id: subInView.id
+            });
+            if (res.ok) {
+                const resData = await res.json();
+                if (resData.data) {
+                    viewSub(subInView.id, true);
+                } else {
+                    console.error('Unknown error');
+                }
+                generateNotices(resData.notices || []);
+            } else {
+                try {
+                    const {error, notices} = await res.json();
+                    if (error) {
+                        staticPwdErrors.push(...error);
+                        generateNotices(notices || []);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } catch {
+                    console.error('Unknown error');
+                }
+            }
+            documentsLoading.value = false;
+        }
+        async function subscriptionRefuse() {
+            
+        }
         async function documentsDecrypt() {
-            documentsDecrypting.value = true;
             if (documentsDecryptPassword.value) {
+                documentsLoading.value = true;
                 const res = await serverReq({
                     action: 'admin_documents_decrypt',
                     password: documentsDecryptPassword.value,
@@ -891,7 +923,7 @@ createApp({
                         console.error('Unknown error');
                     }
                 }
-                documentsDecrypting.value = false;
+                documentsLoading.value = false;
             }
         }
         async function changePassword() {
@@ -1650,7 +1682,8 @@ createApp({
             subFilesType,
             formatSubFiles,
             documentsDecrypt,
-            documentsDecrypting,
+            documentsLoading,
+            documentsConfirm,
             documentsDecryptPassword,
             decryptPasswordSave,
             consoleLog: v => console.log(v)

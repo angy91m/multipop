@@ -480,18 +480,26 @@ switch( $post_data['action'] ) {
             exit;
         }
         $sub_files = [];
-        if (in_array( $sub['status'], ['tosee', 'seen'])) {
+        if ($sub['status'] =='tosee') {
             $sub_user = get_user_by('ID', $sub['user_id']);
+            if ($sub_user) {
+                if ($this->user_has_valid_id_card($sub_user)) {
+                    unlink($this->get_filename_by_sub($sub, true));
+                    unlink($this->get_filename_by_sub($sub, true, false));
+                    $sub['user_id_card_confirmed'] = true;
+                } else {
+                    $sub['user_id_card_confirmed'] = false;
+                    if (file_exists($this->get_filename_by_sub($sub, true)) || file_exists($this->get_filename_by_sub($sub, true, false))) {
+                        $sub_files[] = 'idCard';
+                        $sub['user_id_card_number'] = $sub_user->mpop_id_card_number;
+                        $sub['user_id_card_type'] = intval($sub_user->mpop_id_card_type);
+                        $sub['user_id_card_expiration'] = $sub_user->mpop_id_card_expiration;
+                    }
+                }
+            }
             if ($sub_user && $this->user_has_valid_id_card($sub_user)) {
-                unlink($this->get_filename_by_sub($sub, true));
-                unlink($this->get_filename_by_sub($sub, true, false));
             }
-            if (file_exists($this->get_filename_by_sub($sub, true)) || file_exists($this->get_filename_by_sub($sub, true, false))) {
-                $sub_files[] = 'idCard';
-                $sub['user_id_card_number'] = $sub_user->mpop_id_card_number;
-                $sub['user_id_card_type'] = intval($sub_user->mpop_id_card_type);
-                $sub['user_id_card_expiration'] = $sub_user->mpop_id_card_expiration;
-            }
+            
         }
         if (file_exists($this->get_filename_by_sub($sub)) || file_exists($this->get_filename_by_sub($sub, false, false))) {
             $sub_files[] = 'signedModule';
@@ -539,8 +547,40 @@ switch( $post_data['action'] ) {
             echo json_encode( $res_data );
             exit;
         }
-
-
+        break;
+    case 'admin_documents_confirm':
+        if (!isset($post_data['id']) || !is_int($post_data['id'])) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip']);
+        if (!$sub || $sub['status'] != 'tosee') {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $force_id_card = isset($post_data['forceIdCard']) ? boolval($post_data['forceIdCard']) : false;
+        try {
+            if (!$this->confirm_module_documents($sub, $force_id_card)) {
+                $res_data['error'] = ['unknown_error'];
+                $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
+                http_response_code( 400 );
+                echo json_encode( $res_data );
+                exit;
+            }
+            $res_data['data'] = true;
+        } catch (Exception $err) {
+            $res_data['error'] = [$err->getMessage()];
+            $res_data['notices'] = [['type'=>'error', 'msg'=>$err->getMessage()]];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
         break;
     default:
         $res_data['error'] = ['action'];
