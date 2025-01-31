@@ -823,7 +823,7 @@ if ($this->discourse_utilities()) {
                             </ul>
                             <br>
                             <template v-if="typeof subInView.files[0] == 'string'">
-                                <input type="password" @input="decryptPasswordSave" v-model="documentsDecryptPassword" />&nbsp;&nbsp;
+                                <input type="password" @input="decryptPasswordSave" placeholder="La tua chiave personale" v-model="documentsDecryptPassword" />&nbsp;&nbsp;
                                 <button :disabled="!documentsDecryptPassword || documentsLoading" @click="documentsDecrypt">Sblocca documenti</button>
                             </template>
                             <template v-else-if="subInView.status == 'tosee'">
