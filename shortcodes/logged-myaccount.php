@@ -605,7 +605,7 @@ if ($this->discourse_utilities()) {
                 </div>
                 <div class="mpop-user-search-field">
                     <label>Pagamento notificato dall'utente&nbsp;
-                        <select v-model="userSearch.user_payment_notes_not_null">
+                        <select v-model="userSearch.user_payment_notes_not_null" @change="triggerSearchUsers">
                             <option :value="null"></option>
                             <option :value="true">Sì</option>
                             <option :value="false">No</option>
