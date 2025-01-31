@@ -792,7 +792,7 @@ if ($this->discourse_utilities()) {
                     </tr>
                     <tr>
                         <td><strong>Note:</strong></td>
-                        <td><textarea >{{subInView.notes || ''}}</textarea><br><button @click="saveSubNotes">Salva note</button></td>
+                        <td><textarea v-model="subInView.notes"></textarea><br><button @click="saveSubNotes">Salva note</button></td>
                     </tr>
                     <tr>
                         <td><strong>Ultima modifica:</strong></td>
