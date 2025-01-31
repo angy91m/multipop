@@ -785,12 +785,12 @@ if ($this->discourse_utilities()) {
                             <ul>
                                 <li v-for="(f, k) in formatSubFiles(subInView.files)" :key="k">
                                     <template v-if="typeof subInView.files[k] == 'string'">{{f}}</template>
-                                    <template v-else><span class="mpop-click" @click="subInView.documentToShow = subInView.files[k].content">{{f}}</span></template>
+                                    <template v-else><span class="mpop-click" style="text-decoration: underline" @click="subInView.documentToShow = subInView.files[k].content">{{f}}</span></template>
                                 </li>
                             </ul>
                             <template v-if="typeof subInView.files[0] == 'string'">
                                 <br>
-                                <input type="password" v-model="documentsDecryptPassword" />
+                                <input type="password" @change="(...args) => consoleLog(args)" v-model="documentsDecryptPassword" />
                                 <button :disabled="!documentsDecryptPassword || documentsDecrypting" @click="documentsDecrypt">Sblocca documenti</button>
                             </template>
                         </td>
