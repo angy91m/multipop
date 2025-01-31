@@ -785,7 +785,7 @@ if ($this->discourse_utilities()) {
                             <ul>
                                 <li v-for="(f, k) in formatSubFiles(subInView.files)" :key="k">
                                     <template v-if="typeof subInView.files[k] == 'string'">{{f}}</template>
-                                    <template v-else><span @click="subInView.documentToShow = subInView.files[k].content">{{f}}</span></template>
+                                    <template v-else><span class="mpop-click" @click="subInView.documentToShow = subInView.files[k].content">{{f}}</span></template>
                                 </li>
                             </ul>
                             <template v-if="typeof subInView.files[0] == 'string'">
@@ -793,13 +793,15 @@ if ($this->discourse_utilities()) {
                                 <input type="password" v-model="documentsDecryptPassword" />
                                 <button :disabled="!documentsDecryptPassword || documentsDecrypting" @click="documentsDecrypt">Sblocca documenti</button>
                             </template>
-                            <hr>
-                            <button @click="subInView.documentToShow = null">Chiudi</button>
-                            <br>
-                            <iframe v-if="subInView.documentToShow" :src="subInView.documentToShow" style="width:100%;"></iframe>
                         </td>
                     </tr>
                 </table>
+                <template v-if="subInView.documentToShow">
+                    <hr>
+                    <button @click="subInView.documentToShow = null">Chiudi</button>
+                    <br>
+                    <iframe  :src="subInView.documentToShow" style="width:100%;"></iframe>
+                </template>
             </div>
             <!--USER_VIEW-->
             <div v-if="selectedTab.name == 'userView'" id="mpop-user-view"><template v-if="userInView">
