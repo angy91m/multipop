@@ -1366,7 +1366,7 @@ createApp({
                         url.searchParams.delete('view-sub');
                         paramsToPush.push({'view-sub': null});
                     }
-                    if (paramsToPush.length) pushQueryParams(paramsToPush.reduce((o,v) => ({...o, ...v}), {}));
+                    if (paramsToPush.length) pushQueryParams(paramsToPush.reduce((o,v) => ({...o, ...v}), {}), true);
                 } else if (url.searchParams.has('view-user')) {
                     viewUser(parseInt(url.searchParams.get('view-user'), 10), popstate);
                 } else if (url.searchParams.has('view-sub')) {
