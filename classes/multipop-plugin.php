@@ -2498,7 +2498,9 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if (str_ends_with( $sub_file, '.enc' )) {
             $signed_module = $this->decrypt_asym($fs, $asymkey);
             if (!$signed_module) return false;
-            file_put_contents($this->get_filename_by_sub($sub, false, false), $this->encrypt( $signed_module, $symkey ));
+            if (file_put_contents($this->get_filename_by_sub($sub, false, false), $this->encrypt( $signed_module, $symkey ))) {
+                unlink($sub_file);
+            }
         } else {
             $signed_module = $this->decrypt($fs, $symkey);
         }
@@ -2511,7 +2513,9 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             if (str_ends_with( $sub_file, '.enc' )) {
                 $id_card = $this->decrypt_asym($fs, $asymkey);
                 if (!$id_card) return false;
-                file_put_contents($this->get_filename_by_sub($sub, true, false), $this->encrypt( $id_card, $symkey ));
+                if(file_put_contents($this->get_filename_by_sub($sub, true, false), $this->encrypt( $id_card, $symkey ))) {
+                    unlink($this->get_filename_by_sub($sub, true));
+                }
             } else {
                 $id_card = $this->decrypt($fs, $symkey);
             }
