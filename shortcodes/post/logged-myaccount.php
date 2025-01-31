@@ -542,7 +542,7 @@ switch ($post_data['action']) {
             exit;
         }
         try {
-            if (!$this->refuse_subscription($sub)) {
+            if (!$this->refuse_subscription($sub, true)) {
                 $res_data['error'] = ['id'];
                 $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
                 http_response_code( 400 );
