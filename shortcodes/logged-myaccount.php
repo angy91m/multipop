@@ -311,6 +311,17 @@ if ($this->discourse_utilities()) {
                         </td>
                     </tr>
                 </table>
+                <q-table
+                    v-if="profile.role == 'administrator'"
+                    title="Richieste"
+                    :rows="profile.mpop_my_subscriptions || []"
+                    :columns="subscriptionColumns"
+                    row-key="id"
+                    :pagination="{page:1,rowsPerPage:0}"
+                    hide-bottom
+                    @row-click="(e,row) => viewSub(row.id)"
+                >
+                </q-table>
             </div>
             <div v-if="selectedTab.name == 'passwordChange'">
                 <button class="mpop-button" :disabled="pwdChanging ||pwdChangeErrors.length || !pwdChangeFields.current" @click="changePassword">Cambia password</button>
