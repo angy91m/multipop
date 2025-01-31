@@ -2475,7 +2475,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if (!$sub_user) throw new Exception('Invalid user');
         $meta_input = [];
         if (!$force_id_card) {
-            if (!$this->user_has_valid_id_card($sub_user)) throw new Exception('Invalid ID card');
+            if (!$this->user_has_valid_id_card($sub_user, true)) throw new Exception('Invalid ID card');
             $meta_input['mpop_id_card_confirmed'] = true;
         }
         unlink($this->get_filename_by_sub($sub, true, false));
@@ -2574,8 +2574,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         return $result;
     }
-    private function user_has_valid_id_card($user) {
-        if (!$user->mpop_id_card_confirmed ) return false;
+    private function user_has_valid_id_card($user, $date_only = false) {
+        if (!$user->mpop_id_card_confirmed && !$date_only ) return false;
         if ( $user->mpop_id_card_expiration ) {
             $ex_date = date_create_from_format('Y-m-d His e', $user->mpop_id_card_expiration . ' 000000 '.current_time('e'));
             if ( time() < $ex_date->getTimestamp()) {
