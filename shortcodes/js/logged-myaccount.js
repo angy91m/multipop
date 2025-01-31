@@ -870,7 +870,10 @@ createApp({
                 if (res.ok) {
                     const resData = await res.json();
                     if (resData.data && Array.isArray(resData.data)) {
-                        console.log(resData.data);
+                        subInView.files.length;
+                        for (const k in resData.data) {
+                            subInView.files.push({name: k, content: resData.data[k]});
+                        }
                     } else {
                         console.error('Unknown error');
                     }
