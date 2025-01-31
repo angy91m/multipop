@@ -1358,15 +1358,11 @@ createApp({
                 selectedTab.value = tab;
                 if (!popstate) {
                     const paramsToPush = [];
-                    if (tab.name != 'userView') {
+                    if ( !['userView','subView'].includes(tab.name) ) {
                         url.searchParams.delete('view-user');
-                        paramsToPush.push({'view-user': null});
-                    }
-                    if (tab.name != 'subView') {
                         url.searchParams.delete('view-sub');
-                        paramsToPush.push({'view-sub': null});
+                        pushQueryParams(paramsToPush.push({'view-user': null, 'view-sub': null}));
                     }
-                    if (paramsToPush.length) pushQueryParams(paramsToPush.reduce((o,v) => ({...o, ...v}), {}), true);
                 } else if (url.searchParams.has('view-user')) {
                     viewUser(parseInt(url.searchParams.get('view-user'), 10), popstate);
                 } else if (url.searchParams.has('view-sub')) {
