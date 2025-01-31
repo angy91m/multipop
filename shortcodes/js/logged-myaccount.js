@@ -1568,6 +1568,33 @@ createApp({
                 })
             });
         }
+        async function profileSubCancel(sub) {
+            const res = await serverReq({
+                action: 'cancel_subscription',
+                id: sub.id
+            });
+            if (res.ok) {
+                const resData = await res.json();
+                if (resData.data) {
+                    sub.status = 'canceled';
+                } else {
+                    console.error('Unknown error');
+                }
+                generateNotices(resData.notices || []);
+            } else {
+                try {
+                    const {error, notices} = await res.json();
+                    if (error) {
+                        staticPwdErrors.push(...error);
+                        generateNotices(notices || []);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } catch {
+                    console.error('Unknown error');
+                }
+            }
+        }
         function timestampToFullDatetimeString(ts) {
             if (!ts) return '';
             ts = parseInt(ts, 10);
@@ -1771,6 +1798,7 @@ createApp({
             saveSubNotes,
             documentsDecryptPassword,
             decryptPasswordSave,
+            profileSubCancel,
             consoleLog: v => console.log(v)
         };
     }

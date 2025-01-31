@@ -2498,7 +2498,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             ]
         );
     }
-    private function refuse_subscription($sub) {
+    private function refuse_subscription($sub, $cancel = false) {
         $sub_user = get_user_by('ID', $sub);
         if ($sub_user && !$this->user_has_valid_id_card($sub_user)) {
             delete_user_meta($sub_user->ID, 'mpop_id_card_number');
@@ -2512,7 +2512,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         return $wpdb->update(
             $wpdb->prefix . 'mpop_subscriptions',
             [
-                'status' => 'refused',
+                'status' => $cancel ? 'canceled' : 'refused',
                 'updated_at' => $date_now->getTimestamp()
             ],
             [

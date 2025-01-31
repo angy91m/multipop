@@ -345,6 +345,7 @@ if ($this->discourse_utilities()) {
                                 <li>Quota annuale: {{currencyFormatter.custFormat(nearActiveSub.quote)}}</li>
                                 <button v-if="nearActiveSub.status == 'open'" class="mpop-button" @click="generateSubscriptionPdf(nearActiveSub.id)" :disabled="generatingSubscriptionPdf.find( v => v == nearActiveSub.id)">Genera modulo iscrizione</button>
                                 <button v-if="nearActiveSub.status == 'open'" class="mpop-button" @click="moduleUploadBegin(nearActiveSub)">Carica modulo</button>
+                                <button v-if="!['canceled', 'completed', 'refused'].includes(nearActiveSub.status)" class="mpop-button" @click="profileSubCancel(nearActiveSub)">Annulla richiesta</button>
                                 <template v-if="nearActiveSub.pp_order_id">
                                     <li>PayPal ID: {{nearActiveSub.pp_order_id}}</li>
                                     <li v-if="nearActiveSub.status == 'seen'">Paga</li>
@@ -414,8 +415,8 @@ if ($this->discourse_utilities()) {
                             >
                                 <template v-slot:body-cell="props">
                                     <q-td :props="props">
+                                        {{props.value}}
                                         <template v-if="props.col.name == 'status' && props.row.status == 'open'">
-                                            {{props.value}}
                                             <br>
                                             <q-btn
                                                 dense
@@ -434,7 +435,17 @@ if ($this->discourse_utilities()) {
                                                 @click="moduleUploadBegin(props.row)"
                                             ></q-btn>
                                         </template>
-                                        <template v-else>{{props.value}}</template>
+                                        <template v-if="props.col.name == 'status' && ['canceled', 'refused', 'completed'].includes(props.row.status)">
+                                            <br>
+                                            <q-btn
+                                                dense
+                                                color="primary"
+                                                size="sm"
+                                                label="Annulla"
+                                                @click="profileSubCancel(props.row)"
+                                                style="margin-bottom: 2px;"
+                                            ></q-btn>
+                                        </template>
                                     </q-td>
                                 </template>
                             </q-table>

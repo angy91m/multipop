@@ -623,7 +623,7 @@ switch( $post_data['action'] ) {
             echo json_encode( $res_data );
             exit;
         }
-        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip']);
+        $sub = $this->get_subscription_by('id', $post_data['id']);
         if (!$sub || $sub['status'] != 'seen') {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
