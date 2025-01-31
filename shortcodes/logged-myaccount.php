@@ -808,7 +808,7 @@ if ($this->discourse_utilities()) {
                                 <button :disabled="!documentsDecryptPassword || documentsLoading" @click="documentsDecrypt">Sblocca documenti</button>
                             </template>
                             <template v-else>
-                                <button @click="documentsConfirm">Conferma i documenti</button>
+                                <button @click="documentsConfirm">Conferma i documenti</button>&nbsp;&nbsp;
                                 <button @click="subscriptionRefuse">Rifiuta la richiesta</button>
                             </template>
                         </td>

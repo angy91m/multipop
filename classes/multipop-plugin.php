@@ -2471,7 +2471,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         return MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $sub['filename'] . ($id_card ? '-idcard-' : '-sub-') . $sub['id'] . '-' . $sub['user_id'] . '.pdf' . ($enc ? '.enc' : '');
     }
     private function confirm_module_documents($sub, $force_id_card = false) {
-        $sub_user = get_user_by('ID', $sub);
+        $sub_user = get_user_by('ID', $sub['user_id']);
         if (!$sub_user) throw new Exception('Invalid user');
         $meta_input = [];
         if (!$force_id_card) {
