@@ -1355,18 +1355,20 @@ createApp({
                 }
                 selectedTab.value = tab;
                 if (!popstate) {
+                    const paramsToPush = [];
                     if (tab.name != 'userView') {
                         url.searchParams.delete('view-user');
-                        pushQueryParams({'view-user': null});
+                        paramsToPush.push({'view-user': null});
                     }
                     if (tab.name != 'subView') {
                         url.searchParams.delete('view-sub');
-                        pushQueryParams({'view-sub': null});
+                        paramsToPush.push({'view-sub': null});
                     }
+                    if (paramsToPush.length) pushQueryParams(paramsToPush.reduce((o,v) => ({...o, ...v}), {}));
                 } else if (url.searchParams.has('view-user')) {
-                    viewUser(url.searchParams.get('view-user'), popstate);
+                    viewUser(parseInt(url.searchParams.get('view-user'), 10), popstate);
                 } else if (url.searchParams.has('view-sub')) {
-                    viewSub(url.searchParams.get('view-sub'), popstate);
+                    viewSub(parseInt(url.searchParams.get('view-sub'), 10), popstate);
                 }
                 // FOR FAST DATA REFRESH UNCOMMENT FOLLOWING
                 // if (tab.name == 'card') {

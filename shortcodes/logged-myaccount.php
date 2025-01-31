@@ -700,7 +700,7 @@ if ($this->discourse_utilities()) {
             </div>
             <!--SUB_VIEW-->
             <div v-if="selectedTab.name == 'subView'" id="mpop-sub-view">
-                
+                <h3>{{subInView.id}} - {{userInView.login}}</h3>
             </div>
             <!--USER_VIEW-->
             <div v-if="selectedTab.name == 'userView'" id="mpop-user-view"><template v-if="userInView">
