@@ -870,7 +870,7 @@ createApp({
                 if (res.ok) {
                     const resData = await res.json();
                     if (resData.data && Array.isArray(resData.data)) {
-                        subInView.files.length;
+                        subInView.files.length = 0;
                         for (const k in resData.data) {
                             subInView.files.push({name: k, content: resData.data[k]});
                         }
