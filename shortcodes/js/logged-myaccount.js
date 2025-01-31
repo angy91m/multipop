@@ -1417,11 +1417,11 @@ createApp({
             const url = new URL(location);
             if (url.searchParams.has('view-user') && profile.role == 'administrator') {
                 selectedTab.value.name = 'userView';
-                viewUser(url.searchParams.get('view-user'), true);
+                viewUser(parseInt(url.searchParams.get('view-user'), 10), true);
             }
             if (url.searchParams.has('view-sub') && profile.role == 'administrator') {
                 selectedTab.value.name = 'subView';
-                viewSub(url.searchParams.get('view-sub'), true);
+                viewSub(parseInt(url.searchParams.get('view-sub'), 10), true);
             }
             if (!historyTabs.length) {
                 historyTabs.unshift(selectedTab.value);
