@@ -181,7 +181,7 @@ const subscriptionColumns = [{
 openExternalUrl = url => window.open(url, '_blank');
 userSearchSelectableSubYears.push(thisYear+1, thisYear);
 for (let i = thisYear-1; i >= 2020; i--) userSearchSelectableSubYears.push(i);
-let searchUsersTimeout, triggerSearchTimeout;
+let searchUsersTimeout, triggerSearchTimeout, decryptPasswordSaveTimeout;
 
 createApp({
     components: {
@@ -981,6 +981,10 @@ createApp({
                 pushQueryParams( {...defaultQueryParams, 'view-user': ID } );
             }
         }
+        function decryptPasswordSave() {
+            clearTimeout(decryptPasswordSaveTimeout);
+            decryptPasswordSaveTimeout = setTimeout(() => documentsDecryptPassword.value = '', 5 * 60000);
+        }
         async function viewSub(id, popstate = false) {
             const res = await serverReq({
                action: 'admin_view_sub',
@@ -1648,6 +1652,7 @@ createApp({
             documentsDecrypt,
             documentsDecrypting,
             documentsDecryptPassword,
+            decryptPasswordSave,
             consoleLog: v => console.log(v)
         };
     }
