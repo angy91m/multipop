@@ -674,6 +674,41 @@ switch( $post_data['action'] ) {
             exit;
         }
         break;
+    case 'admin_save_sub_notes':
+        if (!isset($post_data['id']) || !is_int($post_data['id'])) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        if (!isset($post_data['notes']) || !is_string($post_data['notes'])) {
+            $res_data['error'] = ['notes'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Dati non validi']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $date_now = date_create('now', new DateTimeZone(current_time('e')));
+        global $wpdb;
+        if (!$wpdb->update(
+            $wpdb->prefix . 'mpop_subscriptions',
+            [
+                'notes' => $post_data['notes'],
+                'updated_at' => $date_now->getTimestamp()
+            ],
+            [
+                'id' => $post_data['id']
+            ]
+        )) {
+            $res_data['error'] = ['notes'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $res_data['data'] = true;
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
