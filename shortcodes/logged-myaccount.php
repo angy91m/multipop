@@ -544,12 +544,6 @@ if ($this->discourse_utilities()) {
                         <br>
                         <button @click="()=>moduleUploadData.step-= (isValidIdCard ? 2 : 1)">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.generalPolicyAccept || moduleUploadDataSending" @click="moduleUploadDataSend">Invia</button>
                     </q-step>
-                    <q-step
-                        :name="4"
-                        title="Documenti inviati"
-                        icon="download_done"
-                    >
-                    </q-step>
                 </q-stepper>
                 <p v-if="moduleUploadData.sub.status != 'open'">
                     Modulo correttamente caricato. Stai per essere reindirizzato...
