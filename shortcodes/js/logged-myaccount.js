@@ -70,7 +70,7 @@ weekDays = [
 subFilesType = [
     {name: 'signedModule', label: 'Modulo firmato'},
     {name: 'idCard', label: 'Documento d\'identità'}
-];
+],
 historyTabs = [],
 cachedProps = {},
 foundUsersColumns = [
