@@ -933,7 +933,7 @@ createApp({
             }
             if (!popstate) {
                 selectTab({name:'userView', label: 'Modifica utente'});
-                pushQueryParams({'view-user': ID});
+                pushQueryParams({'view-user': ID, 'view-sub': null});
             }
         }
         async function viewSub(id, popstate = false) {
@@ -969,7 +969,7 @@ createApp({
             }
             if (!popstate) {
                 selectTab({name:'subView', label: 'Visualizza sottoscrizione'});
-                pushQueryParams({'view-sub': id});
+                pushQueryParams({'view-sub': id, 'view-user': null});
             }
         }
         function moduleUploadBegin(sub) {
@@ -1418,8 +1418,7 @@ createApp({
             if (url.searchParams.has('view-user') && profile.role == 'administrator') {
                 selectedTab.value.name = 'userView';
                 viewUser(parseInt(url.searchParams.get('view-user'), 10), true);
-            }
-            if (url.searchParams.has('view-sub') && profile.role == 'administrator') {
+            } else if (url.searchParams.has('view-sub') && profile.role == 'administrator') {
                 selectedTab.value.name = 'subView';
                 viewSub(parseInt(url.searchParams.get('view-sub'), 10), true);
             }
@@ -1431,7 +1430,6 @@ createApp({
         });
         function onPopState(e) {
             if (Array.isArray(e.state)){
-                console.log(e.state);
                 selectTab(e.state[0], true);
                 historyTabs.length = 0;
                 historyTabs.push(...e.state);
