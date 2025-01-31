@@ -1011,7 +1011,7 @@ if ($this->discourse_utilities()) {
                         <td>{{userInView.mpop_has_master_key ? 'Impostata': 'Non impostata'}}</td>
                     </tr>
                 </table>
-                <q-table
+                <!-- <q-table
                     title="Richieste"
                     :rows="userInView.mpop_my_subscriptions"
                     :columns="subscriptionColumns"
@@ -1020,7 +1020,7 @@ if ($this->discourse_utilities()) {
                     hide-bottom
                     @row-click="(e,row) => consoleLog(row)"
                 >
-                </q-table>
+                </q-table> -->
             </template></div>
             <!--UPLOAD_USER_CSV-->
             <div v-if="selectedTab.name == 'uploadUserCsv'">

@@ -908,6 +908,7 @@ createApp({
                 const user = await res.json();
                 if (user.data && user.data.user) {
                     Object.assign(userInView, user.data.user);
+                    console.log(userInView);
                 } else {
                     console.error('Unknown error');
                 }
