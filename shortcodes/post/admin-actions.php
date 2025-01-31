@@ -689,6 +689,8 @@ switch( $post_data['action'] ) {
             echo json_encode( $res_data );
             exit;
         }
+        $post_data['notes'] = trim($post_data['notes']);
+        if (!$post_data['notes']) $post_data['notes'] = null;
         $date_now = date_create('now', new DateTimeZone(current_time('e')));
         global $wpdb;
         if (!$wpdb->update(
