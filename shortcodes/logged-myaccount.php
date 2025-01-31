@@ -784,10 +784,8 @@ if ($this->discourse_utilities()) {
                         <td>
                             <ul>
                                 <li v-for="(f, k) in formatSubFiles(subInView.files)" :key="k">
-                                    <template v-if="typeof subInView.files[0] == 'string'">
-                                        <span @click="subInView.documentToShow = f.content">{{f.name}}</span>
-                                    </template>
-                                    <template v-else>{{f}}</template>
+                                    <template v-if="typeof subInView.files[0] == 'string'">{{f}}</template>
+                                    <template v-else><span @click="subInView.documentToShow = f.content">{{f.name}}</span></template>
                                 </li>
                             </ul>
                             <template v-if="typeof subInView.files[0] == 'string'">
