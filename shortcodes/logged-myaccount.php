@@ -809,10 +809,12 @@ if ($this->discourse_utilities()) {
                             </template>
                             <template v-else-if="subInView.status == 'tosee'">
                                 <label><input v-if="!subInView.user_id_card_confirmed" type="checkbox" v-model="subInView.forceIdCard" />&nbsp;&nbsp;Forza documento d'identità<br><br></label>
-                                <button :disabled="!subInView.user_id_card_confirmed && !subInView.forceIdCard" @click="documentsConfirm" style="margin-right:5px">Conferma i documenti</button>
+                                <button :disabled="!subInView.user_id_card_confirmed && !subInView.forceIdCard" @click="documentsConfirm">Conferma i documenti</button>
                             </template>
-                            <br>
-                            <br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
                             <button v-if="subInView.status == 'seen'" @click="paymentConfirm" style="margin-right:5px">Conferma pagamento</button>
                             <button @click="subscriptionRefuse" v-if="!['canceled', 'refused', 'completed'].includes(subInView.status)" style="margin-right:5px">Rifiuta la richiesta</button>
                         </td>
