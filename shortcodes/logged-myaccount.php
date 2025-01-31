@@ -781,15 +781,15 @@ if ($this->discourse_utilities()) {
                     </tr>
                     <template v-if="subInView.user_id_card_number">
                         <tr>
-                            <td><strong>Numero documento d'identità</strong></td>
+                            <td><strong>Numero documento d'identità:</strong></td>
                             <td>{{subInView.user_id_card_number}}</td>
                         </tr>
                         <tr>
-                            <td><strong>Tipo di documento d'identità</strong></td>
+                            <td><strong>Tipo di documento d'identità:</strong></td>
                             <td>{{mainOptions.idCardTypes[subInView.user_id_card_type]}}</td>
                         </tr>
                         <tr>
-                            <td><strong>Scadenza documento d'identità</strong></td>
+                            <td><strong>Scadenza documento d'identità:</strong></td>
                             <td>{{displayLocalDate(subInView.user_id_card_expiration)}}</td>
                         </tr>
                     </template>
