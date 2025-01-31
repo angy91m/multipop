@@ -782,12 +782,23 @@ if ($this->discourse_utilities()) {
                     <tr v-if="subInView.files && subInView.files.length">
                         <td><strong>File sottoscrizione:</strong></td>
                         <td>
-                            <span v-html="formatSubFiles(subInView.files)"></span>
+                            <ul>
+                                <li v-for="(f, k) in formatSubFiles(subInView.files)" :key="k">
+                                    <template v-if="typeof subInView.files[0] == 'string'">
+                                        <span @click="subInView.documentToShow = f.content">{{f.name}}</span>
+                                    </template>
+                                    <template v-else>{{f}}</template>
+                                </li>
+                            </ul>
                             <template v-if="typeof subInView.files[0] == 'string'">
                                 <br>
                                 <input type="password" v-model="documentsDecryptPassword" />
                                 <button :disabled="!documentsDecryptPassword || documentsDecrypting" @click="documentsDecrypt">Sblocca documenti</button>
                             </template>
+                            <hr>
+                            <button @click="subInView.documentToShow = null">Chiudi</button>
+                            <br>
+                            <iframe v-if="subInView.documentToShow" :src="subInView.documentToShow" style="width:100%;"></iframe>
                         </td>
                     </tr>
                 </table>

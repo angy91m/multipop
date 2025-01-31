@@ -993,6 +993,7 @@ createApp({
                         delete subInView[k];
                     }
                     Object.assign(subInView, sub.data);
+                    subInView.documentToShow = null;
                 } else {
                     console.error('Unknown error');
                 }
@@ -1532,13 +1533,7 @@ createApp({
             window.alert('Formato file non valido');
         }
         function formatSubFiles(files) {
-            return files.map(f => {
-                if (typeof f == 'string') {
-                    return subFilesType.find(sft => f == sft.name).label;
-                } else {
-                    return '<a href="' + f.content + '" target="_blank">' + subFilesType.find(sft => f.name == sft.name).label + '</a>';
-                }
-            }).join(', ');
+            return files.map(f => subFilesType.find(sft => (typeof f == 'string' ? f : f.name) == sft.name).label);
         }
         return {
             selectedTab,
