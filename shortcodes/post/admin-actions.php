@@ -488,6 +488,9 @@ switch( $post_data['action'] ) {
             }
             if (file_exists($this->get_filename_by_sub($sub, true)) || file_exists($this->get_filename_by_sub($sub, true, false))) {
                 $sub_files[] = 'idCard';
+                $sub['user_id_card_number'] = $sub_user->mpop_id_card_number;
+                $sub['user_id_card_type'] = intval($sub_user->mpop_id_card_type);
+                $sub['user_id_card_expiration'] = $sub_user->mpop_id_card_expiration;
             }
         }
         if (file_exists($this->get_filename_by_sub($sub)) || file_exists($this->get_filename_by_sub($sub, false, false))) {

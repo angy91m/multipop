@@ -779,6 +779,20 @@ if ($this->discourse_utilities()) {
                         <td><strong>Ultima modifica:</strong></td>
                         <td>{{timestampToFullDatetimeString(subInView.updated_at)}}</td>
                     </tr>
+                    <template v-if="subInView.user_id_card_number">
+                        <tr>
+                            <td><strong>Numero documento d'identità</strong></td>
+                            <td>{{subInView.user_id_card_number}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tipo di documento d'identità</strong></td>
+                            <td>{{mainOptions.idCardTypes[subInView.user_id_card_type]}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scadenza documento d'identità</strong></td>
+                            <td>{{displayLocalDate(subInView.user_id_card_expiration)}}</td>
+                        </tr>
+                    </template>
                     <tr v-if="subInView.files && subInView.files.length">
                         <td><strong>File sottoscrizione:</strong></td>
                         <td>
