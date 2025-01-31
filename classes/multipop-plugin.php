@@ -2467,6 +2467,57 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         return $mime;
     }
+    private function get_filename_by_sub( &$sub, $id_card = false, $enc = true ) {
+        return MULIPOP_PLUGIN_PATH . '/privatedocs/' . $sub['filename'] . ($id_card ? '-idcard-' : '-sub-') . $sub['id'] . '-' . $sub['user_id'] . '.pdf' . ($enc ? '.enc' : '');
+    }
+    private function decrypt_module_documents($sub, string &$passphrase) {
+        if (!is_array($sub) && $sub) {
+            $sub = $this->get_subscription_by('id', $sub, 0, []);
+        }
+        if (!$sub || !$sub['filename']) return false;
+        if (file_exists($this->get_filename_by_sub($sub))) {
+            $sub_file = $this->get_filename_by_sub($sub);
+        } else if (file_exists($this->get_filename_by_sub($sub, false, true))) {
+            $sub_file = $this->get_filename_by_sub($sub, false, true);
+        } else {
+            return false;
+        }
+        $fs = file_get_contents($sub_file);
+        $master_key = base64_decode(
+            $this->decrypt_with_password(
+                base64_decode($this->get_master_key(), true),
+                $passphrase
+            ),
+            true
+        );
+        if (!$master_key) return false;
+        $symkey = substr($master_key, 0, 32);
+        $asymkey = substr($master_key, 32);
+        if (str_ends_with( $sub_file, '.enc' )) {
+            $signed_module = $this->decrypt_asym($fs, $asymkey);
+            if (!$signed_module) return false;
+            file_put_contents($this->get_filename_by_sub($sub, false, false), $this->encrypt( $signed_module, $symkey ));
+        } else {
+            $signed_module = $this->decrypt($fs, $symkey);
+        }
+        if (!$signed_module) return false;
+        $result = [
+            'signedModule' => 'data:application/pdf;base64,'. base64_encode($signed_module)
+        ];
+        if (file_exists($this->get_filename_by_sub($sub, true, str_ends_with( $sub_file, '.enc' )))) {
+            $fs = file_get_contents($this->get_filename_by_sub($sub, true, str_ends_with( $sub_file, '.enc' )));
+            if (str_ends_with( $sub_file, '.enc' )) {
+                $id_card = $this->decrypt_asym($fs, $asymkey);
+                if (!$id_card) return false;
+                file_put_contents($this->get_filename_by_sub($sub, true, false), $this->encrypt( $id_card, $symkey ));
+            } else {
+                $id_card = $this->decrypt($fs, $symkey);
+            }
+            if (!$id_card) return false;
+            $result['idCard'] = 'data:application/pdf;base64,' . base64_encode($id_card);
+        }
+        return $result;
+    }
     private function module_upload(array &$post_data, $user) {
         if (!$this->settings['master_doc_pubkey']) {
             throw new Exception('Server not ready to get subscriptions');
@@ -2705,7 +2756,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             return $wpdb->insert_id;
         }
     }
-    private function get_subscription_by($getby, $sub_id, $year = 0) {
+    private function get_subscription_by($getby, $sub_id, $year = 0, array $unset = ['filename', 'completer_ip']) {
         $search_format = '%d';
         if ($getby == 'id') {
             if (is_array($sub_id) && isset($sub_id['id'])) {
@@ -2752,7 +2803,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             return false;
         }
         $arr = [$res];
-        $this->parse_subs($arr);
+        $this->parse_subs($arr, $unset);
         return $arr[0];
     }
 
@@ -3338,7 +3389,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $sub['completer_id'] = intval($sub['completer_id']);
         }
     }
-    private function get_my_subscriptions($user_id) {
+    private function get_my_subscriptions($user_id, array $unset = ['filename', 'completer_ip']) {
         if (is_object($user_id)) {
             $user_id = $user_id->ID;
         }
@@ -3347,7 +3398,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         global $wpdb;
         $res = $wpdb->get_results("SELECT * FROM " . $this->db_prefix('subscriptions') . " WHERE user_id = $user_id ORDER BY updated_at DESC;", 'ARRAY_A');
-        $this->parse_subs($res);
+        $this->parse_subs($res, $unset);
         return $res;
     }
     private function search_subscriptions(array $options = [], $limit = 100 ) { 
@@ -3372,7 +3423,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             'mpop_billing_city' => [],
             'page' => 1,
             'pagination' => true,
-            'order_by' => ['s.updated_at' => false]
+            'order_by' => ['s.updated_at' => false],
+            'unset' => ['filename', 'completer_ip']
         ];
         $time_interval_reg = '/^\d*,\d*$/';
         $quote_interval_reg = '/^(\d+(\.\d{1,2})?)?,(\d+(\.\d{1,2})?)?$/';
@@ -3683,7 +3735,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $q_from " . ($q_where ? "WHERE $q_where" : '') . " $q_limit;";
         $res = [];
         $res['subscriptions'] = $wpdb->get_results($q, 'ARRAY_A');
-        $this->parse_subs($res['subscriptions']);
+        $this->parse_subs($res['subscriptions'], $options['unset']);
         if (!$options['pagination']) {
             return $res['subscriptions'];
         }

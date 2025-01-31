@@ -103,7 +103,7 @@ loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').va
 userSearchSelectableSubYears = [],
 thisYear  = new Date().getFullYear(),
 userSearchSelectableSubStatuses = [{
-    label: 'Da approvare',
+    label: 'In attesa di approvazione',
     value: 'tosee'
 }, {
     label: 'In attesa di pagamento',
@@ -928,6 +928,38 @@ createApp({
                 pushQueryParams({'view-user': ID});
             }
         }
+        async function viewSub(id, popstate = false) {
+            const res = await serverReq({
+               action: 'admin_view_sub',
+               id
+            });
+            if (res.ok) {
+                const sub = await res.json();
+                if (sub.data) {
+                    Object.assign(subInView, sub.data);
+                } else {
+                    console.error('Unknown error');
+                }
+                generateNotices(sub.notices || []);
+            } else {
+                try {
+                    const {error, notices} = await res.json();
+                    if (error) {
+                        staticPwdErrors.push(...error);
+                        generateNotices(notices || []);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } catch {
+                    console.error('Unknown error');
+                }
+
+            }
+            if (!popstate) {
+                selectTab({name:'subView', label: 'Visualizza sottoscrizione'});
+                pushQueryParams({'view-sub': id});
+            }
+        }
         function moduleUploadBegin(sub) {
             moduleUploadData.sub = sub;
             selectTab({name: 'moduleUpload', label: 'Carica modulo'});
@@ -1317,8 +1349,14 @@ createApp({
                         url.searchParams.delete('view-user');
                         pushQueryParams({'view-user': null});
                     }
+                    if (tab.name != 'subView') {
+                        url.searchParams.delete('view-sub');
+                        pushQueryParams({'view-sub': null});
+                    }
                 } else if (url.searchParams.has('view-user')) {
                     viewUser(url.searchParams.get('view-user'), popstate);
+                } else if (url.searchParams.has('view-sub')) {
+                    viewSub(url.searchParams.get('view-sub'), popstate);
                 }
                 // FOR FAST DATA REFRESH UNCOMMENT FOLLOWING
                 // if (tab.name == 'card') {
@@ -1370,6 +1408,10 @@ createApp({
             if (url.searchParams.has('view-user') && profile.role == 'administrator') {
                 selectedTab.value.name = 'userView';
                 viewUser(url.searchParams.get('view-user'), true);
+            }
+            if (url.searchParams.has('view-sub') && profile.role == 'administrator') {
+                selectedTab.value.name = 'subView';
+                viewSub(url.searchParams.get('view-sub'), true);
             }
             if (!historyTabs.length) {
                 historyTabs.unshift(selectedTab.value);
@@ -1528,6 +1570,7 @@ createApp({
             moduleUploadDataSend,
             moduleUploadDataSending,
             isValidIdCard,
+            viewSub,
             consoleLog: v => console.log(v)
         };
     }

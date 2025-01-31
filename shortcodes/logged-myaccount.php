@@ -16,6 +16,7 @@ if ($this->discourse_utilities()) {
         $discourse_url = $discourse_connect_options['url'] . '/login';
     }
 }
+save_test($this->get_subscriptions(['user_id' => 1]));
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-tel-input.css">
@@ -697,6 +698,10 @@ if ($this->discourse_utilities()) {
                         </q-tr>
                     </template>
                 </q-table>
+            </div>
+            <!--SUB_VIEW-->
+            <div v-if="selectedTab.name == 'subView'" id="mpop-sub-view">
+                
             </div>
             <!--USER_VIEW-->
             <div v-if="selectedTab.name == 'userView'" id="mpop-user-view"><template v-if="userInView">
