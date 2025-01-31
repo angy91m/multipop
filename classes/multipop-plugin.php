@@ -2471,6 +2471,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         return MULIPOP_PLUGIN_PATH . '/privatedocs/' . $sub['filename'] . ($id_card ? '-idcard-' : '-sub-') . $sub['id'] . '-' . $sub['user_id'] . '.pdf' . ($enc ? '.enc' : '');
     }
     private function decrypt_module_documents($sub, string &$passphrase) {
+        $current_user = wp_get_current_user();
+        if (!$current_user->mpop_personal_master_key) return false;
         if (!is_array($sub) && $sub) {
             $sub = $this->get_subscription_by('id', $sub, 0, []);
         }
@@ -2485,7 +2487,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $fs = file_get_contents($sub_file);
         $master_key = base64_decode(
             $this->decrypt_with_password(
-                base64_decode($this->get_master_key(), true),
+                base64_decode($current_user->mpop_personal_master_key, true),
                 $passphrase
             ),
             true
@@ -2518,6 +2520,14 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         return $result;
     }
+    private function user_has_valid_id_card($user) {
+        if (!$user->mpop_id_card_expiration || !$user->mpop_id_card_confirmed ) return false;
+        $ex_date = date_create_from_format('Y-m-d His e', $user->mpop_id_card_expiration . ' 000000 '.current_time('e'));
+        if ( time() < $ex_date->getTimestamp()) {
+            return $ex_date;
+        }
+        return false;
+    }
     private function module_upload(array &$post_data, $user) {
         if (!$this->settings['master_doc_pubkey']) {
             throw new Exception('Server not ready to get subscriptions');
@@ -2526,13 +2536,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if (!$sub || !isset($sub['user_id']) || $sub['user_id'] !== $user->ID || !isset($sub['status']) || $sub['status'] !== 'open') {
             throw new Exception('Invalid id');
         }
-        $require_id_card = true;
-        if ($user->mpop_id_card_expiration) {
-            $ex_date = date_create_from_format('Y-m-dHis e', $user->mpop_id_card_expiration . '000000 Europe/Rome');
-            if ( time() < $ex_date->getTimestamp() ) {
-                $require_id_card = false;
-            }
-        }
+        $require_id_card = !$this->user_has_valid_id_card($user);
         if ($require_id_card) {
             if (!isset($post_data['idCardNumber']) || !is_string($post_data['idCardNumber']) || !preg_match('/^[A-Z0-9]{7,}$/', $post_data['idCardNumber'])) {
                 throw new Exception('Invalid idCardNumber');
