@@ -435,7 +435,7 @@ if ($this->discourse_utilities()) {
                                                 @click="moduleUploadBegin(props.row)"
                                             ></q-btn>
                                         </template>
-                                        <template v-if="props.col.name == 'status' && ['canceled', 'refused', 'completed'].includes(props.row.status)">
+                                        <template v-if="props.col.name == 'status' && !['canceled', 'refused', 'completed'].includes(props.row.status)">
                                             <br>
                                             <q-btn
                                                 dense
