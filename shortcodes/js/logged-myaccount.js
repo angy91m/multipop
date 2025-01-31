@@ -1496,6 +1496,7 @@ createApp({
             window.alert('Formato file non valido');
         }
         function formatSubFiles(files) {
+            console.log(files);
             return files.map(f => subFilesType.find(sft => f == sft.name).label).join(', ');
         }
         return {
