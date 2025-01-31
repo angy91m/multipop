@@ -1538,7 +1538,6 @@ createApp({
                     viewSub(parseInt(url.searchParams.get('view-sub'), 10), popstate);
                 }
                 if (tab.name == 'card') {
-                    getAuthorizedSubscriptionYears();
                     getProfile();
                 } else if(tab.name == 'summary') {
                     getProfile();
