@@ -894,7 +894,9 @@ createApp({
                 return history.replaceState(JSON.parse(JSON.stringify(historyTabs)), '', url.href);
             }
             historyTabs.unshift(selectedTab.value);
-            return history.pushState(JSON.parse(JSON.stringify(historyTabs)), '', url.href);
+            const res = history.pushState(JSON.parse(JSON.stringify(historyTabs)), '', url.href);
+            console.log(history.state);
+            return res;
         }
         async function viewUser(ID, popstate = false) {
             if (ID == profile.ID) {
