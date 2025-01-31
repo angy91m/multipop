@@ -908,7 +908,6 @@ createApp({
                 const user = await res.json();
                 if (user.data && user.data.user) {
                     Object.assign(userInView, user.data.user);
-                    console.log(userInView);
                 } else {
                     console.error('Unknown error');
                 }
@@ -941,6 +940,7 @@ createApp({
                 const sub = await res.json();
                 if (sub.data) {
                     Object.assign(subInView, sub.data);
+                    console.log(subInView);
                 } else {
                     console.error('Unknown error');
                 }

@@ -1018,7 +1018,7 @@ if ($this->discourse_utilities()) {
                     row-key="id"
                     :pagination="{page:1,rowsPerPage:0}"
                     hide-bottom
-                    @row-click="(e,row) => consoleLog(row)"
+                    @row-click="(e,row) => viewSub(row.id)"
                 >
                 </q-table>
             </template></div>
