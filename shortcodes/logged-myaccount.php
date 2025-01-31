@@ -603,6 +603,15 @@ if ($this->discourse_utilities()) {
                         map-options
                     ></q-select>
                 </div>
+                <div class="mpop-user-search-field">
+                    <label>Pagamento notificato dall'utente&nbsp;
+                        <select v-model="userSearch.user_payment_notes_not_null">
+                            <option :value="null"></option>
+                            <option :value="true">Sì</option>
+                            <option :value="false">No</option>
+                        </select>
+                    </label>
+                </div>
                 <div>
                     <div class="mpop-user-search-field mpop-50-wid">
                         <label for="userSearchZone-select">Residenza&nbsp;

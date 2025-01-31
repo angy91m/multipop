@@ -683,6 +683,7 @@ class MultipopPlugin {
             `completer_id` BIGINT UNSIGNED NULL,
             `completer_ip` VARCHAR(255) NULL,
             `notes` TEXT NULL,
+            `user_payment_notes` TEXT NULL,
             PRIMARY KEY (`id`)
         ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
         dbDelta( $q );
@@ -3687,7 +3688,11 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 "( users.user_login LIKE %s
                 OR users.user_email LIKE %s
                 OR fn.meta_value LIKE %s
-                OR ln.meta_value LIKE %s )",
+                OR ln.meta_value LIKE %s
+                OR s.notes LIKE %s
+                OR s.user_payment_notes %s )",
+                $sanitized_value,
+                $sanitized_value,
                 $sanitized_value,
                 $sanitized_value,
                 $sanitized_value,
@@ -3763,6 +3768,9 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         if (count($options['mpop_billing_city'])) {
             $append_to_where("comune.meta_value IN ( " . implode(',', array_map(function($s) {return "'$s'";}, $options['mpop_billing_city'])) . " )");
+        }
+        if (isset($options['user_payment_notes_not_null'])) {
+            $append_to_where("s.user_payment_notes IS " . (boolval($options['user_payment_notes_not_null']) ? 'NOT' : '') . " NULL" );
         }
 
         $q_from = "FROM "
