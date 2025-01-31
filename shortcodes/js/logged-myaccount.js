@@ -868,18 +868,17 @@ createApp({
                     id: subInView.id
                 });
                 if (res.ok) {
-                    console.log(res);
-                    //const resDataBytes = await res.bytes();
-                    // if (resData.data && Array.isArray(resData.data)) {
-                    //     console.log(resData.data);
-                    //     // subInView.files.length = 0;
-                    //     // for (const k in resData.data) {
-                    //     //     subInView.files.push({name: k, content: resData.data[k]});
-                    //     // }
-                    // } else {
-                    //     console.error('Unknown error');
-                    // }
-                    // generateNotices(resData.notices || []);
+                    const resData = await res.text().then(r => JSON.parse(r));
+                    if (resData.data && Array.isArray(resData.data)) {
+                        console.log(resData.data);
+                        // subInView.files.length = 0;
+                        // for (const k in resData.data) {
+                        //     subInView.files.push({name: k, content: resData.data[k]});
+                        // }
+                    } else {
+                        console.error('Unknown error');
+                    }
+                    generateNotices(resData.notices || []);
                 } else {
                     try {
                         const {error, notices} = await res.json();
