@@ -871,10 +871,11 @@ createApp({
                     const resTextData = await res.text(),
                     resData = JSON.parse(resTextData);
                     if (resData.data && Array.isArray(resData.data)) {
-                        subInView.files.length = 0;
-                        for (const k in resData.data) {
-                            subInView.files.push({name: k, content: resData.data[k]});
-                        }
+                        console.log(resData.data);
+                        // subInView.files.length = 0;
+                        // for (const k in resData.data) {
+                        //     subInView.files.push({name: k, content: resData.data[k]});
+                        // }
                     } else {
                         console.error('Unknown error');
                     }
