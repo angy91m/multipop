@@ -989,9 +989,7 @@ createApp({
             if (res.ok) {
                 const sub = await res.json();
                 if (sub.data) {
-                    for (const k in subInView) {
-                        delete subInView[k];
-                    }
+                    cancelSubInView();
                     Object.assign(subInView, sub.data);
                     subInView.documentToShow = null;
                 } else {
@@ -1387,6 +1385,11 @@ createApp({
                 delete userInEditing[key];
             }
         }
+        function cancelSubInView() {
+            for (const k in subInView) {
+                delete subInView[k];
+            }
+        }
         function selectTab(tab, popstate = false) {
             if (selectedTab.value.name != tab?.name) {
                 cancelEditProfile();
@@ -1400,6 +1403,7 @@ createApp({
                 } else {
                     cancelModuleUploadData();
                 }
+                if (tab.name != 'subView') cancelSubInView();
                 selectedTab.value = tab;
                 if (!popstate) {
                     const paramsToPush = [];
