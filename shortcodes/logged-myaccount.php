@@ -800,7 +800,7 @@ if ($this->discourse_utilities()) {
                     <hr>
                     <button @click="subInView.documentToShow = null">Chiudi</button>
                     <br>
-                    <iframe  :src="subInView.documentToShow" style="width:100%;"></iframe>
+                    <iframe :src="subInView.documentToShow" style="width:100%; min-height: 1000px;"></iframe>
                 </template>
             </div>
             <!--USER_VIEW-->
