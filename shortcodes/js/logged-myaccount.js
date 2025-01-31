@@ -1433,6 +1433,7 @@ createApp({
         });
         function onPopState(e) {
             if (Array.isArray(e.state)){
+                console.log(e.state);
                 selectTab(e.state[0], true);
                 historyTabs.push(...e.state);
             }
