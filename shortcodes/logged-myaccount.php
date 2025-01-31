@@ -812,6 +812,7 @@ if ($this->discourse_utilities()) {
                                 <button v-if="subInView.status == 'tosee'" :disabled="!subInView.user_id_card_confirmed && !subInView.forceIdCard" @click="documentsConfirm" style="margin-right:5px">Conferma i documenti</button>
                             </template>
                             <br>
+                            <br>
                             <button v-if="subInView.status == 'seen'" @click="paymentConfirm" style="margin-right:5px">Conferma pagamento</button>
                             <button @click="subscriptionRefuse" v-if="!['canceled', 'refused', 'completed'].includes(subInView.status)" style="margin-right:5px">Rifiuta la richiesta</button>
                         </td>
