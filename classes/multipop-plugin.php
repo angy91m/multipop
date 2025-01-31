@@ -2500,7 +2500,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     }
     private function cancel_subscription($sub) {
         if ($sub['year'] == current_time('Y') && $sub['status'] == 'completed') {
-            $sub_user = get_user_by('ID', $sub);
+            $sub_user = get_user_by('ID', $sub['user_id']);
             if ($sub_user) {
                 $this->disable_user_card($sub_user);
             }
@@ -2519,7 +2519,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         );
     }
     private function refuse_subscription($sub, $cancel = false) {
-        $sub_user = get_user_by('ID', $sub);
+        $sub_user = get_user_by('ID', $sub['user_id']);
         if ($sub_user && !$this->user_has_valid_id_card($sub_user)) {
             delete_user_meta($sub_user->ID, 'mpop_id_card_number');
             delete_user_meta($sub_user->ID, 'mpop_id_card_expiration');
