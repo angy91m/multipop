@@ -907,6 +907,9 @@ createApp({
             if (res.ok) {
                 const user = await res.json();
                 if (user.data && user.data.user) {
+                    for (const k in userInView) {
+                        delete userInView[k];
+                    }
                     Object.assign(userInView, user.data.user);
                 } else {
                     console.error('Unknown error');
@@ -939,6 +942,9 @@ createApp({
             if (res.ok) {
                 const sub = await res.json();
                 if (sub.data) {
+                    for (const k in subInView) {
+                        delete subInView[k];
+                    }
                     Object.assign(subInView, sub.data);
                     console.log(subInView);
                 } else {
