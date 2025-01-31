@@ -1527,11 +1527,10 @@ createApp({
                 if (tab.name != 'subView') cancelSubInView();
                 selectedTab.value = tab;
                 if (!popstate) {
-                    const paramsToPush = [];
                     if ( !['userView','subView'].includes(tab.name) ) {
                         url.searchParams.delete('view-user');
                         url.searchParams.delete('view-sub');
-                        pushQueryParams(paramsToPush.push(defaultQueryParams));
+                        pushQueryParams(defaultQueryParams);
                     }
                 } else if (url.searchParams.has('view-user')) {
                     viewUser(parseInt(url.searchParams.get('view-user'), 10), popstate);
