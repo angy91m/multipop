@@ -3209,12 +3209,10 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $marketing_agree = isset($row['mpop_subscription_marketing_agree']) ? boolval($row['mpop_subscription_marketing_agree']) : false;
             $newsletter_agree = isset($row['mpop_subscription_newsletter_agree']) ? boolval($row['mpop_subscription_newsletter_agree']) : false;
             $publish_agree = isset($row['mpop_subscription_publish_agree']) ? boolval($row['mpop_subscription_publish_agree']) : false;
+            $role_change = false;
             if ($old_user) {
                 if (count($old_user->roles) == 1 && !in_array( $old_user->roles[0], ['administrator', 'multipopolano', 'multipopolare_resp'])) {
-                    wp_update_user([
-                        'ID' => $old_user->ID,
-                        'role' => 'multipopolano'
-                    ]);
+                    $role_change = true;
                 }
                 $others = $this->get_subscriptions([
                     'user_id' => [$old_user->ID],
@@ -3358,6 +3356,11 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             if (is_wp_error($user_id)) {
                 throw new Exception('Error during user save: ' . $user_id->get_error_message());
             }
+        } else if($role_change) {
+            wp_update_user([
+                'ID' => $old_user->ID,
+                'role' => 'multipopolano'
+            ]);
         }
         $sub_id = 0;
         if (!$row['mpop_friend']) {
@@ -3392,7 +3395,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 throw new Exception('Error while completing subscription: ' . $e->getMessage());
             }
         }
-        if (!$old_user) {
+        if (!$old_user && !$role_change) {
             $token = $this->create_temp_token($user_id,'invite_link',3600*24*30);
             if (is_array($mails)) {
                 $mails[] = ['type' => 'invitation', 'token' => $token, 'to' => $row['email']];
