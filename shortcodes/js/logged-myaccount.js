@@ -1433,6 +1433,7 @@ createApp({
             if (Array.isArray(e.state)){
                 console.log(e.state);
                 selectTab(e.state[0], true);
+                historyTabs.length = 0;
                 historyTabs.push(...e.state);
             }
         }
