@@ -2652,16 +2652,16 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $rand_file_name = $date_now->format('YmdHis');
         if ($require_id_card) {
             file_put_contents( MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $rand_file_name . '-idcard-' . $post_data['id'] . '-' . $user->ID .'.pdf.enc', $this->encrypt_asym( $id_card_pdf->export_file(), base64_decode($this->settings['master_doc_pubkey'], true)));
+            wp_update_user([
+                'ID' => $user->ID,
+                'meta_input' => [
+                    'mpop_id_card_type' => $post_data['idCardType'],
+                    'mpop_id_card_expiration' => $ex_date->format('Y-m-d'),
+                    'mpop_id_card_number' => $post_data['idCardNumber']
+                ]
+            ]);
         }
         file_put_contents( MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $rand_file_name . '-sub-' . $post_data['id'] . '-' . $user->ID .'.pdf.enc', $this->encrypt_asym( $signed_module_pdf->export_file(), base64_decode($this->settings['master_doc_pubkey'], true)));
-        wp_update_user([
-            'ID' => $user->ID,
-            'meta_input' => [
-                'mpop_id_card_type' => $post_data['idCardType'],
-                'mpop_id_card_expiration' => $ex_date->format('Y-m-d'),
-                'mpop_id_card_number' => $post_data['idCardNumber']
-            ]
-        ]);
         global $wpdb;
         return $wpdb->update(
             $wpdb->prefix . 'mpop_subscriptions',
