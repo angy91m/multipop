@@ -99,6 +99,7 @@ userCsvFields = [
     'mpop_subscription_notes',
     'esito'
 ].map(col => ({name: col, label: col, align: 'left', field: col})),
+defaultQueryParams = {'view-user': null, 'view-sub': null},
 loggedMyAccountNonce = document.getElementById('mpop-logged-myaccount-nonce').value,
 userSearchSelectableSubYears = [],
 thisYear  = new Date().getFullYear(),
@@ -933,7 +934,7 @@ createApp({
             }
             if (!popstate) {
                 selectTab({name:'userView', label: 'Modifica utente'});
-                pushQueryParams({'view-user': ID, 'view-sub': null});
+                pushQueryParams( {...defaultQueryParams, 'view-user': ID } );
             }
         }
         async function viewSub(id, popstate = false) {
@@ -969,7 +970,7 @@ createApp({
             }
             if (!popstate) {
                 selectTab({name:'subView', label: 'Visualizza sottoscrizione'});
-                pushQueryParams({'view-sub': id, 'view-user': null});
+                pushQueryParams({...defaultQueryParams, 'view-sub': id});
             }
         }
         function moduleUploadBegin(sub) {
@@ -1361,7 +1362,7 @@ createApp({
                     if ( !['userView','subView'].includes(tab.name) ) {
                         url.searchParams.delete('view-user');
                         url.searchParams.delete('view-sub');
-                        pushQueryParams(paramsToPush.push({'view-user': null, 'view-sub': null}));
+                        pushQueryParams(paramsToPush.push(defaultQueryParams));
                     }
                 } else if (url.searchParams.has('view-user')) {
                     viewUser(parseInt(url.searchParams.get('view-user'), 10), popstate);
