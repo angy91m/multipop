@@ -2479,8 +2479,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if (!$sub || !$sub['filename']) return false;
         if (file_exists($this->get_filename_by_sub($sub))) {
             $sub_file = $this->get_filename_by_sub($sub);
-        } else if (file_exists($this->get_filename_by_sub($sub, false, true))) {
-            $sub_file = $this->get_filename_by_sub($sub, false, true);
+        } else if (file_exists($this->get_filename_by_sub($sub, false, false))) {
+            $sub_file = $this->get_filename_by_sub($sub, false, false);
         } else {
             return false;
         }
