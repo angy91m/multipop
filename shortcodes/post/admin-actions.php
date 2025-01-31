@@ -463,6 +463,24 @@ switch( $post_data['action'] ) {
         $res_data['data'] = 'ok';
         $res_data['notices'] = [['type'=>'success', 'msg' => 'Invito inviato con successo']];
         break;
+    case 'admin_view_sub':
+        if (!isset($post_data['id']) || !is_int($post_data['id'])) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $sub = $this->get_subscription_by('id', $post_data['id']);
+        if (!$sub) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $res_data['data'] = $sub;
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
