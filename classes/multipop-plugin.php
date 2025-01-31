@@ -2505,6 +2505,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 $this->disable_user_card($sub_user);
             }
         }
+        $date_now = date_create('now', new DateTimeZone(current_time('e')));
         global $wpdb;
         return $wpdb->update(
             $wpdb->prefix . 'mpop_subscriptions',
