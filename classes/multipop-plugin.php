@@ -2498,6 +2498,25 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             ]
         );
     }
+    private function cancel_subscription($sub) {
+        if ($sub['year'] == current_time('Y') && $sub['status'] == 'completed') {
+            $sub_user = get_user_by('ID', $sub);
+            if ($sub_user) {
+                $this->disable_user_card($sub_user);
+            }
+        }
+        global $wpdb;
+        return $wpdb->update(
+            $wpdb->prefix . 'mpop_subscriptions',
+            [
+                'status' => 'canceled',
+                'updated_at' => $date_now->getTimestamp()
+            ],
+            [
+                'id' => $sub['id']
+            ]
+        );
+    }
     private function refuse_subscription($sub, $cancel = false) {
         $sub_user = get_user_by('ID', $sub);
         if ($sub_user && !$this->user_has_valid_id_card($sub_user)) {

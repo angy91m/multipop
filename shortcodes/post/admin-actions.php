@@ -648,6 +648,32 @@ switch( $post_data['action'] ) {
             exit;
         }
         break;
+    case 'admin_cancel_subscription':
+        if (!isset($post_data['id']) || !is_int($post_data['id'])) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $sub = $this->get_subscription_by('id', $post_data['id']);
+        try {
+            if(!$this->cancel_subscription($sub)) {
+                $res_data['error'] = ['unknown_error'];
+                $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
+                http_response_code( 400 );
+                echo json_encode( $res_data );
+                exit;
+            }
+            $res_data['data'] = true;
+        } catch (Exception $err) {
+            $res_data['error'] = [$err->getMessage()];
+            $res_data['notices'] = [['type'=>'error', 'msg'=>$err->getMessage()]];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];

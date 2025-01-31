@@ -975,6 +975,35 @@ createApp({
             }
             documentsLoading.value = false;
         }
+        async function subCancel() {
+            documentsLoading.value = true;
+            const res = await serverReq({
+                action: 'admin_cancel_subscription',
+                id: subInView.id
+            });
+            if (res.ok) {
+                const resData = await res.json();
+                if (resData.data) {
+                    viewSub(subInView.id, true);
+                } else {
+                    console.error('Unknown error');
+                }
+                generateNotices(resData.notices || []);
+            } else {
+                try {
+                    const {error, notices} = await res.json();
+                    if (error) {
+                        staticPwdErrors.push(...error);
+                        generateNotices(notices || []);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } catch {
+                    console.error('Unknown error');
+                }
+            }
+            documentsLoading.value = false;
+        }
         async function documentsDecrypt() {
             if (documentsDecryptPassword.value) {
                 documentsLoading.value = true;
@@ -1798,6 +1827,7 @@ createApp({
             documentsDecryptPassword,
             decryptPasswordSave,
             profileSubCancel,
+            subCancel,
             consoleLog: v => console.log(v)
         };
     }
