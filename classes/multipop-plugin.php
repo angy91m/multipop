@@ -2381,14 +2381,13 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         $args = $args + [
             'req_id' => null,
-            'intent' => 'AUTHORIZE',
+            'intent' => 'CAPTURE',
             'purchase_units' => [],
             'payment_source' => [
                 'paypal' => [
                     'experience_context' => [
                         'payment_method_preference' => 'UNRESTRICTED',
                         'brand_name' => $brand_name,
-                        'locale' => 'it-IT',
                         'landing_page' => 'LOGIN',
                         'shipping_preference' => 'NO_SHIPPING',
                         'user_action' => 'CONTINUE',
@@ -3833,6 +3832,57 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     }
     private function get_subscriptions(array $options = [], $limit = -1 ) {
         return $this->search_subscriptions($options + ['pagination' => false], $limit);
+    }
+    private function get_resp_by_user($user, $resp = null) {
+        if (is_int($user) || is_string($user)) {
+            $user = get_user_by('ID', $user);
+        }
+        if (!$user || !$user->mpop_billing_city) return is_null($resp) ? [] : false;
+        if (is_int($resp) || is_string($resp)) {
+            $resp = get_user_by('ID', $resp);
+            if (!$resp) return false;
+        }
+        $comune = $this->get_comune_by_catasto($user->mpop_billing_city, true);
+        if (!$comune) return is_null($resp) ? [] : false;
+        if ($resp) {
+            if (empty($resp->roles) || $resp->roles[0] != 'multipopolare_resp') return false;
+            return 
+                is_array($resp->mpop_resp_zones)
+                && (
+                    in_array($comune['codiceCatastale'], $resp->mpop_resp_zones)
+                    || in_array($comune['provincia']['sigla'], $resp->mpop_resp_zones)
+                    || in_array('reg_'. $comune['provincia']['regione'], $resp->mpop_resp_zones)
+                );
+        }
+        return get_users([
+            'role' => 'multipopolare_resp',
+            'meta_query' => [
+                'relation' => 'OR',
+                [
+                    'key' => 'mpop_resp_zones',
+                    'value' => '"'. $comune['codiceCatastale'] .'"',
+                    'compare' => 'LIKE'
+                ],
+                [
+                    'key' => 'mpop_resp_zones',
+                    'value' => '"'. $comune['provincia']['sigla'] .'"',
+                    'compare' => 'LIKE'
+                ],
+                [
+                    'key' => 'mpop_resp_zones',
+                    'value' => '"reg_'. $comune['provincia']['regione'] .'"',
+                    'compare' => 'LIKE'
+                ],
+            ]
+        ]);
+    }
+    private function is_resp_of_user($user, $resp = null) {
+        if (is_int($resp) || is_string($resp)) {
+            $resp = get_user_by('ID', $resp);
+            if (!$resp) return false;
+        }
+        if (!$resp) $resp = wp_get_current_user();
+        return $this->get_resp_by_user($user, $resp);
     }
     public function user_search_pre_user_query($q) {
         global $wpdb;
