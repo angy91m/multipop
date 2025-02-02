@@ -657,7 +657,7 @@ if ($this->discourse_utilities()) {
                             </v-select>
                         </label>
                     </div>
-                    <div class="mpop-user-search-field mpop-50-wid">
+                    <div v-if="profile.role == 'administrator'" class="mpop-user-search-field mpop-50-wid">
                         <label for="userSearchRespZone-select">Zone gestite&nbsp;
                             <v-select
                                 multiple
@@ -724,12 +724,12 @@ if ($this->discourse_utilities()) {
                 >
                     <template #body="props">
                         <q-tr :props="props" @click="()=>viewUser(props.row.ID)" class="mpop-click">
-                            <q-td v-for="prop in foundUsersColumns" :key="prop.name">
-                                <template v-if="prop.name == 'mpop_resp_zones'">
+                            <template v-for="prop in foundUsersColumns" :key="prop.name">
+                                <q-td v-if="profile.role == 'administrator' && prop.name == 'mpop_resp_zones'">
                                     <span v-html="showZones(props.row.mpop_resp_zones)"></span>
-                                </template>
-                                <template v-else>{{prop.format ? prop.format(props.row[prop.name]) : props.row[prop.name]}}</template>
-                            </q-td>
+                                </q-td>
+                                <q-td v-else>{{prop.format ? prop.format(props.row[prop.name]) : props.row[prop.name]}}</q-td>
+                            </template>
                         </q-tr>
                     </template>
                 </q-table>
