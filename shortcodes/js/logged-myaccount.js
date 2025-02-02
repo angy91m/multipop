@@ -83,7 +83,7 @@ foundUsersColumns = [
     {name: 'last_name', label: 'Cognome', sortable: true},
     {name: 'mpop_billing_state', label: 'Provincia', sortable: true},
     {name: 'mpop_billing_city', label: 'Comune', sortable: true},
-    {name: 'mpop_resp_zones', label: 'Zone'},
+    {name: 'mpop_resp_zones', label: 'Zone', admin: true}
 ].map(col => {
     col.align = 'left';
     col.field = col.name;
@@ -326,6 +326,7 @@ createApp({
             }
             return buttons;
         }),
+        foundUsersColumnsComputed = computed(() => profile.role == 'administrator' ? foundUsersColumns : foundUsersColumns.filter(c => !c.admin) ),
         isValidProfileBirthPlace = computed(()=>profileInEditing.mpop_birthplace_country && (profileInEditing.mpop_birthplace_country != 'ita' || profileInEditing.mpop_birthplace)),
         isValidProfileBillingPlace = computed(()=>profileInEditing.mpop_billing_country && (profileInEditing.mpop_billing_country != 'ita' || (profileInEditing.mpop_billing_city && profileInEditing.mpop_billing_state && profileInEditing.mpop_billing_zip))),
         validProfileForm = computed(()=>
@@ -1802,7 +1803,7 @@ createApp({
             profilePhoneInput,
             userEditPhoneInput,
             parsePhone,
-            foundUsersColumns,
+            foundUsersColumns: foundUsersColumnsComputed,
             userSearching,
             userSearchTablePagination,
             menuItems,
