@@ -475,6 +475,17 @@ createApp({
         function isCachedProp(propName) {
             return cachedProps[propName] ? cachedProps[propName] > (new Date()).getTime() : false;
         }
+        function showPendingEdit(k, v) {
+            switch(k) {
+                case 'mpop_billing_city':
+                    v = v.nome
+                    break;
+                case 'mpop_billing_country':
+                    countries.find(c => c.name == v)?.name
+                    break;
+            }
+            return pendingEditsName[k] + ': ' + v;
+        }
         async function loadUsersFromCsv(e) {
             csvUsers.length = 0;
             if (e.target.files.length) {
@@ -1856,7 +1867,7 @@ createApp({
             decryptPasswordSave,
             profileSubCancel,
             subCancel,
-            pendingEditsName
+            showPendingEdit
         };
     }
 })
