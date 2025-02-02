@@ -209,7 +209,7 @@ createApp({
         }, {
             name: 'users',
             label: 'Utenti',
-            admin: true
+            resp: true
         },
         // {
         //     name: 'subscriptions',
@@ -1365,7 +1365,7 @@ createApp({
                 userSearching.value = true;
                 foundUsers.length = 0;
                 const reqObj = {
-                    action: 'admin_search_users',
+                    action: (profile.role == 'administrator' ? 'admin' : 'resp') + '_search_users',
                     ...userSearch,
                     mpop_billing_country: [],
                     mpop_billing_state: [],

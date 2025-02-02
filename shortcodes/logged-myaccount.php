@@ -60,8 +60,20 @@ if ($this->discourse_utilities()) {
                             </q-item-section>
                         </q-item>
                     </template>
-                    <template v-if="profile.role == 'administrator'">
+                    <template v-if="profile.role.includes('administrator', 'multipopolare_resp')">
                         <q-separator></q-separator>
+                        <template v-for="(menuItem, index) in menuItems" :key="index">
+                            <q-item v-if="menuItem.resp" clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
+                                <q-item-section avatar>
+                                <!-- <q-icon :name="menuItem.icon" /> -->
+                                </q-item-section>
+                                <q-item-section>
+                                {{ menuItem.label }}
+                                </q-item-section>
+                            </q-item>
+                        </template>
+                    </template>
+                    <template v-if="profile.role == 'administrator'">
                         <template v-for="(menuItem, index) in menuItems" :key="index">
                             <q-item v-if="menuItem.admin" clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
                                 <q-item-section avatar>
@@ -542,7 +554,7 @@ if ($this->discourse_utilities()) {
                             <input type="checkbox" v-model="moduleUploadData.generalPolicyAccept"/>
                         </label>
                         <br>
-                        <button @click="()=>moduleUploadData.step-= (isValidIdCard ? 2 : 1)">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.generalPolicyAccept || moduleUploadDataSending" @click="moduleUploadDataSend">Invia</button>
+                        <button :disabled="moduleUploadDataSending" @click="()=>moduleUploadData.step-= (isValidIdCard ? 2 : 1)">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.generalPolicyAccept || moduleUploadDataSending" @click="moduleUploadDataSend">Invia</button>
                     </q-step>
                 </q-stepper>
                 <p v-if="moduleUploadData.sub.status != 'open'">
