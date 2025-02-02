@@ -2260,6 +2260,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 $countries[] = $z['code'];
             }
         }
+        $countries = array_unique($countries);
+        $countries = array_values($countries);
         $to_delete = [];
         if (in_array('ext', $countries)) {
             foreach($zones as $k => $z) {
@@ -2299,6 +2301,9 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             return 1;
         });
         foreach($zones as $zone) {
+            if ($zone['type'] == 'nazione') {
+                $res[] = $zone;
+            }
             if ($zone['type'] == 'regione') {
                 if (!isset($res[$zone['nome']])) {
                     $res[$zone['nome']] = $zone;
