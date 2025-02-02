@@ -315,7 +315,7 @@ switch ($post_data['action']) {
             ] as $prop) {
                 if ($current_user->$prop != $post_data[$prop]) {
                     if ($prop == 'mpop_billing_city' && $post_data[$prop]) {
-                        $pending_edits[$prop] = $found_bc;
+                        $pending_edits[$prop] = $found_bc[0];
                         continue;
                     }
                     $pending_edits[$prop] = $post_data[$prop];
