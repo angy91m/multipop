@@ -3924,7 +3924,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if (is_int($user) || is_string($user)) {
             $user = get_user_by('ID', $user);
         }
-        if (!$user || !$user->mpop_billing_country || ($user->mpop_billing_country == 'ita' && !$user->mpop_billing_city)) return is_null($resp) ? [] : false;
+        if (!$user || empty($user->roles) || $user->roles[0] != 'multipopolano' || !$user->mpop_billing_country || ($user->mpop_billing_country == 'ita' && !$user->mpop_billing_city)) return is_null($resp) ? [] : false;
         if (is_int($resp) || is_string($resp)) {
             $resp = get_user_by('ID', $resp);
             if (!$resp) return false;
