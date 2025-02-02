@@ -3997,7 +3997,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     }
     private function resp_user_search($post_data, $user) {
         if (!is_array($user->mpop_resp_zones) || empty($user->mpop_resp_zones)) {
-            return [[], 0, 100, $post_data['sortBy']];
+            return [[], 0, 100, [$post_data['sortBy']]];
         }
         $billing_zones_or = [];
         $mpop_billing_country = [];
@@ -4175,7 +4175,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $limit = 100,
         $billing_zones_or = false
     ) {
-        $res = [[], 0, $limit, $sort_by];
+        $res = [[], 0, $limit, [$sort_by]];
         if (!is_array($roles) && $roles !== true) {
             return $res;
         }
