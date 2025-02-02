@@ -566,7 +566,7 @@ if ($this->discourse_utilities()) {
                 <div class="mpop-user-search-field">
                     <input type="text" v-model="userSearch.txt" @input="triggerSearchUsers" placeholder="Nome, e-mail, username" />
                 </div>
-                <div class="mpop-user-search-field" v-for="(role, index) in userRoles" :key="index">
+                <div v-if="profile.role == 'administrator'" class="mpop-user-search-field" v-for="(role, index) in userRoles" :key="index">
                     <label :for="'user-search-'+role">{{showRole(role)}}&nbsp;
                         <input :id="'user-search-'+role" type="checkbox" v-model="userSearch.roles" @change="triggerSearchUsers" :value="role"/>
                     </label>

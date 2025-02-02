@@ -4033,7 +4033,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         return $this->user_search(
             $post_data['txt'],
-            $post_data['roles'],
+            ['multipopolano'],
             $post_data['mpop_billing_country'],
             $post_data['mpop_billing_state'],
             $post_data['mpop_billing_city'],
