@@ -60,7 +60,7 @@ if ($this->discourse_utilities()) {
                             </q-item-section>
                         </q-item>
                     </template>
-                    <template v-if="profile.role.includes('administrator', 'multipopolare_resp')">
+                    <template v-if="['administrator', 'multipopolare_resp'].includes(profile.role)">
                         <q-separator></q-separator>
                         <template v-for="(menuItem, index) in menuItems" :key="index">
                             <q-item v-if="menuItem.resp" clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
