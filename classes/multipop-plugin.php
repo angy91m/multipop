@@ -4192,7 +4192,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             'number' => $limit
         ];
         if(count($mpop_resp_zones)) {
-            $mpop_resp_zones = array_filter($mpop_resp_zones, function($z) {return is_string($z) && (str_starts_with($z, 'reg_') || preg_match('/^([A-Z]{2})|([A-Z]\d{3})$/', $z));});
+            $mpop_resp_zones = array_filter($mpop_resp_zones, function($z) {return is_string($z) && (str_starts_with($z, 'reg_') || preg_match('/^([A-Z]{2})|([A-Z]\d{3})|([a-z]{3})$/', $z));});
             $mpop_resp_zones = array_unique($mpop_resp_zones);
             $mpop_resp_zones = array_values($mpop_resp_zones);
         }
