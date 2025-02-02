@@ -4245,26 +4245,34 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $mpop_billing_country = array_values(array_unique(array_filter($mpop_billing_country, function($s) { return preg_match('/^[a-z]{3}$/', $s); })));
         $mpop_billing_state = array_values(array_unique(array_filter($mpop_billing_state, function($s) { return preg_match('/^[A-Z]{2}$/', $s); })));
         $mpop_billing_city = array_values(array_unique(array_filter($mpop_billing_city, function($s) { return preg_match('/^[A-Z]\d{3}$/', $s); })));
-        if (count($mpop_billing_country)) {
+        if (in_array('ext', $mpop_billing_country)) {
             $meta_q['mpop_billing_country'] = [
                 'key' => 'mpop_billing_country',
-                'compare' => 'IN',
-                'value' => $mpop_billing_country
+                'compare' => '!=',
+                'value' => 'ita'
             ];
-        }
-        if (count($mpop_billing_state)) {
-            $meta_q['mpop_billing_state'] = [
-                'key' => 'mpop_billing_state',
-                'compare' => 'IN',
-                'value' => $mpop_billing_state
-            ];
-        }
-        if (count($mpop_billing_city)) {
-            $meta_q['mpop_billing_city'] = [
-                'key' => 'mpop_billing_city',
-                'compare' => 'IN',
-                'value' => $mpop_billing_city
-            ];
+        } else {
+            if (!empty($mpop_billing_country)) {
+                $meta_q['mpop_billing_country'] = [
+                    'key' => 'mpop_billing_country',
+                    'compare' => 'IN',
+                    'value' => $mpop_billing_country
+                ];
+            }
+            if (!empty($mpop_billing_state)) {
+                $meta_q['mpop_billing_state'] = [
+                    'key' => 'mpop_billing_state',
+                    'compare' => 'IN',
+                    'value' => $mpop_billing_state
+                ];
+            }
+            if (!empty($mpop_billing_city)) {
+                $meta_q['mpop_billing_city'] = [
+                    'key' => 'mpop_billing_city',
+                    'compare' => 'IN',
+                    'value' => $mpop_billing_city
+                ];
+            }
         }
         if (is_array( $billing_zones_or ) && !empty($billing_zones_or)) {
             $billing_zones_meta_q = [
@@ -4319,6 +4327,14 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 'relation' => 'OR'
             ];
             foreach($mpop_resp_zones as $zone) {
+                if ($zone == 'ext') {
+                    $meta_q['mpop_resp_zones'][] = [
+                        'key' => 'mpop_resp_zones',
+                        'value' => "\"ita\"",
+                        'compare' => 'NOT LIKE'
+                    ];
+                    continue;
+                }
                 $meta_q['mpop_resp_zones'][] = [
                     'key' => 'mpop_resp_zones',
                     'value' => "\"$zone\"",

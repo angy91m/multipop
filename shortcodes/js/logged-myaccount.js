@@ -1392,6 +1392,7 @@ createApp({
                 delete reqObj.zones;
                 delete reqObj.resp_zones;
                 userSearch.zones.forEach(z => {
+                    if (z.type == 'nazione') reqObj.mpop_billing_country.push(z.code);
                     if (z.type == 'regione') reqObj.mpop_billing_state.push(...Object.keys(z.province));
                     if (z.type == 'provincia') reqObj.mpop_billing_state.push(z.sigla);
                     if (z.type == 'comune') reqObj.mpop_billing_city.push(z.codiceCatastale);
