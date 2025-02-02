@@ -1170,7 +1170,7 @@ if ($this->discourse_utilities()) {
                     <hr>
                     <h3 class="text-h3">Modifiche in attesa di conferma</h3>
                     <ul>
-                        <li v-for="(v, k) in userInView.mpop_profile_pending_edits">{{k}}: {{v}}</li>
+                        <li v-for="(v, k) in userInView.mpop_profile_pending_edits">{{pendingEditsName[k]}}: {{v}}</li>
                     </ul>
                 </template>
                 <hr>

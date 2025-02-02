@@ -89,6 +89,14 @@ foundUsersColumns = [
     col.field = col.name;
     return col;
 }),
+pendingEditsName = {
+    'mpop_billing_state': 'Provincia di residenza',
+    'mpop_billing_city': 'Comune di residenza',
+    'mpop_billing_zip': 'CAP',
+    'mpop_billing_phone': 'Telefono',
+    'mpop_billing_country': 'Nazione di residenza',
+    'mpop_billing_address': 'Indirizzo di residenza'
+},
 userCsvFields = [
     'email',
     'first_name',
@@ -1847,7 +1855,8 @@ createApp({
             documentsDecryptPassword,
             decryptPasswordSave,
             profileSubCancel,
-            subCancel
+            subCancel,
+            pendingEditsName
         };
     }
 })
