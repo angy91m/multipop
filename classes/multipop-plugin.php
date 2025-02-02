@@ -2253,6 +2253,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         return $zones;
     }
     private function reduce_zones(array $zones = []) {
+        save_test($zones);
         //MOD FOR COUNTRIES start
         $countries = [];
         foreach ($zones as $z) {
@@ -2281,6 +2282,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             unset($zones[$d]);
         }
         $zones = array_values($zones);
+        save_test($zones,1);
 
         //MOD FOR COUNTRIES end
 
