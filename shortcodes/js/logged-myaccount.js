@@ -481,7 +481,7 @@ createApp({
                     if (v) v = v.nome;
                     break;
                 case 'mpop_billing_country':
-                    countries.find(c => c.code == v)?.name
+                    v = countries.find(c => c.code == v)?.name
                     break;
             }
             return pendingEditsName[k] + ': ' + v;
