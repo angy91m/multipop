@@ -1697,6 +1697,9 @@ createApp({
                 case 'administrator':
                     role = "Amministratore";
                     break;
+                case 'multipopolano':
+                    role = "Multipopolana/o";
+                    break;
                 case 'others':
                     role = 'Altri';
                     break;
