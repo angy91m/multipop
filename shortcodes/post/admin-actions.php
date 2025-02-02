@@ -14,7 +14,9 @@ switch( $post_data['action'] ) {
             $post_data['subs_years'],
             $post_data['subs_statuses'],
             $post_data['page'],
-            $post_data['sortBy']
+            $post_data['sortBy'],
+            100,
+            false
         );
         $res_data['data'] = ['users' => $users, 'total' => $total, 'limit' => $limit, 'sortBy' => $sort_by];
         break;
@@ -242,6 +244,7 @@ switch( $post_data['action'] ) {
             $parsed_resp_zones = [];
             $regioni = false;
             $province = false;
+            $countries = false;
             foreach ($post_data['mpop_resp_zones'] as $zone) {
                 if (!is_string($zone)) continue;
                 if (str_starts_with($zone, 'reg_')) {
@@ -269,6 +272,15 @@ switch( $post_data['action'] ) {
                     $found = array_pop($found);
                     if ($found) {
                         $parsed_resp_zones[] = $found + ['type' => 'comune'];
+                    }
+                } else if (preg_match('/^[a-z]{3}$/', $zone)) {
+                    if (!$countries) {
+                        $countries = $this->get_countries_all();
+                    }
+                    $found = array_filter($countries, function($c) use ($zone) { return $c['code'] == $zone; });
+                    $found = array_pop($found);
+                    if ($found) {
+                        $parsed_resp_zones[] = $found + ['type' => 'nazione'];
                     }
                 }
             }
@@ -357,6 +369,9 @@ switch( $post_data['action'] ) {
                         break;
                     case 'comune':
                         $resp_zones_edits[] = $zone['codiceCatastale'];
+                        break;
+                    case 'nazione':
+                        $resp_zones_edits[] = $zone['code'];
                         break;
                 }
             }

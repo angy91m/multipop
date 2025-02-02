@@ -2138,6 +2138,33 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 return mb_strtoupper( $a['nome'], 'UTF-8') < mb_strtoupper( $b['nome'], 'UTF-8') ? -1 : 1;
             }
         });
+
+        //MOD FOR COUNTRIES
+        $countries = $this->get_countries_all();
+        if (!empty($countries)) {
+            foreach ($countries as $c) {
+                $zone = [
+                    'nome' => $c['name'],
+                    'type' => 'nazione',
+                    'code' => $c['code'],
+                    'untouched_label' => "Nazione: $c[name]"
+                ];
+                $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT', $zone['untouched_label']);
+                if ($c['code'] == 'ita') {
+                    array_unshift($zones, $zone);
+                } else {
+                    $zones[] = $zone;
+                }
+            }
+            $zones[] = [
+                'nome' => 'Estero',
+                'type' => 'nazione',
+                'code' => 'ext',
+                'untouched_label' => 'ESTERO',
+                'label' => 'ESTERO'
+            ];
+        }
+
         return $zones;
     }
     private function retrieve_zones_from_resp_zones($resp_zones) {
@@ -2145,6 +2172,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $regioni_all = false;
         $province_all = false;
         $comuni_all = false;
+        $countries_all = false;
         foreach($resp_zones as $resp_zone) {
             if(str_starts_with($resp_zone, 'reg_')) {
                 if (!$regioni_all) {
@@ -2192,11 +2220,68 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                     $zone['untouched_label'] .= ' (' . $found['provincia']['sigla'] . ')';
                     $zones[] = $zone;
                 }
+            } else if (preg_match('/^[a-z]{3}$/', $resp_zone)) {
+
+                //MOD FOR COUNTRIES
+                if (!$countries_all) {
+                    $countries_all = $this->get_countries_all();
+                }
+                if ($resp_zone == 'ext') {
+                    $zones[] = [
+                        'nome' => 'Estero',
+                        'type' => 'nazione',
+                        'code' => 'ext',
+                        'untouched_label' => 'ESTERO',
+                        'label' => 'ESTERO'
+                    ];
+                } else {
+                    $found = array_filter($countries_all, function($c) use ($resp_zone) { return $c['code'] == $resp_zone; });
+                    $found = array_pop($found);
+                    if ($found) {
+                        $zone = [
+                            'nome' => $found['name'],
+                            'type' => 'nazione',
+                            'code' => $found['code'],
+                            'untouched_label' => "Nazione: $found[name]"
+                        ];
+                        $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT', $zone['untouched_label']);
+                        $zones[] = $zone;
+                    }
+                }
             }
         }
         return $zones;
     }
     private function reduce_zones(array $zones = []) {
+        //MOD FOR COUNTRIES start
+        $countries = [];
+        foreach ($zones as $z) {
+            if ($z['type'] == 'nazione') {
+                $countries[] = $z['code'];
+            }
+        }
+        $to_delete = [];
+        if (in_array('ext', $countries)) {
+            foreach($zones as $k => $z) {
+                if ($z['type'] == 'nazione' && $z['code'] != 'ita' && $z['code'] != 'ext') {
+                    $to_delete[] = $k;
+                }
+            }
+        }
+        if (in_array('ita', $countries)) {
+            foreach($zones as $k => $z) {
+                if ($z['type'] != 'nazione') {
+                    $to_delete[] = $k;
+                }
+            }
+        }
+        foreach($to_delete as $d) {
+            unset($zones[$d]);
+        }
+        $zones = array_values($zones);
+
+        //MOD FOR COUNTRIES end
+
         $res = [];
         usort($zones, function($a, $b) {
             if ($a['type'] == $b['type']) {
@@ -3837,27 +3922,32 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if (is_int($user) || is_string($user)) {
             $user = get_user_by('ID', $user);
         }
-        if (!$user || !$user->mpop_billing_city) return is_null($resp) ? [] : false;
+        if (!$user || !$user->mpop_billing_country || ($user->mpop_billing_country == 'ita' && !$user->mpop_billing_city)) return is_null($resp) ? [] : false;
         if (is_int($resp) || is_string($resp)) {
             $resp = get_user_by('ID', $resp);
             if (!$resp) return false;
         }
-        $comune = $this->get_comune_by_catasto($user->mpop_billing_city, true);
-        if (!$comune) return is_null($resp) ? [] : false;
+        if ($user->mpop_billing_country == 'ita') {
+            $comune = $this->get_comune_by_catasto($user->mpop_billing_city, true);
+            if (!$comune) return is_null($resp) ? [] : false;
+        }
         if ($resp) {
             if (empty($resp->roles) || $resp->roles[0] != 'multipopolare_resp') return false;
             return 
                 is_array($resp->mpop_resp_zones)
                 && (
-                    in_array($comune['codiceCatastale'], $resp->mpop_resp_zones)
-                    || in_array($comune['provincia']['sigla'], $resp->mpop_resp_zones)
-                    || in_array('reg_'. $comune['provincia']['regione'], $resp->mpop_resp_zones)
+                    $user->mpop_billing_country == 'ita' ?
+                        in_array($comune['codiceCatastale'], $resp->mpop_resp_zones)
+                        || in_array($comune['provincia']['sigla'], $resp->mpop_resp_zones)
+                        || in_array('reg_'. $comune['provincia']['regione'], $resp->mpop_resp_zones)
+                        || in_array('ita', $resp->mpop_resp_zones)
+                    :
+                        in_array($user->mpop_billing_country, $resp->mpop_resp_zones)
+                        || in_array('ext', $resp->mpop_resp_zones)
                 );
         }
-        return get_users([
-            'role' => 'multipopolare_resp',
-            'meta_query' => [
-                'relation' => 'OR',
+        $meta_q = $user->mpop_billing_country == 'ita' ?
+            [
                 [
                     'key' => 'mpop_resp_zones',
                     'value' => '"'. $comune['codiceCatastale'] .'"',
@@ -3873,7 +3963,28 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                     'value' => '"reg_'. $comune['provincia']['regione'] .'"',
                     'compare' => 'LIKE'
                 ],
+                [
+                    'key' => 'mpop_resp_zones',
+                    'value' => '"ita"',
+                    'compare' => 'LIKE'
+                ]
             ]
+            : [
+                [
+                    'key' => 'mpop_resp_zones',
+                    'value' => '"'.$user->mpop_billing_country.'"',
+                    'compare' => 'LIKE'
+                ],
+                [
+                    'key' => 'mpop_resp_zones',
+                    'value' => '"ext"',
+                    'compare' => 'LIKE'
+                ]
+            ]
+        ;
+        return get_users([
+            'role' => 'multipopolare_resp',
+            'meta_query' => ['relation' => 'OR'] + $meta_q
         ]);
     }
     private function is_resp_of_user($user, $resp = null) {
@@ -3883,6 +3994,57 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         if (!$resp) $resp = wp_get_current_user();
         return $this->get_resp_by_user($user, $resp);
+    }
+    private function resp_user_search($post_data, $user) {
+        if (!is_array($user->mpop_resp_zones) || empty($user->mpop_resp_zones)) {
+            return [[], 0, 100, $post_data['sortBy']];
+        }
+        $billing_zones_or = [];
+        $mpop_billing_country = [];
+        $mpop_billing_state = [];
+        $mpop_billing_city = [];
+        $zones = $this->retrieve_zones_from_resp_zones($user->mpop_resp_zones);
+        foreach($zones as $z) {
+            switch($z['type']) {
+                case 'nazione':
+                    $mpop_billing_country[] = $z['code'];
+                    break;
+                case 'regione':
+                    $mpop_billing_state += array_map(function($p) {return $p['sigla'];}, $z['province']);
+                    break;
+                case 'provincia':
+                    $mpop_billing_state[] = $z['sigla'];
+                    break;
+                case 'comune':
+                    $mpop_billing_city[] = $z['codiceCatastale'];
+                    break;
+            }
+        }
+        if (!empty($mpop_billing_country)) {
+            $billing_zones_or['mpop_billing_country'] = $mpop_billing_country;
+        }
+        if (!empty($mpop_billing_state)) {
+            $billing_zones_or['mpop_billing_state'] = $mpop_billing_state;
+        }
+        if (!empty($mpop_billing_city)) {
+            $billing_zones_or['mpop_billing_city'] = $mpop_billing_city;
+        }
+        return $this->user_search(
+            $post_data['txt'],
+            $post_data['roles'],
+            $post_data['mpop_billing_country'],
+            $post_data['mpop_billing_state'],
+            $post_data['mpop_billing_city'],
+            $post_data['mpop_resp_zones'],
+            $post_data['mpop_card_active'],
+            $post_data['mpop_mail_to_confirm'],
+            $post_data['subs_years'],
+            $post_data['subs_statuses'],
+            $post_data['page'],
+            $post_data['sortBy'],
+            100,
+            $billing_zones_or
+        );
     }
     public function user_search_pre_user_query($q) {
         global $wpdb;
@@ -4010,9 +4172,10 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         array $subs_statuses = [],
         $page = 1,
         $sort_by = ['ID' => true],
-        $limit = 100
+        $limit = 100,
+        $billing_zones_or = false
     ) {
-        $res = [];
+        $res = [[], 0, $limit, $sort_by];
         if (!is_array($roles) && $roles !== true) {
             return $res;
         }
@@ -4035,7 +4198,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             if ($roles === true || in_array('multipopolare_resp', $roles)) {
                 $roles = ['multipopolare_resp'];
             } else {
-                return [[], 0, $limit];
+                return $res;
             }
         } else {
             $roles = $this->parse_requested_roles($roles);
@@ -4100,6 +4263,54 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 'compare' => 'IN',
                 'value' => $mpop_billing_city
             ];
+        }
+        if (is_array( $billing_zones_or ) && !empty($billing_zones_or)) {
+            $billing_zones_meta_q = [
+                'relation' => 'OR'
+            ];
+            if (isset($billing_zones_or['mpop_billing_country']) && is_array($billing_zones_or['mpop_billing_country'])) {
+                $billing_zones_or['mpop_billing_country'] = array_values(array_unique(array_filter($billing_zones_or['mpop_billing_country'], function($s) { return preg_match('/^[a-z]{3}$/', $s); })));
+                $ext_idx = array_search('ext', $billing_zones_or['mpop_billing_country']);
+                if ($ext_idx !== false) {
+                    unset($billing_zones_or['mpop_billing_country'][$ext_idx]);
+                    $billing_zones_or['mpop_billing_country'] = array_values($billing_zones_or['mpop_billing_country']);
+                    $billing_zones_meta_q[] = [
+                        'key' => 'mpop_billing_country',
+                        'compare' => '!=',
+                        'value' => 'ita'
+                    ];
+                }
+                if (!empty($billing_zones_or['mpop_billing_country'])) {
+                    $billing_zones_meta_q[] = [
+                        'key' => 'mpop_billing_country',
+                        'compare' => 'IN',
+                        'value' => $billing_zones_or['mpop_billing_country']
+                    ];
+                }
+            }
+            if (isset($billing_zones_or['mpop_billing_state']) && is_array($billing_zones_or['mpop_billing_state'])) {
+                $billing_zones_or['mpop_billing_state'] = array_values(array_unique(array_filter($billing_zones_or['mpop_billing_state'], function($s) { return preg_match('/^[A-Z]{2}$/', $s); })));
+                if (!empty($billing_zones_or['mpop_billing_state'])) {
+                    $billing_zones_meta_q[] = [
+                        'key' => 'mpop_billing_state',
+                        'compare' => 'IN',
+                        'value' => $billing_zones_or['mpop_billing_state']
+                    ];
+                }
+            }
+            if (isset($billing_zones_or['mpop_billing_city']) && is_array($billing_zones_or['mpop_billing_city'])) {
+                $billing_zones_or['mpop_billing_city'] = array_values(array_unique(array_filter($billing_zones_or['mpop_billing_city'], function($s) { return preg_match('/^[A-Z]\d{3}$/', $s); })));
+                if (!empty($billing_zones_or['mpop_billing_city'])) {
+                    $billing_zones_meta_q[] = [
+                        'key' => 'mpop_billing_city',
+                        'compare' => 'IN',
+                        'value' => $billing_zones_or['mpop_billing_city']
+                    ];
+                }
+            }
+            if (count($billing_zones_meta_q) > 1) {
+                $meta_q[] = $billing_zones_meta_q;
+            }
         }
         if (count($mpop_resp_zones)) {
             $meta_q['mpop_resp_zones'] = [

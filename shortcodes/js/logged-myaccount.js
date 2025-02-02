@@ -680,6 +680,22 @@ createApp({
         }
         function reduceZones(zones, target, zonesKey = 'zones') {
             const added = zones[zones.length - 1];
+            if (added.type == 'nazione') {
+                if (added.code == 'ita') {
+                    target[zonesKey] = target[zonesKey].filter(z => z.type == 'nazione');
+                } else if (added.code == 'ext') {
+                    target[zonesKey] = target[zonesKey].filter(z => z.type != 'nazione' || ['ita','ext'].includes(z.code));
+                } else {
+                    if (target[zonesKey].find(z => z.type == 'nazione' && z.code == 'ext')) {
+                        target[zonesKey].pop();
+                    }
+                }
+                return;
+            }
+            if (target[zonesKey].find(z => z.type == 'nazione' && z.code == 'ita')) {
+                target[zonesKey].pop();
+                return;
+            }
             if (added.type == 'comune') {
                 if (target[zonesKey].find(z => (z.type == 'provincia' && z.codice == added.provincia.codice) || (z.type == 'regione' && z.nome == added.provincia.regione) ) ) {
                     target[zonesKey].pop();

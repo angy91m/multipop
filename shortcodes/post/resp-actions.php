@@ -35,6 +35,10 @@ switch( $post_data['action'] ) {
             'asym' => base64_encode(substr($master_key, 32))
         ];
         break;
+    case 'resp_search_users':
+        [$users, $total, $limit, $sort_by] = $this->resp_user_search($post_data, $current_user);
+        $res_data['data'] = ['users' => $users, 'total' => $total, 'limit' => $limit, 'sortBy' => $sort_by];
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
