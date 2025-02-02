@@ -274,13 +274,17 @@ switch( $post_data['action'] ) {
                         $parsed_resp_zones[] = $found + ['type' => 'comune'];
                     }
                 } else if (preg_match('/^[a-z]{3}$/', $zone)) {
-                    if (!$countries) {
-                        $countries = $this->get_countries_all();
-                    }
-                    $found = array_filter($countries, function($c) use ($zone) { return $c['code'] == $zone; });
-                    $found = array_pop($found);
-                    if ($found) {
-                        $parsed_resp_zones[] = $found + ['type' => 'nazione'];
+                    if ($zone == 'ext') {
+                        $parsed_resp_zones[] = $this->estero_zone();
+                    } else {
+                        if (!$countries) {
+                            $countries = $this->get_countries_all();
+                        }
+                        $found = array_filter($countries, function($c) use ($zone) { return $c['code'] == $zone; });
+                        $found = array_pop($found);
+                        if ($found) {
+                            $parsed_resp_zones[] = $found + ['type' => 'nazione'];
+                        }
                     }
                 }
             }

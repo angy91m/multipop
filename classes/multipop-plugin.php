@@ -2156,16 +2156,19 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                     $zones[] = $zone;
                 }
             }
-            $zones[] = [
-                'nome' => 'Estero',
-                'type' => 'nazione',
-                'code' => 'ext',
-                'untouched_label' => 'ESTERO',
-                'label' => 'ESTERO'
-            ];
+            $zones[] = $this->estero_zone();
         }
 
         return $zones;
+    }
+    private function estero_zone() {
+        return [
+            'nome' => 'Estero',
+            'type' => 'nazione',
+            'code' => 'ext',
+            'untouched_label' => 'ESTERO',
+            'label' => 'ESTERO'
+        ];
     }
     private function retrieve_zones_from_resp_zones($resp_zones) {
         $zones = [];
@@ -2227,13 +2230,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                     $countries_all = $this->get_countries_all();
                 }
                 if ($resp_zone == 'ext') {
-                    $zones[] = [
-                        'nome' => 'Estero',
-                        'type' => 'nazione',
-                        'code' => 'ext',
-                        'untouched_label' => 'ESTERO',
-                        'label' => 'ESTERO'
-                    ];
+                    $zones[] = $this->estero_zone();
                 } else {
                     $found = array_filter($countries_all, function($c) use ($resp_zone) { return $c['code'] == $resp_zone; });
                     $found = array_pop($found);
@@ -2253,7 +2250,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         return $zones;
     }
     private function reduce_zones(array $zones = []) {
-        save_test($zones);
         //MOD FOR COUNTRIES start
         $countries = [];
         foreach ($zones as $z) {
@@ -2282,7 +2278,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             unset($zones[$d]);
         }
         $zones = array_values($zones);
-        save_test($zones,1);
 
         //MOD FOR COUNTRIES end
 
