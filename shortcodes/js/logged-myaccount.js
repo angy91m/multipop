@@ -615,7 +615,7 @@ createApp({
                     if (zones.data) {
                         zoneSearch[ctx].length = 0;
                         zoneSearch[ctx].push(...target[zonesKey]);
-                        zoneSearch[ctx].push(...zones.data.filter(z => !zoneSearch[ctx].find(zz => z.type == zz.type && (z.type == 'regione' ? z.nome == zz.nome : z.codice == zz.codice))));
+                        zoneSearch[ctx].push(...zones.data.filter(z => !zoneSearch[ctx].find(zz => z.type == zz.type && (z.type == 'regione' ? z.nome == zz.nome : ( z.type == 'nazione' ? z.code == zz.code : z.codice == zz.codice)))));
                     } else {
                         console.error('Unknown error');
                     }
@@ -663,7 +663,8 @@ createApp({
         function showZones(zones) {
             const regioni = zones.filter(z => z.type == 'regione'),
             province = zones.filter(z => z.type == 'provincia'),
-            comuni = zones.filter(z => z.type == 'comune');
+            comuni = zones.filter(z => z.type == 'comune'),
+            nazioni = zones.filter(z => z.type == 'nazione');
             let res = '';
             res += '<ul class="mpop-search-results-zone">';
             if (regioni.length) {
@@ -674,6 +675,9 @@ createApp({
             }
             if (comuni.length) {
                 res += '<li class="mpop-nowrap"><strong>Com:</strong> ' + comuni.map(c => c.nome + addSuppressToLabel(c)).join(', ') + '</li>';
+            }
+            if (nazioni.length) {
+                res += '<li class="mpop-nowrap"><strong>Naz:</strong> ' + nazioni.map(c => c.nome ).join(', ') + '</li>';
             }
             res += '</ul>';
             return res;
@@ -1393,6 +1397,7 @@ createApp({
                     if (z.type == 'comune') reqObj.mpop_billing_city.push(z.codiceCatastale);
                 });
                 userSearch.resp_zones.forEach(z => {
+                    if (z.type == 'nazione') reqObj.mpop_resp_zones.push(z.code);
                     if (z.type == 'regione') {
                         reqObj.mpop_resp_zones.push('reg_' + z.nome, ...Object.keys(z.province));
                         for (const k in z.province) {
