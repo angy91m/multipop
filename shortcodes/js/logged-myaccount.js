@@ -816,6 +816,9 @@ createApp({
                 userInEditing.mpop_resp_zones.forEach(z => {
                     let zs;
                     switch (z.type) {
+                        case 'nazione':
+                            zs = z.code;
+                            break;
                         case 'regione':
                             zs = 'reg_' + z.nome;
                             break;
