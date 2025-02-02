@@ -314,6 +314,10 @@ switch ($post_data['action']) {
                 'mpop_phone'
             ] as $prop) {
                 if ($current_user->$prop != $post_data[$prop]) {
+                    if ($prop == 'mpop_billing_city' && $post_data[$prop]) {
+                        $pending_edits[$prop] = $found_bc;
+                        continue;
+                    }
                     $pending_edits[$prop] = $post_data[$prop];
                 }
             }
