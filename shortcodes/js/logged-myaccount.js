@@ -478,10 +478,10 @@ createApp({
         function showPendingEdit(k, v) {
             switch(k) {
                 case 'mpop_billing_city':
-                    v = v.nome
+                    if (v) v = v.nome;
                     break;
                 case 'mpop_billing_country':
-                    countries.find(c => c.name == v)?.name
+                    countries.find(c => c.code == v)?.name
                     break;
             }
             return pendingEditsName[k] + ': ' + v;
