@@ -410,8 +410,9 @@ createApp({
             && ( !userInView.mpop_billing_address || userInEditing.mpop_billing_address.trim() )
             && ( !userInView.mpop_phone || userInEditing.mpop_phone )
         ),
-        validUserAddForm = computed(()=>
-            mailRegex.test(userInAdd.email.trim())
+        validUserAddForm = computed(()=>{
+            console.log(userInAdd);
+            return mailRegex.test(userInAdd.email.trim())
             && userInAdd.first_name.trim()
             && userInAdd.last_name.trim()
             && userInAdd.mpop_birthdate
@@ -421,6 +422,7 @@ createApp({
             && (userInAdd.mpop_billing_country != 'ita' || (userInAdd.mpop_billing_city && userInAdd.mpop_billing_zip))
             && userInAdd.mpop_billing_address.trim()
             && userInAdd.mpop_phone
+        }
         ),
         staticPwdErrors = reactive([]),
         pwdChangeErrors = computed(()=> {
