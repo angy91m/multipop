@@ -112,12 +112,12 @@ if ($this->discourse_utilities()) {
                     </tr>
                     <tr>
                         <td><strong>Nome:</strong></td>
-                        <td v-if="!profileEditing || (goodSubscriptions.length && profile.role != 'administrator')">{{profile.first_name}}</td>
+                        <td v-if="!profileEditing">{{profile.first_name}}</td>
                         <td v-else><input type="text" :class="savingProfileErrors.includes('first_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="profileInEditing.first_name"/></td>
                     </tr>
                     <tr>
                         <td><strong>Cognome:</strong></td>
-                        <td v-if="!profileEditing || (goodSubscriptions.length && profile.role != 'administrator')">{{profile.last_name}}</td>
+                        <td v-if="!profileEditing">{{profile.last_name}}</td>
                         <td v-else><input type="text" :class="savingProfileErrors.includes('last_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="profileInEditing.last_name"/></td>
                     </tr>
                     <tr>
@@ -130,7 +130,7 @@ if ($this->discourse_utilities()) {
                     </tr>
                     <tr>
                         <td><strong>Data di nascita:</strong></td>
-                        <td v-if="!profileEditing || (goodSubscriptions.length && profile.role != 'administrator')">{{displayLocalDate(profile.mpop_birthdate)}}</td>
+                        <td v-if="!profileEditing">{{displayLocalDate(profile.mpop_birthdate)}}</td>
                         <td v-else>
                             <input type="date"
                                 :class="savingProfileErrors.includes('mpop_birthdate') ? 'bad-input' : ''"
@@ -142,7 +142,7 @@ if ($this->discourse_utilities()) {
                     </tr>
                     <tr>
                         <td><strong>Nazione di nascita:</strong></td>
-                        <td v-if="!profileEditing || (goodSubscriptions.length && profile.role != 'administrator')">{{showCountryName(profile.mpop_birthplace_country)}}</td>
+                        <td v-if="!profileEditing">{{showCountryName(profile.mpop_birthplace_country)}}</td>
                         <td v-else>
                             <v-select
                                 id="birthplaceCountry-select"
@@ -167,7 +167,7 @@ if ($this->discourse_utilities()) {
                     </tr>
                     <tr v-if="(profileEditing ? profileInEditing : profile).mpop_birthplace_country == 'ita'">
                         <td><strong>Comune di nascita:</strong></td>
-                        <td v-if="!profileEditing || (goodSubscriptions.length && profile.role != 'administrator')">{{profile.mpop_birthplace ? (profile.mpop_birthplace.nome + ' (' + profile.mpop_birthplace.provincia.sigla +')' + addSuppressToLabel(profile.mpop_birthplace) ) : ''}}</td>
+                        <td v-if="!profileEditing">{{profile.mpop_birthplace ? (profile.mpop_birthplace.nome + ' (' + profile.mpop_birthplace.provincia.sigla +')' + addSuppressToLabel(profile.mpop_birthplace) ) : ''}}</td>
                         <td v-else>
                             <v-select
                                 id="birthplace-select"
