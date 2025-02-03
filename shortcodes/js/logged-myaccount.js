@@ -1252,6 +1252,36 @@ createApp({
                 }
             }
         }
+        async function refuseUserPendingEdits() {
+            if (confirm('Sei sicura/o di voler rifiutare i dati modificati?')) {
+                saving.value = true;
+                try {
+                    const res = await serverReq({
+                        action: (profile.role == 'administrator' ? 'admin' : 'resp') + '_refuse_profile_pending_edits',
+                        ID: userInView.ID
+                    });
+                    if (res.ok) {
+                        const {notices = []} = await res.json();
+                        generateNotices(notices);
+                        viewUser(userInView.ID, true);
+                    } else {
+                        try {
+                            const {notices = []} = await res.json();
+                            if (error) {
+                                generateNotices(notices);
+                            } else {
+                                console.error('Unknown error');
+                            }
+                        } catch {
+                            console.error('Unknown error');
+                        }
+        
+                    }
+                } finally {
+                    saving.value = false;
+                }
+            }
+        }
         async function cancelProfilePendingEdits() {
             saving.value = true;
             try {
@@ -1944,7 +1974,8 @@ createApp({
             subCancel,
             showPendingEdit,
             cancelProfilePendingEdits,
-            confirmUserPendingEdits
+            confirmUserPendingEdits,
+            refuseUserPendingEdits
         };
     }
 })

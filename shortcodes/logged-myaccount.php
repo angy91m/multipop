@@ -369,7 +369,7 @@ if ($this->discourse_utilities()) {
                                 <li>Quota annuale: {{currencyFormatter.custFormat(nearActiveSub.quote)}}</li>
                                 <button v-if="nearActiveSub.status == 'open'" class="mpop-button" @click="generateSubscriptionPdf(nearActiveSub.id)" :disabled="generatingSubscriptionPdf.find( v => v == nearActiveSub.id)">Genera modulo iscrizione</button>
                                 <button v-if="nearActiveSub.status == 'open'" class="mpop-button" @click="moduleUploadBegin(nearActiveSub)">Carica modulo</button>
-                                <button v-if="!['canceled', 'completed', 'refused'].includes(nearActiveSub.status)" class="mpop-button" @click="profileSubCancel(nearActiveSub)">Annulla richiesta</button>
+                                <button v-if="!['canceled', 'completed', 'refused'].includes(nearActiveSub.status)" class="mpop-button btn-error" @click="profileSubCancel(nearActiveSub)">Annulla richiesta</button>
                                 <li v-if="nearActiveSub.status == 'seen'"><strong>Pagamento con bonifico</strong><br>
                                     Per pagare con bonifico, dopo aver effettuato il pagamento, invia una e-mail dall'indirizzo registrato sul sito a <?=$this->settings['mail_from']?> con gli eventuali riferimenti e scansione della ricevuta.
                                 </li>
@@ -467,7 +467,7 @@ if ($this->discourse_utilities()) {
                                             <br>
                                             <q-btn
                                                 dense
-                                                color="primary"
+                                                color="error"
                                                 size="sm"
                                                 label="Annulla"
                                                 @click="profileSubCancel(props.row)"
@@ -1180,6 +1180,8 @@ if ($this->discourse_utilities()) {
                     <ul>
                         <li v-for="(v, k) in userInView.mpop_profile_pending_edits">{{showPendingEdit(k, v)}}</li>
                     </ul>
+                    <button @click="confirmUserPendingEdits" class="mpop-button btn-success" :disabled="saving">Conferma le modifiche</button>
+                    <button @click="refuseUserPendingEdits" class="mpop-button btn-error" :disabled="saving">Rifiuta le modifiche</button>
                 </template>
                 <hr>
                 <q-table

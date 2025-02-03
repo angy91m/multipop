@@ -759,6 +759,18 @@ switch( $post_data['action'] ) {
         delete_user_meta($user->ID, 'mpop_profile_pending_edits');
         $res_data['data'] = true;
         break;
+    case 'admin_refuse_profile_pending_edits':
+        if (!isset($post_data['ID']) || !is_int($post_data['ID'])) {
+            $res_data['error'] = ['ID'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessun utente selezionato']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $user = get_user_by('ID', $post_data['ID']);
+        delete_user_meta($user->ID, 'mpop_profile_pending_edits');
+        $res_data['data'] = true;
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
