@@ -2384,14 +2384,14 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         if ($add_labels) {
             $comuni = false;
-            if ($parsed_user['mpop_birthplace']) {
+            if ($user->mpop_birthplace_country == 'ita' && $parsed_user['mpop_birthplace']) {
                 $comuni = $this->get_comuni_all();
                 $fc = $this->get_comune_by_catasto($parsed_user['mpop_birthplace'], true);
                 if ($fc) {
                     $parsed_user['mpop_birthplace'] = $this->add_birthplace_labels($fc)[0];
                 }
             }
-            if ($parsed_user['mpop_billing_city']) {
+            if ($user->mpop_billing_country == 'ita' && $parsed_user['mpop_billing_city']) {
                 if (!$comuni) {
                     $comuni = $this->get_comuni_all();
                 }
