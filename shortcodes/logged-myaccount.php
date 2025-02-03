@@ -349,6 +349,11 @@ if ($this->discourse_utilities()) {
                     hide-bottom
                     @row-click="(e,row) => viewSub(row.id)"
                 >
+                <template v-slot:top>
+                    <h4 class="text-h4"></h4>
+                    <q-space />
+                    <q-btn color="primary" :icon="add" />
+                </template>
                 </q-table>
             </div>
             <div v-if="selectedTab.name == 'passwordChange'">

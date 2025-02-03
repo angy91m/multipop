@@ -219,7 +219,7 @@ createApp({
             resp: true
         }, {
             name: 'userAdd',
-            label: 'Aggiungi tesserato',
+            label: 'Aggiungi tesserata/o',
             resp: true
         },
         // {
@@ -242,7 +242,7 @@ createApp({
             email: '',
             first_name: '',
             last_name: '',
-            mpop_birthdate: null,
+            mpop_birthdate: '',
             mpop_birthplace_country: '',
             mpop_birthplace: '',
             mpop_billing_country: '',
@@ -947,7 +947,6 @@ createApp({
                 
                 const res = await serverReq({
                     action: (profile.role == 'administrator' ? 'admin' : 'resp') + '_add_user',
-                    ID: userInAdd.ID,
                     email: userInAdd.email,
                     mpop_mail_confirmed: userInAdd.mpop_mail_confirmed,
                     first_name: userInAdd.first_name?.trim(),
@@ -965,6 +964,9 @@ createApp({
                     const newUser = await res.json();
                     if (newUser.data && newUser.data.ID) {
                         viewUser(newUser.data.ID);
+                        for (const k in userInAdd) {
+                            userInAdd[k] = '';
+                        }
                     }
                     generateNotices(newUser.notices || []);
                 } else {
