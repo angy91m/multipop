@@ -2382,6 +2382,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if ($user->mpop_profile_pending_edits) {
             $parsed_user['mpop_profile_pending_edits'] = json_decode($user->mpop_profile_pending_edits, true);
         }
+        save_test($parsed_user);
         if ($add_labels) {
             $comuni = false;
             if ($user->mpop_birthplace_country == 'ita' && $parsed_user['mpop_birthplace']) {
