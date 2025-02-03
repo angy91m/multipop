@@ -333,6 +333,7 @@ if ($this->discourse_utilities()) {
                     <ul>
                         <li v-for="(v, k) in profile.mpop_profile_pending_edits">{{showPendingEdit(k, v)}}</li>
                     </ul>
+                    <button class="mpop-button btn-error" @click="cancelProfilePendingEdits" :disabled="saving">Annulla modifiche</button>
                 </template>
                 <q-table
                     v-if="profile.role == 'administrator'"

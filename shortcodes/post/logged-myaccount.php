@@ -593,6 +593,10 @@ switch ($post_data['action']) {
         }
         $res_data['data'] = true;
         break;
+    case 'cancel_profile_pending_edits':
+        delete_user_meta($current_user->ID, 'mpop_profile_pending_edits');
+        $res_data['data'] = true;
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];

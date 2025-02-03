@@ -836,7 +836,7 @@ createApp({
             savingUserErrors.length = 0;
             userInEditing.email = userInEditing.email.trim().toLowerCase();
             if (!userInEditing.mpop_mail_confirmed &&!userInView.mpop_mail_to_confirm && userInView.email == userInEditing.email) {
-                if (!confirm(`Stai settando l'e-mail principale dell'utente (${userInView.email}) come non confermata. Questo gli impedirà di effettuare un login fino a che non la confermerà nuovamente.\nSei sicuro di continuare?`)) {
+                if (!confirm(`Stai settando l'e-mail principale dell'utente (${userInView.email}) come non confermata. Questo gli impedirà di effettuare un login fino a che non la confermerà nuovamente.\nSei sicura/o di continuare?`)) {
                     saving.value = false;
                     return;
                 }
@@ -909,92 +909,98 @@ createApp({
             saving.value = false;
         }
         async function documentsConfirm() {
-            documentsLoading.value = true;
-            const res = await serverReq({
-                action: 'admin_documents_confirm',
-                id: subInView.id,
-                forceIdCard: subInView.forceIdCard
-            });
-            if (res.ok) {
-                const resData = await res.json();
-                if (resData.data) {
-                    viewSub(subInView.id, true);
-                } else {
-                    console.error('Unknown error');
-                }
-                generateNotices(resData.notices || []);
-            } else {
-                try {
-                    const {error, notices} = await res.json();
-                    if (error) {
-                        staticPwdErrors.push(...error);
-                        generateNotices(notices || []);
+            if (confirm('Sei sicura/o di voler confermare i documenti?')) {
+                documentsLoading.value = true;
+                const res = await serverReq({
+                    action: 'admin_documents_confirm',
+                    id: subInView.id,
+                    forceIdCard: subInView.forceIdCard
+                });
+                if (res.ok) {
+                    const resData = await res.json();
+                    if (resData.data) {
+                        viewSub(subInView.id, true);
                     } else {
                         console.error('Unknown error');
                     }
-                } catch {
-                    console.error('Unknown error');
+                    generateNotices(resData.notices || []);
+                } else {
+                    try {
+                        const {error, notices} = await res.json();
+                        if (error) {
+                            staticPwdErrors.push(...error);
+                            generateNotices(notices || []);
+                        } else {
+                            console.error('Unknown error');
+                        }
+                    } catch {
+                        console.error('Unknown error');
+                    }
                 }
+                documentsLoading.value = false;
             }
-            documentsLoading.value = false;
         }
         async function subscriptionRefuse() {
-            documentsLoading.value = true;
-            const res = await serverReq({
-                action: 'admin_subscription_refuse',
-                id: subInView.id
-            });
-            if (res.ok) {
-                const resData = await res.json();
-                if (resData.data) {
-                    viewSub(subInView.id, true);
-                } else {
-                    console.error('Unknown error');
-                }
-                generateNotices(resData.notices || []);
-            } else {
-                try {
-                    const {error, notices} = await res.json();
-                    if (error) {
-                        staticPwdErrors.push(...error);
-                        generateNotices(notices || []);
+            if (confirm('Sei sicura/o di voler rifiutare la richiesta di sottoscrizione?')) {
+                documentsLoading.value = true;
+                const res = await serverReq({
+                    action: 'admin_subscription_refuse',
+                    id: subInView.id
+                });
+                if (res.ok) {
+                    const resData = await res.json();
+                    if (resData.data) {
+                        viewSub(subInView.id, true);
                     } else {
                         console.error('Unknown error');
                     }
-                } catch {
-                    console.error('Unknown error');
+                    generateNotices(resData.notices || []);
+                } else {
+                    try {
+                        const {error, notices} = await res.json();
+                        if (error) {
+                            staticPwdErrors.push(...error);
+                            generateNotices(notices || []);
+                        } else {
+                            console.error('Unknown error');
+                        }
+                    } catch {
+                        console.error('Unknown error');
+                    }
                 }
+                documentsLoading.value = false;
             }
-            documentsLoading.value = false;
         }
         async function paymentConfirm() {
-            documentsLoading.value = true;
-            const res = await serverReq({
-                action: 'admin_payment_confirm',
-                id: subInView.id
-            });
-            if (res.ok) {
-                const resData = await res.json();
-                if (resData.data) {
-                    viewSub(subInView.id, true);
-                } else {
-                    console.error('Unknown error');
-                }
-                generateNotices(resData.notices || []);
-            } else {
-                try {
-                    const {error, notices} = await res.json();
-                    if (error) {
-                        staticPwdErrors.push(...error);
-                        generateNotices(notices || []);
+            if (confirm('Sei sicura/o di voler confermare il pagamento?')) {
+                documentsLoading.value = true;
+                const res = await serverReq({
+                    action: 'admin_payment_confirm',
+                    id: subInView.id
+                });
+                if (res.ok) {
+                    const resData = await res.json();
+                    if (resData.data) {
+                        viewSub(subInView.id, true);
                     } else {
                         console.error('Unknown error');
                     }
-                } catch {
-                    console.error('Unknown error');
+                    generateNotices(resData.notices || []);
+                } else {
+                    try {
+                        const {error, notices} = await res.json();
+                        if (error) {
+                            staticPwdErrors.push(...error);
+                            generateNotices(notices || []);
+                        } else {
+                            console.error('Unknown error');
+                        }
+                    } catch {
+                        console.error('Unknown error');
+                    }
                 }
+                documentsLoading.value = false;
             }
-            documentsLoading.value = false;
         }
         async function saveSubNotes() {
             documentsLoading.value = true;
@@ -1025,33 +1031,35 @@ createApp({
             documentsLoading.value = false;
         }
         async function subCancel() {
-            documentsLoading.value = true;
-            const res = await serverReq({
-                action: 'admin_cancel_subscription',
-                id: subInView.id
-            });
-            if (res.ok) {
-                const resData = await res.json();
-                if (resData.data) {
-                    viewSub(subInView.id, true);
-                } else {
-                    console.error('Unknown error');
-                }
-                generateNotices(resData.notices || []);
-            } else {
-                try {
-                    const {error, notices} = await res.json();
-                    if (error) {
-                        staticPwdErrors.push(...error);
-                        generateNotices(notices || []);
+            if(confirm('Sei sicura/o di voler annullare la sottoscrizione?')) {
+                documentsLoading.value = true;
+                const res = await serverReq({
+                    action: 'admin_cancel_subscription',
+                    id: subInView.id
+                });
+                if (res.ok) {
+                    const resData = await res.json();
+                    if (resData.data) {
+                        viewSub(subInView.id, true);
                     } else {
                         console.error('Unknown error');
                     }
-                } catch {
-                    console.error('Unknown error');
+                    generateNotices(resData.notices || []);
+                } else {
+                    try {
+                        const {error, notices} = await res.json();
+                        if (error) {
+                            staticPwdErrors.push(...error);
+                            generateNotices(notices || []);
+                        } else {
+                            console.error('Unknown error');
+                        }
+                    } catch {
+                        console.error('Unknown error');
+                    }
                 }
+                documentsLoading.value = false;
             }
-            documentsLoading.value = false;
         }
         async function documentsDecrypt() {
             if (documentsDecryptPassword.value) {
@@ -1212,6 +1220,61 @@ createApp({
             if (!popstate) {
                 selectTab({name:'subView', label: 'Visualizza sottoscrizione'});
                 pushQueryParams({...defaultQueryParams, 'view-sub': id});
+            }
+        }
+        async function confirmUserPendingEdits() {
+            if (confirm('Sei sicura/o di voler confermare i dati modificati?')) {
+                saving.value = true;
+                try {
+                    const res = await serverReq({
+                        action: (profile.role == 'administrator' ? 'admin' : 'resp') + '_confirm_profile_pending_edits',
+                        ID: userInView.ID
+                    });
+                    if (res.ok) {
+                        const {notices = []} = await res.json();
+                        generateNotices(notices);
+                    } else {
+                        try {
+                            const {notices = []} = await res.json();
+                            if (error) {
+                                generateNotices(notices);
+                            } else {
+                                console.error('Unknown error');
+                            }
+                        } catch {
+                            console.error('Unknown error');
+                        }
+        
+                    }
+                } finally {
+                    saving.value = false;
+                }
+            }
+        }
+        async function cancelProfilePendingEdits() {
+            saving.value = true;
+            try {
+                const res = await serverReq({
+                    action: 'cancel_pending_edits'
+                });
+                if (res.ok) {
+                    const {notices = []} = await res.json();
+                    generateNotices(notices);
+                } else {
+                    try {
+                        const {notices = []} = await res.json();
+                        if (error) {
+                            generateNotices(notices);
+                        } else {
+                            console.error('Unknown error');
+                        }
+                    } catch {
+                        console.error('Unknown error');
+                    }
+    
+                }
+            } finally {
+                saving.value = false;
             }
         }
         function moduleUploadBegin(sub) {
@@ -1641,29 +1704,31 @@ createApp({
             });
         }
         async function profileSubCancel(sub) {
-            const res = await serverReq({
-                action: 'cancel_subscription',
-                id: sub.id
-            });
-            if (res.ok) {
-                const resData = await res.json();
-                if (resData.data) {
-                    sub.status = 'canceled';
-                } else {
-                    console.error('Unknown error');
-                }
-                generateNotices(resData.notices || []);
-            } else {
-                try {
-                    const {error, notices} = await res.json();
-                    if (error) {
-                        staticPwdErrors.push(...error);
-                        generateNotices(notices || []);
+            if (confirm('Sei sicura/o di voler annullare la richiesta?')) {
+                const res = await serverReq({
+                    action: 'cancel_subscription',
+                    id: sub.id
+                });
+                if (res.ok) {
+                    const resData = await res.json();
+                    if (resData.data) {
+                        sub.status = 'canceled';
                     } else {
                         console.error('Unknown error');
                     }
-                } catch {
-                    console.error('Unknown error');
+                    generateNotices(resData.notices || []);
+                } else {
+                    try {
+                        const {error, notices} = await res.json();
+                        if (error) {
+                            staticPwdErrors.push(...error);
+                            generateNotices(notices || []);
+                        } else {
+                            console.error('Unknown error');
+                        }
+                    } catch {
+                        console.error('Unknown error');
+                    }
                 }
             }
         }
@@ -1875,7 +1940,9 @@ createApp({
             decryptPasswordSave,
             profileSubCancel,
             subCancel,
-            showPendingEdit
+            showPendingEdit,
+            cancelProfilePendingEdits,
+            confirmUserPendingEdits
         };
     }
 })

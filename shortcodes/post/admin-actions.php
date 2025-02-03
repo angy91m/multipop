@@ -730,6 +730,35 @@ switch( $post_data['action'] ) {
         }
         $res_data['data'] = true;
         break;
+    case 'admin_confirm_profile_pending_edits':
+        if (!isset($post_data['ID']) || !is_int($post_data['ID'])) {
+            $res_data['error'] = ['ID'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessun utente selezionato']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $user = get_user_by('ID', $post_data['ID']);
+        if (!$user || !$user->mpop_profile_pending_edits) {
+            $res_data['error'] = ['ID'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessun utente selezionato']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $pending_edits = json_decode($user->mpop_profile_pending_edits, true);
+        foreach ($pending_edits as $k => &$v) {
+            if ($k == 'mpop_billing_city' && $v) {
+                $v = $v['codiceCatastale'];
+            }
+        }
+        wp_update_user([
+            'ID' => $user->ID,
+            'meta_input' => $pending_edits
+        ]);
+        delete_user_meta($user->ID, 'mpop_profile_pending_edits');
+        $res_data['data'] = true;
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
