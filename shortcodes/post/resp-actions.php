@@ -256,6 +256,24 @@ switch( $post_data['action'] ) {
             echo json_encode( $res_data );
             exit;
         }
+        $empty_user = new stdClass();
+        $empty_user->roles = ['multipopolano'];
+        $empty_user->mpop_billing_country = $post_data['mpop_billing_country'];
+        $empty_user->mpop_billing_city = $post_data['mpop_billing_city'];
+        if (!$this->is_resp_of_user($empty_user)) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'mpop_billing_country';
+            $res_data['error'][] = 'mpop_billing_city';
+            if (!isset($res_data['notices'])) {
+                $res_data['notices'] = [];
+            }
+            $res_data['notices'][] = ['type' =>'error', 'msg' => 'Non puoi spostare un tesserato in una zona che non gestisci'];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
         if ($post_data['mpop_mail_confirmed']) {
             $user_edits['user_email'] = $post_data['email'];
             $user_edits['meta_input'] = ['mpop_mail_to_confirm' => false,'_new_email' => false];
@@ -279,7 +297,10 @@ switch( $post_data['action'] ) {
                 $user_edits['meta_input'] = [
                     '_new_email' => $post_data['email']
                 ];
-                $res_data['notices'] = [['type'=>'info', 'msg' => 'È stata inviata un\'e-mail di conferma all\'indirizzo indicato']];
+                if (!isset($res_data['notices'])) {
+                    $res_data['notices'] = [];
+                }
+                $res_data['notices'][] = ['type'=>'info', 'msg' => 'È stata inviata un\'e-mail di conferma all\'indirizzo indicato'];
             } else {
                 $this->delete_temp_token_by_user_id($user->ID, 'email_confirmation_link');
                 $token = $this->create_temp_token( $user->ID, 'email_confirmation_link' );
@@ -294,7 +315,10 @@ switch( $post_data['action'] ) {
                     'mpop_mail_to_confirm' => true,
                     '_new_email' => false
                 ];
-                $res_data['notices'] = [['type'=>'info', 'msg' => 'È stata inviata un\'e-mail di conferma all\'indirizzo indicato']];
+                if (!isset($res_data['notices'])) {
+                    $res_data['notices'] = [];
+                }
+                $res_data['notices'][] = ['type'=>'info', 'msg' => 'È stata inviata un\'e-mail di conferma all\'indirizzo indicato'];
             }
         }
         if (!isset($user_edits['meta_input'])) {

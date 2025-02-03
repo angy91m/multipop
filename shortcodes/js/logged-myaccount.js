@@ -215,7 +215,11 @@ createApp({
             label: 'Tessera'
         }, {
             name: 'users',
-            label: 'Utenti',
+            label: 'Tesserati',
+            resp: true
+        }, {
+            name: 'userAdd',
+            label: 'Aggiungi tesserato',
             resp: true
         },
         // {
@@ -225,7 +229,7 @@ createApp({
         // },
         {
             name: 'uploadUserCsv',
-            label: 'Carica CSV Utenti',
+            label: 'Carica CSV Tesserati',
             admin: true
         }]),
         displayNav = ref(true),
@@ -234,6 +238,7 @@ createApp({
         userInEditing = reactive({}),
         userInView = reactive({}),
         subInView = reactive({}),
+        userInAdd = reactive({}),
         profileEditing = ref(false),
         userEditing = ref(false),
         birthplaceCountryOpen = ref(false),
@@ -266,6 +271,7 @@ createApp({
         saving = ref(false),
         savingProfileErrors = reactive([]),
         savingUserErrors = reactive([]),
+        savingUserAddErrors = reactive([]),
         userNotices = reactive([]),
         helloName = computed(()=> profile.first_name || profile.login),
         birthCities = reactive([]),
@@ -385,11 +391,22 @@ createApp({
             && ( !userInView.first_name || userInEditing.first_name.trim() )
             && ( !userInView.last_name || userInEditing.last_name.trim() )
             && ( !userInView.mpop_birthdate || userInEditing.mpop_birthdate )
-            && ( !userInView.mpop_birthplace || userInEditing.mpop_birthplace )
             && isValidUserBirthPlace.value
             && isValidUserBillingPlace.value
             && ( !userInView.mpop_billing_address || userInEditing.mpop_billing_address.trim() )
             && ( !userInView.mpop_phone || userInEditing.mpop_phone )
+        ),
+        validUserAddForm = computed(()=>
+            mailRegex.test(userInAdd.email.trim())
+            && userInAdd.first_name.trim()
+            && userInAdd.last_name.trim()
+            && userInAdd.mpop_birthdate
+            && userInAdd.mpop_birthplace_country
+            && (userInAdd.mpop_birthplace_country != 'ita' || userInAdd.mpop_birthplace)
+            && userInAdd.mpop_billing_country
+            && (userInAdd.mpop_billing_country != 'ita' || (userInAdd.mpop_billing_city && userInAdd.mpop_billing_zip))
+            && userInAdd.mpop_billing_address.trim()
+            && userInAdd.mpop_phone
         ),
         staticPwdErrors = reactive([]),
         pwdChangeErrors = computed(()=> {
@@ -898,6 +915,48 @@ createApp({
                     const {error, notices} = await res.json();
                     if (error) {
                         savingUserErrors.push(...error);
+                        generateNotices(notices || []);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } catch {
+                    console.error('Unknown error');
+                }
+            }
+            saving.value = false;
+        }
+        async function addUser() {
+            saving.value = true;
+            savingUserAddErrors.length = 0;
+            userInAdd.email = userInAdd.email.trim().toLowerCase();
+            
+            const res = await serverReq({
+                action: (profile.role == 'administrator' ? 'admin' : 'resp') + '_add_user',
+                ID: userInAdd.ID,
+                email: userInAdd.email,
+                mpop_mail_confirmed: userInAdd.mpop_mail_confirmed,
+                first_name: userInAdd.first_name?.trim(),
+                last_name: userInAdd.last_name?.trim(),
+                mpop_birthdate: userInAdd.mpop_birthdate,
+                mpop_birthplace_country: userInAdd.mpop_birthplace_country,
+                mpop_birthplace: userInAdd.mpop_birthplace_country == 'ita' ? userInAdd.mpop_birthplace?.codiceCatastale : '',
+                mpop_billing_country: userInAdd.mpop_billing_country,
+                mpop_billing_city: userInAdd.mpop_billing_country == 'ita' ? userInAdd.mpop_billing_city?.codiceCatastale: '',
+                mpop_billing_address: userInAdd.mpop_billing_address?.trim(),
+                mpop_billing_zip: userInAdd.mpop_billing_zip,
+                mpop_phone: userInAdd.mpop_phone,
+            });
+            if (res.ok) {
+                const newUser = await res.json();
+                if (newUser.data && newUser.data.ID) {
+                    viewUser(newUser.data.ID);
+                }
+                generateNotices(newUser.notices || []);
+            } else {
+                try {
+                    const {error, notices} = await res.json();
+                    if (error) {
+                        savingUserAddErrors.push(...error);
                         generateNotices(notices || []);
                     } else {
                         console.error('Unknown error');
@@ -1975,7 +2034,10 @@ createApp({
             showPendingEdit,
             cancelProfilePendingEdits,
             confirmUserPendingEdits,
-            refuseUserPendingEdits
+            refuseUserPendingEdits,
+            userInAdd,
+            validUserAddForm,
+            savingUserAddErrors
         };
     }
 })

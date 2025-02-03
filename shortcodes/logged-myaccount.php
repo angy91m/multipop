@@ -746,6 +746,220 @@ if ($this->discourse_utilities()) {
                     </template>
                 </q-table>
             </div>
+            <!--USER_ADD-->
+            <div v-if="selectedTab.name == 'userAdd'" id="mpop-sub-view">
+                <h3>Nuovo tesserato</h3>
+                <button class="mpop-button btn-success" @click="addUser" :disabled="!validUserAddForm || saving">Salva</button>
+                <table id="mpop-user-table">
+                    <tr>
+                        <td><strong>E-mail:</strong></td>
+                        <td>
+                            <input
+                                type="email"
+                                :class="savingUserAddErrors.includes('email') ? 'bad-input' : ''"
+                                v-model="userInAdd.email"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nome:</strong></td>
+                        <td><input type="text" :class="savingUserAddErrors.includes('first_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="userInAdd.first_name"/></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cognome:</strong></td>
+                        <td><input type="text" :class="savingUserAddErrors.includes('last_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="userInAdd.last_name"/></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data di nascita:</strong></td>
+                        <td >
+                            <input type="date"
+                                :class="savingUserAddErrors.includes('mpop_birthdate') ? 'bad-input' : ''"
+                                min="1910-10-13" :max="maxBirthDate"
+                                v-model="userInAdd.mpop_birthdate"
+                                @change="()=> {if (!userInAdd.mpop_birthdate) userInAdd.mpop_birthplace = '';}"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nazione di nascita:</strong></td>
+                        <td>
+                            <v-select
+                                id="birthplaceCountry-select"
+                                :class="savingUserAddErrors.includes('mpop_birthplace_country') ? 'bad-input' : ''"
+                                v-model="userInAdd.mpop_birthplace_country"
+                                :options="countries"
+                                @close="birthplaceCountryOpen = false"
+                                @open="searchOpen('birthplaceCountry')"
+                                label="name"
+                                :reduce="c=>c.code"
+                            >
+                                <template #search="{ attributes, events }">
+                                    <input
+                                        class="vs__search"
+                                        :style="'display: ' + (birthplaceCountryOpen || !userInAdd.mpop_birthplace_country ? 'unset' : 'none')"
+                                        v-bind="attributes"
+                                        v-on="events"
+                                    />
+                                </template>
+                            </v-select>
+                        </td>
+                    </tr>
+                    <tr v-if="userInAdd.mpop_birthplace_country == 'ita'">
+                        <td><strong>Comune di nascita:</strong></td>
+                        <td>
+                            <v-select
+                                id="birthplace-select"
+                                :class="savingUserAddErrors.includes('mpop_birthplace') ? 'bad-input' : ''"
+                                v-model="userInAdd.mpop_birthplace"
+                                :options="birthCities"
+                                :disabled="!userInAdd.mpop_birthdate"
+                                @close="birthplaceOpen = false"
+                                @open="searchOpen('birthplace')"
+                                :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
+                                :filter="fuseSearch"
+                                @search="(searchTxt, loading) => {
+                                    if (searchTxt.trim().length < 2) return loading(false);
+                                    triggerSearch(searchTxt, loading, 'birthCitiesSearch', true);
+                                }"
+                            >
+                                <template #search="{ attributes, events }">
+                                    <input
+                                        class="vs__search"
+                                        :style="'display: ' + (birthplaceOpen || !userInAdd.mpop_birthplace ? 'unset' : 'none')"
+                                        v-bind="attributes"
+                                        v-on="events"
+                                    />
+                                </template>
+                                <template v-slot:option="city">
+                                    {{city.untouched_label + addSuppressToLabel(city)}}
+                                </template>
+                                <template v-slot:no-options="{search}">
+                                    <template v-if="search.trim().length > 1">
+                                        Nessun risultato per "{{search}}"
+                                    </template>
+                                    <template v-else>
+                                        Inserisci almeno 2 caratteri
+                                    </template>
+                                </template>
+                            </v-select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nazione di residenza:</strong></td>
+                        <td>
+                            <v-select
+                                id="billingCountry-select"
+                                :class="savingUserAddErrors.includes('mpop_billing_country') ? 'bad-input' : ''"
+                                v-model="userInAdd.mpop_billing_country"
+                                :options="countries"
+                                @close="billingCountryOpen = false"
+                                @open="searchOpen('billingCountry')"
+                                label="name"
+                                :reduce="c=>c.code"
+                            >
+                                <template #search="{ attributes, events }">
+                                    <input
+                                        class="vs__search"
+                                        :style="'display: ' + (billingCountryOpen || !userInAdd.mpop_billing_country ? 'unset' : 'none')"
+                                        v-bind="attributes"
+                                        v-on="events"
+                                    />
+                                </template>
+                            </v-select>
+                        </td>
+                    </tr>
+                    <template v-if="userInAdd.mpop_billing_country == 'ita'">
+                        <tr>
+                            <td><strong>Comune di residenza:</strong></td>
+                            <td>
+                                <v-select
+                                    id="billingCity-select"
+                                    v-model="userInAdd.mpop_billing_city"
+                                    :class="savingUserAddErrors.includes('mpop_billing_city') ? 'bad-input' : ''"
+                                    :options="billingCities"
+                                    @close="billingCityOpen = false"
+                                    @open="searchOpen('billingCity')"
+                                    :get-option-label="(option) => option.nome + addSuppressToLabel(option)"
+                                    :filter="fuseSearch"
+                                    @option:selected="c => {
+                                        userInAdd.mpop_billing_state = c.provincia.sigla;
+                                        if (c.cap.length == 1) {
+                                            userInAdd.mpop_billing_zip = c.cap[0];
+                                        } else {
+                                            userInAdd.mpop_billing_zip = '';
+                                        }
+                                    }"
+                                    @option:deselected="() => {
+                                        userInAdd.mpop_billing_state = '';
+                                        userInAdd.mpop_billing_zip = '';
+                                    }"
+                                    @search="(searchTxt, loading) => {
+                                        if (searchTxt.trim().length < 2) return loading(false);
+                                        triggerSearch(searchTxt, loading, 'billingCitiesSearch');
+                                    }"
+                                >
+                                    <template #search="{ attributes, events }">
+                                        <input
+                                            class="vs__search"
+                                            :style="'display: ' + (billingCityOpen || !userInAdd.mpop_billing_city ? 'unset' : 'none')"
+                                            v-bind="attributes"
+                                            v-on="events"
+                                        />
+                                    </template>
+                                    <template v-slot:option="city">
+                                        {{city.nome}} ({{city.provincia.sigla}}){{addSuppressToLabel(city)}}
+                                    </template>
+                                    <template v-slot:no-options="{search}">
+                                        <template v-if="search.trim().length > 1">
+                                            Nessun risultato per "{{search}}"
+                                        </template>
+                                        <template v-else>
+                                            Inserisci almeno 2 caratteri
+                                        </template>
+                                    </template>
+                                </v-select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Provincia di residenza:</strong></td>
+                            <td>
+                                <select v-model="userInAdd.mpop_billing_state" :class="savingUserAddErrors.includes('mpop_billing_state') ? 'bad-input' : ''" disabled>
+                                    <option
+                                        v-if="userInAdd.mpop_billing_city"
+                                        :value="userInAdd.mpop_billing_city.provincia.sigla">{{userInAdd.mpop_billing_city.provincia.sigla}}</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>CAP:</strong></td>
+                            <td>
+                                <select v-model="userInAdd.mpop_billing_zip" :class="savingUserAddErrors.includes('mpop_billing_zip') ? 'bad-input' : ''" :disabled="!userInAdd.mpop_billing_city || userInAdd.mpop_billing_city.cap.length == 1">
+                                    <template v-if="userInAdd.mpop_billing_city">
+                                        <option v-for="cap in userInAdd.mpop_billing_city.cap" :key="cap" :value="cap">{{cap}}</option>
+                                    </template>
+                                </select>
+                            </td>
+                        </tr>
+                    </template>
+                    <tr>
+                        <td><strong>Indirizzo di residenza:</strong></td>
+                        <td><textarea v-model="userInAdd.mpop_billing_address" :class="savingUserAddErrors.includes('mpop_billing_address') ? 'bad-input' : ''" :disabled="!userInAdd.mpop_billing_zip"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Telefono:</strong></td>
+                        <td>
+                            <v-intl-phone
+                                ref="userAddPhoneInput"
+                                :options="{initialCountry: 'it'}"
+                                :value="userInAdd.mpop_phone || ''"
+                                :class="savingUserAddErrors.includes('mpop_phone') ? 'bad-input' : ''"
+                                @change-number="()=>userInAdd.mpop_phone = parsePhone(userAddPhoneInput)"
+                                @change-country="()=>userInAdd.mpop_phone = parsePhone(userAddPhoneInput)"
+                            ></v-intl-phone>
+                        </td>
+                    </tr>
+                </table>
+            </div>
             <!--SUB_VIEW-->
             <div v-if="selectedTab.name == 'subView'" id="mpop-sub-view">
                 <h3>ID: {{subInView.id}} - Utente: {{subInView.user_login || subInView.user_id}}</h3>
@@ -894,7 +1108,7 @@ if ($this->discourse_utilities()) {
                                     }
                                     userInEditing.emailOldValue = userInEditing.email;
                                 }"
-                                :class="savingProfileErrors.includes('email') ? 'bad-input' : ''"
+                                :class="savingUserErrors.includes('email') ? 'bad-input' : ''"
                                 v-model="userInEditing.email"
                             />
                             <template v-if="userInView._new_email">&nbsp;<button class="mpop-button" style="margin-top:5px" @click="()=>{userInEditing.email = userInView.email; userInEditing.mpop_mail_confirmed = true;}">Ripristina</button></template></td>
@@ -910,12 +1124,12 @@ if ($this->discourse_utilities()) {
                     <tr>
                         <td><strong>Nome:</strong></td>
                         <td v-if="!userEditing">{{userInView.first_name}}</td>
-                        <td v-else><input type="text" :class="savingProfileErrors.includes('first_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="userInEditing.first_name"/></td>
+                        <td v-else><input type="text" :class="savingUserErrors.includes('first_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="userInEditing.first_name"/></td>
                     </tr>
                     <tr>
                         <td><strong>Cognome:</strong></td>
                         <td v-if="!userEditing">{{userInView.last_name}}</td>
-                        <td v-else><input type="text" :class="savingProfileErrors.includes('last_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="userInEditing.last_name"/></td>
+                        <td v-else><input type="text" :class="savingUserErrors.includes('last_name') ? 'bad-input' : ''" style="text-transform: uppercase" v-model="userInEditing.last_name"/></td>
                     </tr>
                     <tr>
                         <td><strong>Ruolo:</strong></td>
@@ -980,7 +1194,7 @@ if ($this->discourse_utilities()) {
                         <td v-if="!userEditing">{{displayLocalDate(userInView.mpop_birthdate)}}</td>
                         <td v-else>
                             <input type="date"
-                                :class="savingProfileErrors.includes('mpop_birthdate') ? 'bad-input' : ''"
+                                :class="savingUserErrors.includes('mpop_birthdate') ? 'bad-input' : ''"
                                 min="1910-10-13" :max="maxBirthDate"
                                 v-model="userInEditing.mpop_birthdate"
                                 @change="()=> {if (!userInEditing.mpop_birthdate) userInEditing.mpop_birthplace = '';}"
