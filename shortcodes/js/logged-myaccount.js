@@ -842,7 +842,7 @@ createApp({
                 }
             }
             const respZones = [];
-            if (userInEditing.role == 'multipopolare_resp') {
+            if (profile.role == 'administrator' && userInEditing.role == 'multipopolare_resp') {
                 userInEditing.mpop_resp_zones.forEach(z => {
                     let zs;
                     switch (z.type) {
@@ -863,7 +863,7 @@ createApp({
                 });
             }
             const res = await serverReq({
-                action: 'admin_update_user',
+                action: (profile.role == 'administrator' ? 'admin' : 'resp') + '_update_user',
                 ID: userInEditing.ID,
                 email: userInEditing.email,
                 mpop_mail_confirmed: userInEditing.mpop_mail_confirmed,
@@ -912,7 +912,7 @@ createApp({
             if (confirm('Sei sicura/o di voler confermare i documenti?')) {
                 documentsLoading.value = true;
                 const res = await serverReq({
-                    action: 'admin_documents_confirm',
+                    action: (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_documents_confirm',
                     id: subInView.id,
                     forceIdCard: subInView.forceIdCard
                 });
@@ -944,7 +944,7 @@ createApp({
             if (confirm('Sei sicura/o di voler rifiutare la richiesta di sottoscrizione?')) {
                 documentsLoading.value = true;
                 const res = await serverReq({
-                    action: 'admin_subscription_refuse',
+                    action: (profile.role == 'administrator' ? 'admin' : 'resp' )  + '_subscription_refuse',
                     id: subInView.id
                 });
                 if (res.ok) {
@@ -975,7 +975,7 @@ createApp({
             if (confirm('Sei sicura/o di voler confermare il pagamento?')) {
                 documentsLoading.value = true;
                 const res = await serverReq({
-                    action: 'admin_payment_confirm',
+                    action: (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_payment_confirm',
                     id: subInView.id
                 });
                 if (res.ok) {
@@ -1005,7 +1005,7 @@ createApp({
         async function saveSubNotes() {
             documentsLoading.value = true;
             const res = await serverReq({
-                action: 'admin_save_sub_notes',
+                action: (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_save_sub_notes',
                 id: subInView.id,
                 notes: subInView.notes || ''
             });
@@ -1034,7 +1034,7 @@ createApp({
             if(confirm('Sei sicura/o di voler annullare la sottoscrizione?')) {
                 documentsLoading.value = true;
                 const res = await serverReq({
-                    action: 'admin_cancel_subscription',
+                    action: (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_cancel_subscription',
                     id: subInView.id
                 });
                 if (res.ok) {
@@ -1065,7 +1065,7 @@ createApp({
             if (documentsDecryptPassword.value) {
                 documentsLoading.value = true;
                 const res = await serverReq({
-                    action: 'admin_documents_decrypt',
+                    action: (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_documents_decrypt',
                     password: documentsDecryptPassword.value,
                     id: subInView.id
                 });
@@ -1150,7 +1150,7 @@ createApp({
                 return selectTab();
             }
             const res = await serverReq({
-               action: 'admin_view_user',
+               action: (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_view_user',
                ID
             });
             if (res.ok) {
@@ -1189,7 +1189,7 @@ createApp({
         }
         async function viewSub(id, popstate = false) {
             const res = await serverReq({
-               action: 'admin_view_sub',
+               action: (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_view_sub',
                id
             });
             if (res.ok) {
@@ -1367,7 +1367,7 @@ createApp({
             try {
                 const res = await serverReq({
                     ID: userInView.ID,
-                    action: 'admin_resend_invitation_mail'
+                    action: (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_resend_invitation_mail'
                 });
                 if (res.ok) {
                     const {notices = []} = await res.json();
