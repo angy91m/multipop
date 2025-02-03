@@ -1412,8 +1412,7 @@ if ($this->discourse_utilities()) {
                     @row-click="(e,row) => viewSub(row.id)"
                 >
                     <template v-slot:top>
-                        <h4 class="text-h4">Richieste</h4>
-                        <q-space></q-space>
+                        <h5 class="text-h5">Richieste</h5>
                         <q-btn color="primary" :icon="add"></q-btn>
                     </template>
                 </q-table>
