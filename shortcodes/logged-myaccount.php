@@ -819,7 +819,7 @@ if ($this->discourse_utilities()) {
                                 :filter="fuseSearch"
                                 @search="(searchTxt, loading) => {
                                     if (searchTxt.trim().length < 2) return loading(false);
-                                    triggerSearch(searchTxt, loading, 'birthCitiesSearch', true);
+                                    triggerSearch(searchTxt, loading, 'birthCitiesSearch');
                                 }"
                             >
                                 <template #search="{ attributes, events }">
