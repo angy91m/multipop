@@ -413,10 +413,14 @@ createApp({
         isProfileCompleted = computed(() => profile.first_name
             && profile.last_name
             && profile.mpop_birthdate
-            && profile.mpop_birthplace
-            && profile.mpop_billing_city
-            && profile.mpop_billing_state
-            && profile.mpop_billing_zip
+            && profile.mpop_birthplace_country
+            && (profile.mpop_birthplace_country != 'ita' || profile.mpop_birthplace)
+            && profile.mpop_billing_country
+            && (profile.mpop_billing_country != 'ita' || (
+                profile.mpop_billing_city
+                && profile.mpop_billing_state
+                && profile.mpop_billing_zip
+            ))
             && profile.mpop_billing_address
             && profile.mpop_phone
         ? true : false ),
