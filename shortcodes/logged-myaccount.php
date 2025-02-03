@@ -848,7 +848,7 @@ if ($this->discourse_utilities()) {
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <button v-if="subInView.status == 'completed' && subInView.year == (new Date()).getFullYear()" @click="subCancel" style="margin-right:5px">Annulla sottoscrizione</button>
+                            <button v-if="subInView.status == 'completed'" @click="subCancel" style="margin-right:5px">Annulla sottoscrizione</button>
                             <button v-if="subInView.status == 'seen'" @click="paymentConfirm" style="margin-right:5px">Conferma pagamento</button>
                             <button @click="subscriptionRefuse" v-if="!['canceled', 'refused', 'completed'].includes(subInView.status)" style="margin-right:5px">Rifiuta la richiesta</button>
                         </td>
