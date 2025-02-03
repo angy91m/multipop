@@ -1255,7 +1255,7 @@ createApp({
             saving.value = true;
             try {
                 const res = await serverReq({
-                    action: 'cancel_pending_edits'
+                    action: 'cancel_profile_pending_edits'
                 });
                 if (res.ok) {
                     const {notices = []} = await res.json();
