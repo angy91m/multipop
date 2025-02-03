@@ -212,7 +212,7 @@ $invitation_props = [
     </template>
     <p v-if="role == 'multipopolano'" class="mpop-form-row">
         <label for="billing-address">Indirizzo</label><br>
-        <textarea id="billing-address" v-model="user.mpop_billing_address" :class="errorFields.has('mpop_billing_address') ? 'bad-input' : ''" :disabled="user.mpop_billing_country == 'ita' && !user.mpop_billing_zip"></textarea>
+        <textarea id="billing-address" v-model="user.mpop_billing_address" :class="errorFields.has('mpop_billing_address') ? 'bad-input' : ''" :disabled="!user.mpop_billing_country || user.mpop_billing_country == 'ita' && !user.mpop_billing_zip"></textarea>
     </p>
     <p v-if="role == 'multipopolano'" class="mpop-form-row">
         <label for="phone">Telefono</label><br>

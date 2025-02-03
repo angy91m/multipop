@@ -314,7 +314,7 @@ if ($this->discourse_utilities()) {
                     <tr>
                         <td><strong>Indirizzo di residenza:</strong></td>
                         <td v-if="!profileEditing">{{profile.mpop_billing_address}}</td>
-                        <td v-else><textarea v-model="profileInEditing.mpop_billing_address" :class="savingProfileErrors.includes('mpop_billing_address') ? 'bad-input' : ''" :disabled="profileInEditing.mpop_billing_country == 'ita' && !profileInEditing.mpop_billing_zip"></textarea></td>
+                        <td v-else><textarea v-model="profileInEditing.mpop_billing_address" :class="savingProfileErrors.includes('mpop_billing_address') ? 'bad-input' : ''" :disabled="!profileInEditing.mpop_billing_country || profileInEditing.mpop_billing_country == 'ita' && !profileInEditing.mpop_billing_zip"></textarea></td>
                     </tr>
                     <tr>
                         <td><strong>Telefono:</strong></td>
@@ -943,7 +943,7 @@ if ($this->discourse_utilities()) {
                     </template>
                     <tr>
                         <td><strong>Indirizzo di residenza:</strong></td>
-                        <td><textarea v-model="userInAdd.mpop_billing_address" :class="savingUserAddErrors.includes('mpop_billing_address') ? 'bad-input' : ''" :disabled="userInAdd.mpop_billing_country == 'ita' && !userInAdd.mpop_billing_zip"></textarea></td>
+                        <td><textarea v-model="userInAdd.mpop_billing_address" :class="savingUserAddErrors.includes('mpop_billing_address') ? 'bad-input' : ''" :disabled="!userInAdd.mpop_billing_country || userInAdd.mpop_billing_country == 'ita' && !userInAdd.mpop_billing_zip"></textarea></td>
                     </tr>
                     <tr>
                         <td><strong>Telefono:</strong></td>
@@ -1371,7 +1371,7 @@ if ($this->discourse_utilities()) {
                     <tr>
                         <td><strong>Indirizzo di residenza:</strong></td>
                         <td v-if="!userEditing">{{userInView.mpop_billing_address}}</td>
-                        <td v-else><textarea v-model="userInEditing.mpop_billing_address" :class="savingUserErrors.includes('mpop_billing_address') ? 'bad-input' : ''" :disabled="userInEditing.mpop_billing_country == 'ita' && !userInEditing.mpop_billing_zip"></textarea></td>
+                        <td v-else><textarea v-model="userInEditing.mpop_billing_address" :class="savingUserErrors.includes('mpop_billing_address') ? 'bad-input' : ''" :disabled="!userInEditing.mpop_billing_country || userInEditing.mpop_billing_country == 'ita' && !userInEditing.mpop_billing_zip"></textarea></td>
                     </tr>
                     <tr>
                         <td><strong>Telefono:</strong></td>
