@@ -349,11 +349,6 @@ if ($this->discourse_utilities()) {
                     hide-bottom
                     @row-click="(e,row) => viewSub(row.id)"
                 >
-                    <template v-slot:top>
-                        <h4 class="text-h4">Richieste</h4>
-                        <q-space></q-space>
-                        <q-btn color="primary" :icon="add"></q-btn>
-                    </template>
                 </q-table>
             </div>
             <div v-if="selectedTab.name == 'passwordChange'">
@@ -1416,6 +1411,11 @@ if ($this->discourse_utilities()) {
                     hide-bottom
                     @row-click="(e,row) => viewSub(row.id)"
                 >
+                    <template v-slot:top>
+                        <h4 class="text-h4">Richieste</h4>
+                        <q-space></q-space>
+                        <q-btn color="primary" :icon="add"></q-btn>
+                    </template>
                 </q-table>
             </template></div>
             <!--UPLOAD_USER_CSV-->
