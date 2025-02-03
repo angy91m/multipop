@@ -49,7 +49,6 @@ switch( $post_data['action'] ) {
         }
         $comuni = false;
         $found_caps = [];
-        $card_active = $user->mpop_card_active;
         if (!isset($post_data['email']) || !is_string($post_data['email']) || !$this->is_valid_email(trim($post_data['email']), true)) {
             $res_data['error'] = ['email'];
         } else {
@@ -248,9 +247,10 @@ switch( $post_data['action'] ) {
             'meta_key' => '_new_email',
             'meta_value' => $post_data['email'],
             'meta_compare' => '=',
-            'login__not_in' => [$user->user_login]
+            'login__not_in' => [$user->user_login],
+            'number' => 1
         ]);
-        if (count($duplicated)) {
+        if (!empty($duplicated)) {
             $res_data['error'] = ['email'];
             http_response_code( 400 );
             echo json_encode( $res_data );
@@ -269,7 +269,7 @@ switch( $post_data['action'] ) {
             if (!isset($res_data['notices'])) {
                 $res_data['notices'] = [];
             }
-            $res_data['notices'][] = ['type' =>'error', 'msg' => 'Non puoi spostare un tesserato in una zona che non gestisci'];
+            $res_data['notices'][] = ['type' =>'error', 'msg' => 'Non puoi spostare un/a tesserato/a in una zona che non gestisci'];
             http_response_code( 400 );
             echo json_encode( $res_data );
             exit;
@@ -677,6 +677,17 @@ switch( $post_data['action'] ) {
         }
         delete_user_meta($post_data['ID'], 'mpop_profile_pending_edits');
         $res_data['data'] = true;
+        break;
+    case 'resp_add_user':
+        try {
+            $this->add_user($post_data, $res_data, true);
+        } catch (Exception $err) {
+            $res_data['error'] = ['unknown'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
         break;
     default:
         $res_data['error'] = ['action'];

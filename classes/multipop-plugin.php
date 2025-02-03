@@ -3920,6 +3920,239 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     private function get_subscriptions(array $options = [], $limit = -1 ) {
         return $this->search_subscriptions($options + ['pagination' => false], $limit);
     }
+    private function add_user(&$post_data, &$res_data, $resp = false) {
+        $comuni = false;
+        $found_caps = [];
+        if (!isset($post_data['email']) || !is_string($post_data['email']) || !$this->is_valid_email(trim($post_data['email']), true)) {
+            $res_data['error'] = ['email'];
+        } else {
+            $post_data['email'] = mb_strtolower( trim($post_data['email']), 'UTF-8' );
+        }
+        if (!isset($post_data['first_name']) || !is_string($post_data['first_name']) || mb_strlen(trim($post_data['first_name']), 'UTF-8') < 2) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'first_name';
+        } else {
+            $post_data['first_name'] = mb_strtoupper( trim($post_data['first_name']), 'UTF-8' );
+            if (!$this::is_valid_name($post_data['first_name'])) {
+                if (!isset($res_data['error'])) {
+                    $res_data['error'] = [];
+                }
+                $res_data['error'][] = 'first_name';
+            }
+        }
+        if (!isset($post_data['last_name']) || !is_string($post_data['last_name']) || mb_strlen(trim($post_data['last_name']), 'UTF-8') < 2) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'last_name';
+        } else {
+            $post_data['last_name'] = mb_strtoupper( trim($post_data['last_name']), 'UTF-8' );
+            if (!$this::is_valid_name($post_data['last_name'])) {
+                if (!isset($res_data['error'])) {
+                    $res_data['error'] = [];
+                }
+                $res_data['error'][] = 'last_name';
+            }
+        }
+        if (!isset($post_data['mpop_billing_country']) || !$this->get_country_by_code($post_data['mpop_billing_country'])) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'mpop_billing_country';
+        } else if ($post_data['mpop_billing_country'] != 'ita') {
+            $post_data['mpop_billing_city'] = '';
+            $post_data['mpop_billing_state'] = '';
+            $post_data['mpop_billing_zip'] = '';
+        } else {
+            if (!isset($post_data['mpop_billing_city']) || !preg_match('/^[A-Z]\d{3}$/', $post_data['mpop_billing_city'])) {
+                if (!isset($res_data['error'])) {
+                    $res_data['error'] = [];
+                }
+                $res_data['error'][] = 'mpop_billing_city';
+            } else {
+                $comuni = $this->get_comuni_all();
+                $found_bc = array_values(array_filter($comuni, function($c) use ($post_data) {return (!isset($c['soppresso']) || !$c['soppresso']) && $c['codiceCatastale'] == $post_data['mpop_billing_city'];}));
+                if (!count($found_bc)) {
+                    if (!isset($res_data['error'])) {
+                        $res_data['error'] = [];
+                    }
+                    $res_data['error'][] = 'mpop_billing_city';
+                } else {
+                    $post_data['mpop_billing_state'] = $found_bc[0]['provincia']['sigla'];
+                    $found_caps = $found_bc[0]['cap'];
+                }
+            }
+            if (!isset($post_data['mpop_billing_zip']) || !in_array($post_data['mpop_billing_zip'], $found_caps)) {
+                if (!isset($res_data['error'])) {
+                    $res_data['error'] = [];
+                }
+                $res_data['error'][] = 'mpop_billing_zip';
+            }
+        }
+        if (!isset($post_data['mpop_billing_address']) || !is_string($post_data['mpop_billing_address']) || mb_strlen(trim($post_data['mpop_billing_address']), 'UTF-8') < 2 || mb_strlen(trim($post_data['mpop_billing_address']), 'UTF-8') > 200) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'mpop_billing_address';
+        }
+        if (!isset($post_data['mpop_birthdate'])) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'mpop_birthdate';
+        } else {
+            try {
+                $post_data['mpop_birthdate'] = $this::validate_birthdate($post_data['mpop_birthdate']);
+            } catch (Exception $e) {
+                if (!isset($res_data['error'])) {
+                    $res_data['error'] = [];
+                }
+                $res_data['error'][] = 'mpop_birthdate';
+                $post_data['mpop_birthdate'] = '';
+            }
+        }
+        if (!isset($post_data['mpop_birthplace_country']) || !$this->get_country_by_code($post_data['mpop_birthplace_country'])) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'mpop_birthplace_country';
+        } else if ($post_data['mpop_birthplace_country'] != 'ita') {
+            $post_data['mpop_birthplace'] = '';
+        } else {
+            if (!isset($post_data['mpop_birthplace']) || !$post_data['mpop_birthplace']) {
+                if (!isset($res_data['error'])) {
+                    $res_data['error'] = [];
+                }
+                $res_data['error'][] = 'mpop_birthplace';
+            } else if ($post_data['mpop_birthdate']) {
+                try {
+                    if (!$comuni) {
+                        $comuni = $this->get_comuni_all();
+                    }
+                    $post_data['mpop_birthdate'] = $this->validate_birthplace($post_data['mpop_birthdate'],$post_data['mpop_birthplace'], $comuni);
+                } catch (Exception $e) {
+                    if (!isset($res_data['error'])) {
+                        $res_data['error'] = [];
+                    }
+                    $errors = explode(',',$e->getMessage());
+                    $res_data['error'] = $errors;
+                }
+            }
+        }
+        if (is_object($post_data['mpop_birthdate'])) {
+            $post_data['mpop_birthdate'] = $post_data['mpop_birthdate']->format('Y-m-d');
+        }
+        if (!isset($post_data['mpop_phone']) || !$this::is_valid_phone($post_data['mpop_phone']) ) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'mpop_phone';
+        } else if (!empty(get_users([
+            'meta_key' => 'mpop_phone',
+            'meta_value' => $post_data['mpop_phone'],
+            'meta_compare' => '=',
+            'login__not_in' => [$user->user_login]
+        ]))) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'mpop_phone';
+        }
+        if (isset($res_data['error'])) {
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $duplicated = get_user_by('email', $post_data['email']);
+        if ($duplicated && $duplicated->ID != $user->ID) {
+            $res_data['error'] = ['email'];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $duplicated = get_users([
+            'meta_key' => '_new_email',
+            'meta_value' => $post_data['email'],
+            'meta_compare' => '=',
+            'number' => 1
+        ]);
+        if (!empty($duplicated)) {
+            $res_data['error'] = ['email'];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        if ($resp) {
+            $empty_user = new stdClass();
+            $empty_user->roles = ['multipopolano'];
+            $empty_user->mpop_billing_country = $post_data['mpop_billing_country'];
+            $empty_user->mpop_billing_city = $post_data['mpop_billing_city'];
+            if (!$this->is_resp_of_user($empty_user)) {
+                if (!isset($res_data['error'])) {
+                    $res_data['error'] = [];
+                }
+                $res_data['error'][] = 'mpop_billing_country';
+                $res_data['error'][] = 'mpop_billing_city';
+                if (!isset($res_data['notices'])) {
+                    $res_data['notices'] = [];
+                }
+                $res_data['notices'][] = ['type' =>'error', 'msg' => 'Non puoi aggiungere un/a tesserato/a in una zona che non gestisci'];
+                http_response_code( 400 );
+                echo json_encode( $res_data );
+                exit;
+            }
+        }
+        $meta_input = [
+            'mpop_invited' => true,
+            'first_name' => $post_data['first_name'],
+            'last_name' => $post_data['last_name'],
+            'mpop_birthplace_country' => $post_data['mpop_birthplace_country'],
+            'mpop_birthplace' => $post_data['mpop_birthplace_country'] == 'ita' ? $post_data['mpop_birthplace'] : '',
+            'mpop_birthdate' => $post_data['mpop_birthdate'],
+            'mpop_billing_country' => $post_data['mpop_billing_country'],
+            'mpop_billing_state' => $post_data['mpop_billing_country'] == 'ita' ? $found_bc['provincia']['sigla'] : '',
+            'mpop_billing_city' => $post_data['mpop_billing_country'] == 'ita' ? $found_bc['codiceCatastale'] : '',
+            'mpop_billing_zip' => $post_data['mpop_billing_zip'],
+            'mpop_billing_address' => $post_data['mpop_billing_address'],
+            'mpop_phone' => $post_data['mpop_phone']
+        ];
+        $user_input = [
+            'user_pass' => bin2hex(openssl_random_pseudo_bytes(16)),
+            'user_email' => $post_data['email'],
+            'role' => 'multipopolano',
+            'locate' => 'it_IT',
+            'meta_input' => $meta_input
+        ];
+        do {
+            $user_login = 'mp_' . bin2hex(openssl_random_pseudo_bytes(16));
+        } while(get_user_by('login', $user_login));
+        $user_input['user_login'] = $user_login;
+        $user_id = wp_insert_user($user_input);
+        if (is_wp_error($user_id)) {
+            $res_data['error'] = ['server'];
+            if (!isset($res_data['notices'])) {
+                $res_data['notices'] = [];
+            }
+            $res_data['notices'][] = ['type' =>'error', 'msg' => 'Error during user save: ' . $user_id->get_error_message()];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $token = $this->create_temp_token($user_id,'invite_link',3600*24*30);
+        if(!$this->send_invitation_mail($token, $post_data['email'])) {
+            $res_data['error'] = ['server'];
+            if (!isset($res_data['notices'])) {
+                $res_data['notices'] = [];
+            }
+            $res_data['notices'][] = ['type' =>'error', 'msg' => "Error while sending mail" . ($this->last_mail_error ? ': ' . $this->last_mail_error : '')];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $res_data['data'] = ['ID' => $user_id];
+    }
     private function get_resp_by_user($user, $resp = null) {
         if (is_int($user) || is_string($user)) {
             $user = get_user_by('ID', $user);

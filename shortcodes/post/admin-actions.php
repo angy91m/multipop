@@ -765,6 +765,17 @@ switch( $post_data['action'] ) {
         delete_user_meta($user->ID, 'mpop_profile_pending_edits');
         $res_data['data'] = true;
         break;
+    case 'admin_add_user':
+        try {
+            $this->add_user($post_data, $res_data);
+        } catch (Exception $err) {
+            $res_data['error'] = ['unknown'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
