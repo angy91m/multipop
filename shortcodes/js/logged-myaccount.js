@@ -90,12 +90,11 @@ foundUsersColumns = [
     return col;
 }),
 pendingEditsName = {
-    'mpop_billing_state': 'Provincia di residenza',
-    'mpop_billing_city': 'Comune di residenza',
-    'mpop_billing_zip': 'CAP',
-    'mpop_billing_phone': 'Telefono',
-    'mpop_billing_country': 'Nazione di residenza',
-    'mpop_billing_address': 'Indirizzo di residenza'
+    'first_name': 'Nome',
+    'last_name': 'Cognome',
+    'mpop_birthdate': 'Data di nascita',
+    'mpop_birthplace': 'Comune di nascita',
+    'mpop_birthplace_country': 'Nazione di nascita'
 },
 userCsvFields = [
     'email',
@@ -477,11 +476,14 @@ createApp({
         }
         function showPendingEdit(k, v) {
             switch(k) {
-                case 'mpop_billing_city':
-                    if (v) v = v.nome;
+                case 'mpop_birthplace':
+                    if (v) v = v.nome + ' (' + v.provincia.sigla + ')';
                     break;
-                case 'mpop_billing_country':
+                case 'mpop_birthplace_country':
                     v = countries.find(c => c.code == v)?.name
+                    break;
+                case 'mpop_birthdate':
+                    v = displayLocalDate(v);
                     break;
             }
             return pendingEditsName[k] + ': ' + v;
