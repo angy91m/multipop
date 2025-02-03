@@ -180,78 +180,76 @@ switch ($post_data['action']) {
             }
             $res_data['error'][] = 'mpop_phone';
         }
-        if (!$has_subs) {
-            if (!isset($post_data['first_name']) || !is_string($post_data['first_name']) || mb_strlen(trim($post_data['first_name']), 'UTF-8') < 2) {
+        if (!isset($post_data['first_name']) || !is_string($post_data['first_name']) || mb_strlen(trim($post_data['first_name']), 'UTF-8') < 2) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'first_name';
+        } else {
+            $post_data['first_name'] = mb_strtoupper( trim($post_data['first_name']), 'UTF-8' );
+            if (!$this::is_valid_name($post_data['first_name'])) {
                 if (!isset($res_data['error'])) {
                     $res_data['error'] = [];
                 }
                 $res_data['error'][] = 'first_name';
-            } else {
-                $post_data['first_name'] = mb_strtoupper( trim($post_data['first_name']), 'UTF-8' );
-                if (!$this::is_valid_name($post_data['first_name'])) {
-                    if (!isset($res_data['error'])) {
-                        $res_data['error'] = [];
-                    }
-                    $res_data['error'][] = 'first_name';
-                }
             }
-            if (!isset($post_data['last_name']) || !is_string($post_data['last_name']) || mb_strlen(trim($post_data['last_name']), 'UTF-8') < 2) {
+        }
+        if (!isset($post_data['last_name']) || !is_string($post_data['last_name']) || mb_strlen(trim($post_data['last_name']), 'UTF-8') < 2) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'last_name';
+        } else {
+            $post_data['last_name'] = mb_strtoupper( trim($post_data['last_name']), 'UTF-8' );
+            if (!$this::is_valid_name($post_data['last_name'])) {
                 if (!isset($res_data['error'])) {
                     $res_data['error'] = [];
                 }
                 $res_data['error'][] = 'last_name';
-            } else {
-                $post_data['last_name'] = mb_strtoupper( trim($post_data['last_name']), 'UTF-8' );
-                if (!$this::is_valid_name($post_data['last_name'])) {
-                    if (!isset($res_data['error'])) {
-                        $res_data['error'] = [];
-                    }
-                    $res_data['error'][] = 'last_name';
-                }
             }
-            if (!isset($post_data['mpop_birthdate'])) {
+        }
+        if (!isset($post_data['mpop_birthdate'])) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'mpop_birthdate';
+        } else {
+            try {
+                $this::validate_birthdate($post_data['mpop_birthdate']);
+            } catch(Exception $e) {
                 if (!isset($res_data['error'])) {
                     $res_data['error'] = [];
                 }
                 $res_data['error'][] = 'mpop_birthdate';
-            } else {
-                try {
-                    $this::validate_birthdate($post_data['mpop_birthdate']);
-                } catch(Exception $e) {
-                    if (!isset($res_data['error'])) {
-                        $res_data['error'] = [];
-                    }
-                    $res_data['error'][] = 'mpop_birthdate';
-                }
             }
-            if (!isset($post_data['mpop_birthplace_country']) || !$this->get_country_by_code($post_data['mpop_birthplace_country'])) {
+        }
+        if (!isset($post_data['mpop_birthplace_country']) || !$this->get_country_by_code($post_data['mpop_birthplace_country'])) {
+            if (!isset($res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'mpop_birthplace_country';
+        } elseif ($post_data['mpop_birthplace_country'] != 'ita') {
+            $post_data['mpop_birthplace'] = '';
+        } else {
+            if (!isset($post_data['mpop_birthplace'])) {
                 if (!isset($res_data['error'])) {
                     $res_data['error'] = [];
                 }
-                $res_data['error'][] = 'mpop_birthplace_country';
-            } elseif ($post_data['mpop_birthplace_country'] != 'ita') {
-                $post_data['mpop_birthplace'] = '';
-            } else {
-                if (!isset($post_data['mpop_birthplace'])) {
-                    if (!isset($res_data['error'])) {
-                        $res_data['error'] = [];
-                    }
-                    $res_data['error'][] = 'mpop_birthplace';
+                $res_data['error'][] = 'mpop_birthplace';
+            }
+            if (!isset($res_data['error'])) {
+                if (!$comuni) {
+                    $comuni = $this->get_comuni_all();
                 }
-                if (!isset($res_data['error'])) {
-                    if (!$comuni) {
-                        $comuni = $this->get_comuni_all();
-                    }
-                    try {
-                        $post_data['mpop_birthdate'] = $this->validate_birthplace($post_data['mpop_birthdate'], $post_data['mpop_birthplace'], $comuni);
-                    } catch(Exception $e) {
-                        $res_data['error'] = explode(',',$e->getMessage());
-                    }
+                try {
+                    $post_data['mpop_birthdate'] = $this->validate_birthplace($post_data['mpop_birthdate'], $post_data['mpop_birthplace'], $comuni);
+                } catch(Exception $e) {
+                    $res_data['error'] = explode(',',$e->getMessage());
                 }
             }
-            if (is_object($post_data['mpop_birthdate'])) {
-                $post_data['mpop_birthdate'] = $post_data['mpop_birthdate']->format('Y-m-d');
-            }
+        }
+        if (is_object($post_data['mpop_birthdate'])) {
+            $post_data['mpop_birthdate'] = $post_data['mpop_birthdate']->format('Y-m-d');
         }
         if (isset($res_data['error'])) {
             http_response_code( 400 );
@@ -306,6 +304,29 @@ switch ($post_data['action']) {
         if ($has_subs) {
             $pending_edits = [];
             foreach([
+                'first_name',
+                'last_name',
+                'mpop_birthdate',
+                'mpop_birthplace_country',
+                'mpop_birthplace'
+            ] as $prop) {
+                if ($current_user->$prop != $post_data[$prop]) {
+                    if ($prop == 'mpop_birthplace' && $post_data[$prop]) {
+                        $found_bp = '';
+                        foreach($comuni as $c) {
+                            if ($c['codiceCatastale'] == $post_data[$prop]) {
+                                $found_bp = $c;
+                                break;
+                            }
+                        }
+                        $pending_edits[$prop] = $found_bp;
+                        continue;
+                    }
+                    $pending_edits[$prop] = $post_data[$prop];
+                }
+            }
+            $meta_input = [];
+            foreach([
                 'mpop_billing_address',
                 'mpop_billing_country',
                 'mpop_billing_city',
@@ -314,14 +335,16 @@ switch ($post_data['action']) {
                 'mpop_phone'
             ] as $prop) {
                 if ($current_user->$prop != $post_data[$prop]) {
-                    if ($prop == 'mpop_billing_city' && $post_data[$prop]) {
-                        $pending_edits[$prop] = $found_bc[0];
-                        continue;
-                    }
-                    $pending_edits[$prop] = $post_data[$prop];
+                    $meta_input[$prop] = $post_data[$prop];
                 }
             }
-            if (count($pending_edits)) {
+            if (!empty($meta_input)) {
+                if (!isset($user_edits['meta_input'])) {
+                    $user_edits['meta_input'] = [];
+                }
+                $user_edits['meta_input'] += $meta_input;
+            }
+            if (!empty($pending_edits)) {
                 if (!isset($user_edits['meta_input'])) {
                     $user_edits['meta_input'] = [];
                 }
@@ -329,7 +352,9 @@ switch ($post_data['action']) {
                 if (!isset($res_data['notices'])) {
                     $res_data['notices'] = [];
                 }
-                $res_data['notices'][] = ['type'=>'info', 'msg' => 'I dati modificati sono in attesa di revisione'];
+                $res_data['notices'][] = ['type'=>'info', 'msg' => 'Alcuni dati modificati sono in attesa di revisione'];
+            } elseif (!empty($meta_input)) {
+                $res_data['notices'][] = ['type'=>'success', 'msg' => 'Dati salvati correttamente'];
             }
         } else {
             if (!isset($user_edits['meta_input'])) {
@@ -350,7 +375,7 @@ switch ($post_data['action']) {
             ] as $prop) {
                 $user_edits['meta_input'][$prop] = $post_data[$prop];
             }
-            if (count($user_edits)) {
+            if (!empty($user_edits)) {
                 delete_user_meta( $current_user->ID, 'mpop_profile_pending_edits' );
                 if (!isset($res_data['notices'])) {
                     $res_data['notices'] = [];
@@ -358,7 +383,7 @@ switch ($post_data['action']) {
                 $res_data['notices'][] = ['type'=>'success', 'msg' => 'Dati salvati correttamente'];
             }
         }
-        if (count($user_edits)) {
+        if (!empty($user_edits)) {
             $user_edits['ID'] = $current_user->ID;
             wp_update_user( $user_edits );
         }
