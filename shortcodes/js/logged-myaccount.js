@@ -1233,6 +1233,7 @@ createApp({
                     if (res.ok) {
                         const {notices = []} = await res.json();
                         generateNotices(notices);
+                        viewUser(userInView.ID, true);
                     } else {
                         try {
                             const {notices = []} = await res.json();
@@ -1260,6 +1261,7 @@ createApp({
                 if (res.ok) {
                     const {notices = []} = await res.json();
                     generateNotices(notices);
+                    getProfile();
                 } else {
                     try {
                         const {notices = []} = await res.json();
