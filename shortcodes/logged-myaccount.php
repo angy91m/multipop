@@ -125,7 +125,7 @@ if ($this->discourse_utilities()) {
                         <td>{{showRole(profile.role)}}</td>
                     </tr>
                     <tr v-if="profile.role == 'multipopolare_resp'">
-                        <td>Zone:</td>
+                        <td><strong>Zone:</strong></td>
                         <td v-html="showZones(profile.mpop_resp_zones)"></td>
                     </tr>
                     <tr>
