@@ -386,7 +386,7 @@ if ($this->discourse_utilities()) {
                                 <p>
                                     Richiedi la tua tessera per l'anno:&nbsp;
                                     <select v-model="newSubscription.year">
-                                        <option v-for="y in availableYearsToOrder" :key="y">{{y}}</option>
+                                        <option v-for="y in availableYearsToOrder" :key="y" :value="y">{{y}}</option>
                                     </select>
                                 </p>
                                 <p>
