@@ -467,7 +467,7 @@ if ($this->discourse_utilities()) {
                                             <br>
                                             <q-btn
                                                 dense
-                                                color="#f00"
+                                                color="negative"
                                                 size="sm"
                                                 label="Annulla"
                                                 @click="profileSubCancel(props.row)"
