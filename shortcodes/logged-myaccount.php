@@ -1413,7 +1413,7 @@ if ($this->discourse_utilities()) {
                 >
                     <template v-slot:top>
                         <h5 class="text-h5">Richieste</h5>
-                        <q-btn color="primary" icon="plus"></q-btn>
+                        <q-btn color="primary" icon="add"></q-btn>
                     </template>
                 </q-table>
             </template></div>
