@@ -1499,14 +1499,16 @@ createApp({
             if (!profile.mpop_billing_address) {
                 missingFields.push('Indirizzo di residenza');
             }
-            if (!profile.mpop_billing_city) {
-                missingFields.push('Comune di residenza');
-            }
-            if (!profile.mpop_billing_zip) {
-                missingFields.push('CAP');
-            }
-            if (!profile.mpop_billing_state) {
-                missingFields.push('Provincia di residenza');
+            if (profile.mpop_billing_country == 'ita') {
+                if (!profile.mpop_billing_city) {
+                    missingFields.push('Comune di residenza');
+                }
+                if (!profile.mpop_billing_zip) {
+                    missingFields.push('CAP');
+                }
+                if (!profile.mpop_billing_state) {
+                    missingFields.push('Provincia di residenza');
+                }
             }
             if (missingFields.length) {
                 userNotices.push({
