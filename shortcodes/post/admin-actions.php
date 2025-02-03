@@ -748,7 +748,7 @@ switch( $post_data['action'] ) {
         }
         $pending_edits = json_decode($user->mpop_profile_pending_edits, true);
         foreach ($pending_edits as $k => &$v) {
-            if ($k == 'mpop_billing_city' && $v) {
+            if ($k == 'mpop_birthplace' && $v) {
                 $v = $v['codiceCatastale'];
             }
         }
