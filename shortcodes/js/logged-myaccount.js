@@ -2037,7 +2037,8 @@ createApp({
             refuseUserPendingEdits,
             userInAdd,
             validUserAddForm,
-            savingUserAddErrors
+            savingUserAddErrors,
+            addUser
         };
     }
 })
