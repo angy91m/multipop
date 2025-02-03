@@ -327,6 +327,13 @@ if ($this->discourse_utilities()) {
                         </td>
                     </tr>
                 </table>
+                <template v-if="!profileEditing && profile.mpop_profile_pending_edits">
+                    <hr>
+                    <h3 class="text-h3">Modifiche in attesa di conferma</h3>
+                    <ul>
+                        <li v-for="(v, k) in profile.mpop_profile_pending_edits">{{showPendingEdit(k, v)}}</li>
+                    </ul>
+                </template>
                 <q-table
                     v-if="profile.role == 'administrator'"
                     title="Richieste"
