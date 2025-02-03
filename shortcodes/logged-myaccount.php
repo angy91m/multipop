@@ -124,6 +124,10 @@ if ($this->discourse_utilities()) {
                         <td><strong>Ruolo:</strong></td>
                         <td>{{showRole(profile.role)}}</td>
                     </tr>
+                    <tr v-if="profile.role == 'multipopolare_resp'">
+                        <td>Zone:</td>
+                        <td v-html="showZones(profile.mpop_resp_zones)"></td>
+                    </tr>
                     <tr>
                         <td><strong>Tessera attiva:</strong></td>
                         <td>{{profile.mpop_card_active ? 'Sì' : 'No'}}</td>
