@@ -4142,7 +4142,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if ($sub_search) {
             $q->query_from .= " INNER JOIN " . $this::db_prefix('subscriptions') . " AS subs ON $wpdb->users.ID = subs.user_id ";
         }
-        save_test($q);
         remove_action('pre_user_query', [$this, 'user_search_pre_user_query']);
     }
     private function parse_requested_roles($roles = true) {
