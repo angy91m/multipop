@@ -749,7 +749,7 @@ if ($this->discourse_utilities()) {
             <!--USER_ADD-->
             <div v-if="selectedTab.name == 'userAdd'" id="mpop-sub-view">
                 <h3>Nuovo tesserato</h3>
-                <button class="mpop-button btn-success" @click="addUser" :disabled="!validUserAddForm || saving">Salva</button>
+                <button class="mpop-button btn-success" @click="addUser" :disabled="!validUserAddForm || saving">Aggiungi</button>
                 <table id="mpop-user-table">
                     <tr>
                         <td><strong>E-mail:</strong></td>

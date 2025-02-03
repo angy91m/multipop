@@ -595,7 +595,7 @@ createApp({
                 const res = await serverReq({
                     action: 'get_birth_cities',
                     mpop_birthplace: searchText.trim(),
-                    mpop_birthdate: user ? userInEditing.mpop_birthdate : profileInEditing.mpop_birthdate
+                    mpop_birthdate: user ? userInEditing.mpop_birthdate : (profileInEditing ? profileInEditing.mpop_birthdate : userInAdd.mpop_birthdate)
                 });
                 if (res.ok) {
                     const cities = await res.json();
