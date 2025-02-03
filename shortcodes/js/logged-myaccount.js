@@ -1863,10 +1863,10 @@ createApp({
             }
             window.addEventListener('popstate', onPopState);
             const url = new URL(location);
-            if (url.searchParams.has('view-user') && profile.role == 'administrator') {
+            if (url.searchParams.has('view-user') && ['administrator', 'multipopolare_resp'].includes(profile.role)) {
                 selectedTab.value.name = 'userView';
                 viewUser(parseInt(url.searchParams.get('view-user'), 10), true);
-            } else if (url.searchParams.has('view-sub') && profile.role == 'administrator') {
+            } else if (url.searchParams.has('view-sub') && ['administrator', 'multipopolare_resp'].includes(profile.role)) {
                 selectedTab.value.name = 'subView';
                 viewSub(parseInt(url.searchParams.get('view-sub'), 10), true);
             }
