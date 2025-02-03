@@ -651,13 +651,7 @@ switch( $post_data['action'] ) {
             exit;
         }
         try {
-            if (!$this->complete_subscription($sub['id'])) {
-                $res_data['error'] = ['unknown_error'];
-                $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
-                http_response_code( 400 );
-                echo json_encode( $res_data );
-                exit;
-            }
+            $this->complete_subscription($sub['id']);
             $res_data['data'] = true;
         } catch (Exception $err) {
             $res_data['error'] = [$err->getMessage()];
