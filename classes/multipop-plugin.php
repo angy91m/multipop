@@ -4112,8 +4112,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             'mpop_birthplace' => $post_data['mpop_birthplace_country'] == 'ita' ? $post_data['mpop_birthplace'] : '',
             'mpop_birthdate' => $post_data['mpop_birthdate'],
             'mpop_billing_country' => $post_data['mpop_billing_country'],
-            'mpop_billing_state' => $post_data['mpop_billing_country'] == 'ita' ? $found_bc['provincia']['sigla'] : '',
-            'mpop_billing_city' => $post_data['mpop_billing_country'] == 'ita' ? $found_bc['codiceCatastale'] : '',
+            'mpop_billing_state' => $post_data['mpop_billing_country'] == 'ita' ? $found_bc[0]['provincia']['sigla'] : '',
+            'mpop_billing_city' => $post_data['mpop_billing_country'] == 'ita' ? $found_bc[0]['codiceCatastale'] : '',
             'mpop_billing_zip' => $post_data['mpop_billing_zip'],
             'mpop_billing_address' => $post_data['mpop_billing_address'],
             'mpop_phone' => $post_data['mpop_phone']
