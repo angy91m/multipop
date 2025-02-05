@@ -1102,7 +1102,7 @@ if ($this->discourse_utilities()) {
                                 :disabled="subModuleUploadFiles.length == 2"
                             >Seleziona file da caricare</mpop-uploader>
                             <br>
-                            <button :disabled="!subModuleUploadFiles.length || saving" @click="userSubModuleUploadFiles">Carica file</button>
+                            <button :disabled="!subModuleUploadFiles.length || saving" @click="userSubModuleFilesUpload">Carica file</button>
                         </td>
                     </tr>
                     <tr>

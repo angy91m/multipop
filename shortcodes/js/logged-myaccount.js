@@ -1415,7 +1415,7 @@ createApp({
                 saving.value = false;
             }
         }
-        async function userSubModuleUploadFiles() {
+        async function userSubModuleFilesUpload() {
             saving.value = true;
             try {
                 const res = await serverReq({
@@ -2161,7 +2161,7 @@ createApp({
             addSubscription,
             validSubAdd,
             paymentConfirmationDate,
-            userSubModuleUploadFiles
+            userSubModuleFilesUpload
         };
     }
 })
