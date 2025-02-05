@@ -66,7 +66,7 @@ switch( $post_data['action'] ) {
         if (!isset($post_data['mpop_mail_confirmed']) || !is_bool($post_data['mpop_mail_confirmed'])) {
             $res_data['error'] = ['email'];
         }
-        if (isset($post_data['mpop_old_card_number']) && is_string($post_data['mpop_old_card_number']) || mb_strlen(trim($post_data['mpop_old_card_number']), 'UTF-8') > 64) {
+        if (!isset($post_data['mpop_old_card_number']) || !is_string($post_data['mpop_old_card_number']) || mb_strlen(trim($post_data['mpop_old_card_number']), 'UTF-8') > 64) {
             $res_data['error'] = ['mpop_old_card_number'];
         } else {
             $post_data['mpop_old_card_number'] = mb_strtoupper(trim($post_data['mpop_old_card_number']), 'UTF-8');
