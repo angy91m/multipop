@@ -1075,7 +1075,7 @@ if ($this->discourse_utilities()) {
                         <td>
                             <template v-if="subModuleUploadFiles.length">
                                 <ul>
-                                    <li v-for="(f, k) in subModuleUploadFiles" :key="k" @click="() => subInView.documentToShow = f.content">Pagina {{k+1}}</li>
+                                    <li v-for="(f, k) in subModuleUploadFiles" :key="k" @click="subInView.documentToShow = f.content">Pagina {{k+1}}</li>
                                 </ul>
                                 <br>
                             </template>
@@ -1084,7 +1084,7 @@ if ($this->discourse_utilities()) {
                                 :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']"
                                 :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type }; return f;}"
                                 @invalid-mime="onInvalidMime"
-                                @change="f => subInView.documentToShow(f.content)"
+                                @change="f => subInView.documentToShow = f.content"
                                 :disabled="subModuleUploadFiles.length == 2"
                             >Seleziona file da caricare</mpop-uploader>
                         </td>
