@@ -46,12 +46,9 @@ if ($this->discourse_utilities()) {
                 :breakpoint="500"
                 bordered
                 dark
-                no-focus
-                no-refocus
             >
                 <q-scroll-area class="fit">
                 <q-list>
-
                     <template v-for="(menuItem, index) in menuItems" :key="index">
                         <q-item v-if="!menuItem.admin && !menuItem.resp" clickable @click="if(menuItem.url) {openExternalUrl(menuItem.url);} else {selectTab(menuItem);}" :active="menuItem.name === selectedTab.name" v-ripple>
                             <q-item-section avatar>
@@ -396,7 +393,7 @@ if ($this->discourse_utilities()) {
                                     </select>
                                 </p>
                                 <p>
-                                    Quota annuale:&nbsp;
+                                    Quota annuale:&nbsp;€&nbsp;&nbsp;
                                     <input type="number" :min="mainOptions.authorizedSubscriptionQuote" step=".01" v-model="newSubscription.quote" />
                                 </p>
                                 <p>
@@ -1008,7 +1005,7 @@ if ($this->discourse_utilities()) {
                             <td>{{timestampToFullDatetimeString(subInView.completed_at)}}</td>
                         </tr>
                         <tr>
-                            <td><strong>Data firma:</strong></td>
+                            <td><strong>Data iscrizione/rinnovo:</strong></td>
                             <td>{{timestampToFullDatetimeString(subInView.signed_at)}}</td>
                         </tr>
                     </template>
@@ -1415,14 +1412,72 @@ if ($this->discourse_utilities()) {
                 >
                     <template v-slot:top>
                         <h5 class="text-h5">Richieste</h5>&nbsp;&nbsp;
-                        <q-btn color="primary" icon="add" @click="subAddBegin"></q-btn>
+                        <q-btn v-if="userAvailableYearsToOrder.length" color="primary" icon="add" @click="subAddBegin"></q-btn>
                     </template>
                 </q-table>
             </template></div>
             <!--UPLOAD_USER_CSV-->
-            <div v-if="selectedTab.name == 'subAdd'">
-
-            </div>
+            <div v-if="selectedTab.name == 'subAdd'"><template v-if="userInView">
+                <table id="mpop-sub-table">
+                    <button class="mpop-button btn-success">Aggiungi sottoscrizione</button>
+                    <tr>
+                        <td><strong>ID Tesserato:</strong></td>
+                        <td>{{userInView.ID}}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>E-mail:</strong></td>
+                        <td>{{userInView.email}}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nome:</strong></td>
+                        <td>{{userInView.first_name}}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cognome:</strong></td>
+                        <td>{{userInView.last_name}}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Anno riferimento:</strong></td>
+                        <td>
+                            <select v-model="subInAdd.year">
+                                <option v-for="y in userAvailableYearsToOrder" :value="y">{{y}}</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Stato:</strong></td>
+                        <td>
+                            <select v-model="subInAdd.status">
+                                <option v-for="s in userSearchSelectableSubStatuses.filter(e => ['seen','completed'].includes(e.value))" :value="s.value">{{s.label}}</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Quota annuale:</strong></td>
+                        <td>€&nbsp;&nbsp;<input v-model="subInAdd.quote" type="number" :min="mainOptions.authorizedSubscriptionQuote" step=".01" /></td>
+                    </tr>
+                    <tr v-if="subInAdd.status == 'completed'">
+                        <td><strong>Data iscrizione/rinnovo:</strong></td>
+                        <td><input type="date" :max="todayString" v-model="subInAdd.signed_at"/></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Consenso marketing:</strong></td>
+                        <td><input v-model="subInAdd.marketing_agree" type="checkbox"/></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Consenso newsletter:</strong></td>
+                        <td><input v-model="subInAdd.newsletter_agree" type="checkbox"/></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Consenso pubblicazione:</strong></td>
+                        <td><input v-model="subInAdd.publish_agree" type="checkbox"/></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Note:</strong></td>
+                        <td><textarea v-model="subInAdd.notes"></textarea></td>
+                    </tr>
+                </table>
+            </template></div>
             <!--UPLOAD_USER_CSV-->
             <div v-if="selectedTab.name == 'uploadUserCsv'">
                 <input type="file" @change="loadUsersFromCsv" :disabled="saving">

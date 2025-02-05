@@ -252,6 +252,7 @@ createApp({
             mpop_billing_address: '',
             mpop_phone: ''
         }),
+        subInAdd = reactive({}),
         profileEditing = ref(false),
         userEditing = ref(false),
         birthplaceCountryOpen = ref(false),
@@ -481,8 +482,14 @@ createApp({
         }),
         otherSubscriptions = computed(() => (profile.mpop_my_subscriptions || []).filter(c => nearActiveSub.value ? nearActiveSub.value.id !== c.id : true)),
         goodSubscriptions = computed(() => (profile.mpop_my_subscriptions || []).filter(s => ['completed', 'tosee', 'seen', 'open'].includes( s.status ))),
+        userAvailableYearsToOrder = computed(() => {
+            if (!mainOptions.authorizedSubscriptionQuote || !userInView.mpop_my_subscriptions) return [];
+            const thisYear = (new Date()).getFullYear();
+            return mainOptions.authorizedSubscriptionYears.filter(y => y >= thisYear && !activeCardForYear(userInView.mpop_my_subscriptions || [], y))
+        }),
         maxBirthDate = new Date(),
-        maxIdCardDate = new Date();
+        maxIdCardDate = new Date(),
+        today = new Date();
         maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
         maxIdCardDate.setDate(maxIdCardDate.getDate()+1);
         function cancelModuleUploadData() {
@@ -686,6 +693,18 @@ createApp({
             loading(true);
             const func = eval(callable);
             triggerSearchTimeout = setTimeout( () => func(txt, ...args).then(() => loading(false)), 500);
+        }
+        function resetSubInAdd() {
+            Object.assign(subInAdd, {
+                year: '',
+                status: '',
+                quote: mainOptions.authorizedSubscriptionQuote,
+                signed_at: null,
+                marketing_agree: false,
+                newsletter_agree: false,
+                publish_agree: false,
+                notes: ''
+            });
         }
         function showSubscriptionStatus(card) {
             let status = '';
@@ -1757,6 +1776,7 @@ createApp({
             }
         }
         function subAddBegin() {
+            resetSubInAdd();
             selectTab({name:'subAdd', label: 'Aggiungi richiesta'});
         }
         function selectTab(tab, popstate = false) {
@@ -1996,11 +2016,13 @@ createApp({
             showSubscriptionStatus,
             otherSubscriptions,
             goodSubscriptions,
+            userAvailableYearsToOrder,
             nearActiveSub,
             availableYearsToOrder,
             isProfileCompleted,
             maxBirthDate: maxBirthDate.getFullYear() + '-' + ('0' + (maxBirthDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxBirthDate.getDate()).slice(-2),
             maxIdCardDate: maxIdCardDate.getFullYear() + '-' + ('0' + (maxIdCardDate.getMonth() + 1)).slice(-2) + '-' + ('0' + maxIdCardDate.getDate()).slice(-2),
+            todayString: today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2),
             csvUsers,
             loadUsersFromCsv,
             userCsvFields,
@@ -2061,7 +2083,8 @@ createApp({
             validUserAddForm,
             savingUserAddErrors,
             addUser,
-            subAddBegin
+            subAddBegin,
+            subInAdd
         };
     }
 })
