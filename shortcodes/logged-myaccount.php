@@ -426,7 +426,7 @@ if ($this->discourse_utilities()) {
                                     <button class="mpop-button" @click="publishAgreeShow = false">Chiudi</button><br>
                                     <span v-html="mainOptions.policies.publish || ''"></span>
                                 </p>
-                                <button class="mpop-button" :disabled="requestingNewSubscription" @click="requestNewSubscription">Richiedi</button>
+                                <button class="mpop-button" :disabled="saving" @click="requestNewSubscription">Richiedi</button>
                             </template>
                             <p v-else>Per richiedere una nuova tessera è necessario completare i tuoi dati del profilo</p>
                         </div>
@@ -1416,10 +1416,10 @@ if ($this->discourse_utilities()) {
                     </template>
                 </q-table>
             </template></div>
-            <!--UPLOAD_USER_CSV-->
+            <!--ADD_SUBSCRIPTION-->
             <div v-if="selectedTab.name == 'subAdd'"><template v-if="userInView">
                 <table id="mpop-sub-table">
-                    <button class="mpop-button btn-success">Aggiungi sottoscrizione</button>
+                    <button class="mpop-button btn-success" :disabled="!validSubAdd" @click="addSubscription">Aggiungi sottoscrizione</button>
                     <tr>
                         <td><strong>ID Tesserato:</strong></td>
                         <td>{{userInView.ID}}</td>

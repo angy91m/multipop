@@ -2788,11 +2788,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $marketing_agree = null,
         $newsletter_agree = null,
         $publish_agree = null,
-        // string $pdf_b64 = '',
-        // string $id_card_b64 = '',
-        // int $id_card_type = 0,
-        // string $id_card_number = '',
-        // string $id_card_expiration = '',
         string $notes = '',
         $from_user_web_form = true,
         $force_year = false,
@@ -2842,65 +2837,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             throw new Exception('Invalid user');
         }
         $date_now = date_create('now', new DateTimeZone(current_time('e')));
-        // $from_user_web_form = false;
-        // if ($pdf_b64) {
-        //     $from_user_web_form = true;
-        //     if (!$this->settings['master_doc_pubkey']) {
-        //         throw new Exception('Server not ready to get subscriptions');
-        //     }
-        //     if (!trim($id_card_b64)) {
-        //         throw new Exception('Empty ID card content');
-        //     }
-        //     if ($id_card_type < 0 || !isset($this->id_card_types[$id_card_type])) {
-        //         throw new Exception('Invalid ID card type');
-        //     }
-        //     if (!preg_match('/^[A-Z0-9]{7,}$/', $id_card_number)) {
-        //         throw new Exception('Invalid ID card number');
-        //     }
-        //     if (count(get_users([
-        //         'meta_key' => 'mpop_id_card_number',
-        //         'meta_value' => $id_card_number,
-        //         'meta_compare' => '=',
-        //         'login__not_in' => [$user->user_login]
-        //     ]))) {
-        //         throw new Exception('Duplicated ID card number');
-        //     }
-        //     if (
-        //         !preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $id_card_expiration, $expiration_capture)
-        //         || !checkdate(intval($expiration_capture[2]), intval($expiration_capture[3]), intval($expiration_capture[1]))
-        //     ) {
-        //         throw new Exception('Invalid ID card number');
-        //     }
-        //     $expiration_date = clone $date_now;
-        //     $expiration_date->setDate(intval($expiration_capture[1]),intval($expiration_capture[2]), intval($expiration_capture[3]));
-        //     $expiration_date->setTime(0,0);
-        //     if ($expiration_date->getTimestamp() < $date_now->getTimestamp()) {
-        //         throw new Exception('ID card expired');
-        //     }
-        //     $pdf_content = base64_decode($pdf_b64, true);
-        //     if (!$pdf_content || !$this->check_mime_type($pdf_content, 'application/pdf')) {
-        //         throw new Exception('Invalid pdf content');
-        //     }
-        //     $id_card_content = base64_decode($id_card_b64, true);
-        //     $id_card_mime = $this->check_mime_type($id_card_content, ['application/pdf', 'image/jpeg', 'image/png']);
-        //     if (!$id_card_content || !$id_card_mime) {
-        //         throw new Exception('Invalid ID card content');
-        //     }
-        //     $pdf_content = $this->encrypt_asym($pdf_content, base64_decode( $this->settings['master_doc_pubkey'], true ) );
-        //     $id_card_content = $this->encrypt_asym($id_card_content, base64_decode( $this->settings['master_doc_pubkey'], true ) );
-        //     $pdf_file_name = $rand_file_name . '-sub-' . $user_id . '.pdf.enc';
-        //     $id_card_file_name = $rand_file_name . '-idcard-' . $user_id . $this->mime2ext[$id_card_mime] . '.enc';
-        //     file_put_contents(MULTIPOP_PLUGIN_PATH . "/privatedocs/$pdf_file_name", $pdf_content);
-        //     file_put_contents(MULTIPOP_PLUGIN_PATH . "/privatedocs/$id_card_file_name", $id_card_content);
-        //     update_user([
-        //         'ID' => $user_id,
-        //         'meta_input' => [
-        //             'mpop_id_card_type' => $id_card_type,
-        //             'mpop_id_card_number' => $id_card_number,
-        //             'mpop_id_card_expiration' => $expiration_date->getTimestamp()
-        //         ]
-        //     ]);
-        // }
         $insert_data = [
             ['user_id', $user_id, '%d'],
             ['year', $year, '%d'],

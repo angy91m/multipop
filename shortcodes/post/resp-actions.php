@@ -689,6 +689,57 @@ switch( $post_data['action'] ) {
             exit;
         }
         break;
+    case 'resp_add_subscription':
+        try {
+            if (!isset($post_data['user_id']) || !is_int($post_data['user_id']) || !$this->is_resp_of_user($post_data['user_id'])) {
+                $res_data['error'] = ['user_id'];
+                $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessun utente selezionato']];
+                http_response_code( 400 );
+                echo json_encode( $res_data );
+                exit;
+            }
+            $signed_at_date = false;
+            if ( $post_data['status'] == 'completed' ) {
+                $signed_at_date = $this::validate_date($post_data['signed_at']);
+                $max_signed_date = date_create_from_format('Y-m-d H:i:s e', $post_data['year'] . '-12-31 00:00:00 '. current_time('e'));
+                if (!$max_signed_date || $max_signed_date->getTimestamp() < $signed_at_date->getTimestamp()) {
+                    $res_data['error'] = ['year'];
+                    $res_data['notices'] = [['type'=>'error', 'msg' => 'Anno o data di iscrizione/rinnovo non validi']];
+                    http_response_code( 400 );
+                    echo json_encode( $res_data );
+                    exit;
+                }
+            }
+            $sub_id = $this->create_subscription(
+                $post_data['user_id'],
+                $post_data['year'],
+                $post_data['quote'],
+                $post_data['marketing_agree'],
+                $post_data['newsletter_agree'],
+                $post_data['publish_agree'],
+                $post_data['notes'],
+                false,
+                true
+            );
+            if (!$sub_id) {
+                $res_data['error'] = ['unknown'];
+                $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
+                http_response_code( 400 );
+                echo json_encode( $res_data );
+                exit;
+            }
+            $res_data['data'] = $sub_id;
+            if ($signed_at_date) {
+                $this->complete_subscription($sub_id, $signed_at_date->getTimestamp());
+            }
+        } catch (Exception $err) {
+            $res_data['error'] = ['unknown'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => $err->getMessage()]];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];

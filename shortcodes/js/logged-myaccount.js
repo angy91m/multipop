@@ -276,7 +276,6 @@ createApp({
             mpop_newsletter_agree: false,
             mpop_publish_agree: false
         }),
-        requestingNewSubscription = ref(false),
         generatingSubscriptionPdf = reactive([]),
         marketingAgreeShow = ref(false),
         newsletterAgreeShow = ref(false),
@@ -487,6 +486,14 @@ createApp({
             const thisYear = (new Date()).getFullYear();
             return mainOptions.authorizedSubscriptionYears.filter(y => y >= thisYear && !activeCardForYear(userInView.mpop_my_subscriptions || [], y))
         }),
+        validSubAdd = computed(() =>
+            userInView.ID
+            && subInAdd.year
+            && subInAdd.status
+            && subInAdd.quote
+            && (subInAdd.status == 'completed' ? subInAdd.signed_at : true)
+            && subInAdd.notes
+        ),
         maxBirthDate = new Date(),
         maxIdCardDate = new Date(),
         today = new Date();
@@ -1518,8 +1525,41 @@ createApp({
             }
             return mainOptions;
         }
+        async function addSubscription() {
+            saving.value = !saving.value;
+            try {
+                const res = await serverReq({
+                    action:  (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_add_subscription',
+                    user_id: userInView.ID,
+                    ...subInAdd
+                });
+                if (res.ok) {
+                    const resData = await res.json();
+                    if (resData.data) {
+                        viewSub(resData.data);
+                        resetSubInAdd();
+                    } else {
+                        console.error('Unknown error');
+                    }
+                    generateNotices(resData.notices || []);
+                } else {
+                    try {
+                        const {error} = await res.json();
+                        if (error) {
+                            console.error(error);
+                        } else {
+                            console.error('Unknown error');
+                        }
+                    } catch {
+                        console.error('Unknown error');
+                    }
+                }
+            } finally {
+                saving.value = !saving.value;
+            }
+        }
         async function requestNewSubscription() {
-            requestingNewSubscription.value = !requestingNewSubscription.value;
+            saving.value = !saving.value;
             try {
                 const res = await serverReq({
                     action: 'new_subscription',
@@ -1546,7 +1586,7 @@ createApp({
                     }
                 }
             } finally {
-                requestingNewSubscription.value = !requestingNewSubscription.value;
+                saving.value = !saving.value;
             }
         }
         async function generateSubscriptionPdf(id) {
@@ -1793,6 +1833,9 @@ createApp({
                     cancelModuleUploadData();
                 }
                 if (tab.name != 'subView') cancelSubInView();
+                if (popstate && ['subAdd'].includes(tab.name)) {
+                    tab = {name: 'summary', label: 'Riepilogo'};
+                }
                 selectedTab.value = tab;
                 if (!popstate) {
                     if ( !['userView','subView'].includes(tab.name) ) {
@@ -2050,7 +2093,7 @@ createApp({
             newsletterAgreeShow,
             publishAgreeShow,
             requestNewSubscription,
-            requestingNewSubscription,
+            saving,
             currencyFormatter,
             generateSubscriptionPdf,
             generatingSubscriptionPdf,
@@ -2084,7 +2127,9 @@ createApp({
             savingUserAddErrors,
             addUser,
             subAddBegin,
-            subInAdd
+            subInAdd,
+            addSubscription,
+            validSubAdd
         };
     }
 })
