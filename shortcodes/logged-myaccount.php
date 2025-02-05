@@ -1084,7 +1084,7 @@ if ($this->discourse_utilities()) {
                                         &nbsp;&nbsp;
                                         <q-icon
                                             @click="() => {
-                                                if(f.content == subInView.documentToShow.content ) subInView.documentToShow = null;
+                                                if(subInView.documentToShow && f.content == subInView.documentToShow.content ) subInView.documentToShow = null;
                                                 subModuleUploadFiles.splice(k,1);
                                             }"
                                             name="close"
