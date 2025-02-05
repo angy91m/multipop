@@ -492,7 +492,6 @@ createApp({
             && subInAdd.status
             && subInAdd.quote
             && (subInAdd.status == 'completed' ? subInAdd.signed_at : true)
-            && subInAdd.notes
         ),
         maxBirthDate = new Date(),
         maxIdCardDate = new Date(),
