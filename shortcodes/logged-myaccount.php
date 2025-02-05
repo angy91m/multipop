@@ -1079,9 +1079,8 @@ if ($this->discourse_utilities()) {
                                         v-for="(f, k) in subModuleUploadFiles"
                                         :key="k"
                                         class="mpop-click"
-                                        @click="subInView.documentToShow = f"
                                     >
-                                        File {{k+1}}
+                                        <span @click="subInView.documentToShow = f">File {{k+1}}</span>
                                         &nbsp;&nbsp;
                                         <q-icon
                                             @click="() => {
