@@ -2160,7 +2160,8 @@ createApp({
             subModuleUploadFiles,
             addSubscription,
             validSubAdd,
-            paymentConfirmationDate
+            paymentConfirmationDate,
+            userSubModuleUploadFiles
         };
     }
 })
