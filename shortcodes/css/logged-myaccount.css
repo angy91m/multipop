@@ -1,12 +1,6 @@
 #app {
     max-width: 100%;
 }
-/* #app > div > div > div.q-drawer-container > aside {
-    width: 200px;
-    transform: translateX(-200px);
-    top: 50px;
-    position: absolute;
-} */
 #app > div {
     padding: 16px 0;
 }
@@ -166,6 +160,14 @@ main > div.entry-content.wp-block-post-content {
     }
 }
 @media only screen and (max-width : 1023px) {
+}
+@media only screen and (min-width : 501px) {
+    #app > div > div > div.q-drawer-container > aside {
+        width: 200px;
+        transform: translateX(-200px);
+        top: 50px;
+        position: absolute;
+    }
 }
 @media only screen and (max-width : 480px) {
     .mpop-user-search-field {
