@@ -347,7 +347,7 @@ switch ($post_data['action']) {
             }
             foreach($editable as $prop) {
                 if ($current_user->$prop != $post_data[$prop]) {
-                    if ($prop != 'mpop_phone') $id_card_confirmed = false;
+                    if (!in_array($prop, ['mpop_phone', 'mpop_old_card_number'])) $id_card_confirmed = false;
                     $meta_input[$prop] = $post_data[$prop];
                 }
             }
@@ -377,7 +377,7 @@ switch ($post_data['action']) {
             if (!isset($user_edits['meta_input'])) {
                 $user_edits['meta_input'] = [];
             }
-            foreach([
+            $editable = [
                 'first_name',
                 'last_name',
                 'mpop_birthdate',
@@ -389,7 +389,11 @@ switch ($post_data['action']) {
                 'mpop_billing_zip',
                 'mpop_billing_state',
                 'mpop_phone'
-            ] as $prop) {
+            ];
+            if (in_array($current_user->roles[0],['administrator', 'multipopolare_resp'])) {
+                $editable[] = 'mpop_old_card_number';
+            }
+            foreach( $editable as $prop) {
                 $user_edits['meta_input'][$prop] = $post_data[$prop];
             }
             if (!empty($user_edits)) {
