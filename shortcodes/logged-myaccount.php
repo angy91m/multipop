@@ -1079,7 +1079,6 @@ if ($this->discourse_utilities()) {
                                         v-for="(f, k) in subModuleUploadFiles"
                                         :key="k"
                                         class="mpop-click"
-                                        style="text-decoration: underline"
                                         @click="subInView.documentToShow = f"
                                     >
                                         File {{k+1}}
