@@ -46,6 +46,8 @@ if ($this->discourse_utilities()) {
                 :breakpoint="500"
                 bordered
                 dark
+                no-focus
+                no-refocus
             >
                 <q-scroll-area class="fit">
                 <q-list>
