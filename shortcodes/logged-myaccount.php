@@ -131,7 +131,7 @@ if ($this->discourse_utilities()) {
                         <td><strong>Tessera attiva:</strong></td>
                         <td>{{profile.mpop_card_active ? 'Sì' : 'No'}}</td>
                     </tr>
-                    <tr v-if="profile.mpop_old_card_number">
+                    <tr v-if="profile.mpop_old_card_number || profileEditing">
                         <td><strong>Tessera cartacea (vecchia numerazione):</strong></td>
                         <td v-if="!profileEditing">{{profile.mpop_old_card_number}}</td>
                         <td v-else>
@@ -1145,7 +1145,7 @@ if ($this->discourse_utilities()) {
                         <td><strong>Tessera attiva:</strong></td>
                         <td>{{userInView.mpop_card_active ? 'Sì' : 'No'}}</td>
                     </tr>
-                    <tr v-if="userInView.mpop_old_card_number">
+                    <tr v-if="userInView.mpop_old_card_number || userEditing">
                         <td><strong>Tessera cartacea (vecchia numerazione):</strong></td>
                         <td v-if="!userEditing">{{userInView.mpop_old_card_number}}</td>
                         <td v-else>
