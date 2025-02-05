@@ -555,7 +555,7 @@ switch( $post_data['action'] ) {
             echo json_encode( $res_data );
             exit;
         }
-        if (!isset($post_data['signed_at']) || !is_int($post_data['signed_at'])) {
+        if (!isset($post_data['signed_at']) || !is_string($post_data['signed_at'])) {
             $res_data['error'] = ['signed_at'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Data di iscrizione/rinnovo non valida']];
             http_response_code( 400 );
