@@ -1073,10 +1073,12 @@ if ($this->discourse_utilities()) {
                     <tr v-else-if="['seen', 'completed'].includes(subInView.status)">
                         <td><strong>Carica modulo di sottoscrizione:</strong></td>
                         <td>
-                            <ul>
-                                <li v-for="(f, k) in subModuleUploadFiles" :key="k" @click="subInView.documentToShow = f.content">Pagina {{k+1}}</li>
-                            </ul>
-                            <br>
+                            <template v-if="subModuleUploadFiles.length">
+                                <ul>
+                                    <li v-for="(f, k) in subModuleUploadFiles" :key="k" @click="subInView.documentToShow = f.content">Pagina {{k+1}}</li>
+                                </ul>
+                                <br>
+                            </template>
                             <mpop-uploader 
                                 v-model="subModuleUploadFiles"
                                 :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']"
