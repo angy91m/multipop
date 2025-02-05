@@ -1413,10 +1413,14 @@ if ($this->discourse_utilities()) {
                 >
                     <template v-slot:top>
                         <h5 class="text-h5">Richieste</h5>&nbsp;&nbsp;
-                        <q-btn color="primary" icon="add"></q-btn>
+                        <q-btn color="primary" icon="add" @click="subAddBegin"></q-btn>
                     </template>
                 </q-table>
             </template></div>
+            <!--UPLOAD_USER_CSV-->
+            <div v-if="selectedTab.name == 'subAdd'">
+
+            </div>
             <!--UPLOAD_USER_CSV-->
             <div v-if="selectedTab.name == 'uploadUserCsv'">
                 <input type="file" @change="loadUsersFromCsv" :disabled="saving">

@@ -1756,6 +1756,9 @@ createApp({
                 delete subInView[k];
             }
         }
+        function subAddBegin() {
+            selectTab({name:'subAdd', label: 'Aggiungi richiesta'});
+        }
         function selectTab(tab, popstate = false) {
             if (selectedTab.value.name != tab?.name) {
                 cancelEditProfile();
@@ -2057,7 +2060,8 @@ createApp({
             userInAdd,
             validUserAddForm,
             savingUserAddErrors,
-            addUser
+            addUser,
+            subAddBegin
         };
     }
 })
