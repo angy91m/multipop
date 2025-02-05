@@ -131,6 +131,13 @@ if ($this->discourse_utilities()) {
                         <td><strong>Tessera attiva:</strong></td>
                         <td>{{profile.mpop_card_active ? 'Sì' : 'No'}}</td>
                     </tr>
+                    <tr v-if="profile.mpop_old_card_number">
+                        <td><strong>Tessera cartacea (vecchia numerazione):</strong></td>
+                        <td v-if="!profileEditing">{{profile.mpop_old_card_number}}</td>
+                        <td v-else>
+                            <input type="text" style="text-transform: uppercase" v-model="profileInEditing.mpop_old_card_number"/>
+                        </td>
+                    </tr>
                     <tr>
                         <td><strong>Data di nascita:</strong></td>
                         <td v-if="!profileEditing">{{displayLocalDate(profile.mpop_birthdate)}}</td>
@@ -1137,6 +1144,13 @@ if ($this->discourse_utilities()) {
                     <tr>
                         <td><strong>Tessera attiva:</strong></td>
                         <td>{{userInView.mpop_card_active ? 'Sì' : 'No'}}</td>
+                    </tr>
+                    <tr v-if="userInView.mpop_old_card_number">
+                        <td><strong>Tessera cartacea (vecchia numerazione):</strong></td>
+                        <td v-if="!userEditing">{{userInView.mpop_old_card_number}}</td>
+                        <td v-else>
+                            <input type="text" style="text-transform: uppercase" v-model="userInEditing.mpop_old_card_number"/>
+                        </td>
                     </tr>
                     <tr v-if="userInView.role == 'multipopolare_resp'">
                         <td><strong>Zone:</strong></td>

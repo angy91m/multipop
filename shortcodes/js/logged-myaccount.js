@@ -933,7 +933,8 @@ createApp({
                 mpop_billing_address: userInEditing.mpop_billing_address?.trim(),
                 mpop_billing_zip: userInEditing.mpop_billing_zip,
                 mpop_phone: userInEditing.mpop_phone,
-                mpop_resp_zones: respZones
+                mpop_resp_zones: respZones,
+                mpop_old_card_number: (userInEditing.mpop_old_card_number || '')
             });
             if (res.ok) {
                 const newUser = await res.json();

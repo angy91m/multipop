@@ -57,6 +57,11 @@ switch( $post_data['action'] ) {
         if (!isset($post_data['mpop_mail_confirmed']) || !is_bool($post_data['mpop_mail_confirmed'])) {
             $res_data['error'] = ['email'];
         }
+        if (isset($post_data['mpop_old_card_number']) && is_string($post_data['mpop_old_card_number']) || mb_strlen(trim($post_data['mpop_old_card_number']), 'UTF-8') > 64) {
+            $res_data['error'] = ['mpop_old_card_number'];
+        } else {
+            $post_data['mpop_old_card_number'] = mb_strtoupper(trim($post_data['mpop_old_card_number']), 'UTF-8');
+        }
         if (!isset($post_data['first_name']) || !is_string($post_data['first_name']) || mb_strlen(trim($post_data['first_name']), 'UTF-8') < 2) {
             if ($user->first_name) {
                 if (!isset($res_data['error'])) {
@@ -335,7 +340,8 @@ switch( $post_data['action'] ) {
             'mpop_billing_city',
             'mpop_billing_zip',
             'mpop_billing_state',
-            'mpop_phone'
+            'mpop_phone',
+            'mpop_old_card_number'
         ] as $prop) {
             $user_edits['meta_input'][$prop] = $post_data[$prop];
         }
