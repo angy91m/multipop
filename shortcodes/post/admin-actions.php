@@ -842,7 +842,7 @@ switch( $post_data['action'] ) {
         }
         break;
     case 'admin_subscription_upload_files':
-
+        $this->subscription_upload_files($post_data, $res_data);
         break;
     default:
         $res_data['error'] = ['action'];

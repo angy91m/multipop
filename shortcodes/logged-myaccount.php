@@ -1111,7 +1111,7 @@ if ($this->discourse_utilities()) {
                             <template v-if="subInView.status == 'seen'">
                                 <button @click="paymentConfirm" :disabled="!paymentConfirmationDate" style="margin-right:5px">Conferma pagamento</button>
                                 &nbsp;&nbsp;Data iscrizione/pagamento:&nbsp;<input :max="todayString" type="date" v-model="paymentConfirmationDate"/>
-                                <br>
+                                <br><br>
                             </template>
                             <button @click="subscriptionRefuse" v-if="!['canceled', 'refused', 'completed'].includes(subInView.status)" style="margin-right:5px">Rifiuta la richiesta</button>
                         </td>
