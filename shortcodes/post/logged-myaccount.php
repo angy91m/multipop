@@ -112,7 +112,7 @@ switch ($post_data['action']) {
         $found_caps = [];
         $has_subs = !empty($this->get_subscriptions(['user_id' => [$current_user->ID], 'status' => ['completed', 'seen', 'tosee','open']], 1));
         if (in_array($current_user->roles[0],['administrator', 'multipopolare_resp'])) {
-            if (isset($post_data['mpop_old_card_number']) || !is_string($post_data['mpop_old_card_number']) || mb_strlen(trim($post_data['mpop_old_card_number']), 'UTF-8') > 64) {
+            if (!isset($post_data['mpop_old_card_number']) || !is_string($post_data['mpop_old_card_number']) || mb_strlen(trim($post_data['mpop_old_card_number']), 'UTF-8') > 64) {
                 $res_data['error'] = ['mpop_old_card_number'];
             } else {
                 $post_data['mpop_old_card_number'] = mb_strtoupper(trim($post_data['mpop_old_card_number']), 'UTF-8');
