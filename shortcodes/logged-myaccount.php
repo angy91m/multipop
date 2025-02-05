@@ -1056,7 +1056,7 @@ if ($this->discourse_utilities()) {
                             <ul>
                                 <li v-for="(f, k) in formatSubFiles(subInView.files)" :key="k">
                                     <template v-if="typeof subInView.files[k] == 'string'">{{f}}</template>
-                                    <template v-else><span class="mpop-click" style="text-decoration: underline" @click="subInView.documentToShow = subInView.files[k].content">{{f}}</template>
+                                    <template v-else><span class="mpop-click" style="text-decoration: underline" @click="subInView.documentToShow = subInView.files[k]">{{f}}</template>
                                 </li>
                             </ul>
                             <br>
@@ -1075,7 +1075,23 @@ if ($this->discourse_utilities()) {
                         <td>
                             <template v-if="subModuleUploadFiles.length">
                                 <ul>
-                                    <li v-for="(f, k) in subModuleUploadFiles" :key="k" class="mpop-click" @click="subInView.documentToShow = f.content">File {{k+1}}</li>
+                                    <li
+                                        v-for="(f, k) in subModuleUploadFiles"
+                                        :key="k"
+                                        class="mpop-click"
+                                        style="text-decoration: underline"
+                                        @click="subInView.documentToShow = f"
+                                    >
+                                        File {{k+1}}
+                                        &nbsp;&nbsp;
+                                        <q-icon
+                                            @click="() => {
+                                                if(f.content == subInView.documentToShow.content ) subInView.documentToShow = null;
+                                                subModuleUploadFiles.splice(k,1);
+                                            }"
+                                            name="close"
+                                        ></q-icon>
+                                    </li>
                                 </ul>
                                 <br>
                             </template>
@@ -1084,7 +1100,7 @@ if ($this->discourse_utilities()) {
                                 :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']"
                                 :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type }; return f;}"
                                 @invalid-mime="onInvalidMime"
-                                @change="f => subInView.documentToShow = f.content"
+                                @change="f => subInView.documentToShow = f"
                                 :disabled="subModuleUploadFiles.length == 2"
                             >Seleziona file da caricare</mpop-uploader>
                         </td>
@@ -1101,7 +1117,7 @@ if ($this->discourse_utilities()) {
                     <hr>
                     <button @click="subInView.documentToShow = null">Chiudi</button>
                     <br>
-                    <iframe :src="subInView.documentToShow" style="width:100%; min-height: 1000px;"></iframe>
+                    <iframe :src="subInView.documentToShow.content" style="width:100%; min-height: 1000px;"></iframe>
                 </template>
             </div>
             <!--USER_VIEW-->
