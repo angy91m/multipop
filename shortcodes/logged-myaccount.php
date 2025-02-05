@@ -393,7 +393,7 @@ if ($this->discourse_utilities()) {
                                     </select>
                                 </p>
                                 <p>
-                                    Quota annuale:&nbsp;€&nbsp;&nbsp;
+                                    Quota annuale:&nbsp;&nbsp;€&nbsp;
                                     <input type="number" :min="mainOptions.authorizedSubscriptionQuote" step=".01" v-model="newSubscription.quote" />
                                 </p>
                                 <p>
