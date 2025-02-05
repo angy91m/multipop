@@ -111,6 +111,13 @@ switch ($post_data['action']) {
         $comuni = false;
         $found_caps = [];
         $has_subs = !empty($this->get_subscriptions(['user_id' => [$current_user->ID], 'status' => ['completed', 'seen', 'tosee','open']], 1));
+        if (in_array($current_user->roles[0],['administrator', 'multipopolare_resp'])) {
+            if (isset($post_data['mpop_old_card_number']) || !is_string($post_data['mpop_old_card_number']) || mb_strlen(trim($post_data['mpop_old_card_number']), 'UTF-8') > 64) {
+                $res_data['error'] = ['mpop_old_card_number'];
+            } else {
+                $post_data['mpop_old_card_number'] = mb_strtoupper(trim($post_data['mpop_old_card_number']), 'UTF-8');
+            }
+        }
         if (!isset($post_data['email']) || !is_string($post_data['email']) || !$this->is_valid_email(trim($post_data['email']), true)) {
             $res_data['error'] = ['email'];
         } else {
@@ -327,14 +334,18 @@ switch ($post_data['action']) {
             }
             $id_card_confirmed = boolval($current_user->mpop_id_card_confirmed);
             $meta_input = [];
-            foreach([
+            $editable = [
                 'mpop_billing_address',
                 'mpop_billing_country',
                 'mpop_billing_city',
                 'mpop_billing_zip',
                 'mpop_billing_state',
                 'mpop_phone'
-            ] as $prop) {
+            ];
+            if (in_array($current_user->roles[0],['administrator', 'multipopolare_resp'])) {
+                $editable[] = 'mpop_old_card_number';
+            }
+            foreach($editable as $prop) {
                 if ($current_user->$prop != $post_data[$prop]) {
                     if ($prop != 'mpop_phone') $id_card_confirmed = false;
                     $meta_input[$prop] = $post_data[$prop];

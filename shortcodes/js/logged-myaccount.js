@@ -856,7 +856,8 @@ createApp({
                 mpop_billing_city: profileInEditing.mpop_billing_country == 'ita' ? profileInEditing.mpop_billing_city.codiceCatastale : '',
                 mpop_billing_address: profileInEditing.mpop_billing_address.trim(),
                 mpop_billing_zip: profileInEditing.mpop_billing_zip,
-                mpop_phone: profileInEditing.mpop_phone
+                mpop_phone: profileInEditing.mpop_phone,
+                mpop_old_card_number: ['administrator', 'multipopolare_resp'].includes(profile.role) ? profileInEditing.mpop_old_card_number : ''
             });
             if (res.ok) {
                 const newUser = await res.json();
