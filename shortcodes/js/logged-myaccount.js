@@ -277,6 +277,7 @@ createApp({
             mpop_newsletter_agree: false,
             mpop_publish_agree: false
         }),
+        paymentConfirmationDate = ref(''),
         generatingSubscriptionPdf = reactive([]),
         marketingAgreeShow = ref(false),
         newsletterAgreeShow = ref(false),
@@ -293,7 +294,6 @@ createApp({
         pwdChangeFields = reactive({}),
         pwdChanging = ref(false),
         csvUsers = reactive([]),
-        documentsLoading = ref(false),
         documentsDecryptPassword = ref(''),
         csvImportOptions = reactive({
             forceQuote: false,
@@ -474,7 +474,6 @@ createApp({
             if(Date.now() > d.getTime()) return false;
             return true;
         }),
-        moduleUploadDataSending = ref(false),
         availableYearsToOrder = computed(() => {
             if (!mainOptions.authorizedSubscriptionQuote) return [];
             const thisYear = (new Date()).getFullYear();
@@ -1015,7 +1014,7 @@ createApp({
         }
         async function documentsConfirm() {
             if (confirm('Sei sicura/o di voler confermare i documenti?')) {
-                documentsLoading.value = true;
+                saving.value = true;
                 const res = await serverReq({
                     action: (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_documents_confirm',
                     id: subInView.id,
@@ -1042,12 +1041,12 @@ createApp({
                         console.error('Unknown error');
                     }
                 }
-                documentsLoading.value = false;
+                saving.value = false;
             }
         }
         async function subscriptionRefuse() {
             if (confirm('Sei sicura/o di voler rifiutare la richiesta di sottoscrizione?')) {
-                documentsLoading.value = true;
+                saving.value = true;
                 const res = await serverReq({
                     action: (profile.role == 'administrator' ? 'admin' : 'resp' )  + '_subscription_refuse',
                     id: subInView.id
@@ -1073,15 +1072,16 @@ createApp({
                         console.error('Unknown error');
                     }
                 }
-                documentsLoading.value = false;
+                saving.value = false;
             }
         }
         async function paymentConfirm() {
             if (confirm('Sei sicura/o di voler confermare il pagamento?')) {
-                documentsLoading.value = true;
+                saving.value = true;
                 const res = await serverReq({
                     action: (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_payment_confirm',
-                    id: subInView.id
+                    id: subInView.id,
+                    signed_at: paymentConfirmationDate.value
                 });
                 if (res.ok) {
                     const resData = await res.json();
@@ -1104,11 +1104,11 @@ createApp({
                         console.error('Unknown error');
                     }
                 }
-                documentsLoading.value = false;
+                saving.value = false;
             }
         }
         async function saveSubNotes() {
-            documentsLoading.value = true;
+            saving.value = true;
             const res = await serverReq({
                 action: (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_save_sub_notes',
                 id: subInView.id,
@@ -1133,11 +1133,11 @@ createApp({
                     console.error('Unknown error');
                 }
             }
-            documentsLoading.value = false;
+            saving.value = false;
         }
         async function subCancel() {
             if(confirm('Sei sicura/o di voler annullare la sottoscrizione?')) {
-                documentsLoading.value = true;
+                saving.value = true;
                 const res = await serverReq({
                     action: (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_cancel_subscription',
                     id: subInView.id
@@ -1163,12 +1163,12 @@ createApp({
                         console.error('Unknown error');
                     }
                 }
-                documentsLoading.value = false;
+                saving.value = false;
             }
         }
         async function documentsDecrypt() {
             if (documentsDecryptPassword.value) {
-                documentsLoading.value = true;
+                saving.value = true;
                 const res = await serverReq({
                     action: (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_documents_decrypt',
                     password: documentsDecryptPassword.value,
@@ -1198,7 +1198,7 @@ createApp({
                         console.error('Unknown error');
                     }
                 }
-                documentsLoading.value = false;
+                saving.value = false;
             }
         }
         async function changePassword() {
@@ -1293,6 +1293,7 @@ createApp({
             decryptPasswordSaveTimeout = setTimeout(() => documentsDecryptPassword.value = '', 5 * 60000);
         }
         async function viewSub(id, popstate = false) {
+            paymentConfirmationDate.value = '';
             const res = await serverReq({
                action: (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_view_sub',
                id
@@ -1414,6 +1415,35 @@ createApp({
                 saving.value = false;
             }
         }
+        async function userSubModuleUploadFiles() {
+            saving.value = true;
+            try {
+                const res = await serverReq({
+                    action: (profile.role == 'administrator' ? 'admin' : 'resp') + '_subscription_upload_files',
+                    id: subInView.id,
+                    files: subModuleUploadFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
+                });
+                if (res.ok) {
+                    const {notices = []} = await res.json();
+                    generateNotices(notices);
+                    viewSub(subInView.id, true);
+                } else {
+                    try {
+                        const {notices = []} = await res.json();
+                        if (error) {
+                            generateNotices(notices);
+                        } else {
+                            console.error('Unknown error');
+                        }
+                    } catch {
+                        console.error('Unknown error');
+                    }
+    
+                }
+            } finally {
+                saving.value = false;
+            }
+        }
         function moduleUploadBegin(sub) {
             moduleUploadData.sub = sub;
             selectTab({name: 'moduleUpload', label: 'Carica modulo'});
@@ -1434,7 +1464,7 @@ createApp({
                 )
                 && moduleUploadData.generalPolicyAccept
             ) {
-                moduleUploadDataSending.value = true;
+                saving.value = true;
                 const res = await serverReq({
                     action: 'module_upload',
                     id: moduleUploadData.sub.id,
@@ -1464,7 +1494,7 @@ createApp({
                         console.error('Unknown error');
                     }
                 }
-                moduleUploadDataSending.value = false;
+                saving.value = false;
             }
         }
         async function resendInvitationMail() {
@@ -2095,7 +2125,6 @@ createApp({
             newsletterAgreeShow,
             publishAgreeShow,
             requestNewSubscription,
-            saving,
             currencyFormatter,
             generateSubscriptionPdf,
             generatingSubscriptionPdf,
@@ -2103,7 +2132,6 @@ createApp({
             moduleUploadBegin,
             onInvalidMime,
             moduleUploadDataSend,
-            moduleUploadDataSending,
             isValidIdCard,
             viewSub,
             subInView,
@@ -2111,7 +2139,6 @@ createApp({
             subFilesType,
             formatSubFiles,
             documentsDecrypt,
-            documentsLoading,
             documentsConfirm,
             subscriptionRefuse,
             paymentConfirm,
@@ -2132,7 +2159,8 @@ createApp({
             subInAdd,
             subModuleUploadFiles,
             addSubscription,
-            validSubAdd
+            validSubAdd,
+            paymentConfirmationDate
         };
     }
 })

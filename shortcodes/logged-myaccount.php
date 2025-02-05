@@ -572,7 +572,7 @@ if ($this->discourse_utilities()) {
                             <input type="checkbox" v-model="moduleUploadData.generalPolicyAccept"/>
                         </label>
                         <br>
-                        <button :disabled="moduleUploadDataSending" @click="()=>moduleUploadData.step-= (isValidIdCard ? 2 : 1)">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.generalPolicyAccept || moduleUploadDataSending" @click="moduleUploadDataSend">Invia</button>
+                        <button :disabled="saving" @click="()=>moduleUploadData.step-= (isValidIdCard ? 2 : 1)">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.generalPolicyAccept || saving" @click="moduleUploadDataSend">Invia</button>
                     </q-step>
                 </q-stepper>
                 <p v-if="moduleUploadData.sub.status != 'open'">
@@ -1062,7 +1062,7 @@ if ($this->discourse_utilities()) {
                             <br>
                             <template v-if="typeof subInView.files[0] == 'string'">
                                 <input type="password" @input="decryptPasswordSave" placeholder="La tua chiave personale" v-model="documentsDecryptPassword" />&nbsp;&nbsp;
-                                <button :disabled="!documentsDecryptPassword || documentsLoading" @click="documentsDecrypt">Sblocca documenti</button>
+                                <button :disabled="!documentsDecryptPassword || saving" @click="documentsDecrypt">Sblocca documenti</button>
                             </template>
                             <template v-else-if="subInView.status == 'tosee'">
                                 <label v-if="!subInView.user_id_card_confirmed && !subInView.user_id_card_number"><input type="checkbox" v-model="subInView.forceIdCard" />&nbsp;&nbsp;Forza documento d'identità<br><br></label>
@@ -1101,12 +1101,18 @@ if ($this->discourse_utilities()) {
                                 @change="f => subInView.documentToShow = f"
                                 :disabled="subModuleUploadFiles.length == 2"
                             >Seleziona file da caricare</mpop-uploader>
+                            <br>
+                            <button :disabled="!subModuleUploadFiles.length || saving" @click="">Carica file</button>
                         </td>
                     </tr>
                     <tr>
                         <td colspan="2">
                             <button v-if="subInView.status == 'completed'" @click="subCancel" style="margin-right:5px">Annulla sottoscrizione</button>
-                            <button v-if="subInView.status == 'seen'" @click="paymentConfirm" style="margin-right:5px">Conferma pagamento</button>
+                            <template v-if="subInView.status == 'seen'">
+                                <button @click="paymentConfirm" :disabled="!paymentConfirmationDate" style="margin-right:5px">Conferma pagamento</button>
+                                &nbsp;&nbsp;Data iscrizione/pagamento:&nbsp;<input :max="todayString" type="date" v-model="paymentConfirmationDate"/>
+                                <br>
+                            </template>
                             <button @click="subscriptionRefuse" v-if="!['canceled', 'refused', 'completed'].includes(subInView.status)" style="margin-right:5px">Rifiuta la richiesta</button>
                         </td>
                     </tr>

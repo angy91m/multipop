@@ -656,8 +656,23 @@ switch( $post_data['action'] ) {
             echo json_encode( $res_data );
             exit;
         }
+        if (!isset($post_data['signed_at']) || !is_int($post_data['signed_at'])) {
+            $res_data['error'] = ['signed_at'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Data di iscrizione/rinnovo non valida']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
         try {
-            $this->complete_subscription($sub['id']);
+            $d = $this::validate_date($post_data['signed_at']);
+            if ($d->getTimestamp() > time()) {
+                $res_data['error'] = ['signed_at'];
+                $res_data['notices'] = [['type'=>'error', 'msg' => 'Data di iscrizione/rinnovo non valida']];
+                http_response_code( 400 );
+                echo json_encode( $res_data );
+                exit;
+            }
+            $this->complete_subscription($sub['id'], $d->getTimestamp());
             $res_data['data'] = true;
         } catch (Exception $err) {
             $res_data['error'] = [$err->getMessage()];
@@ -788,7 +803,7 @@ switch( $post_data['action'] ) {
             if ( $post_data['status'] == 'completed' ) {
                 $signed_at_date = $this::validate_date($post_data['signed_at']);
                 $max_signed_date = date_create_from_format('Y-m-d H:i:s e', $post_data['year'] . '-12-31 00:00:00 '. current_time('e'));
-                if (!$max_signed_date || $max_signed_date->getTimestamp() < $signed_at_date->getTimestamp()) {
+                if (!$max_signed_date || $max_signed_date->getTimestamp() < $signed_at_date->getTimestamp() || time() < $signed_at_date->getTimestamp()) {
                     $res_data['error'] = ['year'];
                     $res_data['notices'] = [['type'=>'error', 'msg' => 'Anno o data di iscrizione/rinnovo non validi']];
                     http_response_code( 400 );
@@ -825,6 +840,9 @@ switch( $post_data['action'] ) {
             echo json_encode( $res_data );
             exit;
         }
+        break;
+    case 'admin_subscription_upload_files':
+
         break;
     default:
         $res_data['error'] = ['action'];

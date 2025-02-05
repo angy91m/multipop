@@ -555,8 +555,23 @@ switch( $post_data['action'] ) {
             echo json_encode( $res_data );
             exit;
         }
+        if (!isset($post_data['signed_at']) || !is_int($post_data['signed_at'])) {
+            $res_data['error'] = ['signed_at'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Data di iscrizione/rinnovo non valida']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
         try {
-            $this->complete_subscription($sub['id']);
+            $d = $this::validate_date($post_data['signed_at']);
+            if ($d->getTimestamp() > time()) {
+                $res_data['error'] = ['signed_at'];
+                $res_data['notices'] = [['type'=>'error', 'msg' => 'Data di iscrizione/rinnovo non valida']];
+                http_response_code( 400 );
+                echo json_encode( $res_data );
+                exit;
+            }
+            $this->complete_subscription($sub['id'], $d->getTimestamp());
             $res_data['data'] = true;
         } catch (Exception $err) {
             $res_data['error'] = [$err->getMessage()];
@@ -745,6 +760,9 @@ switch( $post_data['action'] ) {
             echo json_encode( $res_data );
             exit;
         }
+        break;
+    case 'resp_subscription_upload_files':
+        $this->subscription_upload_files($post_data, $res_data, true);
         break;
     default:
         $res_data['error'] = ['action'];

@@ -3482,6 +3482,87 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         clean_user_cache($user->ID);
         update_user_caches(get_user_by('ID', $user->ID));
     }
+    private function subscription_upload_files(&$post_data = [], &$res_data, $resp = false) {
+        if (!$this->user_has_master_key()) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Master key non impostata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        if (!isset($post_data['password']) || !is_string($post_data['password']) || !$post_data['password']) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Password non valida']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        if (!isset($post_data['id']) || !is_int($post_data['id'])) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $sub = $this->get_subscription_by('id', $post_data['id']);
+        if (!$sub || !in_array($sub['status'], ['seen', 'completed']) || !is_null($sub['filename']) || ( $resp ? !$this->is_resp_of_user($sub['user_id']) : false)) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        if (!isset($post_data['files']) || !is_array($post_data['files']) || empty($post_data['files']) || count($post_data['files']) > 2 ) {
+            $res_data['error'] = ['files'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'File non validi']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $master_key = base64_decode(
+            $this->decrypt_with_password(
+                base64_decode($current_user->mpop_personal_master_key, true),
+                $post_data['password']
+            ),
+            true
+        );
+        if (!$master_key) {
+            $res_data['error'] = ['password'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Password non valida']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $symkey = substr($master_key, 0, 32);
+        $signed_module_pdf = null;
+        $date_now = date_create('now', new DateTimeZone(current_time('e')));
+        $rand_file_name = $date_now->format('YmdHis');
+        try {
+            $signed_module_pdf = $this->merge_pdf_from_array($post_data['files']);
+            file_put_contents(
+                MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $rand_file_name . '-sub-' . $sub['id'] . '-' . $sub['user_id'] .'.pdf',
+                $this->encrypt( $signed_module_pdf->export_file(), $symkey )
+            );
+        } catch (Exception $err) {
+            $res_data['error'] = ['files'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'File non validi']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        global $wpdb;
+        $wpdb->update(
+            $wpdb->prefix . 'mpop_subscriptions',
+            [
+                'filename' => $rand_file_name,
+                'updated_at' => $date_now->getTimestamp()
+            ],
+            [
+                'id' => $sub['id']
+            ]
+        );
+        $res_data['data'] = true;
+    }
     private function parse_subs(array &$subs, array $unset = ['filename', 'completer_ip', 'notes']) {
         foreach($subs as &$sub) {
             foreach($unset as $u) {
