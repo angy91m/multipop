@@ -253,6 +253,7 @@ createApp({
             mpop_phone: ''
         }),
         subInAdd = reactive({}),
+        subModuleUploadFiles = reactive([]),
         profileEditing = ref(false),
         userEditing = ref(false),
         birthplaceCountryOpen = ref(false),
@@ -2129,6 +2130,7 @@ createApp({
             addUser,
             subAddBegin,
             subInAdd,
+            subModuleUploadFiles,
             addSubscription,
             validSubAdd
         };

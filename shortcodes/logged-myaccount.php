@@ -1070,6 +1070,23 @@ if ($this->discourse_utilities()) {
                             </template>
                         </td>
                     </tr>
+                    <tr v-else-if="['seen', 'completed'].includes(subInView.status)">
+                        <td><strong>Carica modulo di sottoscrizione:</strong></td>
+                        <td>
+                            <ul>
+                                <li v-for="(f, k) in subModuleUploadFiles" :key="k" @click="subInView.documentToShow = f.content">Pagina {{k+1}}</li>
+                            </ul>
+                            <br>
+                            <mpop-uploader 
+                                v-model="subModuleUploadFiles"
+                                :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']"
+                                :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type }; return f;}"
+                                @invalid-mime="onInvalidMime"
+                                @change="f => subInView.documentToShow(f.content)"
+                                :disabled="subModuleUploadFiles.length == 2"
+                            >Seleziona file da caricare</mpop-uploader>
+                        </td>
+                    </tr>
                     <tr>
                         <td colspan="2">
                             <button v-if="subInView.status == 'completed'" @click="subCancel" style="margin-right:5px">Annulla sottoscrizione</button>
