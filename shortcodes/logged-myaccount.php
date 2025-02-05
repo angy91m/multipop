@@ -1075,7 +1075,7 @@ if ($this->discourse_utilities()) {
                         <td>
                             <template v-if="subModuleUploadFiles.length">
                                 <ul>
-                                    <li v-for="(f, k) in subModuleUploadFiles" :key="k" @click="subInView.documentToShow = f.content">Pagina {{k+1}}</li>
+                                    <li v-for="(f, k) in subModuleUploadFiles" :key="k" class="mpop-click" @click="subInView.documentToShow = f.content">File {{k+1}}</li>
                                 </ul>
                                 <br>
                             </template>
