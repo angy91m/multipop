@@ -1101,7 +1101,9 @@ if ($this->discourse_utilities()) {
                                 @change="f => subInView.documentToShow = f"
                                 :disabled="subModuleUploadFiles.length == 2"
                             >Seleziona file da caricare</mpop-uploader>
-                            <br>
+                            <br><br>
+                            <input type="password" @input="decryptPasswordSave" placeholder="La tua chiave personale" v-model="documentsDecryptPassword" />
+                            <br><br>
                             <button :disabled="!subModuleUploadFiles.length || saving" @click="userSubModuleFilesUpload">Carica file</button>
                         </td>
                     </tr>

@@ -1422,6 +1422,7 @@ createApp({
                     action: (profile.role == 'administrator' ? 'admin' : 'resp') + '_subscription_upload_files',
                     id: subInView.id,
                     files: subModuleUploadFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
+                    password: documentsDecryptPassword.value
                 });
                 if (res.ok) {
                     const {notices = []} = await res.json();
