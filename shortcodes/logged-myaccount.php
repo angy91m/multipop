@@ -22,6 +22,13 @@ if ($this->discourse_utilities()) {
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/logged-myaccount.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/logged-myaccount-fonts.css">
+<?php
+if ($this->settings['pp_client_id']) {
+    ?>
+    <script src="<?=$this->settings['pp_url']?>/sdk/js?client-id=<?=$this->settings['pp_client_id']?>&currency=EUR"></script>
+    <?php
+}
+?>
 <div id="loaded-scripts" style="display:none"></div>
 <div id="app">
     <div style="display:none">

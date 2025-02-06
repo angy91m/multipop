@@ -1290,7 +1290,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $settings['min_subscription_payment'] = (double) $settings['min_subscription_payment'];
         $settings['pp_token_expiration'] = intval($settings['pp_token_expiration']);
         $settings['pp_sandbox'] = intval($settings['pp_sandbox']);
-        $settings['pp_url'] = 'https://api-m.'. ($settings['pp_sandbox'] ? 'sandbox.' : '') .'paypal.com';
+        $settings['pp_api_url'] = 'https://api-m.'. ($settings['pp_sandbox'] ? 'sandbox.' : '') .'paypal.com';
+        $settings['pp_url'] = 'https://'. ($settings['pp_sandbox'] ? 'sandbox.' : '') .'paypal.com';
         $settings['tempmail_urls'] = json_decode($settings['tempmail_urls'], true);
         $settings['last_year_checked'] = intval($settings['last_year_checked']);
         $settings['last_tempmail_update'] = intval($settings['last_tempmail_update']);
@@ -2420,7 +2421,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         ) {
             return false;
         }
-        $res = $this->curl_exec($this->settings['pp_url'] . '/v1/oauth2/token', [
+        $res = $this->curl_exec($this->settings['pp_api_url'] . '/v1/oauth2/token', [
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => 'grant_type=client_credentials',
             CURLOPT_USERPWD => $this->settings['pp_client_id'] . ':' . $this->settings['pp_client_secret']
@@ -2457,7 +2458,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $curl_settings = $curl_settings + [
             CURLOPT_POST => true
         ];
-        $res = $this->curl_exec($this->settings['pp_url'] . $url, $curl_settings);
+        $res = $this->curl_exec($this->settings['pp_api_url'] . $url, $curl_settings);
         if ($res) {
             $res = json_decode($res, true);
         }
