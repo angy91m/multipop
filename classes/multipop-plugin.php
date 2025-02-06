@@ -3482,7 +3482,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         clean_user_cache($user->ID);
         update_user_caches(get_user_by('ID', $user->ID));
     }
-    private function subscription_upload_files(&$post_data = [], &$res_data, $resp = false) {
+    private function subscription_upload_files(&$post_data = [], &$res_data = [], $resp = false) {
         if (!$this->user_has_master_key()) {
             $res_data['error'] = ['password'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Master key non impostata']];
