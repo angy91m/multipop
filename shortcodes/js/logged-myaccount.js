@@ -1949,6 +1949,7 @@ createApp({
             return weekDays[ts.getDay()].slice(0, 3) + ', ' + ('0' + ts.getDate()).slice(-2) + '/' + ('0' + (ts.getMonth()+1)).slice(-2) + '/' + ts.getFullYear() + ' alle ore ' + ('0' + ts.getHours()).slice(-2) + ':' + ('0' + ts.getMinutes()).slice(-2) + ':' + ('0' + ts.getSeconds()).slice(-2);
         }
         onBeforeMount(()=> {
+            window.prova = () => viewUser(1);
             const {user: parsedUser, discourseUrl, privacyPolicyUrl} = JSON.parse(document.getElementById('__MULTIPOP_DATA__').innerText);
             if (discourseUrl) {
                 menuItems.push({name: 'discourseUrl', url: discourseUrl, label: 'Accedi a Discourse'});
