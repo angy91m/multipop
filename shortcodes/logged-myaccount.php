@@ -27,8 +27,6 @@ if ($this->settings['pp_client_id']) {
     ?>
     <script src="<?=$this->settings['pp_url']?>/sdk/js?client-id=<?=$this->settings['pp_client_id']?>&currency=EUR"></script>
     <?php
-} else {
-    echo '<div>PROVA</div>';
 }
 ?>
 <div id="loaded-scripts" style="display:none"></div>
