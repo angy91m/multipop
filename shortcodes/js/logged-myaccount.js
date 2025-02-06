@@ -1342,7 +1342,7 @@ createApp({
                         viewUser(userInView.ID, true);
                     } else {
                         try {
-                            const {notices = []} = await res.json();
+                            const {error, notices = []} = await res.json();
                             if (error) {
                                 generateNotices(notices);
                             } else {
@@ -1372,7 +1372,7 @@ createApp({
                         viewUser(userInView.ID, true);
                     } else {
                         try {
-                            const {notices = []} = await res.json();
+                            const {error, notices = []} = await res.json();
                             if (error) {
                                 generateNotices(notices);
                             } else {
@@ -1400,7 +1400,7 @@ createApp({
                     getProfile();
                 } else {
                     try {
-                        const {notices = []} = await res.json();
+                        const {error, notices = []} = await res.json();
                         if (error) {
                             generateNotices(notices);
                         } else {
@@ -1429,7 +1429,7 @@ createApp({
                     viewSub(subInView.id, true);
                 } else {
                     try {
-                        const {notices = []} = await res.json();
+                        const {error, notices = []} = await res.json();
                         if (error) {
                             generateNotices(notices);
                         } else {
@@ -1509,7 +1509,7 @@ createApp({
                     generateNotices(notices);
                 } else {
                     try {
-                        const {notices = []} = await res.json();
+                        const {error, notices = []} = await res.json();
                         if (error) {
                             generateNotices(notices);
                         } else {
