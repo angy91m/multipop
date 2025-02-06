@@ -3484,14 +3484,14 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     }
     private function subscription_upload_files(&$post_data = [], &$res_data, $resp = false) {
         if (!$this->user_has_master_key()) {
-            $res_data['error'] = ['id'];
+            $res_data['error'] = ['password'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Master key non impostata']];
             http_response_code( 400 );
             echo json_encode( $res_data );
             exit;
         }
         if (!isset($post_data['password']) || !is_string($post_data['password']) || !$post_data['password']) {
-            $res_data['error'] = ['id'];
+            $res_data['error'] = ['password'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Password non valida']];
             http_response_code( 400 );
             echo json_encode( $res_data );
