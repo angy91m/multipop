@@ -173,8 +173,8 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
                     if (!is_string($_REQUEST['master_doc_key_old']) || !trim($_REQUEST['master_doc_key_old'])) {
                         $this->add_admin_notice( 'Master key attuale non valida' );
                     } else {
-                        $master_key = base64_decode(
-                            $this->decrypt_with_password(
+                        $master_key = @base64_decode(
+                            @$this->decrypt_with_password(
                                 base64_decode($this->get_master_key(), true),
                                 $_REQUEST['master_doc_key_old']
                             ),

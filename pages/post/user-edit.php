@@ -27,8 +27,8 @@ if (!$errors->has_errors()) {
                 $errors->add(400, $error_head . "Non sei in possesso di una master key");
                 return;
             }
-            $master_key = base64_decode(
-                $this->decrypt_with_password(
+            $master_key = @base64_decode(
+                @$this->decrypt_with_password(
                     base64_decode($enc_curr_user_mk, true),
                     $_POST['current_user_master_key']
                 ),
@@ -203,8 +203,8 @@ if (!$errors->has_errors()) {
                         $errors->add(400, $error_head . "Non sei in possesso di una master key");
                         return;
                     }
-                    $master_key = base64_decode(
-                        $this->decrypt_with_password(
+                    $master_key = @base64_decode(
+                        @$this->decrypt_with_password(
                             base64_decode($enc_curr_user_mk, true),
                             $_POST['current_user_master_key']
                         ),

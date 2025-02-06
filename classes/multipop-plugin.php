@@ -2645,8 +2645,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             return false;
         }
         $fs = file_get_contents($sub_file);
-        $master_key = base64_decode(
-            $this->decrypt_with_password(
+        $master_key = @base64_decode(
+            @$this->decrypt_with_password(
                 base64_decode($current_user->mpop_personal_master_key, true),
                 $passphrase
             ),
@@ -3519,9 +3519,10 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             echo json_encode( $res_data );
             exit;
         }
-        $master_key = base64_decode(
-            $this->decrypt_with_password(
-                base64_decode($current_user->mpop_personal_master_key, true),
+        $curr_u = wp_get_current_user();
+        $master_key = @base64_decode(
+            @$this->decrypt_with_password(
+                base64_decode($curr_u->mpop_personal_master_key, true),
                 $post_data['password']
             ),
             true
