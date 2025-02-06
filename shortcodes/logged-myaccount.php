@@ -1056,7 +1056,7 @@ if ($this->discourse_utilities()) {
                             <ul>
                                 <li v-for="(f, k) in formatSubFiles(subInView.files)" :key="k">
                                     <template v-if="typeof subInView.files[k] == 'string'">{{f}}</template>
-                                    <template v-else><span class="mpop-click" style="text-decoration: underline" @click="() => {console.log(subInView.files[k]); subInView.documentToShow = {content: subInView.files[k], type: 'application/pdf'}}">{{f}}</template>
+                                    <template v-else><span class="mpop-click" style="text-decoration: underline" @click="subInView.documentToShow = subInView.files[k]">{{f}}</template>
                                 </li>
                             </ul>
                             <br>

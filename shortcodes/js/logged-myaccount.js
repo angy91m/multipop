@@ -1179,7 +1179,7 @@ createApp({
                     if (resData.data && typeof resData.data == 'object') {
                         subInView.files.length = 0;
                         for (const k in resData.data) {
-                            subInView.files.push({name: k, content: resData.data[k]});
+                            subInView.files.push({name: k, content: resData.data[k], type: 'application/pdf'});
                         }
                     } else {
                         console.error('Unknown error');
