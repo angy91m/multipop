@@ -1056,7 +1056,7 @@ if ($this->discourse_utilities()) {
                             <ul>
                                 <li v-for="(f, k) in formatSubFiles(subInView.files)" :key="k">
                                     <template v-if="typeof subInView.files[k] == 'string'">{{f}}</template>
-                                    <template v-else><span class="mpop-click" style="text-decoration: underline" @click="subInView.documentToShow = subInView.files[k]">{{f}}</template>
+                                    <template v-else><span class="mpop-click" style="text-decoration: underline" @click="subInView.documentToShow = {content: subInView.files[k], type: 'application/pdf'}">{{f}}</template>
                                 </li>
                             </ul>
                             <br>
@@ -1119,14 +1119,6 @@ if ($this->discourse_utilities()) {
                         </td>
                     </tr>
                 </table>
-                <template v-if="moduleUploadData.idCardFiles.length">
-                            <div v-for="(f, k) in moduleUploadData.idCardFiles" :key="k">
-                                - {{f.name}}&nbsp;&nbsp;<button @click="() => moduleUploadData.idCardFiles.splice(k, 1)">Rimuovi</button>
-                                <br>
-                                <iframe v-if="f.type == 'application/pdf'" :src="f.content" style="width:100%; max-height:250px;"></iframe>
-                                <image v-if="f.type != 'application/pdf'" :src="f.content" style="max-height:250px;" />
-                            </div>
-                        </template>
                 <template v-if="subInView.documentToShow">
                     <hr>
                     <button @click="subInView.documentToShow = null">Chiudi</button>
