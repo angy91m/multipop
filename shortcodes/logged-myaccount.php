@@ -1104,7 +1104,7 @@ if ($this->discourse_utilities()) {
                             <br><br>
                             <input type="password" @input="decryptPasswordSave" placeholder="La tua chiave personale" v-model="documentsDecryptPassword" />
                             <br><br>
-                            <button :disabled="!subModuleUploadFiles.length || saving" @click="userSubModuleFilesUpload">Carica file</button>
+                            <button :disabled="!subModuleUploadFiles.length || !documentsDecryptPassword || saving" @click="userSubModuleFilesUpload">Carica file</button>
                         </td>
                     </tr>
                     <tr>
