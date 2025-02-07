@@ -817,10 +817,10 @@ createApp({
                 generateNotices(newUser.notices || []);
             } else {
                 try {
-                    const {error, notices} = await res.json();
+                    const {error, notices = []} = await res.json();
                     if (error) {
                         savingProfileErrors.push(...error);
-                        generateNotices(notices || []);
+                        generateNotices(notices);
                     } else {
                         console.error('Unknown error');
                     }
@@ -875,10 +875,10 @@ createApp({
                 generateNotices(newUser.notices || []);
             } else {
                 try {
-                    const {error, notices} = await res.json();
+                    const {error, notices = []} = await res.json();
                     if (error) {
                         savingProfileErrors.push(...error);
-                        generateNotices(notices || []);
+                        generateNotices(notices);
                     } else {
                         console.error('Unknown error');
                     }
@@ -953,10 +953,10 @@ createApp({
                 generateNotices(newUser.notices || []);
             } else {
                 try {
-                    const {error, notices} = await res.json();
+                    const {error, notices = []} = await res.json();
                     if (error) {
                         savingUserErrors.push(...error);
-                        generateNotices(notices || []);
+                        generateNotices(notices);
                     } else {
                         console.error('Unknown error');
                     }
@@ -998,10 +998,10 @@ createApp({
                     generateNotices(newUser.notices || []);
                 } else {
                     try {
-                        const {error, notices} = await res.json();
+                        const {error, notices = []} = await res.json();
                         if (error) {
                             savingUserAddErrors.push(...error);
-                            generateNotices(notices || []);
+                            generateNotices(notices);
                         } else {
                             console.error('Unknown error');
                         }
@@ -1030,10 +1030,10 @@ createApp({
                     generateNotices(resData.notices || []);
                 } else {
                     try {
-                        const {error, notices} = await res.json();
+                        const {error, notices = []} = await res.json();
                         if (error) {
                             staticPwdErrors.push(...error);
-                            generateNotices(notices || []);
+                            generateNotices(notices);
                         } else {
                             console.error('Unknown error');
                         }
@@ -1061,10 +1061,10 @@ createApp({
                     generateNotices(resData.notices || []);
                 } else {
                     try {
-                        const {error, notices} = await res.json();
+                        const {error, notices = []} = await res.json();
                         if (error) {
                             staticPwdErrors.push(...error);
-                            generateNotices(notices || []);
+                            generateNotices(notices);
                         } else {
                             console.error('Unknown error');
                         }
@@ -1093,10 +1093,10 @@ createApp({
                     generateNotices(resData.notices || []);
                 } else {
                     try {
-                        const {error, notices} = await res.json();
+                        const {error, notices = []} = await res.json();
                         if (error) {
                             staticPwdErrors.push(...error);
-                            generateNotices(notices || []);
+                            generateNotices(notices);
                         } else {
                             console.error('Unknown error');
                         }
@@ -1122,10 +1122,10 @@ createApp({
                 generateNotices(resData.notices || []);
             } else {
                 try {
-                    const {error, notices} = await res.json();
+                    const {error, notices = []} = await res.json();
                     if (error) {
                         staticPwdErrors.push(...error);
-                        generateNotices(notices || []);
+                        generateNotices(notices);
                     } else {
                         console.error('Unknown error');
                     }
@@ -1152,10 +1152,10 @@ createApp({
                     generateNotices(resData.notices || []);
                 } else {
                     try {
-                        const {error, notices} = await res.json();
+                        const {error, notices = []} = await res.json();
                         if (error) {
                             staticPwdErrors.push(...error);
-                            generateNotices(notices || []);
+                            generateNotices(notices);
                         } else {
                             console.error('Unknown error');
                         }
@@ -1187,10 +1187,10 @@ createApp({
                     generateNotices(resData.notices || []);
                 } else {
                     try {
-                        const {error, notices} = await res.json();
+                        const {error, notices = []} = await res.json();
                         if (error) {
                             staticPwdErrors.push(...error);
-                            generateNotices(notices || []);
+                            generateNotices(notices);
                         } else {
                             console.error('Unknown error');
                         }
@@ -1221,10 +1221,10 @@ createApp({
                 generateNotices(pwdRes.notices || []);
             } else {
                 try {
-                    const {error, notices} = await res.json();
+                    const {error, notices = []} = await res.json();
                     if (error) {
                         staticPwdErrors.push(...error);
-                        generateNotices(notices || []);
+                        generateNotices(notices);
                     } else {
                         console.error('Unknown error');
                     }
@@ -1271,10 +1271,10 @@ createApp({
                 generateNotices(user.notices || []);
             } else {
                 try {
-                    const {error, notices} = await res.json();
+                    const {error, notices = []} = await res.json();
                     if (error) {
                         staticPwdErrors.push(...error);
-                        generateNotices(notices || []);
+                        generateNotices(notices);
                     } else {
                         console.error('Unknown error');
                     }
@@ -1311,10 +1311,10 @@ createApp({
                 generateNotices(sub.notices || []);
             } else {
                 try {
-                    const {error, notices} = await res.json();
+                    const {error, notices = []} = await res.json();
                     if (error) {
                         staticPwdErrors.push(...error);
-                        generateNotices(notices || []);
+                        generateNotices(notices);
                     } else {
                         console.error('Unknown error');
                     }
@@ -1484,10 +1484,10 @@ createApp({
                     generateNotices(resJson.notices || []);
                 } else {
                     try {
-                        const {error, notices} = await res.json();
+                        const {error, notices = []} = await res.json();
                         if (error) {
                             console.error(error);
-                            generateNotices(notices || []);
+                            generateNotices(notices);
                         } else {
                             console.error('Unknown error');
                         }
@@ -1545,12 +1545,13 @@ createApp({
                     generateNotices(resData.notices || []);
                 } else {
                     try {
-                        const {error} = await res.json();
+                        const {error, notices = []} = await res.json();
                         if (error) {
                             console.error(error);
                         } else {
                             console.error('Unknown error');
                         }
+                        generateNotices(notices);
                     } catch {
                         console.error('Unknown error');
                     }
@@ -1577,12 +1578,13 @@ createApp({
                     generateNotices(resData.notices || []);
                 } else {
                     try {
-                        const {error} = await res.json();
+                        const {error, notices = []} = await res.json();
                         if (error) {
                             console.error(error);
                         } else {
                             console.error('Unknown error');
                         }
+                        generateNotices(notices);
                     } catch {
                         console.error('Unknown error');
                     }
@@ -1605,15 +1607,15 @@ createApp({
                     } else {
                         console.error('Unknown error');
                     }
-                    generateNotices(resData.notices || []);
                 } else {
                     try {
-                        const {error} = await res.json();
+                        const {error, notices = []} = await res.json();
                         if (error) {
                             console.error(error);
                         } else {
                             console.error('Unknown error');
                         }
+                        generateNotices(notices);
                     } catch {
                         console.error('Unknown error');
                     }
@@ -1647,12 +1649,13 @@ createApp({
                     generateNotices(resData.notices || []);
                 } else {
                     try {
-                        const {error} = await res.json();
+                        const {error, notices = []} = await res.json();
                         if (error) {
                             console.error(error);
                         } else {
                             console.error('Unknown error');
                         }
+                        generateNotices(notices);
                     } catch {
                         console.error('Unknown error');
                     }
@@ -1723,12 +1726,13 @@ createApp({
                     generateNotices(users.notices || []);
                 } else {
                     try {
-                        const {error} = await res.json();
+                        const {error, notices = []} = await res.json();
                         if (error) {
                             console.error(error);
                         } else {
                             console.error('Unknown error');
                         }
+                        generateNotices(notices);
                     } catch {
                         console.error('Unknown error');
                     }
