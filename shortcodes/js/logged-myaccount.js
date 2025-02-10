@@ -2045,7 +2045,7 @@ createApp({
         }
         async function onPpApprove(subId) {
             await serverReq({
-                id: sub.id,
+                id: subId,
                 action: 'capture_paypal_order'
             });
             getProfile();
