@@ -680,6 +680,7 @@ class MultipopPlugin {
             `completed_at` BIGINT UNSIGNED NULL,
             `author_id` BIGINT UNSIGNED NOT NULL,
             `pp_order_id` VARCHAR(255) NULL,
+            `pp_capture_id` VARCHAR(255) NULL,
             `completer_id` BIGINT UNSIGNED NULL,
             `completer_ip` VARCHAR(255) NULL,
             `notes` TEXT NULL,
@@ -2466,13 +2467,12 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     }
     private function pp_create_order($args = []) {
         $site_url = (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) ? 'https': 'http') . "://$_SERVER[HTTP_HOST]";
-        $brand_name = 'Multipopolare';
-        if (!isset($args['brand_name'])) {
+        $brand_name = 'Multipopolare APS';
+        if (isset($args['brand_name'])) {
             $brand_name = $args['brand_name'];
             unset($args['brand_name']);
         }
-        $args = $args + [
-            'req_id' => null,
+        $args += [
             'intent' => 'CAPTURE',
             'purchase_units' => [],
             'payment_source' => [
@@ -2482,20 +2482,15 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                         'brand_name' => $brand_name,
                         'landing_page' => 'LOGIN',
                         'shipping_preference' => 'NO_SHIPPING',
-                        'user_action' => 'CONTINUE',
-                        'return_url' => $site_url . '/mpop-pp-success',
-                        'cancel_url' => $site_url . '/mpop-pp-cancel'
+                        'user_action' => 'PAY_NOW'
                     ]
                 ]
             ]
         ];
         $headers = [
             'Content-Type: application/json',
-            'Prefer: return=representation'
+            'PayPal-Request-Id: '. $args['req_id']
         ];
-        if ($args['req_id']) {
-            $headers[] = 'PayPal-Request-Id: '. $args['req_id'];
-        }
         unset($args['req_id']);
         return $this->pp_req('/v2/checkout/orders', [
             CURLOPT_HTTPHEADER => $headers,
@@ -2507,42 +2502,78 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             CURLOPT_POST => false
         ]);
     }
-    private function create_subscription_pp_order($args, $req_id = true) {
-        if (!isset($args['subs_id']) || !is_int($args['subs_id'])) {
+    private function create_subscription_pp_order($sub) {
+        if (isset($sub['pp_order_id']) && is_string($sub['pp_order_id']) && $sub['pp_order_id']) {
+            $order = $this->pp_get_order($sub['pp_order_id']);
+            if (!$order) {
+                return false;
+            }
+            if ($order['status'] != 'REVERSED') {
+                return $order;
+            }
+        }
+        if (!isset($sub['id']) || !is_int($sub['id'])) {
             return false;
         }
-        if (!isset($args['payment']) || !is_numeric($args['payment'])) {
+        if (!isset($sub['quote']) || !is_numeric($sub['quote'])) {
             return false;
         }
-        $args['payment'] = round(((double) $args['payment']) * 100) /100;
-        if ($args['payment'] < $this->settings['min_subscription_payment']) {
+        $quote = round(((double) $sub['quote']) * 100) /100;
+        if ($quote < $this->settings['min_subscription_payment']) {
             return false;
         }
-        return $this->pp_create_order([
-            'req_id' => $req_id ? 'subs-' . $args['subs_id'] : null,
+        $order = $this->pp_create_order([
+            'req_id' => uniqid("pp_", true),
             'purchase_units' => [[
-                'reference_id' => "$args[subs_id]",
+                'reference_id' => "$sub[id]",
                 'items' => [[
                     'quantity' => '1',
-                    'name' => 'Iscrizione',
-                    'category' => 'DIGITAL_GOODS',
+                    'name' => "MPOP-PP-$sub[id]",
+                    'category' => 'DONATION',
                     'unit_amount' => [
                         'currency_code' => 'EUR',
-                        'value' => "$args[payment]"
+                        'value' => "$quote"
                     ]
                 ]],
                 'amount' => [
                     'currency_code' => 'EUR',
-                    'value' => "$args[payment]",
+                    'value' => "$quote",
                     'breakdown' => [
                         'item_total' => [
                             'currency_code' => 'EUR',
-                            'value' => "$args[payment]"
+                            'value' => "$quote"
                         ]
                     ]
                 ]
             ]]
         ]);
+        if ($order && $order['id']) {
+            global $wpdb;
+            $wpdb->update(
+                $wpdb->prefix . 'mpop_subscriptions',
+                [
+                    'pp_order_id' => $order['id'],
+                    'updated_at' => $date_now->getTimestamp()
+                ],
+                [
+                    'id' => $sub['id']
+                ]
+            );
+        }
+        return $order;
+    }
+    private function capture_subscription_pp_order($sub) {
+        $order = $this->pp_req("/v2/checkout/orders/$sub[pp_order_id]/capture");
+        if (!$order || $order['status'] != 'COMPLETED') return false;
+        $capture_id = false;
+        foreach( $order['purchase_units'][0]['payments']['captures'] as $c ) {
+            if ($c['status'] == 'COMPLETED') {
+                $capture_id = $c['id'];
+                break;
+            }
+        }
+        $this->complete_subscription($sub['id'], 0, $capture_id);
+        return true;
     }
     private function check_mime_type(string $file_content, $accepted = true) {
         $f_info = new finfo(FILEINFO_MIME_TYPE);
@@ -2867,7 +2898,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             return $wpdb->insert_id;
         }
     }
-    private function get_subscription_by($getby, $sub_id, $year = 0, array $unset = ['filename', 'completer_ip', 'notes']) {
+    private function get_subscription_by($getby, $sub_id, $year = 0, array $unset = ['filename', 'completer_ip', 'notes', 'pp_order_id', 'pp_capture_id']) {
         $search_format = '%d';
         if ($getby == 'id') {
             if (is_array($sub_id) && isset($sub_id['id'])) {
@@ -2960,7 +2991,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 signed_at = $signed_at,
                 completer_id = %d,
                 completer_ip = %s
-                ".($paypal ? '' : ", pp_order_id = NULL")."
+                ".($paypal ? (", pp_capture_id = '$paypal'") : "")."
             WHERE id = $sub_id;",
             [
                 get_current_user_id(),
@@ -3565,7 +3596,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         );
         $res_data['data'] = true;
     }
-    private function parse_subs(array &$subs, array $unset = ['filename', 'completer_ip', 'notes']) {
+    private function parse_subs(array &$subs, array $unset = ['filename', 'completer_ip', 'notes', 'pp_order_id', 'pp_capture_id']) {
         foreach($subs as &$sub) {
             foreach($unset as $u) {
                 unset($sub[$u]);
@@ -3585,7 +3616,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $sub['completer_id'] = intval($sub['completer_id']);
         }
     }
-    private function get_my_subscriptions($user_id, array $unset = ['filename', 'completer_ip', 'notes']) {
+    private function get_my_subscriptions($user_id, array $unset = ['filename', 'completer_ip', 'notes', 'pp_order_id', 'pp_capture_id']) {
         if (is_object($user_id)) {
             $user_id = $user_id->ID;
         }
@@ -3620,7 +3651,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             'page' => 1,
             'pagination' => true,
             'order_by' => ['s.updated_at' => false],
-            'unset' => ['filename', 'completer_ip']
+            'unset' => ['filename', 'completer_ip', 'pp_order_id', 'pp_capture_id']
         ];
         $time_interval_reg = '/^\d*,\d*$/';
         $quote_interval_reg = '/^(\d+(\.\d{1,2})?)?,(\d+(\.\d{1,2})?)?$/';

@@ -395,7 +395,7 @@ switch( $post_data['action'] ) {
             echo json_encode( $res_data );
             exit;
         }
-        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip']);
+        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip', 'pp_order_id', 'pp_capture_id']);
         if (!$sub || !$this->is_resp_of_user($sub['user_id'])) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
@@ -439,7 +439,7 @@ switch( $post_data['action'] ) {
             echo json_encode( $res_data );
             exit;
         }
-        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip']);
+        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip', 'pp_order_id', 'pp_capture_id']);
         if (!$sub || !$this->is_resp_of_user($sub['user_id'])) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
@@ -480,7 +480,7 @@ switch( $post_data['action'] ) {
             echo json_encode( $res_data );
             exit;
         }
-        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip']);
+        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['']);
         if (!$sub || $sub['status'] != 'tosee' || !$this->is_resp_of_user($sub['user_id'])) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
@@ -514,7 +514,7 @@ switch( $post_data['action'] ) {
             echo json_encode( $res_data );
             exit;
         }
-        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip']);
+        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip', 'pp_order_id', 'pp_capture_id']);
         if (!$sub || in_array( $sub['status'], ['refused', 'canceled', 'completed']) || !$this->is_resp_of_user($sub['user_id'])) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];

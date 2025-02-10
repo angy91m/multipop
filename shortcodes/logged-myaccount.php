@@ -394,15 +394,15 @@ if ($this->settings['pp_client_id']) {
                                     <?php
                                     if ($this->settings['pp_client_id']) { ?>
                                         <li><strong>Pagamento con PayPal</strong><br>
-                                            <mpop-pp-btn :subscription="nearActiveSub" :options="paypalOptions(nearActiveSub)"></mpop-pp-btn>
+                                            <mpop-pp-btn :subscription="nearActiveSub" :options="paypalOptions"></mpop-pp-btn>
                                         </li>
                                     <?php
                                     } ?>
                                 </template>
-                                <template v-if="nearActiveSub.pp_order_id">
+                                <!-- <template v-if="nearActiveSub.pp_order_id">
                                     <li>PayPal ID: {{nearActiveSub.pp_order_id}}</li>
                                     <li v-if="nearActiveSub.status == 'seen'">Paga</li>
-                                </template>
+                                </template> -->
                             </ul>
                         </template>
                         <div v-if="availableYearsToOrder.length" id="mpop-avail-years-to-order">

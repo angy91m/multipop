@@ -10,9 +10,9 @@
         },
         options: {
             required: true,
-            type: Object
+            type: Function
         }
     }),
     buttonId = computed(() => 'mpop-ppbtn-' + props.subscription.id );
-    onMounted(() => paypal.Buttons(props.options).render('#'+buttonId.value));
+    onMounted(() => paypal.Buttons(props.options(props.subscription, buttonId.value)).render('#'+buttonId.value));
 </script>

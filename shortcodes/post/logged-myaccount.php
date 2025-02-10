@@ -583,7 +583,7 @@ switch ($post_data['action']) {
             echo json_encode( $res_data );
             exit;
         }
-        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip']);
+        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip', 'pp_order_id', 'pp_capture_id']);
         if (!$sub || $sub['user_id'] !== $current_user->ID || in_array($sub['status'], ['canceled', 'completed', 'refused'])) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
@@ -610,6 +610,57 @@ switch ($post_data['action']) {
         break;
     case 'cancel_profile_pending_edits':
         delete_user_meta($current_user->ID, 'mpop_profile_pending_edits');
+        $res_data['data'] = true;
+        break;
+    case 'create_paypal_order':
+        if (!isset($post_data['id']) || !is_int($post_data['id'])) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip', 'pp_capture_id']);
+        if (!$sub || $sub['status'] != 'seen' || $sub['user_id'] != $current_user->ID) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $order = $this->create_subscription_pp_order($sub);
+        if (!$order) {
+            $res_data['error'] = ['uknown'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $res_data['data'] = $order;
+        break;
+    case 'capture_paypal_order':
+        if (!isset($post_data['id']) || !is_int($post_data['id'])) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip', 'pp_capture_id']);
+        if (!$sub || $sub['status'] != 'seen' || $sub['user_id'] != $current_user->ID) {
+            $res_data['error'] = ['id'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        if (!$this->capture_subscription_pp_order($sub)) {
+            $res_data['error'] = ['uknown'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
         $res_data['data'] = true;
         break;
     default:
