@@ -2561,6 +2561,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     }
     private function capture_subscription_pp_order($sub) {
         $order = $this->pp_req("/v2/checkout/orders/$sub[pp_order_id]/capture");
+        save_test($order);
         if (!$order || $order['status'] != 'COMPLETED') return false;
         $capture_id = false;
         foreach( $order['purchase_units'][0]['payments']['captures'] as $c ) {
