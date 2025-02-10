@@ -2564,7 +2564,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
             CURLOPT_POSTFIELDS => '{}'
         ]);
-        save_test($order);
         if (!$order || $order['status'] != 'COMPLETED') return false;
         $capture_id = false;
         foreach( $order['purchase_units'][0]['payments']['captures'] as $c ) {
