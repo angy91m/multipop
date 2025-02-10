@@ -387,9 +387,18 @@ if ($this->settings['pp_client_id']) {
                                 <button v-if="nearActiveSub.status == 'open'" class="mpop-button" @click="generateSubscriptionPdf(nearActiveSub.id)" :disabled="generatingSubscriptionPdf.find( v => v == nearActiveSub.id)">Genera modulo iscrizione</button>
                                 <button v-if="nearActiveSub.status == 'open'" class="mpop-button" @click="moduleUploadBegin(nearActiveSub)">Carica modulo</button>
                                 <button v-if="!['canceled', 'completed', 'refused'].includes(nearActiveSub.status)" class="mpop-button btn-error" @click="profileSubCancel(nearActiveSub)">Annulla richiesta</button>
-                                <li v-if="nearActiveSub.status == 'seen'"><strong>Pagamento con bonifico</strong><br>
-                                    Per pagare con bonifico, dopo aver effettuato il pagamento, invia una e-mail dall'indirizzo registrato sul sito a <?=$this->settings['mail_from']?> con gli eventuali riferimenti e scansione della ricevuta.
-                                </li>
+                                <template v-if="nearActiveSub.status == 'seen'">
+                                    <li><strong>Pagamento con bonifico</strong><br>
+                                        Per pagare con bonifico, dopo aver effettuato il pagamento, invia una e-mail dall'indirizzo registrato sul sito a <?=$this->settings['mail_from']?> con gli eventuali riferimenti e scansione della ricevuta.
+                                    </li>
+                                    <?php
+                                    if ($this->settings['pp_client_id']) { ?>
+                                        <li><strong>Pagamento con PayPal</strong><br>
+                                            <mpop-pp-btn :subscription="nearActiveSub" :options="paypalOptions(nearActiveSub)"></mpop-pp-btn>
+                                        </li>
+                                    <?php
+                                    } ?>
+                                </template>
                                 <template v-if="nearActiveSub.pp_order_id">
                                     <li>PayPal ID: {{nearActiveSub.pp_order_id}}</li>
                                     <li v-if="nearActiveSub.status == 'seen'">Paga</li>

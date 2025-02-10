@@ -21,6 +21,7 @@ loadVueModule = (...modules) => {
 },
 [vSel] = loadVueModule('vue-select.js'),
 [mpopUploader] = loadVueModule('MpopUploader.vue'),
+[mpopPaypalButton] = loadVueModule('MpopPaypalButton.vue'),
 mailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/s,
 passwordRegex = {
     rr: [
@@ -194,7 +195,8 @@ createApp({
     components: {
         'v-select': defineAsyncComponent(() => vSel),
         'v-intl-phone': IntlTelInput,
-        'mpop-uploader': defineAsyncComponent(() => mpopUploader)
+        'mpop-uploader': defineAsyncComponent(() => mpopUploader),
+        'mpop-pp-btn': defineAsyncComponent(() => mpopPaypalButton),
     },
     setup() {
         function activeCardForYear(cards = [], year) {
@@ -2041,6 +2043,30 @@ createApp({
         function formatSubFiles(files) {
             return files.map(f => subFilesType.find(sft => (typeof f == 'string' ? f : f.name) == sft.name).label);
         }
+        function paypalOptions(sub) {
+            return {
+                async createOrder() {
+                    const res = await serverReq({
+                        id: sub.id,
+                        action: 'create_paypal_order'
+                    });
+                    if (res.ok) {
+                        const {data} = await res.json();
+                        return data;
+                    }
+                },
+                async onApprove() {
+                    const res = await serverReq({
+                        id: sub.id,
+                        action: 'capture_paypal_order'
+                    });
+                    if (res.ok) {
+                        const {data} = await res.json();
+                        if (data) getProfile();
+                    }
+                }
+            };
+        }
         return {
             selectedTab,
             profile,
@@ -2171,7 +2197,8 @@ createApp({
             addSubscription,
             validSubAdd,
             paymentConfirmationDate,
-            userSubModuleFilesUpload
+            userSubModuleFilesUpload,
+            paypalOptions
         };
     }
 })
