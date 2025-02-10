@@ -2451,14 +2451,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 return false;
             }
         }
-        if (isset($curl_settings[CURLOPT_HTTPHEADER])) {
-            $curl_settings[CURLOPT_HTTPHEADER] += [
-                'Authorization: Bearer ' . $this->settings['pp_access_token']
-            ];
-        } else {
-            $curl_settings[CURLOPT_HTTPHEADER] = ['Authorization: Bearer ' . $this->settings['pp_access_token']];
-        }
-        $curl_settings = $curl_settings + [
+        $curl_settings[CURLOPT_HTTPHEADER][] = 'Authorization: Bearer ' . $this->settings['pp_access_token'];
+        $curl_settings += [
             CURLOPT_POST => true
         ];
         save_test($curl_settings);
