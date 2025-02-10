@@ -2043,6 +2043,13 @@ createApp({
         function formatSubFiles(files) {
             return files.map(f => subFilesType.find(sft => (typeof f == 'string' ? f : f.name) == sft.name).label);
         }
+        async function onPpApprove(subId) {
+            await serverReq({
+                id: sub.id,
+                action: 'capture_paypal_order'
+            });
+            getProfile();
+        }
         function paypalOptions(sub, buttonId) {
             return {
                 async createOrder() {
@@ -2056,24 +2063,15 @@ createApp({
                             if (order.status == 'PAYER_ACTION_REQUIRED') {
                                 return order.id;
                             } else if (order.status == 'APPROVED') {
-                                console.log('ciao');
-                                return this.onApprove();
+                                return onPpApprove(sub.id);
                             } else if (order.status == 'PENDING_APPROVAL') {
                                 document.getElementById(buttonId).innerHTML = 'Pagamento in attesa di approvazione';
                             }
                         }
                     }
                 },
-                async onApprove() {
-                    console.log('ciao2');
-                    const res = await serverReq({
-                        id: sub.id,
-                        action: 'capture_paypal_order'
-                    });
-                    if (res.ok) {
-                        const {data} = await res.json();
-                        if (data) getProfile();
-                    }
+                onApprove() {
+                    return onPpApprove(sub.id);
                 }
             };
         }
