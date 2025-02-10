@@ -2427,8 +2427,11 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             CURLOPT_POSTFIELDS => 'grant_type=client_credentials',
             CURLOPT_USERPWD => $this->settings['pp_client_id'] . ':' . $this->settings['pp_client_secret']
         ]);
+        save_test($this->settings['pp_client_id']);
+        save_test($this->settings['pp_client_secret'], 1);
         if ($res) {
             $res = json_decode($res, true);
+            save_test($res, 2);
             if ($res['access_token']) {
                 global $wpdb;
                 $wpdb->query( "UPDATE " . $this::db_prefix('plugin_settings') . " SET `pp_access_token` = '$res[access_token]', `pp_token_expiration` = " . ($res['expires_in'] + time()) . ";" );
