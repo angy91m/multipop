@@ -14,5 +14,5 @@
         }
     }),
     buttonId = computed(() => 'mpop-ppbtn-' + props.subscription.id );
-    onMounted(() => paypal.Buttons(props.options).render(buttonId.value));
+    onMounted(() => setTimeout(()=>paypal.Buttons(props.options).render(buttonId.value), 1000));
 </script>
