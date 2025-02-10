@@ -630,7 +630,7 @@ switch ($post_data['action']) {
         }
         $order = $this->create_subscription_pp_order($sub);
         if (!$order) {
-            $res_data['error'] = ['uknown'];
+            $res_data['error'] = ['unknown'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
             http_response_code( 400 );
             echo json_encode( $res_data );
@@ -655,7 +655,7 @@ switch ($post_data['action']) {
             exit;
         }
         if (!$this->capture_subscription_pp_order($sub)) {
-            $res_data['error'] = ['uknown'];
+            $res_data['error'] = ['unknown'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
             http_response_code( 400 );
             echo json_encode( $res_data );

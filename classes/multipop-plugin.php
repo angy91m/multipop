@@ -2453,7 +2453,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         $curl_settings[CURLOPT_HTTPHEADER][] = 'Authorization: Bearer ' . $this->settings['pp_access_token'];
         $curl_settings += [
-            CURLOPT_POST => true
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => '{}'
         ];
         $res = $this->curl_exec($this->settings['pp_api_url'] . $url, $curl_settings);
         if ($res) {
@@ -2561,7 +2562,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     }
     private function capture_subscription_pp_order($sub) {
         $order = $this->pp_req("/v2/checkout/orders/$sub[pp_order_id]/capture");
-        save_test($order);
         if (!$order || $order['status'] != 'COMPLETED') return false;
         $capture_id = false;
         foreach( $order['purchase_units'][0]['payments']['captures'] as $c ) {
