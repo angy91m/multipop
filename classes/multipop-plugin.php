@@ -2427,11 +2427,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             CURLOPT_POSTFIELDS => 'grant_type=client_credentials',
             CURLOPT_USERPWD => $this->settings['pp_client_id'] . ':' . $this->settings['pp_client_secret']
         ]);
-        save_test($this->settings['pp_client_id']);
-        save_test($this->settings['pp_client_secret'], 1);
         if ($res) {
             $res = json_decode($res, true);
-            save_test($res, 2);
             if ($res['access_token']) {
                 global $wpdb;
                 $wpdb->query( "UPDATE " . $this::db_prefix('plugin_settings') . " SET `pp_access_token` = '$res[access_token]', `pp_token_expiration` = " . ($res['expires_in'] + time()) . ";" );
@@ -2455,9 +2452,11 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             }
         }
         if (isset($curl_settings[CURLOPT_HTTPHEADER])) {
-            $curl_settings[CURLOPT_HTTPHEADER] = $curl_settings[CURLOPT_HTTPHEADER] + [
+            $curl_settings[CURLOPT_HTTPHEADER] += [
                 'Authorization: Bearer ' . $this->settings['pp_access_token']
             ];
+        } else {
+            $curl_settings[CURLOPT_HTTPHEADER] = ['Authorization: Bearer ' . $this->settings['pp_access_token']];
         }
         $curl_settings = $curl_settings + [
             CURLOPT_POST => true
@@ -2501,7 +2500,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         ]);
     }
     private function pp_get_order($order_id) {
-        return $this->pp_req('/v2/checkout/orders/' . $order_id, [
+        return $this->pp_req("/v2/checkout/orders/$order_id", [
             CURLOPT_POST => false
         ]);
     }
