@@ -2544,6 +2544,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 ]
             ]]
         ]);
+        $date_now = date_create('now', new DateTimeZone(current_time('e')));
         if ($order && $order['id']) {
             global $wpdb;
             $wpdb->update(
