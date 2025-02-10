@@ -2045,7 +2045,7 @@ createApp({
         }
         function paypalOptions(sub, buttonId) {
             return {
-                async createOrder(_data, actions) {
+                async createOrder() {
                     const res = await serverReq({
                         id: sub.id,
                         action: 'create_paypal_order'
@@ -2057,7 +2057,7 @@ createApp({
                                 return order.id;
                             } else if (order.status == 'APPROVED') {
                                 console.log('ciao');
-                                return actions.onApprove();
+                                return this.onApprove();
                             } else if (order.status == 'PENDING_APPROVAL') {
                                 document.getElementById(buttonId).innerHTML = 'Pagamento in attesa di approvazione';
                             }
