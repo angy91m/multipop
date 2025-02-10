@@ -2462,6 +2462,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             CURLOPT_POST => true
         ];
         $res = $this->curl_exec($this->settings['pp_api_url'] . $url, $curl_settings);
+        save_test($res);
         if ($res) {
             $res = json_decode($res, true);
         }
