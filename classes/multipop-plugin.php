@@ -2560,7 +2560,10 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         return $order;
     }
     private function capture_subscription_pp_order($sub) {
-        $order = $this->pp_req("/v2/checkout/orders/$sub[pp_order_id]/capture", [CURLOPT_POSTFIELDS => '{}']);
+        $order = $this->pp_req("/v2/checkout/orders/$sub[pp_order_id]/capture", [
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_POSTFIELDS => '{}'
+        ]);
         save_test($order);
         if (!$order || $order['status'] != 'COMPLETED') return false;
         $capture_id = false;
