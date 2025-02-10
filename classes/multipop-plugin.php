@@ -2346,11 +2346,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if (!$user) {
             return false;
         }
-        $curr_u = wp_get_current_user();
-        $is_resp_user = false;
-        if ($curr_u && is_array( $curr_u->roles ) && isset($curr_u->roles[0]) && in_array( $curr_u->roles[0], ['administrator', 'multipopolare_resp'] )) {
-            $is_resp_user = true;
-        }
         $parsed_user = [
             'ID' => $user->ID,
             'login' => $user->user_login,
@@ -2378,9 +2373,10 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             'mpop_invited' => boolval($user->mpop_invited),
             'mpop_resp_zones' => [],
             'mpop_id_card_expiration' => $user->mpop_id_card_confirmed ? $user->mpop_id_card_expiration : '',
-            'mpop_my_subscriptions' => $this->get_my_subscriptions($user->ID, $is_resp_user ? ['filename', 'completer_ip', 'notes', 'pp_capture_id'] : null)
+            'mpop_my_subscriptions' => $this->get_my_subscriptions($user->ID)
         ];
-        if ($is_resp_user) {
+        $curr_u = wp_get_current_user();
+        if ($curr_u && is_array( $curr_u->roles ) && isset($curr_u->roles[0]) && in_array( $curr_u->roles[0], ['administrator', 'multipopolare_resp'] )) {
             $parsed_user['mpop_old_card_number'] = $user->mpop_old_card_number;
         }
         if (in_array($parsed_user['role'], ['administrator', 'multipopolare_resp'])) {
