@@ -399,10 +399,6 @@ if ($this->settings['pp_client_id']) {
                                     <?php
                                     } ?>
                                 </template>
-                                <!-- <template v-if="nearActiveSub.pp_order_id">
-                                    <li>PayPal ID: {{nearActiveSub.pp_order_id}}</li>
-                                    <li v-if="nearActiveSub.status == 'seen'">Paga</li>
-                                </template> -->
                             </ul>
                         </template>
                         <div v-if="availableYearsToOrder.length" id="mpop-avail-years-to-order">
@@ -1030,6 +1026,10 @@ if ($this->settings['pp_client_id']) {
                         <tr>
                             <td><strong>Data iscrizione/rinnovo:</strong></td>
                             <td>{{timestampToFullDatetimeString(subInView.signed_at)}}</td>
+                        </tr>
+                        <tr v-if="subInView.pp_order_id">
+                            <td><strong>ID ordine PayPal:</strong></td>
+                            <td>{{subInView.pp_order_id}}</td>
                         </tr>
                     </template>
                     <tr>

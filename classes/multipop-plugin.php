@@ -2346,6 +2346,11 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if (!$user) {
             return false;
         }
+        $curr_u = wp_get_current_user();
+        $is_resp_user = false;
+        if ($curr_u && is_array( $curr_u->roles ) && isset($curr_u->roles[0]) && in_array( $curr_u->roles[0], ['administrator', 'multipopolare_resp'] )) {
+            $is_resp_user = true;
+        }
         $parsed_user = [
             'ID' => $user->ID,
             'login' => $user->user_login,
@@ -2373,10 +2378,9 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             'mpop_invited' => boolval($user->mpop_invited),
             'mpop_resp_zones' => [],
             'mpop_id_card_expiration' => $user->mpop_id_card_confirmed ? $user->mpop_id_card_expiration : '',
-            'mpop_my_subscriptions' => $this->get_my_subscriptions($user->ID)
+            'mpop_my_subscriptions' => $this->get_my_subscriptions($user->ID, $is_resp_user ? ['filename', 'completer_ip', 'notes', 'pp_capture_id'] : null)
         ];
-        $curr_u = wp_get_current_user();
-        if ($curr_u && is_array( $curr_u->roles ) && isset($curr_u->roles[0]) && in_array( $curr_u->roles[0], ['administrator', 'multipopolare_resp'] )) {
+        if ($is_resp_user) {
             $parsed_user['mpop_old_card_number'] = $user->mpop_old_card_number;
         }
         if (in_array($parsed_user['role'], ['administrator', 'multipopolare_resp'])) {
@@ -2898,7 +2902,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             return $wpdb->insert_id;
         }
     }
-    private function get_subscription_by($getby, $sub_id, $year = 0, array $unset = ['filename', 'completer_ip', 'notes', 'pp_order_id', 'pp_capture_id']) {
+    private function get_subscription_by($getby, $sub_id, $year = 0, $unset = null) {
         $search_format = '%d';
         if ($getby == 'id') {
             if (is_array($sub_id) && isset($sub_id['id'])) {
@@ -3596,10 +3600,15 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         );
         $res_data['data'] = true;
     }
-    private function parse_subs(array &$subs, array $unset = ['filename', 'completer_ip', 'notes', 'pp_order_id', 'pp_capture_id']) {
+    private function parse_subs(array &$subs, $unset = null) {
         foreach($subs as &$sub) {
-            foreach($unset as $u) {
-                unset($sub[$u]);
+            if (is_null($unset)) {
+                $unset = ['filename', 'completer_ip', 'notes', 'pp_order_id', 'pp_capture_id'];
+            }
+            if ($unset && is_array($unset)) {
+                foreach($unset as $u) {
+                    unset($sub[$u]);
+                }
             }
             $sub['id'] = intval($sub['id']);
             $sub['user_id'] = intval($sub['user_id']);
@@ -3616,7 +3625,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $sub['completer_id'] = intval($sub['completer_id']);
         }
     }
-    private function get_my_subscriptions($user_id, array $unset = ['filename', 'completer_ip', 'notes', 'pp_order_id', 'pp_capture_id']) {
+    private function get_my_subscriptions($user_id, $unset = null) {
         if (is_object($user_id)) {
             $user_id = $user_id->ID;
         }
