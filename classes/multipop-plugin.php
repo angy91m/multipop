@@ -2474,7 +2474,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             'payment_source' => [
                 'paypal' => [
                     'experience_context' => [
-                        'payment_method_preference' => 'UNRESTRICTED',
+                        'payment_method_preference' => 'IMMEDIATE_PAYMENT_REQUIRED',
                         'brand_name' => $brand_name,
                         'landing_page' => 'LOGIN',
                         'shipping_preference' => 'NO_SHIPPING',

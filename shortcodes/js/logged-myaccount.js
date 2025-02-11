@@ -2052,6 +2052,7 @@ createApp({
         }
         function paypalOptions(sub, buttonId) {
             return {
+                fundingSource: paypal.FUNDING.PAYPAL,
                 async createOrder() {
                     const res = await serverReq({
                         id: sub.id,
