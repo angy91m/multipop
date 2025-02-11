@@ -500,7 +500,7 @@ if ($this->settings['pp_client_id']) {
                                             <br>
                                             <?php
                                             if ($this->settings['pp_client_id']) { ?>
-                                                <div><mpop-pp-btn style="max-width: 150px;" :subscription="props.row" :options="paypalOptions"></mpop-pp-btn></div>
+                                                <div><mpop-pp-btn style="max-width: 150px; margin-right: 0; margin-left: auto;" :subscription="props.row" :options="paypalOptions"></mpop-pp-btn></div>
                                             <?php
                                             } ?>
                                         </template>
