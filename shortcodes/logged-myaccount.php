@@ -496,6 +496,14 @@ if ($this->settings['pp_client_id']) {
                                                 style="margin-bottom: 2px;"
                                             ></q-btn>
                                         </template>
+                                        <template v-if="props.col.name == 'status' && props.row.status == 'seen'">
+                                            <br>
+                                            <?php
+                                            if ($this->settings['pp_client_id']) { ?>
+                                                <mpop-pp-btn :subscription="props.row" :options="paypalOptions"></mpop-pp-btn>
+                                            <?php
+                                            } ?>
+                                        </template>
                                     </q-td>
                                 </template>
                             </q-table>
