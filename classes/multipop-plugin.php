@@ -545,6 +545,33 @@ class MultipopPlugin {
         // flush_rewrite_rules();
     }
 
+    private static function plugin_purge() {
+        global $wpdb;
+        $wpdb->query("DELETE FROM $wpdb->usermeta WHERE 'meta_key' LIKE 'mpop_%'");
+        $tb_names = [
+            'plugin_settings',
+            'temp_tokens',
+            'subscriptions'
+        ];
+        foreach($tb_names as $t) {
+            $wpdb->query("DROP TABLE IF EXISTS " . $this::db_prefix($t));
+        }
+        if (file_exists(MULTIPOP_PLUGIN_PATH . '/privatedocs')) {
+            $private_docs = scandir(MULTIPOP_PLUGIN_PATH . '/privatedocs');
+            foreach($private_docs as $d) {
+                if (!str_starts_with($d, '.')) {
+                    unlink(MULTIPOP_PLUGIN_PATH . "/privatedocs/$d");
+                }
+            }
+        }
+    }
+
+    private static function purge_deactivate() {
+        static::plugin_purge();
+        deactivate_plugins('multipop/multipop.php');
+        wp_redirect(admin_url('plugins.php'));
+    }
+
     // PLUGIN DEACTIVATION HOOK
     public static function deactivate() {
 

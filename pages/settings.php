@@ -105,6 +105,9 @@ do_action('mpop_settings_notices', $this->get_settings());
     <h4>Policy pubblicazione</h4>
     <textarea name="publish_policy" style="width:98%; height:fit-content; margin-right: 10px;"><?=$this->settings['publish_policy']?></textarea>
     <hr>
+    <input type="hidden" id="purge_deactivate" name="purge_deactivate" value="" />
+    <button class="button" id="purge_deactivate_button">Disattiva plugin e pulisci</button>
+    <hr>
     <?php wp_nonce_field( 'mpop-admin-settings', 'mpop-admin-settings-nonce' ); ?>
     <button class="button button-primary" id="mpop_settings_save">Salva</button>
 </form>

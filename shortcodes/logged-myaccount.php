@@ -59,7 +59,6 @@ if ($this->settings['pp_client_id']) {
                     <template v-for="(menuItem, index) in menuItems" :key="index">
                         <q-item v-if="!menuItem.admin && !menuItem.resp" clickable @click="if(menuItem.url) {openExternalUrl(menuItem.url);} else {selectTab(menuItem);}" :active="menuItem.name === selectedTab.name" v-ripple>
                             <q-item-section avatar>
-                            <!-- <q-icon :name="menuItem.icon" /> -->
                             </q-item-section>
                             <q-item-section>
                             {{ menuItem.label }}
@@ -71,7 +70,6 @@ if ($this->settings['pp_client_id']) {
                         <template v-for="(menuItem, index) in menuItems" :key="index">
                             <q-item v-if="menuItem.resp" clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
                                 <q-item-section avatar>
-                                <!-- <q-icon :name="menuItem.icon" /> -->
                                 </q-item-section>
                                 <q-item-section>
                                 {{ menuItem.label }}
@@ -83,7 +81,6 @@ if ($this->settings['pp_client_id']) {
                         <template v-for="(menuItem, index) in menuItems" :key="index">
                             <q-item v-if="menuItem.admin" clickable @click="selectTab(menuItem)" :active="menuItem.name === selectedTab.name" v-ripple>
                                 <q-item-section avatar>
-                                <!-- <q-icon :name="menuItem.icon" /> -->
                                 </q-item-section>
                                 <q-item-section>
                                 {{ menuItem.label }}

@@ -17,6 +17,9 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
             $disc_utils->get_discourse_groups(true);
             $this->add_admin_notice("Cache gruppi Discourse ricaricata", 'success');
         }
+    } else if ($_REQUEST['purge_deactivate'] == '1') {
+        $this::purge_deactivate();
+        exit;
     } else if (!empty(trim($_REQUEST['send_test_mail']))) {
         if (!$this->is_valid_email(trim($_REQUEST['send_test_mail']), false, true)) {
             $this->add_admin_notice("Indirizzo e-mail non valido");
