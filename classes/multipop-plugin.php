@@ -547,7 +547,8 @@ class MultipopPlugin {
 
     private static function plugin_purge() {
         global $wpdb;
-        $wpdb->query("DELETE FROM $wpdb->usermeta WHERE 'meta_key' LIKE 'mpop_%'");
+        $wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key LIKE 'mpop_%'");
+        $wpdb->query("UPDATE $wpdb->usermeta SET meta_value = '". serialize(['subscriber' => true]) . "' WHERE meta_key = '" . $wpdb->prefix . 'capabilities' . "' AND (meta_value LIKE '%\"multipopolano\"%' OR meta_value LIKE '%\"multipopolare_resp\"%')");
         $tb_names = [
             'plugin_settings',
             'temp_tokens',

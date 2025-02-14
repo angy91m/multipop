@@ -44,9 +44,11 @@ function setMasterKey(e) {
 }
 function purgeDeactivate(e) {
     e.preventDefault();
-    document.getElementById('purge_deactivate_button').disabled = true;
-    document.getElementById('purge_deactivate').value = '1';
-    document.getElementById('mpop_settings_form').submit();
+    if (confirm('Vuoi davvero disattivare il plugin ed eliminare tutti i dati?')) {
+        document.getElementById('purge_deactivate_button').disabled = true;
+        document.getElementById('purge_deactivate').value = '1';
+        document.getElementById('mpop_settings_form').submit();
+    }
 }
 document.getElementById('send_test_mail_button').addEventListener('click', sendTestMail);
 document.getElementById('force_tempmail_update_button').addEventListener('click', forceUpdateTempmail);
