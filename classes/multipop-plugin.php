@@ -555,7 +555,7 @@ class MultipopPlugin {
             'subscriptions'
         ];
         foreach($tb_names as $t) {
-            $wpdb->query("DROP TABLE IF EXISTS " . $this::db_prefix($t));
+            $wpdb->query("DROP TABLE IF EXISTS " . static::db_prefix($t));
         }
         if (file_exists(MULTIPOP_PLUGIN_PATH . '/privatedocs')) {
             $private_docs = scandir(MULTIPOP_PLUGIN_PATH . '/privatedocs');
