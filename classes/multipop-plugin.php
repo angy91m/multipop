@@ -570,7 +570,6 @@ class MultipopPlugin {
     private static function purge_deactivate() {
         static::plugin_purge();
         deactivate_plugins('multipop/multipop.php');
-        wp_redirect(admin_url('plugins.php'));
     }
 
     // PLUGIN DEACTIVATION HOOK
