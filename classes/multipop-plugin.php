@@ -905,6 +905,16 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         return wp_mail($to,'Multipopolare - Conferma rinnovo iscrizione','La tua iscrizione a Multipopolare.it è stata rinnovata.');
     }
 
+    private function send_new_tosee_subscription($sub) {
+        $sub_link = get_permalink($this->settings['myaccount_page']) . "?view-sub=$sub[id]";
+        $resp = $this->get_resp_by_user($sub['user_id']);
+        $dest = array_map(function($r) {return $r->user_email;}, $resp) + explode(',', $this->settings['mail_general_notifications']);
+        $dest = array_unique($dest);
+        foreach($dest as $d) {
+            return wp_mail($d,'Multipopolare - Nuova richiesta da verificare','È necessario verificare una nuova richiesta: <a href="'.$sub_link.'" target="_blank">'.$sub_link.'</a>');
+        }
+    }
+
     // CREATE PDF
     private function empty_pdf() {
         require_once(MULTIPOP_PLUGIN_PATH . '/classes/multipopdf.php');
@@ -2832,7 +2842,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         file_put_contents( MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $rand_file_name . '-sub-' . $post_data['id'] . '-' . $user->ID .'.pdf.enc', $this->encrypt_asym( $signed_module_pdf->export_file(), base64_decode($this->settings['master_doc_pubkey'], true)));
         global $wpdb;
-        return $wpdb->update(
+        if($wpdb->update(
             $wpdb->prefix . 'mpop_subscriptions',
             [
                 'status' => 'tosee',
@@ -2842,7 +2852,11 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             [
                 'id' => $post_data['id']
             ]
-        );
+        )) {
+            $this->send_new_tosee_subscription($sub);
+            return true;
+        };
+        return false;
     }
     private function create_subscription(
         int $user_id,

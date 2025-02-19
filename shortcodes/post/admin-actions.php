@@ -763,7 +763,7 @@ switch( $post_data['action'] ) {
         }
         $pending_edits = json_decode($user->mpop_profile_pending_edits, true);
         foreach ($pending_edits as $k => &$v) {
-            if ($k == 'mpop_birthplace' && $v) {
+            if ( in_array($k, ['mpop_birthplace', 'mpop_billing_city']) && $v) {
                 $v = $v['codiceCatastale'];
             }
         }
@@ -772,6 +772,7 @@ switch( $post_data['action'] ) {
             'meta_input' => $pending_edits
         ]);
         delete_user_meta($user->ID, 'mpop_profile_pending_edits');
+        delete_user_meta($user->ID, 'mpop_id_card_confirmed');
         $res_data['data'] = true;
         break;
     case 'admin_refuse_profile_pending_edits':

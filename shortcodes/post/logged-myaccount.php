@@ -315,10 +315,15 @@ switch ($post_data['action']) {
                 'last_name',
                 'mpop_birthdate',
                 'mpop_birthplace_country',
-                'mpop_birthplace'
+                'mpop_birthplace',
+                'mpop_billing_address',
+                'mpop_billing_country',
+                'mpop_billing_city',
+                'mpop_billing_zip',
+                'mpop_billing_state'
             ] as $prop) {
                 if ($current_user->$prop != $post_data[$prop]) {
-                    if ($prop == 'mpop_birthplace' && $post_data[$prop]) {
+                    if ( in_array($prop, ['mpop_birthplace', 'mpop_billing_city']) && $post_data[$prop]) {
                         $found_bp = '';
                         foreach($comuni as $c) {
                             if ($c['codiceCatastale'] == $post_data[$prop]) {
@@ -332,14 +337,8 @@ switch ($post_data['action']) {
                     $pending_edits[$prop] = $post_data[$prop];
                 }
             }
-            $id_card_confirmed = boolval($current_user->mpop_id_card_confirmed);
             $meta_input = [];
             $editable = [
-                'mpop_billing_address',
-                'mpop_billing_country',
-                'mpop_billing_city',
-                'mpop_billing_zip',
-                'mpop_billing_state',
                 'mpop_phone'
             ];
             if (in_array($current_user->roles[0],['administrator', 'multipopolare_resp'])) {
@@ -347,7 +346,6 @@ switch ($post_data['action']) {
             }
             foreach($editable as $prop) {
                 if ($current_user->$prop != $post_data[$prop]) {
-                    if (!in_array($prop, ['mpop_phone', 'mpop_old_card_number'])) $id_card_confirmed = false;
                     $meta_input[$prop] = $post_data[$prop];
                 }
             }
@@ -358,7 +356,6 @@ switch ($post_data['action']) {
                 $user_edits['meta_input'] += $meta_input;
             }
             if (!empty($pending_edits)) {
-                $id_card_confirmed = false;
                 if (!isset($user_edits['meta_input'])) {
                     $user_edits['meta_input'] = [];
                 }
@@ -369,9 +366,6 @@ switch ($post_data['action']) {
                 $res_data['notices'][] = ['type'=>'info', 'msg' => 'Alcuni dati modificati sono in attesa di revisione'];
             } elseif (!empty($meta_input)) {
                 $res_data['notices'][] = ['type'=>'success', 'msg' => 'Dati salvati correttamente'];
-            }
-            if (!$id_card_confirmed) {
-                delete_user_meta($current_user->ID, 'mpop_id_card_confirmed');
             }
         } else {
             if (!isset($user_edits['meta_input'])) {

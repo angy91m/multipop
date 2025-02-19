@@ -529,7 +529,13 @@ createApp({
                 case 'mpop_birthplace':
                     if (v) v = v.nome + ' (' + v.provincia.sigla + ')';
                     break;
+                case 'mpop_billing_city':
+                    if (v) v = v.nome + ' (' + v.provincia.sigla + ')';
+                    break;
                 case 'mpop_birthplace_country':
+                    v = countries.find(c => c.code == v)?.name
+                    break;
+                case 'mpop_billing_country':
                     v = countries.find(c => c.code == v)?.name
                     break;
                 case 'mpop_birthdate':
