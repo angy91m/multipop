@@ -95,7 +95,12 @@ pendingEditsName = {
     'last_name': 'Cognome',
     'mpop_birthdate': 'Data di nascita',
     'mpop_birthplace': 'Comune di nascita',
-    'mpop_birthplace_country': 'Nazione di nascita'
+    'mpop_birthplace_country': 'Nazione di nascita',
+    'mpop_billing_country': 'Nazione di residenza',
+    'mpop_billing_state': 'Provincia di residenza',
+    'mpop_billing_city': 'Comune di residenza',
+    'mpop_billing_address': 'Indirizzo di residenza',
+    'mpop_billing_zip': 'CAP di residenza'
 },
 userCsvFields = [
     'email',
