@@ -118,7 +118,7 @@ switch ($post_data['action']) {
                 $post_data['mpop_old_card_number'] = mb_strtoupper(trim($post_data['mpop_old_card_number']), 'UTF-8');
             }
         }
-        if (!isset($post_data['email']) || !is_string($post_data['email']) || !$this->is_valid_email(trim($post_data['email']), true)) {
+        if (!isset($post_data['email']) || !is_string($post_data['email']) || !$this->is_valid_email(trim($post_data['email']), true, $current_user->roles[0] == 'administrator')) {
             $res_data['error'] = ['email'];
         } else {
             $post_data['email'] = mb_strtolower( trim($post_data['email']), 'UTF-8' );

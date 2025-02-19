@@ -37,11 +37,11 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
         }
     } else {
         $edits['tempmail_urls'] = $this->settings['tempmail_urls'];
-        if (is_string($_REQUEST['tempmail_urls_block']) && !empty(trim($_REQUEST['tempmail_urls_block'])))  {
+        if (is_string($_REQUEST['tempmail_urls_block']))  {
             $edits['tempmail_urls']['block'] = preg_split('/\r\n|\r|\n/', trim($_REQUEST['tempmail_urls_block']));
             $edits['tempmail_urls']['block'] = array_values(array_filter($edits['tempmail_urls']['block'], function($url){ return !empty(trim($url)); }));
         }
-        if (is_string($_REQUEST['tempmail_urls_allow']) && !empty(trim($_REQUEST['tempmail_urls_allow'])))  {
+        if (is_string($_REQUEST['tempmail_urls_allow']))  {
             $edits['tempmail_urls']['allow'] = preg_split('/\r\n|\r|\n/', trim($_REQUEST['tempmail_urls_allow']));
             $edits['tempmail_urls']['allow'] = array_values(array_filter($edits['tempmail_urls']['allow'], function($url){ return !empty(trim($url)); }));
         }

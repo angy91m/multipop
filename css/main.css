@@ -98,3 +98,6 @@ button.mpop-button:disabled {
 .mpop-notice p {
     margin: 0;
 }
+.v-select {
+    color: #000;
+}
