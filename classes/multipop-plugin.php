@@ -565,6 +565,13 @@ class MultipopPlugin {
                 }
             }
         }
+
+        // REGENERATE COMUNI LINKS
+        $comuni_bk_arr = explode(',',file_get_contents(MULTIPOP_PLUGIN_PATH . '/comuni/bk/last-cycle.txt'));
+        unlink(MULTIPOP_PLUGIN_PATH . '/comuni/comuni.json');
+        unlink(MULTIPOP_PLUGIN_PATH . '/comuni/province.json');
+        symlink(MULTIPOP_PLUGIN_PATH . '/comuni/bk/' . $comuni_bk_arr[0], MULTIPOP_PLUGIN_PATH . '/comuni/comuni.json');
+        symlink(MULTIPOP_PLUGIN_PATH . '/comuni/bk/' . $comuni_bk_arr[1], MULTIPOP_PLUGIN_PATH . '/comuni/province.json');
     }
 
     private static function purge_deactivate() {
