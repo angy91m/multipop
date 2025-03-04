@@ -50,6 +50,34 @@ function purgeDeactivate(e) {
         document.getElementById('mpop_settings_form').submit();
     }
 }
+async function savePlugin(e) {
+    e.preventDefault();
+    const res = await fetch(location.href, {
+        method: 'POST',
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: new URLSearchParams({save_plugin: '1', 'mpop-admin-settings-nonce': document.getElementById('mpop-admin-settings-nonce').value})
+    });
+    if (res.ok) {
+        const resTxt = await res.text(),
+        doc = document.createElement('div');
+        doc.innerHTML = resTxt;
+        const jsEl = doc.querySelector('#mpop_json_res');
+        if (jsEl) {
+            const jsRes = JSON.parse(jsEl.innerHTML),
+            {data, error} = jsRes;
+            if (error) console.error(error);
+            if (data) {
+                const linkSource = `data:application/zip;base64,${data}`,
+                downloadLink = document.createElement('a');
+                downloadLink.href = linkSource;
+                downloadLink.target = '_blank';
+                downloadLink.download = 'bak.zip';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+            }
+        }
+    }
+}
 document.getElementById('send_test_mail_button').addEventListener('click', sendTestMail);
 document.getElementById('force_tempmail_update_button').addEventListener('click', forceUpdateTempmail);
 document.getElementById('force_comuni_update_button').addEventListener('click', forceUpdateComuni);
@@ -57,3 +85,4 @@ document.getElementById('force_discourse_groups_reload_button').addEventListener
 document.getElementById('mpop_settings_save').addEventListener('click', saveSettings);
 document.getElementById('master_doc_key_button').addEventListener('click', setMasterKey);
 document.getElementById('purge_deactivate_button').addEventListener('click', purgeDeactivate);
+document.getElementById('save_plugin_button').addEventListener('click', savePlugin);

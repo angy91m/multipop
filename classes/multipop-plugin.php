@@ -565,7 +565,6 @@ class MultipopPlugin {
                 }
             }
         }
-
         // REGENERATE COMUNI LINKS
         $comuni_bk_arr = explode(',',file_get_contents(MULTIPOP_PLUGIN_PATH . '/comuni/bk/last-cycle.txt'));
         unlink(MULTIPOP_PLUGIN_PATH . '/comuni/comuni.json');
@@ -5053,6 +5052,36 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         unset($user_data['capabilities']);
         return $user_data;
+    }
+	private function save_plugin() {
+        $plugin_path = realpath(MULTIPOP_PLUGIN_PATH);
+        $file_names = array_filter(array_slice(scandir($plugin_path),2), function($f) {return !in_array($f, ['comuni', 'private', 'privatedocs', 'tempmail']);});
+        $zip_name = "$plugin_path/private/bak.zip";
+        unlink($zip_name);
+        $zip = new ZipArchive();
+        if ($zip->open($zip_name, ZipArchive::CREATE)!==true) {
+            return false;
+        }
+        foreach ($file_names as $f_name) {
+            if (is_dir( "$plugin_path/$f_name")) {
+                $dir_path = realpath("$plugin_path/$f_name");
+                $files = new RecursiveIteratorIterator(
+                    new RecursiveDirectoryIterator($dir_path),
+                    RecursiveIteratorIterator::LEAVES_ONLY
+                );
+                foreach ($files as $f) {
+                    if (!$f->isDir()) {
+                        $file_path = $f->getRealPath();
+                        $rel_path = substr($file_path, strlen($plugin_path) + 1);
+                        $zip->addFile($file_path, $rel_path);
+                    }
+                }
+            } else {
+                $zip->addFile("$plugin_path/$f_name", $f_name);
+            }
+        }
+        $zip->close();
+        return true;
     }
 }
 

@@ -99,10 +99,6 @@ if ($this->settings['pp_client_id']) {
                 <template v-if="!profileEditing">
                     <button class="mpop-button" @click="editProfile">Modifica profilo</button>
                 </template>
-                <template v-else>
-                    <button class="mpop-button btn-error" @click="cancelEditProfile" :disabled="saving">Annulla</button>
-                    <button class="mpop-button btn-success" @click="updateProfile" :disabled="!validProfileForm || saving">Salva</button>
-                </template>
                 <table id="mpop-profile-table">
                     <tr>
                         <td><strong>ID Tesserato:</strong></td>
@@ -341,6 +337,10 @@ if ($this->settings['pp_client_id']) {
                         </td>
                     </tr>
                 </table>
+                <template v-if="profileEditing">
+                    <button class="mpop-button btn-error" @click="cancelEditProfile" :disabled="saving">Annulla</button>
+                    <button class="mpop-button btn-success" @click="updateProfile" :disabled="!validProfileForm || saving">Salva</button>
+                </template>
                 <template v-if="!profileEditing && profile.mpop_profile_pending_edits">
                     <hr>
                     <h3 class="text-h3">Modifiche in attesa di conferma</h3>
@@ -1158,10 +1158,6 @@ if ($this->settings['pp_client_id']) {
                 <template v-if="!userEditing">
                     <button class="mpop-button" @click="editUser">Modifica utente</button>
                 </template>
-                <template v-else>
-                    <button class="mpop-button btn-error" @click="cancelEditUser" :disabled="saving">Annulla</button>
-                    <button class="mpop-button btn-success" @click="updateUser" :disabled="!validUserForm || saving">Salva</button>
-                </template>
                 <table id="mpop-user-table">
                     <tr>
                         <td><strong>E-mail:</strong></td>
@@ -1468,6 +1464,10 @@ if ($this->settings['pp_client_id']) {
                         <td>{{userInView.mpop_has_master_key ? 'Impostata': 'Non impostata'}}</td>
                     </tr>
                 </table>
+                <template v-if="userEditing">
+                    <button class="mpop-button btn-error" @click="cancelEditUser" :disabled="saving">Annulla</button>
+                    <button class="mpop-button btn-success" @click="updateUser" :disabled="!validUserForm || saving">Salva</button>
+                </template>
                 <template v-if="!userEditing && userInView.mpop_profile_pending_edits">
                     <hr>
                     <h3 class="text-h3">Modifiche in attesa di conferma</h3>

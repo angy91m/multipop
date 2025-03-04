@@ -91,13 +91,7 @@ span.mpop-app-notice > span > span.dashicons-before.dashicons-no-alt {
 #mpop-passwordChange input {
     margin-bottom: 9px;
 }
-#birthplace-select:not(:disabled),
-#billingCity-select:not(:disabled),
-#birthplaceCountry-select:not(:disabled),
-#billingCountry-select:not(:disabled),
-#userEditingRespZone-select:not(:disabled) {
-    background: #fff;
-}
+
 .mpop-user-search-field {
     display: inline-block;
     margin-right: 20px;

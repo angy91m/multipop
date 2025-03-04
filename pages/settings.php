@@ -107,6 +107,8 @@ do_action('mpop_settings_notices', $this->get_settings());
     <hr>
     <input type="hidden" id="purge_deactivate" name="purge_deactivate" value="" />
     <button class="button" id="purge_deactivate_button">Disattiva plugin e pulisci</button>
+    <br><br>
+    <button class="button" id="save_plugin_button">Salva plugin</button>
     <hr>
     <?php wp_nonce_field( 'mpop-admin-settings', 'mpop-admin-settings-nonce' ); ?>
     <button class="button button-primary" id="mpop_settings_save">Salva</button>

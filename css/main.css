@@ -101,3 +101,16 @@ button.mpop-button:disabled {
 .v-select {
     color: #000;
 }
+.mpop-user-search-field .q-field__native,
+.mpop-user-search-field .q-field__label {
+	color: #fff;
+}
+.q-menu .q-item__label {
+	color: #000;
+}
+.vs__dropdown-toggle {
+	background: #fff !important;
+}
+.q-stepper__step-inner {
+	color: #000;
+}

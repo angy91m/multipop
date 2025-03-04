@@ -17,6 +17,15 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
             $disc_utils->get_discourse_groups(true);
             $this->add_admin_notice("Cache gruppi Discourse ricaricata", 'success');
         }
+    } else if ($_REQUEST['save_plugin'] == '1') {
+        if ($this->save_plugin()) {
+            $res = ['data' => base64_encode( file_get_contents(MULTIPOP_PLUGIN_PATH . "/private/bak.zip") )];
+            echo '<script id="mpop_json_res" type="application/json">' . json_encode($res) . '</script>';
+            unlink(MULTIPOP_PLUGIN_PATH . "/private/bak.zip");
+        } else {
+            echo '<script id="mpop_json_res" type="application/json">' .  json_encode(["error" => "Cannot create backup file"]) . '</script>';
+        }
+        exit;
     } else if ($_REQUEST['purge_deactivate'] == '1') {
         $this::purge_deactivate();
         exit;
