@@ -86,6 +86,7 @@ do_action('mpop_settings_notices', $this->get_settings());
         <?php if ($this->settings['master_doc_key']) { ?>
             <h4>Master key attuale</h4>
             <input type="password" name="master_doc_key_old" />
+            <p><strong>Master key db string:</strong> <?=$this->get_master_key()?></p>
         <?php } else {?>
             <p><strong>NOTA:</strong> Al primo settaggio della master key sarà impostata anche la tua personale</p>
         <?php }
