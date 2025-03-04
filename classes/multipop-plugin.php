@@ -4392,7 +4392,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $extra_from = [];
         if (!empty($q->query_vars['mpop_extra_meta'])) {
             foreach($q->query_vars['mpop_extra_meta'] as $m_key => $m_type) {
-                $extra_from[$m_key] = "LEFT JOIN $wpdb->usermeta mpop_exmt_$m_key ON (mp_users.ID = mpop_exmt_$m_key.user_id AND mpop_exmt_$m_key.meta_key = '$m_key')";
+                $extra_from[$m_key] = "LEFT JOIN $wpdb->usermeta mpop_exmt_$m_key ON ($wpdb->users.ID = mpop_exmt_$m_key.user_id AND mpop_exmt_$m_key.meta_key = '$m_key')";
             }
         }
         if (!empty($extra_from)) {
