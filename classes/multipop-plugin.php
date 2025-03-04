@@ -908,7 +908,11 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
 
     private function send_invitation_mail($token, $to) {
         $confirmation_link = get_permalink($this->settings['myaccount_page']);
-        return wp_mail($to,'Multipopolare - Invito iscrizione','Sei stato invitato a iscriverti su Multipopolare.it. Clicca sul link per completare l\'iscrizione: <a href="'. $confirmation_link . '?mpop_invite_token=' . $token . '" target="_blank">'. $confirmation_link . '?mpop_invite_token=' . $token . '</a>');
+        return wp_mail($to,'Multipopolare - Invito iscrizione','Sei stata/o invitata/o a iscriverti su Multipopolare.it. Clicca sul link per completare l\'iscrizione: <a href="'. $confirmation_link . '?mpop_invite_token=' . $token . '" target="_blank">'. $confirmation_link . '?mpop_invite_token=' . $token . '</a>');
+    }
+
+    private function send_awaiting_payment_email($to) {
+        return wp_mail($to,'Multipopolare - Attesa pagamento quota annuale','Ti confermiamo che la tua richiesta è stata accettata e che risulta in attesa di pagamento.<br><br>Grazie.');
     }
 
     private function send_renew_confirm_mail($to) {
@@ -2667,7 +2671,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         $date_now = date_create('now', new DateTimeZone(current_time('e')));
         global $wpdb;
-        return $wpdb->update(
+        $res = $wpdb->update(
             $wpdb->prefix . 'mpop_subscriptions',
             [
                 'status' => 'seen',
@@ -2677,6 +2681,10 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 'id' => $sub['id']
             ]
         );
+        if ($res) {
+            $this->send_awaiting_payment_email($sub_user->user_email);
+        }
+        return $res;
     }
     private function cancel_subscription($sub) {
         if ($sub['year'] == current_time('Y') && $sub['status'] == 'completed') {

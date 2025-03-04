@@ -772,7 +772,6 @@ if ($this->settings['pp_client_id']) {
             <!--USER_ADD-->
             <div v-if="selectedTab.name == 'userAdd'" id="mpop-sub-view">
                 <h3>Nuovo tesserato</h3>
-                <button class="mpop-button btn-success" @click="addUser" :disabled="!validUserAddForm || saving">Aggiungi</button>
                 <table id="mpop-user-table">
                     <tr>
                         <td><strong>E-mail:</strong></td>
@@ -982,6 +981,7 @@ if ($this->settings['pp_client_id']) {
                         </td>
                     </tr>
                 </table>
+                <button class="mpop-button btn-success" @click="addUser" :disabled="!validUserAddForm || saving">Aggiungi</button>
             </div>
             <!--SUB_VIEW-->
             <div v-if="selectedTab.name == 'subView'" id="mpop-sub-view">
@@ -1496,7 +1496,6 @@ if ($this->settings['pp_client_id']) {
             <!--ADD_SUBSCRIPTION-->
             <div v-if="selectedTab.name == 'subAdd'"><template v-if="userInView">
                 <table id="mpop-sub-table">
-                    <button class="mpop-button btn-success" :disabled="!validSubAdd" @click="addSubscription">Aggiungi sottoscrizione</button>
                     <tr>
                         <td><strong>ID Tesserato:</strong></td>
                         <td>{{userInView.ID}}</td>
@@ -1554,6 +1553,7 @@ if ($this->settings['pp_client_id']) {
                         <td><textarea v-model="subInAdd.notes"></textarea></td>
                     </tr>
                 </table>
+                <button class="mpop-button btn-success" :disabled="!validSubAdd" @click="addSubscription">Aggiungi sottoscrizione</button>
             </template></div>
             <!--UPLOAD_USER_CSV-->
             <div v-if="selectedTab.name == 'uploadUserCsv'">
