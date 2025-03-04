@@ -1757,8 +1757,19 @@ createApp({
             searchUsersTimeout = setTimeout(searchUsers, 500);
         }
         function generateNotices(srvNotices = []) {
+            srvNotices.map(v => {
+                switch(v.type) {
+                    case 'error':
+                        v.type = 'negative';
+                        break;
+                    case 'success':
+                        v.type = 'positive';
+                        break;
+                }
+                v.message = v.msg;
+                return v;
+            }).forEach(v => qNotify(v));
             userNotices.length = 0;
-            userNotices.push(...srvNotices);
             const missingFields = [];
             if (profile._new_email) {
                 userNotices.push({
@@ -2059,6 +2070,9 @@ createApp({
             });
             getProfile();
         }
+        function qNotify(...args) {
+            return Quasar.Notify.create(...args);
+        }
         function paypalOptions(sub, buttonId) {
             return {
                 fundingSource: paypal.FUNDING.PAYPAL,
@@ -2220,5 +2234,11 @@ createApp({
         };
     }
 })
-.use(Quasar)
+.use(Quasar, {
+    config: {
+        nofity: {
+            type: 'info'
+        }
+    }
+})
 .mount('#app');
