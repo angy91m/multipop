@@ -26,4 +26,7 @@ $this->show_hcaptcha_script();
         <button type="submit" class="primary" name="login" value="login">Accedi</button>
     </p>
 </form>
+<p class="mpop-form-row">
+    oppure <a href="<?=get_permalink($this->settings['register_page'])?>">Registrati</a>
+</p>
 <?php

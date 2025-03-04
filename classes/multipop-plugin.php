@@ -287,6 +287,10 @@ class MultipopPlugin {
         add_shortcode('mpop_register_form', [$this, 'register_sc'] );
         // MYACCOUNT PAGE SHORTCODE
         add_shortcode('mpop_myaccount', [$this, 'myaccount_sc'] );
+        // ENTER LINK SHORTCODE
+        add_shortcode('mpop_enter_link', [$this, 'mpop_enter_link_sc']);
+        // ENTER BUTTON SHORTCODE
+        add_shortcode('mpop_enter_button', [$this, 'mpop_enter_button_sc']);
         // FILTER NAV MENU ITEMS AND ADD LOGOFF BUTTON
         add_filter( 'block_core_navigation_render_inner_blocks', [$this, 'filter_menu_items'], 10 );
     
@@ -1688,6 +1692,17 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     // MYACCOUNT PAGE SHORTCODE
     public function myaccount_sc() {
         return $this->html_to_string( [$this, 'myaccount_page'] );
+    }
+
+    // ENTER LINK SHORTCODE
+    public function mpop_enter_link_sc($atts = []) {
+        return get_permalink( get_current_user_id() ? $this->settings['myaccount_page'] : $this->settings['register_page'] );
+    }
+    // ENTER BUTTON SHORTCODE
+    public function mpop_enter_button_sc($atts = [], $content = '') {
+        $content = trim($content);
+        $style = '<style type="text/css">.wp-block-button, .wp-block-button__link {border-radius: 10px; padding-top: 0.67rem; padding-right: 1.5rem; padding-bottom: 0.67rem; padding-left: 1.5rem; }</style>';
+        return $style . '<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="' . get_permalink( get_current_user_id() ? $this->settings['myaccount_page'] : $this->settings['register_page'] ). '">' . ($content ? $content : 'Clicca qui per la tua tessera 2025') . '</a></div>';
     }
 
 
