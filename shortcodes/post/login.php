@@ -16,7 +16,7 @@ if (
     )
 ) {
     $_GET['invalid_mpop_login'] = '1';
-    header("Status: 401 Unauthorized");
+    header("Status: 303 See Other");
     header('Location: '.  explode('?',$this->req_path)[0] . '?' . $this->export_GET());
     exit();
 }
@@ -26,7 +26,7 @@ if (
     && !$this::is_valid_username( $_POST['user'], true )
 ) {
     $_GET['invalid_mpop_login'] = '1';
-    header("Status: 401 Unauthorized");
+    header("Status: 303 See Other");
     header('Location: '.  explode('?',$this->req_path)[0] . '?' . $this->export_GET());
     exit();
 }
@@ -36,7 +36,7 @@ $res = wp_signon([
 ], isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']));
 if (get_class($res) == 'WP_Error') {
     $_GET['invalid_mpop_login'] = '1';
-    header("Status: 401 Unauthorized");
+    header("Status: 303 See Other");
     header('Location: '.  explode('?',$this->req_path)[0] . '?' . $this->export_GET());
     exit();
 } else {
