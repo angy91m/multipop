@@ -218,7 +218,7 @@ createApp({
             label: 'Cambio password'
         }, {
             name: 'card',
-            label: 'Tessera'
+            label: 'Tesseramento'
         }, {
             name: 'users',
             label: 'Tesserati',
@@ -269,6 +269,7 @@ createApp({
         userSearchZoneOpen = ref(false),
         userSearchRespZoneOpen = ref(false),
         userEditingRespZoneOpen = ref(false),
+        subInstructionOpen = ref(false),
         mainOptions = reactive({
             authorizedSubscriptionYears: [],
             authorizedSubscriptionQuote: 0,
@@ -279,9 +280,9 @@ createApp({
         newSubscription = reactive({
             year: mainOptions.authorizedSubscriptionYears.length ? mainOptions.authorizedSubscriptionYears[0] : null,
             quote: mainOptions.authorizedSubscriptionQuote,
-            mpop_marketing_agree: false,
-            mpop_newsletter_agree: false,
-            mpop_publish_agree: false
+            mpop_marketing_agree: true,
+            mpop_newsletter_agree: true,
+            mpop_publish_agree: true
         }),
         paymentConfirmationDate = ref(''),
         generatingSubscriptionPdf = reactive([]),
@@ -717,9 +718,9 @@ createApp({
                 status: '',
                 quote: mainOptions.authorizedSubscriptionQuote,
                 signed_at: null,
-                marketing_agree: false,
-                newsletter_agree: false,
-                publish_agree: false,
+                marketing_agree: true,
+                newsletter_agree: true,
+                publish_agree: true,
                 notes: ''
             });
         }
@@ -1812,7 +1813,7 @@ createApp({
             if (missingFields.length) {
                 userNotices.push({
                     type: 'warning',
-                    msg: 'Per poter procedere con il tessaramento è necessario compilare i seguenti campi:<br>' + missingFields.join('<br>')
+                    msg: '<strong>Per poter procedere con il tessaramento è necessario compilare i seguenti campi. Clicca su MODIFICA PROFILO per aggiungerli:</strong><br>' + missingFields.join('<br>')
                 });
             }
         }
@@ -2230,7 +2231,8 @@ createApp({
             validSubAdd,
             paymentConfirmationDate,
             userSubModuleFilesUpload,
-            paypalOptions
+            paypalOptions,
+            subInstructionOpen
         };
     }
 })

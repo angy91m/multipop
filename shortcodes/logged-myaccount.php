@@ -37,7 +37,7 @@ if ($this->settings['pp_client_id']) {
             :options="{initialCountry: 'it'}"
         ></v-intl-phone>
     </div>
-    <span v-for="(notice, noticeInd) in userNotices" :class="'mpop-app-notice' + ' notice-' + notice.type"><span @click="dismissNotice(noticeInd)"><?=$this::dashicon('no-alt')?></span><span v-html="notice.msg"></span></span>
+    <span v-for="(notice, noticeInd) in userNotices" :class="'mpop-app-notice' + ' notice-' + notice.type"><span @click="dismissNotice(noticeInd)"><?=$this::dashicon('no-alt')?></span><span style="font-size:13px" v-html="notice.msg"></span></span>
     <div class="q-pa-md">
         <q-layout view="hHh Lpr lff" class="shadow-2 rounded-borders">
             <q-header elevated class="bg-red-9" style="position: relative">
@@ -402,6 +402,17 @@ if ($this->settings['pp_client_id']) {
                             <hr v-if="nearActiveSub">
                             <template v-if="isProfileCompleted">
                                 <h5 class="text-h5">Richiesta tessera</h5>
+                                <q-expansion-item
+                                    v-model="subInstructionOpen"
+                                    icon="info"
+                                    label="Istruzioni tesseramento"
+                                    >
+                                    <q-card>
+                                        <q-card-section>
+                                        Per proseguire nell'iscrizione scarica il modulo tramite il pulsante GENERA MODULO ISCRIZIONE, firmalo (sono necessarie 4 firme) e torna qui per caricarlo cliccando su CARICA MODULO. Insieme al modulo potrebbe essere richiesto il caricamento di un documento di identità.
+                                        </q-card-section>
+                                    </q-card>
+                                </q-expansion-item>
                                 <p>
                                     Richiedi la tua tessera per l'anno:&nbsp;
                                     <select v-model="newSubscription.year">

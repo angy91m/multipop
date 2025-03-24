@@ -98,19 +98,21 @@ button.mpop-button:disabled {
 .mpop-notice p {
     margin: 0;
 }
-.v-select {
-    color: #000;
-}
 .mpop-user-search-field .q-field__native,
 .mpop-user-search-field .q-field__label {
 	color: #fff;
 }
-.q-menu .q-item__label {
-	color: #000;
-}
 .vs__dropdown-toggle {
 	background: #fff !important;
 }
-.q-stepper__step-inner {
+.v-select,
+.q-stepper__step-inner,
+.q-stepper__step-inner a,
+.q-card .q-card__section,
+.q-menu .q-item__label {
 	color: #000;
+}
+.q-expansion-item {
+    margin-bottom: 10px;
+    font-weight: 600;
 }

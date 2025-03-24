@@ -22,12 +22,18 @@ $this->show_hcaptcha_script();
             <p v-if="startedFields.has('username') && !isValidUsername() && !errorFields.has('duplicated')" class="mpop-field-error">Il nome utente può contenere solo lettere minuscole, numeri e i simboli . _ -<br>Inoltre non può iniziare e terminare con i simboli . -</p>
             <p v-if="!isValidUsername() && errorFields.has('duplicated')" class="mpop-field-error">Nome utente già registrato</p>
             <p class="mpop-form-row">
-                <input v-model="username" @input="startField('username')" type="text" :class="startedFields.has('username') ? (isValidUsername() ? '' : ' bad-input' ) : ''" id="reg_username" autocomplete="username" placeholder="Nome utente" />
+                <label>Nome utente</label>
+            </p>
+            <p class="mpop-form-row">
+                <input v-model="username" @input="startField('username')" type="text" :class="startedFields.has('username') ? (isValidUsername() ? '' : ' bad-input' ) : ''" id="reg_username" autocomplete="username" />
             </p>
             <p v-if="startedFields.has('email') && !isValidEmail() && !errorFields.has('duplicated')" class="mpop-field-error">Indirizzo e-mail non valido</p>
             <p v-if="!isValidEmail() && errorFields.has('duplicated')" class="mpop-field-error">Indirizzo e-mail già registrato</p>
             <p class="mpop-form-row">
-                <input v-model="email" @input="startField('email')" type="email" :class="startedFields.has('email') ? (isValidEmail() ? '' : ' bad-input' ) : ''" name="email" id="reg_email" autocomplete="email" placeholder="Indirizzo e-mail" />
+                <label>Indirizzo e-mail</label>
+            </p>
+            <p class="mpop-form-row">
+                <input v-model="email" @input="startField('email')" type="email" :class="startedFields.has('email') ? (isValidEmail() ? '' : ' bad-input' ) : ''" name="email" id="reg_email" autocomplete="email" />
             </p>
             <div v-if="startedFields.has('password') && !isValidPassword()" class="mpop-field-error">
                 <p>La password deve essere lunga dagli 8 ai 64 caratteri e deve contenere 3 dei seguenti gruppi di caratteri<p>
@@ -39,11 +45,17 @@ $this->show_hcaptcha_script();
                 </ul>
             </div>
             <p class="mpop-form-row">
-                <input v-model="password" @input="startField('password')" type="password" :class="startedFields.has('password') ? (isValidPassword() ? '' : ' bad-input' ) : ''" name="password" id="reg_password" placeholder="Password"/>
+                <label>Password</label>
+            </p>
+            <p class="mpop-form-row">
+                <input v-model="password" @input="startField('password')" type="password" :class="startedFields.has('password') ? (isValidPassword() ? '' : ' bad-input' ) : ''" name="password" id="reg_password"/>
             </p>
             <p v-if="startedFields.has('passwordConfirm') && !isValidPasswordConfirm()" class="mpop-field-error">Le password non coincidono</p>
             <p class="mpop-form-row">
-                <input v-model="passwordConfirm" @input="startField('passwordConfirm')" type="password" :class="startedFields.has('passwordConfirm') ? (isValidPasswordConfirm() ? '' : ' bad-input' ) : ''" name="passwordConfirm" id="reg_password_confirm" placeholder="Conferma password"/>
+                <label>Conferma password</label>
+            </p>
+            <p class="mpop-form-row">
+                <input v-model="passwordConfirm" @input="startField('passwordConfirm')" type="password" :class="startedFields.has('passwordConfirm') ? (isValidPasswordConfirm() ? '' : ' bad-input' ) : ''" name="passwordConfirm" id="reg_password_confirm"/>
             </p>
 
             <p>Riceverai un link per confermare l'indirizzo</p>
@@ -58,7 +70,7 @@ $this->show_hcaptcha_script();
     <template v-else>
         <div class="registered">
             <h2>Registrazione completata</h2>
-            <p>Il tuo account è stato creato con successo</p>
+            <p>Il tuo account è stato creato con successo. Controlla la posta per confermare l'indirizzo e-mail e procedere nel tesseramento.</p>
         </div>
     </template>
 </div>

@@ -82,9 +82,9 @@ createApp({
             mpop_billing_zip: '',
             mpop_billing_address: '',
             mpop_phone: '',
-            mpop_subscription_marketing_agree: false,
-            mpop_subscription_newsletter_agree: false,
-            mpop_subscription_publish_agree: false
+            mpop_subscription_marketing_agree: true,
+            mpop_subscription_newsletter_agree: true,
+            mpop_subscription_publish_agree: true
         }),
         countries = reactive([]),
         marketingAgreeShow = ref(false),
