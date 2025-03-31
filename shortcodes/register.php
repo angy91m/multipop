@@ -1,7 +1,7 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 if (get_current_user_id() && !$this->current_user_is_admin()) {
-    wp_redirect(get_permalink($this->settings['myaccount_page']));
+    wp_redirect(get_permalink($this->settings['myaccount_page']), 303);
     exit;
 }
 if (

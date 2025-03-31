@@ -65,6 +65,15 @@ do_action('mpop_settings_notices', $this->get_settings());
     <br><br>
     <button class="button" id="send_test_mail_button">Invia e-mail di test</button>
     <hr>
+    <h4>IP rilevato:</h4>
+    <p><?=$this::get_client_ip()?></p>
+    <h4>Numero massimo di login falliti</h4>
+    <input type="number" min="-1" step="1" name="max_failed_login_attempts" value="<?=$this->settings['max_failed_login_attempts']?>" />
+    <h4>Numero secondi tra i tentativi di login</h4>
+    <input type="number" min="1" step="1" name="seconds_between_login_attempts" value="<?=$this->settings['seconds_between_login_attempts']?>" />
+    <h4>Numero secondi in blacklist dopo il superamento tentativi</h4>
+    <input type="number" min="1" step="1" name="seconds_in_blacklist" value="<?=$this->settings['seconds_in_blacklist']?>" />
+    <hr>
     <h4>hCatpcha Site key</h4>
     <input type="text" name="hcaptcha_site_key" value="<?=$this->settings['hcaptcha_site_key']?>" />
     <h4>hCatpcha Secret</h4>

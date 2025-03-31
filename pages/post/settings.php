@@ -3,13 +3,13 @@ defined( 'ABSPATH' ) || exit;
 if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-settings' ) ) {
     $this->add_admin_notice("Invalid request");
 } else {
-    if ($_REQUEST['force_tempmail_update'] == '1') {
+    if (isset($_REQUEST['force_tempmail_update']) && $_REQUEST['force_tempmail_update'] == '1') {
         $this->update_tempmail(true);
         $this->add_admin_notice("Aggiornamento completato", 'success');
-    } else if ($_REQUEST['force_comuni_update'] == '1') {
+    } else if (isset($_REQUEST['force_comuni_update']) && $_REQUEST['force_comuni_update'] == '1') {
         $this->update_comuni(true);
         $this->add_admin_notice("Aggiornamento in corso", 'success');
-    } else if ($_REQUEST['force_discourse_groups_reload'] == '1') {
+    } else if (isset($_REQUEST['force_discourse_groups_reload']) && $_REQUEST['force_discourse_groups_reload'] == '1') {
         $disc_utils = $this->discourse_utilities();
         if (!$disc_utils) {
             $this->add_admin_notice("Plugin per Discourse non presente");
@@ -17,7 +17,7 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
             $disc_utils->get_discourse_groups(true);
             $this->add_admin_notice("Cache gruppi Discourse ricaricata", 'success');
         }
-    } else if ($_REQUEST['save_plugin'] == '1') {
+    } else if (isset($_REQUEST['save_plugin']) && $_REQUEST['save_plugin'] == '1') {
         if ($this->save_plugin()) {
             $res = ['data' => base64_encode( file_get_contents(MULTIPOP_PLUGIN_PATH . "/private/bak.zip") )];
             echo '<script id="mpop_json_res" type="application/json">' . json_encode($res) . '</script>';
@@ -26,10 +26,10 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
             echo '<script id="mpop_json_res" type="application/json">' .  json_encode(["error" => "Cannot create backup file"]) . '</script>';
         }
         exit;
-    } else if ($_REQUEST['purge_deactivate'] == '1') {
+    } else if (isset($_REQUEST['purge_deactivate']) && $_REQUEST['purge_deactivate'] == '1') {
         $this::purge_deactivate();
         exit;
-    } else if (!empty(trim($_REQUEST['send_test_mail']))) {
+    } else if (isset($_REQUEST['send_test_mail']) && !empty(trim($_REQUEST['send_test_mail']))) {
         if (!$this->is_valid_email(trim($_REQUEST['send_test_mail']), false, true)) {
             $this->add_admin_notice("Indirizzo e-mail non valido");
         } else {
@@ -135,6 +135,24 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
             $min_v = round($min_v * 100) / 100;
             if ($min_v > 0) {
                 $edits['min_subscription_payment'] = "$min_v";
+            }
+        }
+        if (is_string($_REQUEST['max_failed_login_attempts']) && is_numeric($_REQUEST['max_failed_login_attempts'])) {
+            $max_attempts = intval($_REQUEST['max_failed_login_attempts']);
+            if ($max_attempts >= -1) {
+                $edits['max_failed_login_attempts'] = $max_attempts;
+            }
+        }
+        if (is_string($_REQUEST['seconds_between_login_attempts']) && is_numeric($_REQUEST['seconds_between_login_attempts'])) {
+            $secs = intval($_REQUEST['seconds_between_login_attempts']);
+            if ($secs > 0) {
+                $edits['seconds_between_login_attempts'] = $secs;
+            }
+        }
+        if (is_string($_REQUEST['seconds_in_blacklist']) && is_numeric($_REQUEST['seconds_in_blacklist'])) {
+            $secs = intval($_REQUEST['seconds_in_blacklist']);
+            if ($secs > 0) {
+                $edits['seconds_in_blacklist'] = $secs;
             }
         }
         if (is_string($_REQUEST['hcaptcha_site_key'])) {

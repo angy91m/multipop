@@ -279,6 +279,7 @@ class MultipopPlugin {
         // ADD ELEMENTS TO LOGIN PAGE
         // CHECK AFTER LOGIN
 
+        add_filter('authenticate', [$this, 'filter_login_by_blacklist'], 3, 1);
         add_filter('authenticate', [$this, 'filter_login'], 21, 1);
 
         // SHOW USER NOTICES
@@ -372,9 +373,24 @@ class MultipopPlugin {
         $this->flush_db();
         $this->update_tempmail();
         $this->update_comuni();
+        
+        //EVERY 100 CALLS
+        if (!rand(0,99)) {
+            $this->flush_blacklist();
+        }
 
         if ($this->current_user_is_admin()) {
             return;
+        }
+
+        if (
+            isset($this->settings['hcaptcha_site_key'])
+            && trim($this->settings['hcaptcha_site_key'])
+            && isset($_POST['hcaptcha-response'])
+            && $_POST['hcaptcha-response']
+            && is_string($_POST['hcaptcha-response'])
+        ) {
+            $GLOBALS['hcaptcha_verified'] = $this->verify_hcaptcha( $_POST['hcaptcha-response'] );
         }
 
         $current_user = wp_get_current_user();
@@ -439,7 +455,7 @@ class MultipopPlugin {
                              ]
                          ]);
                     }
-                    wp_redirect(get_permalink($this->settings['myaccount_page']));
+                    wp_redirect(get_permalink($this->settings['myaccount_page']), 303);
                     exit;
                 } else {
                     $this->logout_redirect($this->req_url);
@@ -635,7 +651,7 @@ class MultipopPlugin {
         $current_user = wp_get_current_user();
 
         if (count($current_user->roles) == 1 && in_array($current_user->roles[0], ['multipopolano','multipopolare_resp','multipopolare_friend'])) {
-            wp_redirect(site_url('/'));
+            wp_redirect(site_url('/'), 303);
             exit();
         }
         if ( $this->current_user_is_admin() && !$this->settings['master_doc_key'] ) {
@@ -686,9 +702,20 @@ class MultipopPlugin {
             `marketing_policy` TEXT NOT NULL,
             `newsletter_policy` TEXT NOT NULL,
             `publish_policy` TEXT NOT NULL,
+            `max_failed_login_attempts` INT NOT NULL,
+            `seconds_between_login_attempts` BIGINT UNSIGNED NOT NULL,
+            `seconds_in_blacklist` BIGINT UNSIGNED NOT NULL,
             PRIMARY KEY (`id`)
         ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
         dbDelta( $q );
+
+        // ALTER SETTINGS
+        // $q = "SHOW COLUMNS FROM " . $this::db_prefix('plugin_settings') . ";";
+        // $column_names = $wpdb->get_col($q);
+        // if (!in_array('seconds_between_login_attempts', $column_names)) {
+        //     $wpdb->query("ALTER TABLE " . $this::db_prefix('plugin_settings') . " ADD `seconds_between_login_attempts` BIGINT UNSIGNED NOT NULL, ADD `seconds_in_blacklist` BIGINT UNSIGNED NOT NULL;");
+        //     $wpdb->query("UPDATE " . $this::db_prefix('plugin_settings') . " SET `seconds_between_login_attempts` = 30, `seconds_in_blacklist` = 300 WHERE `id` = 1;");
+        // }
 
         // TOKEN TABLE
         $q = "CREATE TABLE IF NOT EXISTS " . $this::db_prefix('temp_tokens') . " (
@@ -724,6 +751,15 @@ class MultipopPlugin {
             PRIMARY KEY (`id`)
         ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
         dbDelta( $q );
+
+        // BLACKLIST IP LOGIN TABLE
+        $q = "CREATE TABLE IF NOT EXISTS " . $this::db_prefix('blacklist_ip') . " (
+            `ip` VARCHAR(255) NOT NULL,
+            `failed_attempts` INT UNSIGNED NOT NULL,
+            `ts` BIGINT UNSIGNED NOT NULL,
+            PRIMARY KEY (`ip`)
+        ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
+        dbDelta( $q );
     
         // ADD SETTINGS ROW IF NOT EXISTS
         if (!$this->get_settings()) {
@@ -748,7 +784,8 @@ class MultipopPlugin {
                     `temp_token_key`,
                     `marketing_policy`,
                     `newsletter_policy`,
-                    `publish_policy`
+                    `publish_policy`,
+                    `max_failed_login_attempts`
                 )"
                 . " VALUES (
                     1,
@@ -769,13 +806,14 @@ class MultipopPlugin {
                     1,
                     '".base64_encode(openssl_random_pseudo_bytes(64))."',
                     ".
-                        $wpdb->prepare("%s, %s, %s",[
+                        $wpdb->prepare("%s, %s, %s",
                             'Presto il mio consenso e fino alla revoca dello stesso, per la proposizione di offerte, comunicazioni commerciali e per il successivo invio di materiale informativo pubblicitario e/o promozionale e/o sondaggi di opinione, ricerche di mercato, invio di newsletter (di seguito complessivamente definite “attività di propaganda”) di MULTIPOPOLARE APS e/o da organizzazioni correlate. Il trattamento per attività di marketing avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea e/o chiamate da operatore), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo SMS e/o MMS, chiamate telefoniche senza l’intervento dell’operatore, posta elettronica, social network, newsletter, applicazioni interattive, notifiche push).',
                             'Presto il mio consenso e fino alla revoca dello stesso, per la comunicazioni di iniziative ed attività (di seguito complessivamente definite “attività di informazione dell’associazione”) di MULTIPOPOLARE APS e/o da organizzazioni correlate.
 Il trattamento per attività di informazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo posta cartacea), ovvero mediante sistemi “automatizzati” di contatto (a titolo esemplificativo posta elettronica).',
                             'Presto il mio consenso e fino alla revoca dello stesso, per la pubblicazione del mio nominativo su riviste, cataloghi, brochure, annuari, siti, ecc. (di seguito complessivamente definite “attività di pubblicazione dell’associazione”) di MULTIPOPOLARE APS e/o da organizzazioni correlate. Il trattamento per attività di pubblicazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo pubblicazioni cartacee), ovvero mediante sistemi “elettronici” (a titolo esemplificativo pubblicazioni elettroniche, social network, sito, blog, ecc.).'
-                        ])
-                    ."
+                        )
+                    .",
+                    5
                 ) ;";
             $wpdb->query($q);
         }
@@ -1352,6 +1390,9 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $settings['register_page'] = intval($settings['register_page']);
         $settings['myaccount_page'] = intval($settings['myaccount_page']);
         $settings['temp_token_key'] = base64_decode($settings['temp_token_key'], true);
+        $settings['max_failed_login_attempts'] = intval($settings['max_failed_login_attempts']);
+        $settings['seconds_between_login_attempts'] = intval($settings['seconds_between_login_attempts']);
+        $settings['seconds_in_blacklist'] = intval($settings['seconds_in_blacklist']);
         $this->settings = $settings;
         return $this->settings;
     }
@@ -1532,7 +1573,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if (get_current_user_id()) {
             wp_logout();
         }
-        wp_redirect( $url );
+        wp_redirect( $url, 303 );
         exit;
     }
 
@@ -1594,9 +1635,30 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
     }
 
+    public function filter_login_by_blacklist($user) {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            return $user;
+        }
+        if ($this->settings['max_failed_login_attempts'] >= 0) {
+            $ip = $this::get_client_ip();
+            if ($this->get_attempts_by_ip($ip) > $this->settings['max_failed_login_attempts']) {
+                $this->increment_attempts_by_ip($this::get_client_ip());
+                $_GET['invalid_mpop_login'] = '1';
+                $this->logout_redirect(explode('?',$this->req_path)[0] . '?' . $this->export_GET());
+            }
+        }
+        return $user;
+    }
+
     // CHECK AFTER LOGIN
     public function filter_login( $user ) {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            return $user;
+        }
         if (is_null($user) || is_wp_error($user)) {
+            if ($this->settings['max_failed_login_attempts'] >= 0) {
+                $this->increment_attempts_by_ip($this::get_client_ip());
+            }
             return $user;
         }
         if ($user->mpop_invited) return new WP_Error(401, "Inactive user's invitation");
@@ -1604,6 +1666,18 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if (count( $roles ) == 0) {
             return new WP_Error(401, "No roles found");
         } else if (count( $roles ) == 1 && in_array($roles[0], ['multipopolano','multipopolare_resp','multipopolare_friend'])) {
+            if (
+                isset($this->settings['hcaptcha_site_key'])
+                && trim($this->settings['hcaptcha_site_key'])
+                && (
+                    !isset($GLOBALS['hcaptcha_verified'])
+                    || !$GLOBALS['hcaptcha_verified']
+                )
+            ) {
+                $this->increment_attempts_by_ip($this::get_client_ip());
+                $_GET['invalid_mpop_login'] = '1';
+                $this->logout_redirect(explode('?',$this->req_path)[0] . '?' . $this->export_GET());
+            }
             if ($user->mpop_mail_to_confirm || $user->_new_email) {
                 if (
                     isset($_REQUEST['mpop_mail_token'])
@@ -3007,7 +3081,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 fn.meta_value AS first_name, 
                 ln.meta_value AS last_name
                 $q_from WHERE s.$getby = $search_format LIMIT 1;",
-                [$sub_id]
+                $sub_id
             ),
             'ARRAY_A'
         );
@@ -3063,10 +3137,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 completer_ip = %s
                 ".($paypal ? (", pp_capture_id = '$paypal'") : "")."
             WHERE id = $sub_id;",
-            [
-                get_current_user_id(),
-                $this::get_client_ip()
-            ]
+            get_current_user_id(),
+            $this::get_client_ip()
         ))) {
             throw new Exception("Error while saving on DB");
         }
@@ -4885,7 +4957,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             !count($user->roles)
             || !in_array( $user->roles[0], $allowed_roles )
         ) {
-            wp_redirect(get_permalink($this->settings['myaccount_page']));
+            wp_redirect(get_permalink($this->settings['myaccount_page']), 303);
             exit;
         }
     }
@@ -5105,6 +5177,32 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         $zip->close();
         return true;
+    }
+    private function get_attempts_by_ip($ip) {
+        global $wpdb;
+        $attempts = $wpdb->get_var($wpdb->prepare( "SELECT `failed_attempts` FROM "  . $this::db_prefix('blacklist_ip') . " WHERE `ip` = %s AND ( ( `failed_attempts` > %d AND `ts` > %d ) OR `ts` > %d )", $ip, $this->settings['max_failed_login_attempts'], time()-$this->settings['seconds_in_blacklist'], time()-$this->settings['seconds_between_login_attempts']));
+        if (is_string($attempts)) {
+            return intval($attempts);
+        }
+        return 0;
+    }
+    private function increment_attempts_by_ip($ip) {
+        $attempts = $this->get_attempts_by_ip($ip);
+        global $wpdb;
+        if ($attempts) {
+            $wpdb->query($wpdb->prepare("UPDATE " . $this::db_prefix('blacklist_ip') . " SET `failed_attempts` = `failed_attempts` +1, `ts` = %d WHERE `ip` = %s", time(), $ip));
+        } else {
+            $wpdb->query($wpdb->prepare("INSERT INTO " . $this::db_prefix('blacklist_ip') . " (`ip`,`failed_attempts`, `ts`) VALUES ( %s, 1, %d ) ON DUPLICATE KEY UPDATE `failed_attempts` = 1, `ts` = %d", $ip, time(), time()));
+        }
+        return ++$attempts;
+    }
+    private function delete_ip_from_blacklist($ip) {
+        global $wpdb;
+        $wpdb->query($wpdb->prepare("DELETE FROM " . $this::db_prefix('blacklist_ip') . " WHERE `ip` = %s", $ip));
+    }
+    private function flush_blacklist() {
+        global $wpdb;
+        $wpdb->query($wpdb->prepare("DELETE FROM " . $this::db_prefix('blacklist_ip') . " WHERE `ts` <= %d OR (`ts` <= %d AND `failed_attempts` <= %d)", time()-$this->settings['seconds_in_blacklist'],time()-$this->settings['seconds_between_login_attempts'],$this->settings['max_failed_login_attempts']));
     }
 }
 
