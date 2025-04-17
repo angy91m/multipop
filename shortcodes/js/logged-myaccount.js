@@ -270,6 +270,7 @@ createApp({
         userSearchRespZoneOpen = ref(false),
         userEditingRespZoneOpen = ref(false),
         subInstructionOpen = ref(false),
+        regInstructionOpen = ref(false),
         mainOptions = reactive({
             authorizedSubscriptionYears: [],
             authorizedSubscriptionQuote: 0,
@@ -2232,7 +2233,8 @@ createApp({
             paymentConfirmationDate,
             userSubModuleFilesUpload,
             paypalOptions,
-            subInstructionOpen
+            subInstructionOpen,
+            regInstructionOpen
         };
     }
 })

@@ -96,6 +96,17 @@ if ($this->settings['pp_client_id']) {
             <q-page padding>
             <div v-if="selectedTab.name == 'summary'">
                 <h3>Ciao {{helloName}}</h3>
+                <q-expansion-item
+                    v-model="regInstructionOpen"
+                    icon="info"
+                    label="Istruzioni tesseramento"
+                    >
+                    <q-card>
+                        <q-card-section>
+                        Per proseguire nell'iscrizione, completa il tuo profilo (se non l'hai già fatto) e continua la procedura seguendo le istruzioni nel menù <i @click="selectTab('card')">Tesseramento</i>.
+                        </q-card-section>
+                    </q-card>
+                </q-expansion-item>
                 <template v-if="!profileEditing">
                     <button class="mpop-button" @click="editProfile">Modifica profilo</button>
                 </template>
@@ -409,7 +420,7 @@ if ($this->settings['pp_client_id']) {
                                     >
                                     <q-card>
                                         <q-card-section>
-                                        Per proseguire nell'iscrizione scarica il modulo tramite il pulsante GENERA MODULO ISCRIZIONE, firmalo (sono necessarie 4 firme) e torna qui per caricarlo cliccando su CARICA MODULO. Insieme al modulo potrebbe essere richiesto il caricamento di un documento di identità.
+                                        Per proseguire nell'iscrizione, scarica il modulo tramite il pulsante GENERA MODULO ISCRIZIONE, firmalo (sono necessarie 4 firme) e torna qui per caricarlo cliccando su CARICA MODULO. Insieme al modulo potrebbe essere richiesto il caricamento di un documento di identità.
                                         </q-card-section>
                                     </q-card>
                                 </q-expansion-item>
