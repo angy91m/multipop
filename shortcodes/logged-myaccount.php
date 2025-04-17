@@ -103,7 +103,7 @@ if ($this->settings['pp_client_id']) {
                     >
                     <q-card>
                         <q-card-section>
-                        Per proseguire nell'iscrizione, completa il tuo profilo (se non l'hai già fatto) e continua la procedura seguendo le istruzioni nel menù <i @click="selectTab('card')">Tesseramento</i>.
+                        Per proseguire nell'iscrizione, completa il tuo profilo (se non l'hai già fatto) e continua la procedura seguendo le istruzioni nel menù <i class="mpop-click" @click="selectTab({name: 'card', label: 'Tesseramento'})">Tesseramento</i>.
                         </q-card-section>
                     </q-card>
                 </q-expansion-item>
