@@ -6,9 +6,9 @@ if ( !$this->current_user_is_admin() ) {
 }
 $log_page = isset($_GET['log_page']) ? intval($_GET['log_page']) : 1;
 $log_action = isset($_GET['log_action']) ? strval($_GET['log_action']) : '';
-$log_user = isset($_GET['log_user']) && $_GET['log_user'] ? intval($_GET['log_user']) : null;
+$log_user = isset($_GET['log_user']) && strlen($_GET['log_user']) ? intval($_GET['log_user']) : null;
 if ($log_user < 1) $log_user = null; 
-$log_author = isset($_GET['log_author']) && $_GET['log_author'] ? intval($_GET['log_author']) : null;
+$log_author = isset($_GET['log_author']) && strlen($_GET['log_author']) ? intval($_GET['log_author']) : null;
 if ($log_author < 0) $log_author = null;
 $results = $this->get_logs($log_page, $log_action, $log_user, $log_author);
 ?>
