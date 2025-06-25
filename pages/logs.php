@@ -22,6 +22,12 @@ $results = $this->get_logs($log_page, $log_action, $log_user, $log_author);
         padding: 8px;
     }
 </style>
+<form method="GET">
+    <label>
+        Action:&nbsp;
+        <input type="text" name="log_action" style="text-transform: uppercase" />
+    </label>
+</form>
 <table id="mpop-logs-table">
     <thead>
         <tr>
