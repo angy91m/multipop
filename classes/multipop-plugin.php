@@ -1522,7 +1522,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             if ($force_sync || ($user->discourse_sso_user_id && !empty($user->roles))) {
                 $this->sync_discourse_record($user);
             }
-            //$this->log_data('USER CARD ENABLED', null, $user->ID);
+            $this->log_data('USER CARD ENABLED', null, $user->ID);
         }
     }
 
@@ -1538,7 +1538,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             if ($user->discourse_sso_user_id && isset($user->roles[0]) && in_array($user->roles[0], ['multipopolano', 'multipopolare_resp'])) {
                 $this->sync_discourse_record($user);
             }
-            //$this->log_data('USER CARD DISABLED', null, $user->ID);
+            $this->log_data('USER CARD DISABLED', null, $user->ID);
         }
     }
 
@@ -2770,6 +2770,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             ]
         );
         if ($res) {
+            $this->log_data('SUBSCRIPTION MODULE CONFIRMED', ['sub_id' => $sub['id']], $sub['user_id']);
             $this->send_awaiting_payment_email($sub_user->user_email);
         }
         return $res;
@@ -2783,7 +2784,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         $date_now = date_create('now', new DateTimeZone(current_time('e')));
         global $wpdb;
-        return $wpdb->update(
+        $res = $wpdb->update(
             $wpdb->prefix . 'mpop_subscriptions',
             [
                 'status' => 'canceled',
@@ -2793,6 +2794,10 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 'id' => $sub['id']
             ]
         );
+        if ($res) {
+            $this->log_data('SUBSCRIPTION CANCELED', ['sub_id' => $sub['id']], $sub['user_id']);
+        }
+        return $res;
     }
     private function refuse_subscription($sub, $cancel = false) {
         $sub_user = get_user_by('ID', $sub['user_id']);
@@ -2805,7 +2810,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         unlink($this->get_filename_by_sub($sub, true, false));
         $date_now = date_create('now', new DateTimeZone(current_time('e')));
         global $wpdb;
-        return $wpdb->update(
+        $res = $wpdb->update(
             $wpdb->prefix . 'mpop_subscriptions',
             [
                 'status' => $cancel ? 'canceled' : 'refused',
@@ -2815,6 +2820,10 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 'id' => $sub['id']
             ]
         );
+        if ($res) {
+            $this->log_data('SUBSCRIPTION REFUSED', ['sub_id' => $sub['id']], $sub['user_id']);
+        }
+        return $res;
     }
     private function decrypt_module_documents($sub, string &$passphrase) {
         $current_user = wp_get_current_user();
@@ -3054,7 +3063,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             array_map(function($v) {return $v[2];}, $insert_data)
         )) {
             if ($wpdb->insert_id) {
-                //$this->log_data('SUBSCRIPTION CREATED', ['sub_id' => $wpdb->insert_id], $user_id);
+                $this->log_data('SUBSCRIPTION CREATED', ['sub_id' => $wpdb->insert_id], $user_id);
             }
             return $wpdb->insert_id;
         }
@@ -3159,7 +3168,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         ))) {
             throw new Exception("Error while saving on DB");
         }
-        //$this->log_data('SUBSCRIPTION COMPLETED', ['sub_id' => $sub_id], $sub['user_id']);
+        $this->log_data('SUBSCRIPTION COMPLETED', ['sub_id' => $sub_id], $sub['user_id']);
         if (current_time('Y') == $sub['year']) {
             $this->enable_user_card($sub['user_id'], $sub['marketing_agree'], $sub['newsletter_agree'], $sub['publish_agree'], true);
             return true;
@@ -3574,13 +3583,13 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             if (is_wp_error($user_id)) {
                 throw new Exception('Error during user save: ' . $user_id->get_error_message());
             }
-            //$this->log_data('USER CREATED', ['user_pass' => null] + $user_input, $user_id);
+            $this->log_data('USER CREATED', ['user_pass' => null] + $user_input, $user_id);
         } else if($role_change) {
             wp_update_user([
                 'ID' => $old_user->ID,
                 'role' => 'multipopolano'
             ]);
-            //$this->log_data('USER UPDATED', ['role' => 'multipopolano'], $old_user->ID);
+            $this->log_data('USER UPDATED', ['role' => 'multipopolano'], $old_user->ID);
         }
         $sub_id = 0;
         if (!$row['mpop_friend']) {
@@ -4356,7 +4365,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             echo json_encode( $res_data );
             exit;
         }
-        //$this->log_data('USER CREATED', ['user_pass' => null] + $user_input, $user_id);
+        $this->log_data('USER CREATED', ['user_pass' => null] + $user_input, $user_id);
         $token = $this->create_temp_token($user_id,'invite_link',3600*24*30);
         if(!$this->send_invitation_mail($token, $post_data['email'])) {
             $res_data['error'] = ['server'];
