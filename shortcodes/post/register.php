@@ -104,18 +104,14 @@ $user_id = wp_insert_user([
 ]);
 
 if (is_int($user_id)) {
-    try {
-        $this->log_data('USER REGISTERED', null, $user_id);
-        $token = $this->create_temp_token( $user_id, 'email_confirmation_link' );
-        if($this->send_confirmation_mail($token, $post_data['email'])) {
-            $res_data['data'] = 'ok';
-        } else {
-            $this->delete_temp_token( $token );
-            http_response_code( 500 );
-            $res_data['error'] = ['server'];
-        }
-        echo json_encode( $res_data );
-    } catch (Exception $e) {
-        save_test($e->getMessage());
+    $this->log_data('USER REGISTERED', null, $user_id);
+    $token = $this->create_temp_token( $user_id, 'email_confirmation_link' );
+    if($this->send_confirmation_mail($token, $post_data['email'])) {
+        $res_data['data'] = 'ok';
+    } else {
+        $this->delete_temp_token( $token );
+        http_response_code( 500 );
+        $res_data['error'] = ['server'];
     }
+    echo json_encode( $res_data );
 }
