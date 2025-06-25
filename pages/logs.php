@@ -50,8 +50,12 @@ if ($log_page > 1) {
     &nbsp;&nbsp;
 <?php
 }
+if (!empty($results)) {
 ?>
-<a href="?page=multipop_logs&log_page=<?=$log_page + 1?>&log_action=<?=urlencode($log_action)?>&log_user=<?=urlencode(strval($log_user))?>&log_author=<?=urlencode(strval($log_author))?>">Prossima pagina</a>
+    <a href="?page=multipop_logs&log_page=<?=$log_page + 1?>&log_action=<?=urlencode($log_action)?>&log_user=<?=urlencode(strval($log_user))?>&log_author=<?=urlencode(strval($log_author))?>">Prossima pagina</a>
+<?php
+}
+?>
 <table id="mpop-logs-table">
     <thead>
         <tr>
