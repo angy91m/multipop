@@ -10,7 +10,22 @@ $log_user = isset($_GET['log_user']) ? intval($_GET['log_user']) : null;
 $log_author = isset($_GET['log_author']) ? intval($_GET['log_author']) : null;
 $results = $this->get_logs($log_page, $log_action, $log_user, $log_author);
 ?>
-<table>
+<style type="text/css">
+    #mpop-logs-table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    #mpop-logs-table td,
+    #mpop-logs-table th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    #mpop-logs-table tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+</style>
+<table id="mpop-logs-table">
     <thead>
         <tr>
             <th>Azione</th>
@@ -36,3 +51,4 @@ $results = $this->get_logs($log_page, $log_action, $log_user, $log_author);
         ?>
     </tbody>
 </table>
+<?php
