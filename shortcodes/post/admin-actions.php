@@ -405,6 +405,7 @@ switch( $post_data['action'] ) {
         if (count($user_edits)) {
             $user_edits['ID'] = $user->ID;
             wp_update_user( $user_edits );
+            $this->log_data('USER UPDATED', $user_edits, $user->ID);
             delete_user_meta( $user->ID, 'mpop_profile_pending_edits' );
             if ($user->discourse_sso_user_id && isset($user->roles[0]) && in_array($user->roles[0], ['administrator', 'multipopolano', 'multipopolare_resp', 'multipopolare_friend'])) {
                 $this->sync_discourse_record($user);
@@ -771,6 +772,7 @@ switch( $post_data['action'] ) {
             'ID' => $user->ID,
             'meta_input' => $pending_edits
         ]);
+        $this->log_data('USER UPDATED', ['meta_input' => $pending_edits], $user->ID);
         delete_user_meta($user->ID, 'mpop_profile_pending_edits');
         delete_user_meta($user->ID, 'mpop_id_card_confirmed');
         $res_data['data'] = true;
