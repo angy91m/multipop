@@ -21,9 +21,6 @@ $results = $this->get_logs($log_page, $log_action, $log_user, $log_author);
         text-align: left;
         padding: 8px;
     }
-    #mpop-logs-table tr:nth-child(even) {
-        background-color: #dddddd;
-    }
 </style>
 <table id="mpop-logs-table">
     <thead>
