@@ -29,15 +29,19 @@ $results = $this->get_logs($log_page, $log_action, $log_user, $log_author);
         Action:&nbsp;
         <input type="text" name="log_action" style="text-transform: uppercase" value="<?=$log_action?>" />
     </label>
+    <br>
     <label>
         User ID:&nbsp;
         <input type="number" min="0" step="1" name="log_user" value="<?=strval($log_user)?>"/>
     </label>
+    <br>
     <label>
         Author ID:&nbsp;
         <input type="number" min="-1" step="1" name="log_author" value="<?=strval($log_author)?>"/>
     </label>
     <input type="hidden" name="page" value="multipop_logs" />
+    <br>
+    <button>Cerca</button>
 </form>
 <table id="mpop-logs-table">
     <thead>
