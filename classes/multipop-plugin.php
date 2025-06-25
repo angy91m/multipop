@@ -299,6 +299,9 @@ class MultipopPlugin {
         add_action('admin_menu', function() {
             add_menu_page('Multipop Plugin', 'Multipop', 'edit_private_posts', 'multipop_settings', [$this, 'menu_page'], 'dashicons-fullscreen-exit-alt', 61);
         });
+        add_action('admin_menu', function() {
+            add_menu_page('Multipop Logs', 'Multipop Logs', 'edit_private_posts', 'multipop_logs', [$this, 'logs_page'], 'dashicons-database', 62);
+        });
         add_action('user_new_form', [$this, 'user_new_form']);
 
         add_action('show_user_profile', [$this, 'add_profile_meta']);
@@ -1804,6 +1807,11 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     // PLUGIN SETTINGS PAGE
     public function menu_page() { 
         require(MULTIPOP_PLUGIN_PATH . '/pages/settings.php');
+    }
+
+    // PLUGIN LOGS PAGE
+    public function logs_page() {
+        require(MULTIPOP_PLUGIN_PATH . '/pages/logs.php');
     }
 
     //
@@ -5253,6 +5261,25 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             '%d',
             '%d'
         ]);
+    }
+    private function get_logs(int $page = 1, string $action = '', $user = null, $author = null) {
+        if ($page < 1) $page = 1;
+        $limit = 100;
+        $offset = ($page -1) * $limit;
+        global $wpdb;
+        $where_arr = [];
+        if ($action) {
+            $where_arr[] = $wpdb->prepare( '`action` LIKE %s' , '%' . $wpdb->esc_like(strtoupper( $action )) . '%');
+        }
+        if (is_int($user)) {
+            $where_arr[] = "`user` = $user";
+        }
+        if (is_int($author)) {
+            $where_arr[] = "`author` = $author";
+        }
+        $where = implode(' AND ', $where_arr);
+        if ($where) $where = " WHERE $where ";
+        return $wpdb->get_results("SELECT * FROM " . $this::db_prefix('logs') . " $where ORDER BY `id` DESC LIMIT $limit OFFSET $offset;", 'ARRAY_A');
     }
 }
 
