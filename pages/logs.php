@@ -26,6 +26,7 @@ $results = $this->get_logs($log_page, $log_action, $log_user, $log_author);
     <label>
         Action:&nbsp;
         <input type="text" name="log_action" style="text-transform: uppercase" />
+        <input type="hidden" name="page" value="multipop_logs" />
     </label>
 </form>
 <table id="mpop-logs-table">
