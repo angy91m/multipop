@@ -43,6 +43,7 @@ $results = $this->get_logs($log_page, $log_action, $log_user, $log_author);
     <br>
     <button>Cerca</button>
 </form>
+<a href="?page=multipop_logs&log_page=<?=$log_page + 1?>&log_action=<?=urlencode($log_action)?>&log_user=<?=urlencode(strval($log_user))?>&log_author=<?=urlencode(strval($log_author))?>">Prossima pagina</a>
 <table id="mpop-logs-table">
     <thead>
         <tr>
