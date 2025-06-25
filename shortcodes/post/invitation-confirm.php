@@ -144,72 +144,6 @@ switch( $post_data['action'] ) {
                 $res_data['error'][] = 'mpop_phone';
             }
         }
-        // if (str_starts_with($user->user_login, 'mp_')) {
-        //     if(!isset($post_data['username']) || !$this::is_valid_username($post_data['username']) || get_user_by('login', $post_data['username'])) {
-        //         $res_data['error'][] = 'username';
-        //     }
-        //     if(!isset($post_data['first_name']) || !$this::is_valid_name($post_data['first_name'])) {
-        //         $res_data['error'][] = 'first_name';
-        //     }
-        //     if(!isset($post_data['last_name']) || !$this::is_valid_name($post_data['last_name'])) {
-        //         $res_data['error'][] = 'last_name';
-        //     }
-        //     $comuni = [];
-        //     if(!isset($post_data['mpop_birthdate'])) {
-        //         $res_data['error'][] = 'mpop_birthdate';
-        //         $post_data['mpop_birthdate'] = false;
-        //     } else {
-        //         try {
-        //             $post_data['mpop_birthdate'] = $this::validate_birthdate($post_data['mpop_birthdate']);
-        //         } catch(Exception $e) {
-        //             $res_data['error'][] = 'mpop_birthdate';
-        //             $post_data['mpop_birthdate'] = false;
-        //         }
-        //     }
-        //     if (!isset($post_data['mpop_birthplace_country']) || !$this->get_country_by_code($post_data['mpop_birthplace_country'])) {
-        //         $res_data['error'][] = 'mpop_birthplace_country';
-        //     } else if ($post_data['mpop_birthplace_country'] == 'ita' && $post_data['mpop_birthdate']) {
-        //         if(!isset($post_data['mpop_birthplace']) ) {
-        //             $res_data['error'][] = 'mpop_birthplace';
-        //         } else {
-        //             if (empty($comuni)) {
-        //                 $comuni = $this->get_comuni_all();
-        //             }
-        //             try {
-        //                 $post_data['mpop_birthdate'] = $this->validate_birthplace($post_data['mpop_birthdate'], $post_data['mpop_birthplace'], $comuni);
-        //             } catch(Exception $e) {
-        //                 array_push($res_data['error'], ...explode(',',$e->getMessage()));
-        //             }
-        //         }
-        //     } else if ($post_data['mpop_birthdate']) {
-        //         $post_data['mpop_birthdate'] = $post_data['mpop_birthdate']->format('Y-m-d');
-        //     }
-        //     if (!isset($post_data['mpop_billing_country']) || !$this->get_country_by_code($post_data['mpop_billing_country'])) {
-        //         $res_data['error'][] = 'mpop_billing_country';
-        //     } else if ($post_data['mpop_billing_country'] == 'ita') {
-        //         if (!isset($post_data['mpop_billing_city']) || !is_string($post_data['mpop_billing_city']) || !preg_match('/^[A-Z]\d{3}$/', $post_data['mpop_billing_city'])) {
-        //             $res_data['error'][] = 'mpop_billing_city';
-        //         } else {
-        //             if (empty($comuni)) {
-        //                 $comuni = $this->get_comuni_all();
-        //             }
-        //             $residenza = $this->get_comune_by_catasto($post_data['mpop_billing_city'], false, $comuni);
-        //             if (!$residenza) {
-        //                 $res_data['error'][] = 'mpop_billing_city';
-        //             } else {
-        //                 if(!isset($post_data['mpop_billing_zip']) || !in_array($post_data['mpop_billing_zip'], $residenza['cap'])) {
-        //                     $res_data['error'][] = 'mpop_billing_zip';
-        //                 }
-        //             }
-        //         }
-        //     }
-        //     if (!isset($post_data['mpop_billing_address']) || !is_string($post_data['mpop_billing_address']) || mb_strlen(trim($post_data['mpop_billing_address']), 'UTF-8') < 2 || mb_strlen(trim($post_data['mpop_billing_address']), 'UTF-8') > 200) {
-        //         $res_data['error'][] = 'mpop_billing_address';
-        //     }
-        //     if (!isset($post_data['mpop_phone']) || !$this::is_valid_phone($post_data['mpop_phone']) || !empty(get_users(['meta_key' => 'mpop_phone', 'meta_value' => $post_data['mpop_phone'], 'meta_compare' => '=', 'login__not_in' => [$user->user_login]]))) {
-        //         $res_data['error'][] = 'mpop_phone';
-        //     }
-        // }
         if (!empty($res_data['error'])) {
             http_response_code( 400 );
             echo json_encode( $res_data );
@@ -235,41 +169,14 @@ switch( $post_data['action'] ) {
             'mpop_newsletter_agree' => isset($post_data['mpop_subscription_newsletter_agree']) ? boolval($post_data['mpop_subscription_newsletter_agree']) : false,
             'mpop_publish_agree' => isset($post_data['mpop_subscription_publish_agree']) ? boolval($post_data['mpop_subscription_publish_agree']) : false
         ]:[]);
-        // $meta_input = [
-        //     'mpop_invited' => false
-        // ] + ($user->roles[0] == 'multipopolano'? [
-        //     'mpop_marketing_agree' => isset($post_data['mpop_subscription_marketing_agree']) ? boolval($post_data['mpop_subscription_marketing_agree']) : false,
-        //     'mpop_newsletter_agree' => isset($post_data['mpop_subscription_newsletter_agree']) ? boolval($post_data['mpop_subscription_newsletter_agree']) : false,
-        //     'mpop_publish_agree' => isset($post_data['mpop_subscription_publish_agree']) ? boolval($post_data['mpop_subscription_publish_agree']) : false
-        // ]:[]) +(str_starts_with($user->user_login, 'mp_') ? [
-        //     'first_name' => mb_strtoupper($post_data['first_name'], 'UTF-8'),
-        //     'last_name' =>  mb_strtoupper($post_data['last_name'], 'UTF-8'),
-        //     'mpop_birthdate' => $post_data['mpop_birthdate'],
-        //     'mpop_birthplace_country' => $post_data['mpop_birthplace_country'],
-        //     'mpop_birthplace' => $post_data['mpop_birthplace_country'] == 'ita' ? $post_data['mpop_birthplace'] : '',
-        //     'mpop_billing_country' => $post_data['mpop_billing_country'],
-        //     'mpop_billing_city' => $post_data['mpop_billing_country'] == 'ita' ? $post_data['mpop_billing_city'] : '',
-        //     'mpop_billing_state' => $post_data['mpop_billing_country'] == 'ita' ? $residenza['provincia']['sigla'] : '',
-        //     'mpop_billing_zip' => $post_data['mpop_billing_country'] == 'ita' ? $post_data['mpop_billing_zip'] : '',
-        //     'mpop_billing_address' => $post_data['mpop_billing_address'],
-        //     'mpop_phone' => $post_data['mpop_phone']
-        // ] : []);
         $user_edits = [
             'ID' => $user->ID,
             'user_pass' => $post_data['password'],
             'meta_input' => $meta_input
         ];
-        // if ($user->roles[0] != 'multipopolare_friend') {
-        //     $sub = array_pop($this->get_subscriptions(['user_id' => [$user->ID]], 1));
-        //     if (!$sub) {
-        //         $res_data['error'] = ['subscription'];
-        //         http_response_code( 400 );
-        //         echo json_encode( $res_data );
-        //         exit;
-        //     }
-        // }
         add_filter('send_password_change_email', function() {return false;}, 10, 0);
         wp_update_user($user_edits);
+        $this->log_data('USER ENABLED', null, ['role' => $user->roles[0],'meta_input' => $meta_input], $user->ID);
         if ($user->roles[0] == 'multipopolano') {
             $this->change_user_login($user->ID, $post_data['username'], mb_strtoupper($post_data['first_name'], 'UTF-8') . ' ' . mb_strtoupper($post_data['last_name'], 'UTF-8'));
             $user = get_user_by('ID',$user->ID);
