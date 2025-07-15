@@ -982,7 +982,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $dest = array_map(function($r) {return $r->user_email;}, $resp) + explode(',', $this->settings['mail_general_notifications']);
         $dest = array_unique($dest);
         foreach($dest as $d) {
-            return wp_mail($d,'Multipopolare - Nuova richiesta da verificare','È necessario verificare una nuova richiesta: <a href="'.$sub_link.'" target="_blank">'.$sub_link.'</a>');
+            wp_mail($d,'Multipopolare - Nuova richiesta da verificare','È necessario verificare una nuova richiesta: <a href="'.$sub_link.'" target="_blank">'.$sub_link.'</a>');
         }
     }
 
