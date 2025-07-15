@@ -22,7 +22,7 @@ fi
 if [ ! -L "province.json" ]; then
     ln -s "bk/$LAST_CYCLE_FILE_PROVINCE" province.json
 fi
-php comuni-update.php "$@" && \
+php "$SCRIPT_DIR/comuni-update.php" "$@" && \
 LAST_CYCLE_CONTENT=$(cat bk/last-cycle.txt) && \
 OLD_IFS=$IFS && \
 IFS=',' && \

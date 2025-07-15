@@ -1555,6 +1555,9 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     }
 
     private function update_comuni($force = false) {
+        if (file_exists(MULTIPOP_PLUGIN_PATH . 'private/.updating_comuni')) {
+            return;
+        }
         if (!$force) {
             $last_update = $this->last_comuni_update();
             $last_update->add(new DateInterval('P30D'));
@@ -1562,7 +1565,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 return;
             }
         }
-        exec(MULTIPOP_PLUGIN_PATH . 'comuni/comuni-update.sh --skip-on-error=attivi,soppressi,multicap --flush=2 > /dev/null &');
+        touch(MULTIPOP_PLUGIN_PATH . 'private/.updating_comuni');
+        exec('( ' . MULTIPOP_PLUGIN_PATH . 'comuni/comuni-update.sh --skip-multicap --skip-on-error=attivi,soppressi --flush=2 > /dev/null 2>&1; rm -f '. MULTIPOP_PLUGIN_PATH . 'private/.updating_comuni ) &' );
     }
     
     private function check_update_comuni() {
