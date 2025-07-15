@@ -14,6 +14,7 @@ Author URI: https://www.facebook.com/Hamburg91/
 
 defined( 'ABSPATH' ) || exit;
 define( 'MULTIPOP_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+define( 'MPOP_MASTER_KEY_LENGTH', 16 );
 
 // REGISTER FUNCTIONS AND HOOKS
 require_once( __DIR__ . '/classes/multipop-plugin.php');

@@ -10,7 +10,7 @@ $user->last_name = mb_strtoupper(trim($user->last_name), 'UTF-8');
 $user->user_email = mb_strtolower(trim($user->user_email), 'UTF-8');
 $user_meta = [];
 $error_head = '<strong>Multipopolare:</strong>&nbsp;';
-$master_key_len = 16;
+$master_key_len = MPOP_MASTER_KEY_LENGTH;
 if (!$errors->has_errors()) {
     if (defined('MPOP_PERSONAL_UPDATE') && MPOP_PERSONAL_UPDATE) {
         if (isset($_POST['master_key']) && $_POST['master_key']) {
@@ -232,11 +232,12 @@ if (!$errors->has_errors()) {
         if (isset($_POST['send_mail_confirmation']) && $_POST['send_mail_confirmation']) {
             $send_confirmation = $user->user_email;
         }
-        add_action('user_register', function($user_id) use ($user_meta, $send_confirmation) {
+        add_action('user_register', function($user_id) use ($user_meta, $send_confirmation, $user) {
             if ($send_confirmation) {
                 $token = $this->create_temp_token( $user_id, 'email_confirmation_link' );
                 $this->send_confirmation_mail($token, $send_confirmation);
             }
+            $this->log_data('USER CREATED', ['user_pass' => null, 'meta_input' => $user_meta] + json_decode(json_encode($user), 'ARRAY_A'), $user_id);
             foreach($user_meta as $k => $v) {
                 update_user_meta($user_id, $k, $v);
             }
@@ -253,4 +254,5 @@ if (!$errors->has_errors()) {
     if (in_array($user->role, ['administrator', 'multipopolano', 'multipopolare_resp', 'multipopolare_friend'])) {
         $this->sync_discourse_record($user);
     }
+    $this->log_data('USER UPDATED', ['user_pass' => null, 'meta_input' => ['mpop_personal_master_key' => null] + $user_meta] + json_decode(json_encode($user), 'ARRAY_A'), $user->ID);
 }

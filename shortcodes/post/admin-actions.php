@@ -847,6 +847,9 @@ switch( $post_data['action'] ) {
     case 'admin_subscription_upload_files':
         $this->subscription_upload_files($post_data, $res_data);
         break;
+    case 'admin_masterkey_change':
+        $this->change_master_key($post_data, $res_data);
+        break;
     default:
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];

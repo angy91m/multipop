@@ -38,6 +38,18 @@ passwordRegex = {
     },
     acceptedSymbols: "| \\ ! \" £ $ % & / ( ) = ? ' ^ , . ; : _ @ ° # * + [ ] { } _ -"
 },
+mkRegex = {
+    rr: [
+        /[a-z]+/s,
+        /[A-Z]+/s,
+        /[0-9]+/s,
+        /[|\\!"£$%&/()=?'^,.;:_@°#*+[\]{}_-]+/s
+    ],
+    test(mk) {
+        if (mk.length < 16 || mk.length > 64) return false;
+        return mkRegex.rr.every(r => r.test(mk));
+    }
+},
 boolVal = v => {
     if (typeof v == 'string' && v) {
         v = v.toLowerCase();
@@ -220,6 +232,10 @@ createApp({
             name: 'card',
             label: 'Tesseramento'
         }, {
+            name: 'masterkeyChange',
+            label: 'Cambia master key',
+            resp: true
+        }, {
             name: 'users',
             label: 'Tesserati',
             resp: true
@@ -301,6 +317,8 @@ createApp({
         billingCities = reactive([]),
         pwdChangeFields = reactive({}),
         pwdChanging = ref(false),
+        mkChangeFields = reactive({}),
+        masterkeyChanging = ref(false),
         csvUsers = reactive([]),
         documentsDecryptPassword = ref(''),
         csvImportOptions = reactive({
@@ -433,12 +451,26 @@ createApp({
         ),
         staticPwdErrors = reactive([]),
         pwdChangeErrors = computed(()=> {
+            if (typeof pwdChangeFields.new == 'string') pwdChangeFields.new = pwdChangeFields.new.trim();
+            if (typeof pwdChangeFields.confirm == 'string') pwdChangeFields.confirm = pwdChangeFields.confirm.trim();
             const errs = [];
             errs.push(...staticPwdErrors);
             if (!pwdChangeFields.current && !pwdChangeFields.new && !pwdChangeFields.confirm) return errs;
             if (!pwdChangeFields.current) errs.push('current');
             if (!pwdChangeFields.new || !passwordRegex.test(pwdChangeFields.new)) errs.push('new');
             if (!pwdChangeFields.confirm || pwdChangeFields.new !== pwdChangeFields.confirm) errs.push('confirm');
+            return errs;
+        }),
+        staticMkErrors = reactive([]),
+        mkChangeErrors = computed(()=> {
+            if (typeof mkChangeFields.new == 'string') mkChangeFields.new = mkChangeFields.new.trim();
+            if (typeof mkChangeFields.confirm == 'string') mkChangeFields.confirm = mkChangeFields.confirm.trim();
+            const errs = [];
+            errs.push(...staticMkErrors);
+            if (!mkChangeFields.current && !mkChangeFields.new && !mkChangeFields.confirm) return errs;
+            if (!mkChangeFields.current) errs.push('current');
+            if (!mkChangeFields.new || !mkRegex.test(mkChangeFields.new)) errs.push('new');
+            if (!mkChangeFields.confirm || mkChangeFields.new !== mkChangeFields.confirm) errs.push('confirm');
             return errs;
         }),
         nearActiveSub = computed(() => {
@@ -1003,7 +1035,7 @@ createApp({
                 if (res.ok) {
                     const newUser = await res.json();
                     if (newUser.data && newUser.data.ID) {
-                        viewUser(newUser.data.ID);
+                        open(location.href + '?view-user=' + newUser.data.ID, '_blank');
                         for (const k in userInAdd) {
                             userInAdd[k] = '';
                         }
@@ -1045,7 +1077,6 @@ createApp({
                     try {
                         const {error, notices = []} = await res.json();
                         if (error) {
-                            staticPwdErrors.push(...error);
                             generateNotices(notices);
                         } else {
                             console.error('Unknown error');
@@ -1076,7 +1107,6 @@ createApp({
                     try {
                         const {error, notices = []} = await res.json();
                         if (error) {
-                            staticPwdErrors.push(...error);
                             generateNotices(notices);
                         } else {
                             console.error('Unknown error');
@@ -1108,7 +1138,6 @@ createApp({
                     try {
                         const {error, notices = []} = await res.json();
                         if (error) {
-                            staticPwdErrors.push(...error);
                             generateNotices(notices);
                         } else {
                             console.error('Unknown error');
@@ -1137,7 +1166,6 @@ createApp({
                 try {
                     const {error, notices = []} = await res.json();
                     if (error) {
-                        staticPwdErrors.push(...error);
                         generateNotices(notices);
                     } else {
                         console.error('Unknown error');
@@ -1167,7 +1195,6 @@ createApp({
                     try {
                         const {error, notices = []} = await res.json();
                         if (error) {
-                            staticPwdErrors.push(...error);
                             generateNotices(notices);
                         } else {
                             console.error('Unknown error');
@@ -1202,7 +1229,6 @@ createApp({
                     try {
                         const {error, notices = []} = await res.json();
                         if (error) {
-                            staticPwdErrors.push(...error);
                             generateNotices(notices);
                         } else {
                             console.error('Unknown error');
@@ -1215,6 +1241,7 @@ createApp({
             }
         }
         async function changePassword() {
+            staticPwdErrors.length = 0;
             pwdChanging.value = true;
             const {current, new: newPassword} = pwdChangeFields;
             const res = await serverReq({
@@ -1246,6 +1273,40 @@ createApp({
                 }
             }
             pwdChanging.value = false;
+        }
+        async function changeMk() {
+            staticMkErrors.length = 0;
+            masterkeyChanging.value = true;
+            const {current, new: newMasterkey} = mkChangeFields;
+            const res = await serverReq({
+                action: (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_masterkey_change',
+                current: current,
+                new: newMasterkey
+            });
+            if (res.ok) {
+                const mkRes = await res.json();
+                if (mkRes.data && mkRes.data.mkRes) {
+                    mkChangeFields.current = '';
+                    mkChangeFields.new = '';
+                    mkChangeFields.confirm = '';
+                } else {
+                    console.error('Unknown error');
+                }
+                generateNotices(mkRes.notices || []);
+            } else {
+                try {
+                    const {error, notices = []} = await res.json();
+                    if (error) {
+                        staticMkErrors.push(...error);
+                        generateNotices(notices);
+                    } else {
+                        console.error('Unknown error');
+                    }
+                } catch {
+                    console.error('Unknown error');
+                }
+            }
+            masterkeyChanging.value = false;
         }
         function pushQueryParams(params = {}, replace = false) {
             const url = new URL(location);
@@ -1286,7 +1347,6 @@ createApp({
                 try {
                     const {error, notices = []} = await res.json();
                     if (error) {
-                        staticPwdErrors.push(...error);
                         generateNotices(notices);
                     } else {
                         console.error('Unknown error');
@@ -1326,7 +1386,6 @@ createApp({
                 try {
                     const {error, notices = []} = await res.json();
                     if (error) {
-                        staticPwdErrors.push(...error);
                         generateNotices(notices);
                     } else {
                         console.error('Unknown error');
@@ -1791,8 +1850,10 @@ createApp({
             if (!profile.mpop_birthplace_country) {
                 missingFields.push('Nazione di nascita');
             }
-            if (!profile.mpop_birthplace) {
-                missingFields.push('Comune di nascita');
+            if (profile.mpop_birthplace_country == 'ita') {
+                if (!profile.mpop_birthplace) {
+                    missingFields.push('Comune di nascita');
+                }
             }
             if (!profile.mpop_billing_country) {
                 missingFields.push('Nazione di residenza');
@@ -1962,7 +2023,6 @@ createApp({
                     try {
                         const {error, notices} = await res.json();
                         if (error) {
-                            staticPwdErrors.push(...error);
                             generateNotices(notices || []);
                         } else {
                             console.error('Unknown error');
@@ -2128,10 +2188,15 @@ createApp({
             validProfileForm,
             validUserForm,
             pwdChangeFields,
+            mkChangeFields,
             pwdChangeErrors,
+            mkChangeErrors,
             pwdChanging,
+            masterkeyChanging,
             changePassword,
+            changeMk,
             staticPwdErrors,
+            staticMkErrors,
             userRoles,
             userSearch,
             showRole,

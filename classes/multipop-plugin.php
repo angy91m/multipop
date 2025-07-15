@@ -3070,10 +3070,11 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             array_reduce($insert_data, function($arr, $v){$arr[$v[0]] = $v[1]; return $arr;}, []),
             array_map(function($v) {return $v[2];}, $insert_data)
         )) {
-            if ($wpdb->insert_id) {
-                $this->log_data('SUBSCRIPTION CREATED', ['sub_id' => $wpdb->insert_id], $user_id);
+			$insert_id = $wpdb->insert_id;
+            if ($insert_id) {
+                $this->log_data('SUBSCRIPTION CREATED', ['sub_id' => $insert_id], $user_id);
             }
-            return $wpdb->insert_id;
+            return $insert_id;
         }
     }
     private function get_subscription_by($getby, $sub_id, $year = 0, $unset = null) {
@@ -5280,6 +5281,57 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $where = implode(' AND ', $where_arr);
         if ($where) $where = " WHERE $where ";
         return $wpdb->get_results("SELECT * FROM " . $this::db_prefix('logs') . " $where ORDER BY `id` DESC LIMIT $limit OFFSET $offset;", 'ARRAY_A');
+    }
+    private function change_master_key(array &$post_data, array &$res_data) {
+        $enc_curr_user_mk = get_user_meta(get_current_user_id(), 'mpop_personal_master_key', true);
+        if (!$enc_curr_user_mk) {
+            $res_data['error'] = ['ID'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna master key impostata']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        if (!isset($post_data['current']) || !is_string($post_data['current']) || !$post_data['current']) {
+            $res_data['error'] = ['current'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Master key corrente non valida']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        if (!isset($post_data['new']) || !is_string($post_data['new']) || !$this::is_strong_password($post_data['new'], MPOP_MASTER_KEY_LENGTH)) {
+            $res_data['error'] = ['new'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Nuova master key non valida']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $master_key = @base64_decode(
+            @$this->decrypt_with_password(
+                base64_decode($enc_curr_user_mk, true),
+                $post_data['current']
+            ),
+            true
+        );
+        if (!$master_key || strlen($master_key) <= 32) {
+            $res_data['error'] = ['current'];
+            $res_data['notices'] = [['type'=>'error', 'msg' => 'Master key corrente non valida']];
+            http_response_code( 400 );
+            echo json_encode( $res_data );
+            exit;
+        }
+        $new_enc_master_key = base64_encode(
+            $this->encrypt_with_password(
+                base64_encode($master_key),
+                $post_data['new']
+            )
+        );
+        wp_update_user([
+            'ID' => get_current_user_id(),
+            'meta_input' => [
+                'mpop_personal_master_key' => $new_enc_master_key
+            ]
+        ]);
+        $res_data['data'] = ['mkRes' => 'ok'];
     }
 }
 

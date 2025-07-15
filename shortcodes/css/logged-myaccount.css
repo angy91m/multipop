@@ -61,8 +61,10 @@ span.mpop-app-notice > span > span.dashicons-before.dashicons-no-alt {
 #mpop-profile-table td:nth-child(2) input,
 #mpop-user-table td:nth-child(2),
 #mpop-user-table td:nth-child(2) input,
-#mpop-passwordChange input {
+#mpop-passwordChange input,
+#mpop-mkChange input {
     width: 100%;
+    margin-bottom: 9px;
 }
 #mpop-profile-table td:nth-child(2) input[type="date"],
 #mpop-user-table td:nth-child(2) input[type="date"] {
@@ -83,13 +85,11 @@ span.mpop-app-notice > span > span.dashicons-before.dashicons-no-alt {
 #mpop-user-table select,
 #mpop-user-table textarea,
 #mpop-passwordChange input,
+#mpop-mkChange input,
 #mpop-user-search input {
     font-size: var(--wp--preset--font-size--medium);
     padding: 5px;
     font-family: inherit;
-}
-#mpop-passwordChange input {
-    margin-bottom: 9px;
 }
 
 .mpop-user-search-field {
