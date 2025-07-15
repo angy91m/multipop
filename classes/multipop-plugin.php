@@ -326,6 +326,10 @@ class MultipopPlugin {
         // FILTER OAUTH LOGIN
         add_filter('wo_me_resource_return', [$this, 'oauth_filter_login'], 10, 2);
 
+        // LOG DELETED USERS
+        add_action('deleted_user', function ($id) {
+            $this->log_data('USER DELETED', null, $id);
+        }, 10, 1);
 
         $this->delayed_action = isset($GLOBALS['mpop_delayed_action']) ? $GLOBALS['mpop_delayed_action'] : false;
         $this->delayed_scripts = [
@@ -4501,7 +4505,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         return $this->user_search(
             $post_data['txt'],
-            ['multipopolano'],
+            true,
             $post_data['mpop_billing_country'],
             $post_data['mpop_billing_state'],
             $post_data['mpop_billing_city'],

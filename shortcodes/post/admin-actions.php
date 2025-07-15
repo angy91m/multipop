@@ -506,6 +506,7 @@ switch( $post_data['action'] ) {
             exit;
         }
         $sub_files = [];
+        $sub['is_editable'] = true;
         if ($sub['status'] =='tosee') {
             $sub_user = get_user_by('ID', $sub['user_id']);
             if ($sub_user) {
@@ -523,9 +524,6 @@ switch( $post_data['action'] ) {
                     }
                 }
             }
-            if ($sub_user && $this->user_has_valid_id_card($sub_user)) {
-            }
-            
         }
         if (file_exists($this->get_filename_by_sub($sub)) || file_exists($this->get_filename_by_sub($sub, false, false))) {
             $sub_files[] = 'signedModule';

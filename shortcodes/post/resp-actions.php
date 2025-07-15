@@ -14,13 +14,6 @@ switch( $post_data['action'] ) {
                 echo json_encode( $res_data );
                 exit;
             }
-            if (!$this->is_resp_of_user($post_data['ID'])) {
-                $res_data['error'] = ['ID'];
-                $res_data['notices'] = [['type'=>'error', 'msg' => 'Non sei autorizzato a modificare questi dati']];
-                http_response_code( 400 );
-                echo json_encode( $res_data );
-                exit;
-            }
             $res_user = $this->myaccount_get_profile($post_data['ID'], true, true);
             if (!$res_user) {
                 $res_data['error'] = ['ID'];
@@ -29,6 +22,7 @@ switch( $post_data['action'] ) {
                 echo json_encode( $res_data );
                 exit;
             }
+            $res_user['is_editable'] = $this->is_resp_of_user($post_data['ID']);
             $res_data['data'] = ['user' => $res_user];
         }
         break;
@@ -397,7 +391,7 @@ switch( $post_data['action'] ) {
             exit;
         }
         $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip', 'pp_capture_id']);
-        if (!$sub || !$this->is_resp_of_user($sub['user_id'])) {
+        if (!$sub) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
@@ -405,6 +399,7 @@ switch( $post_data['action'] ) {
             exit;
         }
         $sub_files = [];
+        $sub['is_editable'] = $this->is_resp_of_user($sub['user_id']);
         if ($sub['status'] =='tosee') {
             $sub_user = get_user_by('ID', $sub['user_id']);
             if ($sub_user) {
@@ -422,9 +417,6 @@ switch( $post_data['action'] ) {
                     }
                 }
             }
-            if ($sub_user && $this->user_has_valid_id_card($sub_user)) {
-            }
-            
         }
         if (file_exists($this->get_filename_by_sub($sub)) || file_exists($this->get_filename_by_sub($sub, false, false))) {
             $sub_files[] = 'signedModule';

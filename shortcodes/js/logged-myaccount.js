@@ -1711,10 +1711,9 @@ createApp({
                 if (res.ok) {
                     const resData = await res.json();
                     if (resData.data && resData.data.pdf) {
-                        Object.assign(document.createElement('a'), {
-                            href: resData.data.pdf,
-                            download: 'Modulo Multipopolare.pdf'
-                        }).click();
+                        const blob = await fetch(resData.data.pdf).then(r => r.blob()),
+                        url = URL.createObjectURL(blob);
+                        window.open(url, '_blank');
                     } else {
                         console.error('Unknown error');
                     }

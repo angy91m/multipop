@@ -1088,7 +1088,11 @@ if ($this->settings['pp_client_id']) {
                     </tr>
                     <tr>
                         <td><strong>Note:</strong></td>
-                        <td><textarea v-model="subInView.notes"></textarea><br><button @click="saveSubNotes">Salva note</button></td>
+                        <td>
+                            <textarea v-model="subInView.notes"></textarea>
+                            <br>
+                            <button :disabled="!subInView.is_editable" @click="saveSubNotes">Salva note</button>
+                        </td>
                     </tr>
                     <tr>
                         <td><strong>Ultima modifica:</strong></td>
@@ -1124,7 +1128,7 @@ if ($this->settings['pp_client_id']) {
                             </template>
                             <template v-else-if="subInView.status == 'tosee'">
                                 <label v-if="!subInView.user_id_card_confirmed && !subInView.user_id_card_number"><input type="checkbox" v-model="subInView.forceIdCard" />&nbsp;&nbsp;Forza documento d'identità<br><br></label>
-                                <button :disabled="!subInView.user_id_card_confirmed && !subInView.user_id_card_number && !subInView.forceIdCard" @click="documentsConfirm">Conferma i documenti</button>
+                                <button :disabled="!subInView.is_editable || subInView.user_id_card_confirmed || (!subInView.user_id_card_number && !subInView.forceIdCard)" @click="documentsConfirm">Conferma i documenti</button>
                             </template>
                         </td>
                     </tr>
@@ -1192,7 +1196,7 @@ if ($this->settings['pp_client_id']) {
                     <a :href="'/wp-admin/user-edit.php?user_id='+userInView.ID" target="_blank">Vedi in dashboard&nbsp;<?=$this::dashicon('external')?></a>
                     <br><br>
                 </template>
-                <template v-if="!userEditing">
+                <template v-if="!userEditing && userInView.is_editable">
                     <button class="mpop-button" @click="editUser">Modifica utente</button>
                 </template>
                 <table id="mpop-user-table">
@@ -1526,7 +1530,7 @@ if ($this->settings['pp_client_id']) {
                 >
                     <template v-slot:top>
                         <h5 class="text-h5">Richieste</h5>&nbsp;&nbsp;
-                        <q-btn v-if="userAvailableYearsToOrder.length" color="primary" icon="add" @click="subAddBegin"></q-btn>
+                        <q-btn v-if="userAvailableYearsToOrder.length && userInView.is_editable" color="primary" icon="add" @click="subAddBegin"></q-btn>
                     </template>
                 </q-table>
             </template></div>
