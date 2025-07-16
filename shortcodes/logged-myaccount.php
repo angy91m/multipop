@@ -100,6 +100,7 @@ if ($this->settings['pp_client_id']) {
                     v-model="regInstructionOpen"
                     icon="info"
                     label="Istruzioni tesseramento"
+                    class="mpop-instructions"
                     >
                     <q-card>
                         <q-card-section>
@@ -432,6 +433,7 @@ if ($this->settings['pp_client_id']) {
                                     v-model="subInstructionOpen"
                                     icon="info"
                                     label="Istruzioni tesseramento"
+                                    class="mpop-instructions"
                                     >
                                     <q-card>
                                         <q-card-section>
@@ -453,7 +455,7 @@ if ($this->settings['pp_client_id']) {
                                     <strong>Consensi facoltativi</strong>
                                 </p>
                                 <p>
-                                    <label><span class="mpop-click" @click="e => {e.preventDefault(); marketingAgreeShow = !marketingAgreeShow}">Accetto le condizioni commerciali</span>&nbsp;
+                                    <label><u class="mpop-click" @click="e => {e.preventDefault(); marketingAgreeShow = !marketingAgreeShow}">Accetto le condizioni commerciali</u>&nbsp;
                                         <input type="checkbox" v-model="newSubscription.mpop_marketing_agree"/>
                                     </label>
                                 </p>
@@ -462,7 +464,7 @@ if ($this->settings['pp_client_id']) {
                                     <span v-html="mainOptions.policies.marketing || ''"></span>
                                 </p>
                                 <p>
-                                    <label><span class="mpop-click" @click="e => {e.preventDefault(); newsletterAgreeShow = !newsletterAgreeShow}">Accetto le condizioni della newsletter</span>&nbsp;
+                                    <label><u class="mpop-click" @click="e => {e.preventDefault(); newsletterAgreeShow = !newsletterAgreeShow}">Accetto le condizioni della newsletter</u>&nbsp;
                                         <input type="checkbox" v-model="newSubscription.mpop_newsletter_agree"/>
                                     </label>
                                 </p>
@@ -471,7 +473,7 @@ if ($this->settings['pp_client_id']) {
                                     <span v-html="mainOptions.policies.newsletter || ''"></span>
                                 </p>
                                 <p>
-                                    <label><span class="mpop-click" @click="e => {e.preventDefault(); publishAgreeShow = !publishAgreeShow}">Accetto le condizioni di pubblicazione</span>&nbsp;
+                                    <label><u class="mpop-click" @click="e => {e.preventDefault(); publishAgreeShow = !publishAgreeShow}">Accetto le condizioni di pubblicazione</u>&nbsp;
                                         <input type="checkbox" v-model="newSubscription.mpop_publish_agree"/>
                                     </label>
                                 </p>

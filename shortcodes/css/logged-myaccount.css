@@ -147,6 +147,9 @@ label[for="mpop-tabs-nav"] {
 main > div.entry-content.wp-block-post-content {
     padding: 0;
 }
+.mpop-instructions > .q-expansion-item__container > .q-item:first-child {
+    background: var(--q-primary);
+}
 @media only screen and (min-width : 1024px) {
     #mpop-profile-table tr td:first-child,
     #mpop-user-table tr td:first-child {

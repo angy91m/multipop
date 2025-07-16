@@ -232,7 +232,7 @@ $invitation_props = [
             <strong>Consensi facoltativi</strong>
         </p>
         <p class="mpop-form-row">
-            <label><span class="mpop-click" @click="e => {e.preventDefault(); marketingAgreeShow = !marketingAgreeShow}">Accetto le condizioni commerciali</span>&nbsp;
+            <label><u class="mpop-click" @click="e => {e.preventDefault(); marketingAgreeShow = !marketingAgreeShow}">Accetto le condizioni commerciali</u>&nbsp;
                 <input type="checkbox" v-model="user.mpop_subscription_marketing_agree"/>
             </label>
         </p>
@@ -240,7 +240,7 @@ $invitation_props = [
             <button class="mpop-button" @click="marketingAgreeShow = false">Chiudi</button><br><?=nl2br($this->settings['marketing_policy'])?>
         </p>
         <p class="mpop-form-row">
-            <label><span class="mpop-click" @click="e => {e.preventDefault(); newsletterAgreeShow = !newsletterAgreeShow}">Accetto le condizioni della newsletter</span>&nbsp;
+            <label><u class="mpop-click" @click="e => {e.preventDefault(); newsletterAgreeShow = !newsletterAgreeShow}">Accetto le condizioni della newsletter</u>&nbsp;
                 <input type="checkbox" v-model="user.mpop_subscription_newsletter_agree"/>
             </label>
         </p>
@@ -248,7 +248,7 @@ $invitation_props = [
             <button class="mpop-button" @click="newsletterAgreeShow = false">Chiudi</button><br><?=nl2br($this->settings['newsletter_policy'])?>
         </p>
         <p class="mpop-form-row">
-            <label><span class="mpop-click" @click="e => {e.preventDefault(); publishAgreeShow = !publishAgreeShow}">Accetto le condizioni di pubblicazione</span>&nbsp;
+            <label><u class="mpop-click" @click="e => {e.preventDefault(); publishAgreeShow = !publishAgreeShow}">Accetto le condizioni di pubblicazione</u>&nbsp;
                 <input type="checkbox" v-model="user.mpop_subscription_publish_agree"/>
             </label>
         </p>
