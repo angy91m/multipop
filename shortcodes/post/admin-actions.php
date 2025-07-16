@@ -37,6 +37,7 @@ switch( $post_data['action'] ) {
                 echo json_encode( $res_data );
                 exit;
             }
+            $res_user['is_editable'] = true;
             $res_data['data'] = ['user' => $res_user];
         }
         break;
