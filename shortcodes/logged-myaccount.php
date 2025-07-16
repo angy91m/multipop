@@ -1161,7 +1161,7 @@ if ($this->settings['pp_client_id']) {
                                 :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type }; return f;}"
                                 @invalid-mime="onInvalidMime"
                                 @change="f => subInView.documentToShow = f"
-                                :disabled="subModuleUploadFiles.length == 2"
+                                :disabled="!subInView.is_editable || subModuleUploadFiles.length == 2"
                             >Seleziona file da caricare</mpop-uploader>
                             <br><br>
                             <input type="password" @input="decryptPasswordSave" placeholder="La tua chiave personale" v-model="documentsDecryptPassword" />
