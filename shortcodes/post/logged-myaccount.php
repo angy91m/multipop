@@ -1,6 +1,17 @@
 <?php
 defined( 'ABSPATH' ) || exit;
-$post_data = json_decode( file_get_contents('php://input'), true );
+$all_headers = getallheaders();
+if (isset($all_headers['Content-Type']) && $all_headers['Content-Type'] == 'application/json') {
+    $post_data = json_decode( file_get_contents('php://input'), true );
+} else {
+    if (isset($_POST['data']) && $_POST['data'] ) {
+        $jData = urldecode($_POST['data']);
+        $jData = @json_decode($jData, true);
+        if (is_array($jData)) {
+            $post_data = $jData;
+        }
+    }
+}
 $res_data = [];
 if (!isset($post_data['action']) || !is_string($post_data['action']) || !trim($post_data['action'])) {
     $res_data['error'] = ['action'];
@@ -537,7 +548,9 @@ switch ($post_data['action']) {
             echo json_encode( $res_data );
             exit;
         }
-        $res_data['data']['pdf'] = 'data:application/pdf;base64,'. base64_encode( $this->pdf_compile($this->pdf_create([], false), [
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="modulo.pdf"');
+        echo $this->pdf_compile($this->pdf_create([], false), [
             'name' => $current_user->first_name . ' ' . $current_user->last_name,
             'quote' => $sub['quote'],
             'mpop_birthplace_country' => $current_user->mpop_birthplace_country,
@@ -555,7 +568,8 @@ switch ($post_data['action']) {
             'mpop_publish_agree' => $sub['publish_agree'],
             'subscription_id' => $post_data['id'],
             'card_number' => "$current_user->ID"
-        ])->export_file() );
+        ])->export_file();
+        exit;
         break;
     case 'module_upload':
         try {

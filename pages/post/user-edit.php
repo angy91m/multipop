@@ -237,7 +237,7 @@ if (!$errors->has_errors()) {
                 $token = $this->create_temp_token( $user_id, 'email_confirmation_link' );
                 $this->send_confirmation_mail($token, $send_confirmation);
             }
-            $this->log_data('USER CREATED', ['user_pass' => null, 'meta_input' => $user_meta] + json_decode(json_encode($user), 'ARRAY_A'), $user_id);
+            $this->log_data('USER CREATED', ['user_pass' => null, 'meta_input' => $user_meta] + json_decode(json_encode($user), true), $user_id);
             foreach($user_meta as $k => $v) {
                 update_user_meta($user_id, $k, $v);
             }
@@ -254,5 +254,5 @@ if (!$errors->has_errors()) {
     if (in_array($user->role, ['administrator', 'multipopolano', 'multipopolare_resp', 'multipopolare_friend'])) {
         $this->sync_discourse_record($user);
     }
-    $this->log_data('USER UPDATED', ['user_pass' => null, 'meta_input' => ['mpop_personal_master_key' => null] + $user_meta] + json_decode(json_encode($user), 'ARRAY_A'), $user->ID);
+    $this->log_data('USER UPDATED', ['user_pass' => null, 'meta_input' => ['mpop_personal_master_key' => null] + $user_meta] + json_decode(json_encode($user), true), $user->ID);
 }

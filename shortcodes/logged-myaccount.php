@@ -408,7 +408,7 @@ if ($this->settings['pp_client_id']) {
                                 <li>Stato attivazione: {{userSearchSelectableSubStatuses.find(s => s.value == nearActiveSub.status).label}}</li>
                                 <li>Anno: {{nearActiveSub.year}}</li>
                                 <li>Quota annuale: {{currencyFormatter.custFormat(nearActiveSub.quote)}}</li>
-                                <button v-if="nearActiveSub.status == 'open'" class="mpop-button" @click="generateSubscriptionPdf(nearActiveSub.id)" :disabled="generatingSubscriptionPdf.find( v => v == nearActiveSub.id)">Genera modulo iscrizione</button>
+                                <button v-if="nearActiveSub.status == 'open'" class="mpop-button" @click="generateSubscriptionPdf(nearActiveSub.id)">Genera modulo iscrizione</button>
                                 <button v-if="nearActiveSub.status == 'open'" class="mpop-button" @click="moduleUploadBegin(nearActiveSub)">Carica modulo</button>
                                 <button v-if="!['canceled', 'completed', 'refused'].includes(nearActiveSub.status)" class="mpop-button btn-error" @click="profileSubCancel(nearActiveSub)">Annulla richiesta</button>
                                 <template v-if="nearActiveSub.status == 'seen'">
@@ -509,7 +509,6 @@ if ($this->settings['pp_client_id']) {
                                                 size="sm"
                                                 label="Genera modulo"
                                                 @click="generateSubscriptionPdf(props.row.id)"
-                                                :disabled="generatingSubscriptionPdf.find(v => v == props.row.id)"
                                                 style="margin-bottom: 2px;"
                                             ></q-btn><br>
                                             <q-btn

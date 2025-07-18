@@ -302,7 +302,6 @@ createApp({
             mpop_publish_agree: true
         }),
         paymentConfirmationDate = ref(''),
-        generatingSubscriptionPdf = reactive([]),
         marketingAgreeShow = ref(false),
         newsletterAgreeShow = ref(false),
         publishAgreeShow = ref(false),
@@ -1701,39 +1700,24 @@ createApp({
                 action: 'create_pp_order'
             });
         }
-        async function generateSubscriptionPdf(id) {
-            generatingSubscriptionPdf.push(id);
-            try {
-                const res = await serverReq({
-                    action: 'generate_subscription_pdf',
-                    id
-                });
-                if (res.ok) {
-                    const resData = await res.json();
-                    if (resData.data && resData.data.pdf) {
-                        const blob = await fetch(resData.data.pdf).then(r => r.blob()),
-                        url = URL.createObjectURL(blob);
-                        window.open(url, '_blank');
-                    } else {
-                        console.error('Unknown error');
-                    }
-                    generateNotices(resData.notices || []);
-                } else {
-                    try {
-                        const {error, notices = []} = await res.json();
-                        if (error) {
-                            console.error(error);
-                        } else {
-                            console.error('Unknown error');
-                        }
-                        generateNotices(notices);
-                    } catch {
-                        console.error('Unknown error');
-                    }
-                }
-            } finally {
-                generatingSubscriptionPdf.splice( generatingSubscriptionPdf.findIndex(v => v == id), 1);
-            }
+        function generateSubscriptionPdf(id) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.target = '_blank';
+            form.action = location.origin + location.pathname;
+            form.style.display = 'none';
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'data';
+            input.value = encodeURIComponent(JSON.stringify({
+                'mpop-logged-myaccount-nonce': loggedMyAccountNonce,
+                action: 'generate_subscription_pdf',
+                id
+            }));
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
         }
         async function searchUsers(options) {
             const newPagination = options ? options.pagination : userSearchTablePagination.value;
@@ -2261,7 +2245,6 @@ createApp({
             requestNewSubscription,
             currencyFormatter,
             generateSubscriptionPdf,
-            generatingSubscriptionPdf,
             moduleUploadData,
             moduleUploadBegin,
             onInvalidMime,
