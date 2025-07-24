@@ -455,7 +455,7 @@ if ($this->settings['pp_client_id']) {
                                     <strong>Consensi facoltativi</strong>
                                 </p>
                                 <p>
-                                    <label><u class="mpop-click" @click="e => {e.preventDefault(); marketingAgreeShow = !marketingAgreeShow}">Accetto le condizioni commerciali</u>&nbsp;
+                                    <label><u class="mpop-click" @click="e => {e.preventDefault(); marketingAgreeShow = !marketingAgreeShow}">Accetto le condizioni marketing</u>&nbsp;
                                         <input type="checkbox" v-model="newSubscription.mpop_marketing_agree"/>
                                     </label>
                                 </p>
@@ -623,7 +623,7 @@ if ($this->settings['pp_client_id']) {
                         icon="send"
                         :done="moduleUploadData.step > 3"
                     >
-                        <label>Accetto le <a @click="e => {e.preventDefault(); if (mainOptions.privacyPolicyUrl) openExternalUrl();}">condizioni del sito sul trattamento dati</a>&nbsp;
+                        <label>Dichiaro di aver accettato i <a @click="e => {e.preventDefault(); if (mainOptions.privacyPolicyUrl) openExternalUrl();}">termini e le condizioni sul trattamento dati</a>&nbsp;
                             <input type="checkbox" v-model="moduleUploadData.generalPolicyAccept"/>
                         </label>
                         <br>

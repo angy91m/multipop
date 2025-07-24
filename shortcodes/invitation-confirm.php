@@ -232,7 +232,7 @@ $invitation_props = [
             <strong>Consensi facoltativi</strong>
         </p>
         <p class="mpop-form-row">
-            <label><u class="mpop-click" @click="e => {e.preventDefault(); marketingAgreeShow = !marketingAgreeShow}">Accetto le condizioni commerciali</u>&nbsp;
+            <label><u class="mpop-click" @click="e => {e.preventDefault(); marketingAgreeShow = !marketingAgreeShow}">Accetto le condizioni marketing</u>&nbsp;
                 <input type="checkbox" v-model="user.mpop_subscription_marketing_agree"/>
             </label>
         </p>
