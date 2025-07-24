@@ -326,8 +326,19 @@ class MultipopPlugin {
         // FILTER OAUTH LOGIN
         add_filter('wo_me_resource_return', [$this, 'oauth_filter_login'], 10, 2);
 
+
+        // BEFORE USER DELETED
+        add_action('delete_user', function($id) {
+            $disc_utils = $this->discourse_utilities();
+            if ($disc_utils) {
+                $disc_utils->update_mpop_discourse_groups_by_user($id, [['name' => 'mp_disabled_users', 'full_name' => 'Utenti Wordpress disabilitati', 'owner' => false]]);
+            }
+        }, 10, 1);
+
         // LOG DELETED USERS
         add_action('deleted_user', function ($id) {
+            global $wpdb;
+            $wpdb->query("UPDATE " . $this::db_prefix('subscriptions') . " SET `status` = 'canceled' WHERE `user_id` = $id AND `status` IN ('tosee','seen','open');");
             $this->log_data('USER DELETED', null, $id);
         }, 10, 1);
 
@@ -347,7 +358,6 @@ class MultipopPlugin {
                     $mails = json_decode(file_get_contents($file_name), true);
                     $errors = [];
                     if ($mails && is_array($mails)) {
-                        $this->get_settings();
                         foreach($mails as $m) {
                             if (isset($m['type'])) {
                                 if ($m['type'] === 'renew_confirm') {
@@ -370,6 +380,75 @@ class MultipopPlugin {
                         unlink($file_name);
                     }
                 }
+            },
+            'hourlyAutoActions' => function($now_ts, $last_ts, $passed) {
+                if (file_exists(MULTIPOP_PLUGIN_PATH . 'private/.hourlyAutoActions')) {
+                    return;
+                }
+                touch(MULTIPOP_PLUGIN_PATH . 'private/.hourlyAutoActions');
+                $now_ts = intval($now_ts);
+                $last_ts = intval($last_ts);
+                $passed = intval($passed);
+
+                global $wpdb;
+                $wpdb->query("UPDATE " . $this::db_prefix('plugin_settings') . " SET `last_auto_action` = $now_ts WHERE `id` = 1 AND `last_auto_action` <> $now_ts ;");
+                unlink(MULTIPOP_PLUGIN_PATH . 'private/.hourlyAutoActions');
+            },
+            'dailyAutoActions' => function($now_ts, $last_ts, $passed) {
+                if (file_exists(MULTIPOP_PLUGIN_PATH . 'private/.dailyAutoActions')) {
+                    return;
+                }
+                touch(MULTIPOP_PLUGIN_PATH . 'private/.dailyAutoActions');
+                $now_ts = intval($now_ts);
+                $last_ts = intval($last_ts);
+                $passed = intval($passed);
+
+                global $wpdb;
+                $wpdb->query("UPDATE " . $this::db_prefix('plugin_settings') . " SET `last_auto_action` = $now_ts WHERE `id` = 1 AND `last_auto_action` <> $now_ts ;");
+                unlink(MULTIPOP_PLUGIN_PATH . 'private/.dailyAutoActions');
+            },
+            'weeklyAutoActions' => function($now_ts, $last_ts, $passed) {
+                if (file_exists(MULTIPOP_PLUGIN_PATH . 'private/.weeklyAutoActions')) {
+                    return;
+                }
+                touch(MULTIPOP_PLUGIN_PATH . 'private/.weeklyAutoActions');
+                $now_ts = intval($now_ts);
+                $last_ts = intval($last_ts);
+                $passed = intval($passed);
+                
+                $d = date_create_from_format('U', $now_ts);
+                $d->setTimezone(new DateTimeZone(curren_time('e')));
+                $this->send_tosee_subscription_notifications(intval($d->format('Y')));
+                
+                global $wpdb;
+                $wpdb->query("UPDATE " . $this::db_prefix('plugin_settings') . " SET `last_auto_action` = $now_ts WHERE `id` = 1 AND `last_auto_action` <> $now_ts ;");
+                unlink(MULTIPOP_PLUGIN_PATH . 'private/.weeklyAutoActions');
+            },
+            'monthlyAutoActions' => function($now_ts, $last_ts, $passed) {
+                if (file_exists(MULTIPOP_PLUGIN_PATH . 'private/.monthlyAutoActions')) {
+                    return;
+                }
+                touch(MULTIPOP_PLUGIN_PATH . 'private/.monthlyAutoActions');
+                $now_ts = intval($now_ts);
+                $last_ts = intval($last_ts);
+                $passed = intval($passed);
+                
+                global $wpdb;
+                $wpdb->query("UPDATE " . $this::db_prefix('plugin_settings') . " SET `last_auto_action` = $now_ts WHERE `id` = 1 AND `last_auto_action` <> $now_ts ;");
+                unlink(MULTIPOP_PLUGIN_PATH . 'private/.monthlyAutoActions');
+            },
+            'yearlyAutoActions' => function($now_ts, $last_ts, $passed) {
+                if (file_exists(MULTIPOP_PLUGIN_PATH . 'private/.yearlyAutoActions')) {
+                    return;
+                }
+                touch(MULTIPOP_PLUGIN_PATH . 'private/.yearlyAutoActions');
+                $now_ts = intval($now_ts);
+                $last_ts = intval($last_ts);
+                $passed = intval($passed);
+                
+                global $wpdb;
+                $wpdb->query("UPDATE " . $this::db_prefix('plugin_settings') . " SET `last_auto_action` = $now_ts WHERE `id` = 1 AND `last_auto_action` <> $now_ts ;");
+                unlink(MULTIPOP_PLUGIN_PATH . 'private/.yearlyAutoActions');
             }
         ];
     }
@@ -380,7 +459,7 @@ class MultipopPlugin {
         $this->flush_db();
         $this->update_tempmail();
         $this->update_comuni();
-        
+
         //EVERY 100 CALLS
         if (!rand(0,99)) {
             $this->flush_blacklist();
@@ -712,6 +791,7 @@ class MultipopPlugin {
             `max_failed_login_attempts` INT NOT NULL,
             `seconds_between_login_attempts` BIGINT UNSIGNED NOT NULL,
             `seconds_in_blacklist` BIGINT UNSIGNED NOT NULL,
+            `last_auto_action` BIGINT UNSIGNED NOT NULL,
             PRIMARY KEY (`id`)
         ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
         dbDelta( $q );
@@ -804,7 +884,8 @@ class MultipopPlugin {
                     `marketing_policy`,
                     `newsletter_policy`,
                     `publish_policy`,
-                    `max_failed_login_attempts`
+                    `max_failed_login_attempts`,
+                    `last_auto_action`
                 )"
                 . " VALUES (
                     1,
@@ -832,7 +913,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                             'Presto il mio consenso e fino alla revoca dello stesso, per la pubblicazione del mio nominativo su riviste, cataloghi, brochure, annuari, siti, ecc. (di seguito complessivamente definite “attività di pubblicazione dell’associazione”) di MULTIPOPOLARE APS e/o da organizzazioni correlate. Il trattamento per attività di pubblicazione dell’associazione avverrà con modalità “tradizionali” (a titolo esemplificativo pubblicazioni cartacee), ovvero mediante sistemi “elettronici” (a titolo esemplificativo pubblicazioni elettroniche, social network, sito, blog, ecc.).'
                         )
                     .",
-                    5
+                    5,
+                    " . time() . "
                 ) ;";
             $wpdb->query($q);
         }
@@ -969,20 +1051,50 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     }
 
     private function send_awaiting_payment_email($to) {
-        return wp_mail($to,'Multipopolare - Attesa pagamento quota annuale','Ti confermiamo che la tua richiesta è stata accettata e che risulta in attesa di pagamento.<br><br>Grazie.');
+        $sub_link = get_permalink($this->settings['myaccount_page']) . '?tab=card';
+        return wp_mail($to,'Multipopolare - Attesa pagamento quota annuale','Ti confermiamo che la tua richiesta è stata accettata e che risulta in attesa di pagamento.<br><br><a href="' . $sub_link . '" target="_blank">Visualizza le richieste</a><br><br>Grazie.');
     }
 
     private function send_renew_confirm_mail($to) {
-        return wp_mail($to,'Multipopolare - Conferma rinnovo iscrizione','La tua iscrizione a Multipopolare.it è stata rinnovata.');
+        return wp_mail($to,'Multipopolare - Conferma rinnovo iscrizione','La tua iscrizione a Multipopolare.it è stata accettata.<br><br>Se l\'iscrizione è per l\'anno in corso la tessera è stata attivata, altrimenti verrà attivata all\'inizio dell\'anno di riferimento.<br><br>Grazie.');
     }
 
     private function send_new_tosee_subscription($sub) {
         $sub_link = get_permalink($this->settings['myaccount_page']) . "?view-sub=$sub[id]";
         $resp = $this->get_resp_by_user($sub['user_id']);
-        $dest = array_map(function($r) {return $r->user_email;}, $resp) + explode(',', $this->settings['mail_general_notifications']);
+        $dest = array_map(function($r) {return $r->user_email;}, $resp);
+        array_push($dest, ...explode(',', $this->settings['mail_general_notifications']));
         $dest = array_unique($dest);
-        foreach($dest as $d) {
+        foreach($dest as $i => $d) {
             wp_mail($d,'Multipopolare - Nuova richiesta da verificare','È necessario verificare una nuova richiesta: <a href="'.$sub_link.'" target="_blank">'.$sub_link.'</a>');
+        }
+    }
+
+
+    // SEND TOSEE SUBSCRIPTION NOTIFICATIONS
+    private function send_tosee_subscription_notifications($year_min = null) {
+        if (!is_int($year_min)) {
+            $year_min = current_time('Y');
+        }
+        $subs = $this->get_subscriptions([
+            'year' => $year_min . ',',
+            'status' => ['tosee']
+        ]);
+        $dests = [];
+        foreach($subs as $sub) {
+            $resp = $this->get_resp_by_user($sub['user_id']);
+            $dest = array_map(function($r) {return $r->user_email;}, $resp);
+            array_push($dest, ...explode(',', $this->settings['mail_general_notifications']));
+            $dest = array_unique($dest);
+            foreach($dest as $d) {
+                if (!isset($dests[$d])) {
+                    $dests[$d] = [];
+                }
+                $dests[$d][] = get_permalink($this->settings['myaccount_page']) . "?view-sub=$sub[id]";
+            }
+        }
+        foreach($dests as $d => $links) {
+            wp_mail($d,'Multipopolare - Richieste da verificare','È necessario verificare queste richieste:<br><ul>' . array_map(function($l) {return "<li><a href=\"$l\" target=\"_blank\">$l</a></li>";}, $links) . '</ul>');
         }
     }
 
@@ -1380,7 +1492,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     }
 
     // LOAD SETTINGS FROM DB AND SET THEM IN GLOBALS
-    private function get_settings() {
+    public function get_settings() {
         global $wpdb;
         $q = "SHOW COLUMNS FROM " . $this::db_prefix('plugin_settings') . ";";
         $column_names = implode(',', array_map( function($c) {return "`$c`";}, array_filter( $wpdb->get_col($q), function($c) {return $c !== 'master_doc_key';} ) ));
@@ -1412,6 +1524,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $settings['max_failed_login_attempts'] = intval($settings['max_failed_login_attempts']);
         $settings['seconds_between_login_attempts'] = intval($settings['seconds_between_login_attempts']);
         $settings['seconds_in_blacklist'] = intval($settings['seconds_in_blacklist']);
+        $settings['last_auto_action'] = intval($settings['last_auto_action']);
         $this->settings = $settings;
         return $this->settings;
     }
@@ -1445,7 +1558,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $last_update = date_create();
             $last_update->setTimestamp($this->settings['last_tempmail_update']);
             $last_update->add(new DateInterval('P30D'));
-            if ($force || $last_update->getTimestamp() <= time()) {
+            if (!file_exists(MULTIPOP_PLUGIN_PATH . 'private/.updating_tempmail') && ( $force || $last_update->getTimestamp() <= time())) {
+                touch(MULTIPOP_PLUGIN_PATH . 'private/.updating_tempmail');
                 $old_list = file_exists(MULTIPOP_PLUGIN_PATH . 'tempmail/list.txt') ? file_get_contents(MULTIPOP_PLUGIN_PATH . 'tempmail/list.txt') : "";
                 $block_list = $old_list !== false ? preg_split('/\r\n|\r|\n/', trim($old_list)) : [];
                 foreach($this->settings['tempmail_urls']['block'] as $l ) {
@@ -1477,12 +1591,13 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 global $wpdb;
                 $q = "UPDATE " . $this::db_prefix('plugin_settings') . " SET `last_tempmail_update` = " . time() . " WHERE `id` = 1 ;";
                 $wpdb->query($q);
+                unlink(MULTIPOP_PLUGIN_PATH . 'private/.updating_tempmail');
             }
         }
     }
 
     private function flush_subscriptions() {
-        file_put_contents(MULTIPOP_PLUGIN_PATH . 'private/.flushing_subs', '');
+        touch(MULTIPOP_PLUGIN_PATH . 'private/.flushing_subs');
         global $wpdb;
         $users_to_enable = $wpdb->get_results("SELECT `user_id`, `marketing_agree`, `newsletter_agree`, `publish_agree` FROM " . $this::db_prefix('subscriptions') . " WHERE `status` = 'completed' AND `year` = $this_year;", 'ARRAY_A');
         $users_enabled = [];
@@ -1588,6 +1703,58 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             }
         }
         return $errors;
+    }
+
+    // CHECK AUTO ACTIONS
+    private function check_auto_actions() {
+        if (!isset( $this->settings ) || !is_array( $this->settings )) {
+            return;
+        }
+        $now = date_create('now', new DateTimeZone(current_time('e')));
+        if ($now->getTimestamp() == $this->settings['last_auto_action']) {
+            return;
+        }
+        $last_date = date_create_from_format('U', $this->settings['last_auto_action']);
+        $last_date->setTimezone(new DateTimeZone(current_time('e')));
+        $now_clone = clone $now;
+        $ld_clone = clone $last_date;
+        $now_clone->setTime(intval($now_clone->format('H')), 0);
+        $ld_clone->setTime(intval($ld_clone->format('H')), 0);
+        $passed_hours = intval(($now->getTimestamp() - $ld_clone->getTimestamp()) / 3600);
+        $now_clone->setTime(0, 0);
+        $ld_clone->setTime(0, 0);
+        $interval = $ld_clone->diff($now_clone);
+        $passed_days = $interval->days;
+        $passed_weeks = 0;
+        if ($now_clone->format('oW') != $ld_clone->format('oW')) {
+            $week_interval = new DateInterval('P7D');
+            while($now_clone->format('oW') != $ld_clone->format('oW')) {
+                $ld_clone->add($week_interval);
+                $passed_weeks++;
+            }
+        }
+        $ld_clone = clone $last_date;
+        $ld_clone->setTime(0, 0);
+        $now_clone->setDate(intval($now_clone->format('Y')), intval($now_clone->format('m')), 1);
+        $ld_clone->setDate(intval($ld_clone->format('Y')), intval($ld_clone->format('m')), 1);
+        $interval = $ld_clone->diff($now_clone);
+        $passed_months = intval($interval->format('%y')) * 12 + intval($interval->format('%m'));
+        $passed_years = intval($now->format('Y')) - intval($last_date->format('Y'));
+        if ($passed_hours) {
+            $this->delay_script('hourlyAutoActions', $now->getTimestamp(), $last_date->getTimestamp(), $passed_hours);
+        }
+        if ($passed_days) {
+            $this->delay_script('dailyAutoActions', $now->getTimestamp(), $last_date->getTimestamp(), $passed_days);
+        }
+        if ($passed_weeks) {
+            $this->delay_script('weeklyAutoActions', $now->getTimestamp(), $last_date->getTimestamp(), $passed_weeks);
+        }
+        if ($passed_months) {
+            $this->delay_script('monthlyAutoActions', $now->getTimestamp(), $last_date->getTimestamp(), $passed_months);
+        }
+        if ($passed_years) {
+            $this->delay_script('yearlyAutoActions', $now->getTimestamp(), $last_date->getTimestamp(), $passed_years);
+        }
     }
 
     // LOGOUT AND REDIRECT TO URL OR HOME
@@ -3140,7 +3307,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     private function complete_subscription(
         $sub_id,
         $signed_at = 0,
-        $paypal = false
+        $paypal = false,
+        $send_email = true
     ) {
         $sub = $this->get_subscription_by('id', $sub_id);
         if (!$sub) {
@@ -3184,6 +3352,12 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $this::get_client_ip()
         ))) {
             throw new Exception("Error while saving on DB");
+        }
+        if ($send_email) {
+            $sub_user = get_user_by('ID', $sub['user_id']);
+            if ($sub_user) {
+                $this->send_renew_confirm_mail($sub_user->user_email);
+            }
         }
         $this->log_data('SUBSCRIPTION COMPLETED', ['sub_id' => $sub_id], $sub['user_id']);
         if (current_time('Y') == $sub['year']) {
@@ -3631,7 +3805,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 throw new Exception('Error while saving subscription');
             }
             try {
-                $this->complete_subscription($sub_id,$subscription_date->getTimestamp());
+                $this->complete_subscription($sub_id,$subscription_date->getTimestamp(), false, false);
             } catch(Exception $e) {
                 throw new Exception('Error while completing subscription: ' . $e->getMessage());
             }

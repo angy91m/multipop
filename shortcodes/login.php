@@ -10,6 +10,7 @@ if (
 }
 $this->show_hcaptcha_script();
 ?>
+<?php $this->html_added()?>
 <form class="mpop-form mpop-form-login" method="post">
     <p class="mpop-form-row">
         <input type="text"  name="user" autocomplete="username" placeholder="Nome utente o e-mail" />

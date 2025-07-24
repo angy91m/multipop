@@ -34,7 +34,13 @@ if (get_class($res) == 'WP_Error') {
     if (isset($_GET['redirect_to'])) {
         header('Location: '. $_GET['redirect_to']);
     } else {
-        header('Location: '. explode('?',$this->req_path)[0]);
+        $valid_params = ['tab', 'view-user', 'view-sub'];
+        foreach($_GET as $k => $v) {
+            if (!in_array($k, $valid_params)) {
+                unset($_GET[$k]);
+            }
+        }
+        header('Location: '. explode('?',$this->req_path)[0] . '?' . $this->export_GET());
     }
     exit();
 }

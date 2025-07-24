@@ -285,8 +285,8 @@ createApp({
         userSearchZoneOpen = ref(false),
         userSearchRespZoneOpen = ref(false),
         userEditingRespZoneOpen = ref(false),
-        subInstructionOpen = ref(false),
-        regInstructionOpen = ref(false),
+        subInstructionOpen = ref(true),
+        regInstructionOpen = ref(true),
         mainOptions = reactive({
             authorizedSubscriptionYears: [],
             authorizedSubscriptionQuote: 0,
@@ -1355,9 +1355,12 @@ createApp({
                 }
 
             }
+            const label = 'Modifica utente';
             if (!popstate) {
-                selectTab({name:'userView', label: 'Modifica utente'});
+                selectTab({name:'userView', label});
                 pushQueryParams( {...defaultQueryParams, 'view-user': ID } );
+            } else {
+                selectedTab.value.label = label;
             }
         }
         function decryptPasswordSave() {
@@ -1394,9 +1397,12 @@ createApp({
                 }
 
             }
+            const label = 'Visualizza sottoscrizione';
             if (!popstate) {
-                selectTab({name:'subView', label: 'Visualizza sottoscrizione'});
+                selectTab({name:'subView', label});
                 pushQueryParams({...defaultQueryParams, 'view-sub': id});
+            } else {
+                selectedTab.value.label = label;
             }
         }
         async function confirmUserPendingEdits() {
@@ -2044,6 +2050,19 @@ createApp({
             } else if (url.searchParams.has('view-sub') && ['administrator', 'multipopolare_resp'].includes(profile.role)) {
                 selectedTab.value.name = 'subView';
                 viewSub(parseInt(url.searchParams.get('view-sub'), 10), true);
+            } else if (url.searchParams.has('tab')) {
+                const t = menuItems.find(t => t.name == url.searchParams.get('tab'));
+                if (
+                    t
+                    && (
+                        (!t.resp && !t.admin)
+                        || (t.resp && ['administrator', 'multipopolare_resp'].includes(profile.role))
+                        || (t.admin && profile.role == 'administrator')
+                    )
+                ) {
+                    selectedTab.value = t;
+                }
+                history.replaceState([], '', location.origin + location.pathname);
             }
             if (!historyTabs.length) {
                 historyTabs.unshift(selectedTab.value);

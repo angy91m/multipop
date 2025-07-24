@@ -4,6 +4,7 @@
         require_once(__DIR__ . '/../../../../wp-load.php');
         $mpop = new MultipopPlugin();
         if (isset($mpop->delayed_scripts[$argv[1]])) {
+            $mpop->get_settings();
             $mpop->delayed_scripts[$argv[1]](...array_slice($argv, 2));
         }
     }
