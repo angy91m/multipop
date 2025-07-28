@@ -1512,7 +1512,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         $settings['pp_token_expiration'] = intval($settings['pp_token_expiration']);
         $settings['pp_sandbox'] = intval($settings['pp_sandbox']);
         $settings['pp_api_url'] = 'https://api-m.'. ($settings['pp_sandbox'] ? 'sandbox.' : '') .'paypal.com';
-        $settings['pp_url'] = 'https://'. ($settings['pp_sandbox'] ? 'sandbox.' : '') .'paypal.com';
+        $settings['pp_url'] = 'https://'. ($settings['pp_sandbox'] ? 'sandbox.' : 'www.') .'paypal.com';
         $settings['tempmail_urls'] = json_decode($settings['tempmail_urls'], true);
         $settings['last_year_checked'] = intval($settings['last_year_checked']);
         $settings['last_tempmail_update'] = intval($settings['last_tempmail_update']);
@@ -2848,9 +2848,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             return false;
         }
         $quote = round(((double) $sub['quote']) * 100) /100;
-        if ($quote < $this->settings['min_subscription_payment']) {
-            return false;
-        }
         $order = $this->pp_create_order([
             'req_id' => uniqid("pp_", true),
             'purchase_units' => [[

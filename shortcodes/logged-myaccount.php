@@ -623,7 +623,7 @@ if ($this->settings['pp_client_id']) {
                         icon="send"
                         :done="moduleUploadData.step > 3"
                     >
-                        <label>Dichiaro di aver accettato i <a @click="e => {e.preventDefault(); if (mainOptions.privacyPolicyUrl) openExternalUrl();}">termini e le condizioni sul trattamento dati</a>&nbsp;
+                        <label>Dichiaro di aver accettato i <a class="mpop-click" @click="e => {e.preventDefault(); if (mainOptions.privacyPolicyUrl) openExternalUrl(mainOptions.privacyPolicyUrl);}"><u>termini e le condizioni sul trattamento dati</u></a>&nbsp;
                             <input type="checkbox" v-model="moduleUploadData.generalPolicyAccept"/>
                         </label>
                         <br>
