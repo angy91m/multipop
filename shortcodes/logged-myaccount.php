@@ -1129,7 +1129,7 @@ if ($this->settings['pp_client_id']) {
                             </template>
                             <template v-else-if="subInView.status == 'tosee'">
                                 <label v-if="!subInView.user_id_card_confirmed && !subInView.user_id_card_number"><input type="checkbox" v-model="subInView.forceIdCard" />&nbsp;&nbsp;Forza documento d'identità<br><br></label>
-                                <button :disabled="!subInView.is_editable || subInView.user_id_card_confirmed || (!subInView.user_id_card_number && !subInView.forceIdCard)" @click="documentsConfirm">Conferma i documenti</button>
+                                <button :disabled="!subInView.is_editable || !subInView.user_id_card_confirmed || (!subInView.user_id_card_number && !subInView.forceIdCard)" @click="documentsConfirm">Conferma i documenti</button>
                             </template>
                         </td>
                     </tr>

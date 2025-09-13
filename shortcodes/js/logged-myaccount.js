@@ -1,6 +1,7 @@
 import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.js';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
+
 const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
@@ -49,6 +50,27 @@ mkRegex = {
         if (mk.length < 16 || mk.length > 64) return false;
         return mkRegex.rr.every(r => r.test(mk));
     }
+},
+base64ToBlob = (base64, contentType = "", sliceSize = 512) => {
+    const byteCharacters = atob(base64.split(",")[1]);
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteCharacters.length;
+        offset += sliceSize) {
+        const slice = byteCharacters.slice(
+            offset, offset + sliceSize);
+
+        const byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        const byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+    }
+
+    const blob = new Blob(byteArrays, { type: contentType });
+    return blob;
 },
 boolVal = v => {
     if (typeof v == 'string' && v) {
@@ -1218,7 +1240,9 @@ createApp({
                     if (resData.data && typeof resData.data == 'object') {
                         subInView.files.length = 0;
                         for (const k in resData.data) {
-                            subInView.files.push({name: k, content: resData.data[k], type: 'application/pdf'});
+                            const b = base64ToBlob(resData.data[k], 'application/pdf'),
+                            url = URL.createObjectURL(b);
+                            subInView.files.push({name: k, content: url, type: 'application/pdf'});
                         }
                     } else {
                         console.error('Unknown error');
