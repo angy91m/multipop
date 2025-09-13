@@ -57,7 +57,13 @@ class MultipopEventsPlugin {
       if (
         get_post_type() == 'mpop_event'
         && isset($block['blockName'])
-        && in_array($block['blockName'], ['core/post-author'])
+        && (
+          (
+            $block['blockName'] == 'core/template-part'
+            && isset($block['attrs']['slug'])
+            && $block['attrs']['slug'] == 'post-meta'
+          )
+        )
       ) {
         return '';
       }
