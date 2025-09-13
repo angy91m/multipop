@@ -59,6 +59,9 @@ class MultipopEventsPlugin {
         && isset($block['blockName'])
         && (
           (
+            in_array($block['blockName'], ['core/post-author','core/post-date'])
+          )
+          || (
             $block['blockName'] == 'core/template-part'
             && isset($block['attrs']['slug'])
             && $block['attrs']['slug'] == 'post-meta'
