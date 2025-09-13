@@ -341,6 +341,8 @@ class MultipopPlugin {
             $wpdb->query("UPDATE " . $this::db_prefix('subscriptions') . " SET `status` = 'canceled' WHERE `user_id` = $id AND `status` IN ('tosee','seen','open');");
             $this->log_data('USER DELETED', null, $id);
         }, 10, 1);
+        require_once('events.php');
+        MultipopEventsPlugin::init();
 
         $this->delayed_action = isset($GLOBALS['mpop_delayed_action']) ? $GLOBALS['mpop_delayed_action'] : false;
         $this->delayed_scripts = [
