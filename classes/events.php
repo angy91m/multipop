@@ -52,5 +52,16 @@ class MultipopEventsPlugin {
 
       register_post_type( 'mpop_event', $args );
     } );
+
+    add_filter( 'render_block', function($block_content, $block) {
+      if (
+        get_post_type() == 'mpop_event'
+        && isset($block['blockName'])
+        && in_array($block['blockName'], ['core/post-author'])
+      ) {
+        return '';
+      }
+      return $block_content;
+    }, 10, 2 );
   }
 }
