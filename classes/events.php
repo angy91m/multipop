@@ -3,10 +3,6 @@
 defined( 'ABSPATH' ) || exit;
 
 class MultipopEventsPlugin {
-  public static function extra_fields() { ?>
-    <div>CIAO</div>
-  <?php
-  }
   public static function init() {
 
     // ADD mpop_event POST TYPE
@@ -86,11 +82,32 @@ class MultipopEventsPlugin {
       add_meta_box(
         'mpop_event_extra_fields',
         'Dettagli evento',
-        [self, 'extra_fields'],
+        [self::class, 'extra_fields'],
         'mpop_event',
         'normal',
         'high'
       );
     });
+  }
+  public static function extra_fields() {
+    wp_nonce_field( 'mpop_event_extra_fields_nonce_action', 'mpop_event_extra_fields_nonce' );
+  ?>
+    <p>
+      <label for="">Inizio</label>
+      <input
+        id="mpop_event_start"
+        name="mpop_event_start"
+        type="datetime-local"
+      />
+    </p>
+    <p>
+      <label for="">Fine</label>
+      <input
+        id="mpop_event_end"
+        name="mpop_event_end"
+        type="datetime-local"
+      />
+    </p>
+  <?php
   }
 }
