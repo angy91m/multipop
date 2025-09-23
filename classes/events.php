@@ -88,9 +88,22 @@ class MultipopEventsPlugin {
         'high'
       );
     });
+    add_filter('wp_insert_post_data', [self::class, 'extra_fields_validation'], 10, 1);
+    add_action('save_post_mpop_event', [self::class, 'extra_fields_save'], 10, 1);
   }
-  public static function extra_fields() {
+  public static function extra_fields($post) {
     wp_nonce_field( 'mpop_event_extra_fields_nonce_action', 'mpop_event_extra_fields_nonce' );
+    $start_date = date_create('now', new DateTimeZone(current_time('e')));
+    $end_date = date_create('now', new DateTimeZone(current_time('e')));
+    $end_date->add(new DateInterval('PT1H'));
+    $start_ts = get_post_meta( $post->ID, '_mpop_event_start', true );
+    $end_ts = get_post_meta( $post->ID, '_mpop_event_end', true );
+    if ($start_ts) {
+      $start_date->setTimestamp(intval($start_ts));
+    }
+    if ($end_ts) {
+      $end_date->setTimestamp(intval($end_ts));
+    }
   ?>
     <p>
       <label for="">Data inizio</label>
@@ -98,6 +111,7 @@ class MultipopEventsPlugin {
         id="mpop_event_start_date"
         name="mpop_event_start_date"
         type="date"
+        value="<?=$start_date->format('Y-m-d')?>"
       />
       &nbsp;&nbsp;&nbsp;&nbsp;
       <label for="">Ora inizio</label>
@@ -105,6 +119,7 @@ class MultipopEventsPlugin {
         id="mpop_event_start_time"
         name="mpop_event_start_time"
         type="time"
+        value="<?=$start_date->format('H:i')?>"
       />
     </p>
     <p>
@@ -113,6 +128,7 @@ class MultipopEventsPlugin {
         id="mpop_event_end_date"
         name="mpop_event_end_date"
         type="date"
+        value="<?=$end_date->format('Y-m-d')?>"
       />
       &nbsp;&nbsp;&nbsp;&nbsp;
       <label for="">Ora fine</label>
@@ -120,8 +136,70 @@ class MultipopEventsPlugin {
         id="mpop_event_end_time"
         name="mpop_event_end_time"
         type="time"
+        value="<?=$end_date->format('H:i')?>"
       />
     </p>
   <?php
+  }
+  public static function extra_fields_validation($data) {
+    if ($data['post_type'] == 'mpop_event') {
+      do {
+        if (
+          empty($_POST['mpop_event_start_date'])
+          || empty($_POST['mpop_event_start_time'])
+          || empty($_POST['mpop_event_end_date'])
+          || empty($_POST['mpop_event_end_time'])
+        ) {
+          $data['post_status'] = 'draft';
+          add_filter( 'redirect_post_location', function( $location ) {
+            return add_query_arg( 'validation_error', '1', $location );
+          } );
+          break;
+        }
+        try {
+          $start_date = MultipopPlugin::validate_date($_POST['mpop_event_start_date']);
+          $start_time = MultipopPlugin::validate_time($_POST['mpop_event_start_time']);
+          $start_date->setTime($start_time[0], $start_time[1]);
+          $end_date = MultipopPlugin::validate_date($_POST['mpop_event_end_date']);
+          $end_time = MultipopPlugin::validate_time($_POST['mpop_event_end_time']);
+          $end_date->setTime($end_time[0], $end_time[1]);
+          if ($start_date->getTimestamp() > $end_date->getTimestamp()) {
+            $data['post_status'] = 'draft';
+            add_filter( 'redirect_post_location', function( $location ) {
+              return add_query_arg( 'validation_error', '1', $location );
+            } );
+            break;
+          }
+        } catch(Exception $e) {
+          $data['post_status'] = 'draft';
+          add_filter( 'redirect_post_location', function( $location ) {
+            return add_query_arg( 'validation_error', '1', $location );
+          } );
+          break;
+        }
+      } while(false);
+    }
+    return $data;
+  }
+  public static function extra_fields_save($post_id) {
+    if (
+      !isset( $_POST['mpop_event_extra_fields_nonce'] )
+      || !wp_verify_nonce( $_POST['mpop_event_extra_fields_nonce'], 'mpop_event_extra_fields_nonce_action' )
+      || !current_user_can( 'edit_post', $post_id )
+    ) {
+      return;
+    }
+    try {
+      $start_date = MultipopPlugin::validate_date($_POST['mpop_event_start_date']);
+      $start_time = MultipopPlugin::validate_time($_POST['mpop_event_start_time']);
+      $start_date->setTime($start_time[0], $start_time[1]);
+      $end_date = MultipopPlugin::validate_date($_POST['mpop_event_end_date']);
+      $end_time = MultipopPlugin::validate_time($_POST['mpop_event_end_time']);
+      $end_date->setTime($end_time[0], $end_time[1]);
+      if ($start_date->getTimestamp() <= $end_date->getTimestamp()) {
+        update_post_meta($post_id, '_mpop_event_start', $start_date->getTimestamp());
+        update_post_meta($post_id, '_mpop_event_end', $end_date->getTimestamp());
+      }
+    } catch(Exception $e) {}
   }
 }
