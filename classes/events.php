@@ -3,7 +3,13 @@
 defined( 'ABSPATH' ) || exit;
 
 class MultipopEventsPlugin {
+  public static function extra_fields() { ?>
+    <div>CIAO</div>
+  <?php
+  }
   public static function init() {
+
+    // ADD mpop_event POST TYPE
     add_action( 'init', function () {
       $labels = array(
         'name'                  => 'Eventi',
@@ -53,6 +59,7 @@ class MultipopEventsPlugin {
       register_post_type( 'mpop_event', $args );
     } );
 
+    // HIDING META INFO FROM EVENT RENDERING
     add_filter( 'render_block', function($block_content, $block) {
       if (
         get_post_type() == 'mpop_event'
@@ -72,5 +79,18 @@ class MultipopEventsPlugin {
       }
       return $block_content;
     }, 10, 2 );
+
+
+    // META FIELDS
+    add_action('add_meta_boxes', function () {
+      add_meta_box(
+        'mpop_event_extra_fields',
+        'Dettagli evento',
+        [self, 'extra_fields'],
+        'mpop_event',
+        'normal',
+        'high'
+      );
+    });
   }
 }
