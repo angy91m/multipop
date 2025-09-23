@@ -158,9 +158,9 @@ class MultipopEventsPlugin {
           endDate.setTime(NaN);
         }
         if (!isNaN(startDate) && !isNaN(endDate) && startDate.getTime() <= endDate.getTime()) {
-          wp.data.dispatch( 'core/editor' ).lockPostSaving( 'mpopEventDateLock' );
-        } else {
           wp.data.dispatch( 'core/editor' ).unlockPostSaving( 'mpopEventDateLock' );
+        } else {
+          wp.data.dispatch( 'core/editor' ).lockPostSaving( 'mpopEventDateLock' );
         }
       };
       mpopEventDateSet();
