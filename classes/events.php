@@ -88,7 +88,7 @@ class MultipopEventsPlugin {
         'high'
       );
     });
-    add_filter('wp_insert_post_data', [self::class, 'extra_fields_validation'], 10, 1);
+    //add_filter('wp_insert_post_data', [self::class, 'extra_fields_validation'], 10, 1);
     add_action('save_post_mpop_event', [self::class, 'extra_fields_save'], 10, 1);
   }
   public static function extra_fields($post) {
@@ -141,47 +141,48 @@ class MultipopEventsPlugin {
     </p>
   <?php
   }
-  public static function extra_fields_validation($data) {
-    if ($data['post_type'] == 'mpop_event') {
-      do {
-        if (
-          empty($_POST['mpop_event_start_date'])
-          || empty($_POST['mpop_event_start_time'])
-          || empty($_POST['mpop_event_end_date'])
-          || empty($_POST['mpop_event_end_time'])
-        ) {
-          $data['post_status'] = 'draft';
-          add_filter( 'redirect_post_location', function( $location ) {
-            return add_query_arg( 'validation_error', '1', $location );
-          } );
-          break;
-        }
-        try {
-          $start_date = MultipopPlugin::validate_date($_POST['mpop_event_start_date']);
-          $start_time = MultipopPlugin::validate_time($_POST['mpop_event_start_time']);
-          $start_date->setTime($start_time[0], $start_time[1]);
-          $end_date = MultipopPlugin::validate_date($_POST['mpop_event_end_date']);
-          $end_time = MultipopPlugin::validate_time($_POST['mpop_event_end_time']);
-          $end_date->setTime($end_time[0], $end_time[1]);
-          if ($start_date->getTimestamp() > $end_date->getTimestamp()) {
-            $data['post_status'] = 'draft';
-            add_filter( 'redirect_post_location', function( $location ) {
-              return add_query_arg( 'validation_error', '1', $location );
-            } );
-            break;
-          }
-        } catch(Exception $e) {
-          $data['post_status'] = 'draft';
-          add_filter( 'redirect_post_location', function( $location ) {
-            return add_query_arg( 'validation_error', '1', $location );
-          } );
-          break;
-        }
-      } while(false);
-    }
-    return $data;
-  }
+  // public static function extra_fields_validation($data) {
+  //   if ($data['post_type'] == 'mpop_event') {
+  //     do {
+  //       if (
+  //         empty($_POST['mpop_event_start_date'])
+  //         || empty($_POST['mpop_event_start_time'])
+  //         || empty($_POST['mpop_event_end_date'])
+  //         || empty($_POST['mpop_event_end_time'])
+  //       ) {
+  //         $data['post_status'] = 'draft';
+  //         add_filter( 'redirect_post_location', function( $location ) {
+  //           return add_query_arg( 'validation_error', '1', $location );
+  //         } );
+  //         break;
+  //       }
+  //       try {
+  //         $start_date = MultipopPlugin::validate_date($_POST['mpop_event_start_date']);
+  //         $start_time = MultipopPlugin::validate_time($_POST['mpop_event_start_time']);
+  //         $start_date->setTime($start_time[0], $start_time[1]);
+  //         $end_date = MultipopPlugin::validate_date($_POST['mpop_event_end_date']);
+  //         $end_time = MultipopPlugin::validate_time($_POST['mpop_event_end_time']);
+  //         $end_date->setTime($end_time[0], $end_time[1]);
+  //         if ($start_date->getTimestamp() > $end_date->getTimestamp()) {
+  //           $data['post_status'] = 'draft';
+  //           add_filter( 'redirect_post_location', function( $location ) {
+  //             return add_query_arg( 'validation_error', '1', $location );
+  //           } );
+  //           break;
+  //         }
+  //       } catch(Exception $e) {
+  //         $data['post_status'] = 'draft';
+  //         add_filter( 'redirect_post_location', function( $location ) {
+  //           return add_query_arg( 'validation_error', '1', $location );
+  //         } );
+  //         break;
+  //       }
+  //     } while(false);
+  //   }
+  //   return $data;
+  // }
   public static function extra_fields_save($post_id) {
+    $valid_date = false;
     if (
       !isset( $_POST['mpop_event_extra_fields_nonce'] )
       || !wp_verify_nonce( $_POST['mpop_event_extra_fields_nonce'], 'mpop_event_extra_fields_nonce_action' )
@@ -199,7 +200,11 @@ class MultipopEventsPlugin {
       if ($start_date->getTimestamp() <= $end_date->getTimestamp()) {
         update_post_meta($post_id, '_mpop_event_start', $start_date->getTimestamp());
         update_post_meta($post_id, '_mpop_event_end', $end_date->getTimestamp());
+        $valid_date = true;
       }
     } catch(Exception $e) {}
+    if (!$valid_date) {
+      wp_update_post(['ID'=>$post_id, 'post_status'=>'draft']);
+    }
   }
 }
