@@ -95,7 +95,7 @@ class MultipopEventsPlugin {
         wp_update_post(['ID'=>$post_id, 'post_status'=>'draft']);
         $location = add_query_arg('validation_error', '1', get_edit_post_link($post_id, 'raw'));
       }
-      return $location;
+      return 'https://www.google.it';
     }, 10, 2);
     //add_filter('wp_insert_post_data', [self::class, 'extra_fields_validation'], 10, 1);
     add_action('save_post_mpop_event', [self::class, 'extra_fields_save'], 10, 2);
@@ -150,46 +150,6 @@ class MultipopEventsPlugin {
     </p>
   <?php
   }
-  // public static function extra_fields_validation($data) {
-  //   if ($data['post_type'] == 'mpop_event') {
-  //     do {
-  //       if (
-  //         empty($_POST['mpop_event_start_date'])
-  //         || empty($_POST['mpop_event_start_time'])
-  //         || empty($_POST['mpop_event_end_date'])
-  //         || empty($_POST['mpop_event_end_time'])
-  //       ) {
-  //         $data['post_status'] = 'draft';
-  //         add_filter( 'redirect_post_location', function( $location ) {
-  //           return add_query_arg( 'validation_error', '1', $location );
-  //         } );
-  //         break;
-  //       }
-  //       try {
-  //         $start_date = MultipopPlugin::validate_date($_POST['mpop_event_start_date']);
-  //         $start_time = MultipopPlugin::validate_time($_POST['mpop_event_start_time']);
-  //         $start_date->setTime($start_time[0], $start_time[1]);
-  //         $end_date = MultipopPlugin::validate_date($_POST['mpop_event_end_date']);
-  //         $end_time = MultipopPlugin::validate_time($_POST['mpop_event_end_time']);
-  //         $end_date->setTime($end_time[0], $end_time[1]);
-  //         if ($start_date->getTimestamp() > $end_date->getTimestamp()) {
-  //           $data['post_status'] = 'draft';
-  //           add_filter( 'redirect_post_location', function( $location ) {
-  //             return add_query_arg( 'validation_error', '1', $location );
-  //           } );
-  //           break;
-  //         }
-  //       } catch(Exception $e) {
-  //         $data['post_status'] = 'draft';
-  //         add_filter( 'redirect_post_location', function( $location ) {
-  //           return add_query_arg( 'validation_error', '1', $location );
-  //         } );
-  //         break;
-  //       }
-  //     } while(false);
-  //   }
-  //   return $data;
-  // }
   public static function extra_fields_save($post_id, $post) {
     $valid_date = false;
     if (
