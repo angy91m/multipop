@@ -98,10 +98,10 @@ class MultipopEventsPlugin {
     $end_date->add(new DateInterval('PT1H'));
     $start_ts = get_post_meta( $post->ID, '_mpop_event_start', true );
     $end_ts = get_post_meta( $post->ID, '_mpop_event_end', true );
-    if ($start_ts) {
+    if (!empty($start_ts)) {
       $start_date->setTimestamp(intval($start_ts));
     }
-    if ($end_ts) {
+    if (!empty($end_ts)) {
       $end_date->setTimestamp(intval($end_ts));
     }
   ?>
