@@ -3365,13 +3365,13 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         return false;
     }
-    private static function validate_time($time_string = '') {
+    public static function validate_time($time_string = '') {
         if ( !is_string($time_string) || !preg_match('/^(\\d{2}):(\\d{2})$/', trim($time_string), $time_arr)) {
             throw new Exception('Invalid time');
         }
         return [intval($time_arr[1]), intval($time_arr[2])];
     }
-    private static function validate_date($date_string = '') {
+    public static function validate_date($date_string = '') {
         if ( !is_string($date_string) || strlen(trim($date_string)) != 10) {
             throw new Exception('Invalid date');
         }
