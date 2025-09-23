@@ -205,6 +205,9 @@ class MultipopEventsPlugin {
     } catch(Exception $e) {}
     if (!$valid_date) {
       wp_update_post(['ID'=>$post_id, 'post_status'=>'draft']);
+      add_filter( 'redirect_post_location', function( $location ) {
+        return add_query_arg( 'validation_error', '1', $location );
+      } );
     }
   }
 }
