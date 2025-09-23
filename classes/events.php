@@ -89,7 +89,7 @@ class MultipopEventsPlugin {
       );
     });
     //add_filter('wp_insert_post_data', [self::class, 'extra_fields_validation'], 10, 1);
-    add_action('save_post_mpop_event', [self::class, 'extra_fields_save'], 10, 1);
+    add_action('save_post_mpop_event', [self::class, 'extra_fields_save'], 10, 2);
   }
   public static function extra_fields($post) {
     wp_nonce_field( 'mpop_event_extra_fields_nonce_action', 'mpop_event_extra_fields_nonce' );
@@ -181,7 +181,7 @@ class MultipopEventsPlugin {
   //   }
   //   return $data;
   // }
-  public static function extra_fields_save($post_id) {
+  public static function extra_fields_save($post_id, $post) {
     $valid_date = false;
     if (
       !isset( $_POST['mpop_event_extra_fields_nonce'] )
@@ -203,10 +203,15 @@ class MultipopEventsPlugin {
         $valid_date = true;
       }
     } catch(Exception $e) {}
-    if (!$valid_date) {
-      wp_update_post(['ID'=>$post_id, 'post_status'=>'draft']);
-      exit;
-      //wp_send_json_error('Date invalide per l\'evento', 400);
+    if (!$valid_date && $post->post_status == 'publish') {
+      add_action('all_admin_notices', function() use ($post_id) {
+        wp_update_post(['ID'=>$post_id, 'post_status'=>'draft']);
+        ?>
+            <div class="notice notice-error is-dismissible">
+                <p><strong>Multipop Events: </strong>&nbsp;Evento non pubbliato per errore nelle date</p>
+            </div>
+        <?php
+      });
     }
   }
 }
