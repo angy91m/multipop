@@ -204,14 +204,10 @@ class MultipopEventsPlugin {
       }
     } catch(Exception $e) {}
     if (!$valid_date && $post->post_status == 'publish') {
-      add_action('all_admin_notices', function() use ($post_id) {
+      add_filter( 'redirect_post_location', function( $location ) use ($post_id) {
         wp_update_post(['ID'=>$post_id, 'post_status'=>'draft']);
-        ?>
-            <div class="notice notice-error is-dismissible">
-                <p><strong>Multipop Events: </strong>&nbsp;Evento non pubbliato per errore nelle date</p>
-            </div>
-        <?php
-      });
+        return add_query_arg( 'validation_error', '1', $location );
+      }, 10, 1 );
     }
   }
 }
