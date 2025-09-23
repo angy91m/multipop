@@ -140,7 +140,7 @@ class MultipopEventsPlugin {
     </p>
     <script type="text/javascript">
     window.addEventListener('load', ()=>{
-      const btn = document.querySelector('.editor-post-publish-button');
+      const btn = document.querySelector('.editor-post-publish-button__button');
       console.log(btn);
     });
     </script>
