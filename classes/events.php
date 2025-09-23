@@ -88,16 +88,6 @@ class MultipopEventsPlugin {
         'high'
       );
     });
-    // add_filter('redirect_post_location', function($location, $post_id){
-    //   $date_validation_failed = get_post_meta($post_id, '_mpop_event_date_validation_failed', true);
-    //   if ($date_validation_failed) {
-    //     delete_post_meta($post_id, '_mpop_event_date_validation_failed');
-    //     wp_update_post(['ID'=>$post_id, 'post_status'=>'draft']);
-    //     $location = add_query_arg('validation_error', '1', get_edit_post_link($post_id, 'raw'));
-    //   }
-    //   return $location;
-    // }, 10, 2);
-    //add_filter('wp_insert_post_data', [self::class, 'extra_fields_validation'], 10, 1);
     add_action('save_post_mpop_event', [self::class, 'extra_fields_save'], 10, 2);
   }
   public static function extra_fields($post) {
@@ -148,6 +138,12 @@ class MultipopEventsPlugin {
         value="<?=$end_date->format('H:i')?>"
       />
     </p>
+    <script type="text/javascript">
+    window.addEventListener('load', ()=>{
+      const btn = document.querySelector('.editor-post-publish-button');
+      console.log(btn);
+    });
+    </script>
   <?php
   }
   public static function extra_fields_save($post_id, $post) {
@@ -172,7 +168,6 @@ class MultipopEventsPlugin {
         $valid_date = true;
       }
     } catch(Exception $e) {}
-    delete_post_meta($post_id, '_mpop_event_date_validation_failed');
     if (!$valid_date && $post->post_status == 'publish') {
       wp_update_post(['ID'=>$post_id, 'post_status'=>'draft']);
     }
