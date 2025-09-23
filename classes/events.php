@@ -140,8 +140,31 @@ class MultipopEventsPlugin {
     </p>
     <script type="text/javascript">
     window.addEventListener('load', ()=>{
-      const btn = document.querySelector('.editor-post-publish-button__button');
-      console.log(btn);
+      const startDate = new Date(),
+      endDate = new Date(),
+      startDateEl = document.querySelector('#mpop_event_start_date'),
+      startTimeEl = document.querySelector('#mpop_event_start_time'),
+      endDateEl = document.querySelector('#mpop_event_end_date'),
+      endTimeEl = document.querySelector('#mpop_event_end_time'),
+      mpopEventDateSet = () => {
+        if (startDateEl.value && startTimeEl.value) {
+          startDate.setTime(new Date(startDateEl.value + 'T' + startTimeEl.value + ':00.000').getTime());
+        } else {
+          startDate.setTime(NaN);
+        }
+        if (endDateEl.value && endTimeEl.value) {
+          endDate.setTime(new Date(endDateEl.value + 'T' + endTimeEl.value + ':00.000').getTime());
+        } else {
+          endDate.setTime(NaN);
+        }
+        if (!isNaN(startDate) && !isNaN(endDate) && startDate.getTime() <= endDate.getTime()) {
+          wp.data.dispatch( 'core/editor' ).lockPostSaving( 'mpopEventDateLock' );
+        } else {
+          wp.data.dispatch( 'core/editor' ).unlockPostSaving( 'mpopEventDateLock' );
+        }
+      };
+      mpopEventDateSet();
+      [startDateEl, startTimeEl, endDateEl, endTimeEl].foreach(el => el.addEventListener('change', mpopEventDateSet));
     });
     </script>
   <?php
