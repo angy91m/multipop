@@ -164,7 +164,7 @@ class MultipopEventsPlugin {
         }
       };
       mpopEventDateSet();
-      [startDateEl, startTimeEl, endDateEl, endTimeEl].foreach(el => el.addEventListener('change', mpopEventDateSet));
+      [startDateEl, startTimeEl, endDateEl, endTimeEl].forEach(el => el.addEventListener('change', mpopEventDateSet));
     });
     </script>
   <?php
