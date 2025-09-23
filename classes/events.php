@@ -205,7 +205,8 @@ class MultipopEventsPlugin {
     } catch(Exception $e) {}
     if (!$valid_date) {
       wp_update_post(['ID'=>$post_id, 'post_status'=>'draft']);
-      wp_send_json_error('Date invalide per l\'evento', 400);
+      exit;
+      //wp_send_json_error('Date invalide per l\'evento', 400);
     }
   }
 }
