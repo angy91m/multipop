@@ -93,19 +93,33 @@ class MultipopEventsPlugin {
     wp_nonce_field( 'mpop_event_extra_fields_nonce_action', 'mpop_event_extra_fields_nonce' );
   ?>
     <p>
-      <label for="">Inizio</label>
+      <label for="">Data inizio</label>
       <input
-        id="mpop_event_start"
-        name="mpop_event_start"
-        type="datetime-local"
+        id="mpop_event_start_date"
+        name="mpop_event_start_date"
+        type="date"
+      />
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <label for="">Ora inizio</label>
+      <input
+        id="mpop_event_start_time"
+        name="mpop_event_start_time"
+        type="time"
       />
     </p>
     <p>
-      <label for="">Fine</label>
+      <label for="">Data fine</label>
       <input
-        id="mpop_event_end"
-        name="mpop_event_end"
-        type="datetime-local"
+        id="mpop_event_end_date"
+        name="mpop_event_end_date"
+        type="date"
+      />
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <label for="">Ora fine</label>
+      <input
+        id="mpop_event_end_time"
+        name="mpop_event_end_time"
+        type="time"
       />
     </p>
   <?php
