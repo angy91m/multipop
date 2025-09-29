@@ -197,7 +197,7 @@ class MultipopPlugin {
         return false;
     }
 
-    private static function dashicon(string $icon = '', string $ba = 'before') {
+    public static function dashicon(string $icon = '', string $ba = 'before') {
         return '<span class="dashicons-'.$ba.' dashicons-'.$icon.'">&nbsp;</span>';
     }
     
