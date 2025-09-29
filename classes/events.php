@@ -12,6 +12,20 @@ class MultipopEventsPlugin {
     'Venerdì',
     'Sabato'
   ];
+  const MONTH_NAMES = [
+    'Gennaio',
+    'Febbraio',
+    'Marzo',
+    'Aprile',
+    'Maggio',
+    'Giugno',
+    'Luglio',
+    'Agosto',
+    'Settembre',
+    'Ottobre',
+    'Novembre',
+    'Dicembre'
+  ];
   public static function init() {
 
     // ADD mpop_event POST TYPE
@@ -68,7 +82,11 @@ class MultipopEventsPlugin {
     add_shortcode('mpop_event_start_date', function () {
       $post = get_post();
       if (!$post || $post->post_type != 'mpop_event' || !$post->_mpop_event_start) return '';
-      return 'START_DATE';
+      $d = date_create('now', new DateTimeZone(current_time('e')));
+      $d->setTimestamp(intval($post->_mpop_event_start));
+      $dayName = self::DAY_NAMES[intval($d->format('w'))];
+      $monthName = self::MONTH_NAMES[intval($d->format('n'))-1];
+      return substr($dayName, 0, 3) . ', ' . $d->format('j') . ' ' . substr($monthName, 0, 3) . ' ' . $d->format('Y');
     });
 
     // HIDING META INFO FROM EVENT RENDERING
