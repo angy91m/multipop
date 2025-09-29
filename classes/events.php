@@ -88,6 +88,29 @@ class MultipopEventsPlugin {
       $monthName = self::MONTH_NAMES[intval($d->format('n'))-1];
       return substr($dayName, 0, 3) . ', ' . $d->format('j') . ' ' . substr($monthName, 0, 3) . ' ' . $d->format('Y');
     });
+    add_shortcode('mpop_event_start_time', function () {
+      $post = get_post();
+      if (!$post || $post->post_type != 'mpop_event' || !$post->_mpop_event_start) return '';
+      $d = date_create('now', new DateTimeZone(current_time('e')));
+      $d->setTimestamp(intval($post->_mpop_event_start));
+      return $d->format('H:i');
+    });
+    add_shortcode('mpop_event_end_date', function () {
+      $post = get_post();
+      if (!$post || $post->post_type != 'mpop_event' || !$post->_mpop_event_end) return '';
+      $d = date_create('now', new DateTimeZone(current_time('e')));
+      $d->setTimestamp(intval($post->_mpop_event_end));
+      $dayName = self::DAY_NAMES[intval($d->format('w'))];
+      $monthName = self::MONTH_NAMES[intval($d->format('n'))-1];
+      return substr($dayName, 0, 3) . ', ' . $d->format('j') . ' ' . substr($monthName, 0, 3) . ' ' . $d->format('Y');
+    });
+    add_shortcode('mpop_event_end_time', function () {
+      $post = get_post();
+      if (!$post || $post->post_type != 'mpop_event' || !$post->_mpop_event_end) return '';
+      $d = date_create('now', new DateTimeZone(current_time('e')));
+      $d->setTimestamp(intval($post->_mpop_event_end));
+      return $d->format('H:i');
+    });
 
     // HIDING META INFO FROM EVENT RENDERING
     add_filter( 'render_block', function($block_content, $block) {
