@@ -130,7 +130,11 @@ class MultipopEventsPlugin {
       $end_date = self::human_date($ed);
       $end_time = $ed->format('H:i');
       $end_string = $start_date != $end_date ? $end_date . ' ' . $end_time : ($start_time != $end_time ? $end_time : '');
-      return '<p>' . $start_date . ' ' . $start_time . ($end_string ? ' - ' . $end_string : '') . '</p>';
+      $location = '';
+      if ($post->_mpop_event_location) {
+        $location = '<br><a href="https://www.google.com/maps/search/?api=1&query=' . urlencode($post->_mpop_event_location) . '">' . $post->_mpop_event_location . '</a>';
+      }
+      return '<p>' . $start_date . ' ' . $start_time . ($end_string ? ' - ' . $end_string : '') . $location . '</p>';
     });
 
     // HIDING META INFO FROM EVENT RENDERING
@@ -181,9 +185,11 @@ class MultipopEventsPlugin {
     if ($end_ts) {
       $end_date->setTimestamp(intval($end_ts));
     }
+
+    $location = get_post_meta( $post->ID, '_mpop_event_location', true );
   ?>
     <p>
-      <label for="">Data inizio</label>
+      <label for="mpop_event_start_date">Data inizio</label>
       <input
         id="mpop_event_start_date"
         name="mpop_event_start_date"
@@ -191,7 +197,7 @@ class MultipopEventsPlugin {
         value="<?=$start_date->format('Y-m-d')?>"
       />
       &nbsp;&nbsp;&nbsp;&nbsp;
-      <label for="">Ora inizio</label>
+      <label for="mpop_event_start_time">Ora inizio</label>
       <input
         id="mpop_event_start_time"
         name="mpop_event_start_time"
@@ -200,7 +206,7 @@ class MultipopEventsPlugin {
       />
     </p>
     <p>
-      <label for="">Data fine</label>
+      <label for="mpop_event_end_date">Data fine</label>
       <input
         id="mpop_event_end_date"
         name="mpop_event_end_date"
@@ -208,12 +214,21 @@ class MultipopEventsPlugin {
         value="<?=$end_date->format('Y-m-d')?>"
       />
       &nbsp;&nbsp;&nbsp;&nbsp;
-      <label for="">Ora fine</label>
+      <label for="mpop_event_end_time">Ora fine</label>
       <input
         id="mpop_event_end_time"
         name="mpop_event_end_time"
         type="time"
         value="<?=$end_date->format('H:i')?>"
+      />
+    </p>
+    <p>
+      <label for="mpop_event_location">Luogo</label>
+      <input
+        id="mpop_event_location"
+        name="mpop_event_location"
+        type="text"
+        value="<?=$location?>"
       />
     </p>
     <script type="text/javascript">
@@ -255,6 +270,9 @@ class MultipopEventsPlugin {
       || !current_user_can( 'edit_post', $post_id )
     ) {
       return;
+    }
+    if (isset($_POST['mpop_event_location'])) {
+      update_post_meta($post_id, '_mpop_event_location', trim($_POST['mpop_event_location']));
     }
     try {
       $start_date = MultipopPlugin::validate_date($_POST['mpop_event_start_date']);
