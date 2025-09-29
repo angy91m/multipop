@@ -132,9 +132,9 @@ class MultipopEventsPlugin {
       $end_string = $start_date != $end_date ? $end_date . ' ' . $end_time : ($start_time != $end_time ? $end_time : '');
       $location = '';
       if ($post->_mpop_event_location) {
-        $location = '<br><a href="https://www.google.com/maps/search/?api=1&query=' . urlencode($post->_mpop_event_location) . '" target="_blank">' . $post->_mpop_event_location . '</a>';
+        $location = '<br>'. MultipopPlugin::dashicon('location') .' <a href="https://www.google.com/maps/search/?api=1&query=' . urlencode($post->_mpop_event_location) . '" target="_blank">' . $post->_mpop_event_location . ' ' . MultipopPlugin::dashicon('external') . '</a>';
       }
-      return '<p>' . $start_date . ' ' . $start_time . ($end_string ? ' - ' . $end_string : '') . $location . '</p>';
+      return '<p>' . MultipopPlugin::dashicon('clock') .' ' . $start_date . ' ' . $start_time . ($end_string ? ' - ' . $end_string : '') . $location . '</p>';
     });
 
     // HIDING META INFO FROM EVENT RENDERING
