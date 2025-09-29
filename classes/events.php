@@ -130,7 +130,7 @@ class MultipopEventsPlugin {
       $end_date = self::human_date($ed);
       $end_time = $ed->format('H:i');
       $end_string = $start_date != $end_date ? $end_date . ' ' . $end_time : ($start_time != $end_time ? $end_time : '');
-      return $start_date . ' ' . $start_time . ($end_string ? ' - ' . $end_string : '');
+      return '<p>' . $start_date . ' ' . $start_time . ($end_string ? ' - ' . $end_string : '') . '</p>';
     });
 
     // HIDING META INFO FROM EVENT RENDERING
