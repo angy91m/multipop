@@ -32,7 +32,7 @@ class MultipopEventsPlugin {
         'show_in_rest'       => true,   // abilita REST API / Gutenberg
         'query_var'          => true,
         'rewrite'            => array( 'slug' => 'eventi' ),
-        'has_archive'        => true,
+        'has_archive'        => 'archivio-eventi',
         'hierarchical'       => false,
         'menu_position'      => 5,
         'menu_icon'          => 'dashicons-calendar',
