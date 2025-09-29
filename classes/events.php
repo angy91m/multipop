@@ -3,6 +3,15 @@
 defined( 'ABSPATH' ) || exit;
 
 class MultipopEventsPlugin {
+  const DAY_NAMES = [
+    'Domenica',
+    'Lunedì',
+    'Martedì',
+    'Mercoledì',
+    'Giovedì',
+    'Venerdì',
+    'Sabato'
+  ];
   public static function init() {
 
     // ADD mpop_event POST TYPE
@@ -54,6 +63,13 @@ class MultipopEventsPlugin {
 
       register_post_type( 'mpop_event', $args );
     } );
+
+    // SHORTCODES
+    add_shortcode('mpop_event_start_date', function () {
+      $post = get_post();
+      if (!$post || $post->post_type != 'mpop_event' || !$post->_mpop_event_start) return '';
+      return 'START_DATE';
+    });
 
     // HIDING META INFO FROM EVENT RENDERING
     add_filter( 'render_block', function($block_content, $block) {
