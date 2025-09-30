@@ -16,13 +16,15 @@ loadVueModule = (...modules) => {
             }
             return { getContentData: asBinary => asBinary ? response.arrayBuffer() : response.text()};
         },
-        addStyle() {}
+        addStyle(textContent) {
+            const style = Object.assign(document.createElement('style'), { textContent }),
+            ref = document.head.getElementsByTagName('style')[0] || null;
+            document.head.insertBefore(style, ref);
+        }
     })));
     return loaded;
 },
-[vSel] = loadVueModule('vue-select.js'),
-[mpopUploader] = loadVueModule('MpopUploader.vue'),
-[mpopPaypalButton] = loadVueModule('MpopPaypalButton.vue'),
+[vSel, mpopUploader, mpopPaypalButton] = loadVueModule('vue-select.js', 'MpopUploader.vue', 'MpopPaypalButton.vue'),
 mailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/s,
 passwordRegex = {
     rr: [
