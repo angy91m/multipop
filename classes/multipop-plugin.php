@@ -60,6 +60,7 @@ class MultipopPlugin {
     public ?object $disc_utils;
     public array $delayed_scripts = [];
     public bool $delayed_action = false;
+    public static array $instances = [];
 
     // FORMAT DATETIME TO LOCAL STRING YYYY-MM-DD HH:MM:SS TZ
     private static function show_date_time($date) {
@@ -246,6 +247,7 @@ class MultipopPlugin {
     }
 
     function __construct() {
+        self::$instances[] = $this;
 
         $req_url = (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) ? 'https': 'http') . "://" . ( isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '' ) . ( isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '' );
         $this->req_url = $req_url;
@@ -794,6 +796,7 @@ class MultipopPlugin {
             `seconds_between_login_attempts` BIGINT UNSIGNED NOT NULL,
             `seconds_in_blacklist` BIGINT UNSIGNED NOT NULL,
             `last_auto_action` BIGINT UNSIGNED NOT NULL,
+            `gmaps_api_key` VARCHAR(255) NULL,
             PRIMARY KEY (`id`)
         ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;";
         dbDelta( $q );
@@ -2304,7 +2307,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         return $run_texturize;
     }
-    private function get_comuni_all() {
+    public function get_comuni_all() {
         if (!isset($this->comuni_all)) {
             $comuni = json_decode(file_get_contents(MULTIPOP_PLUGIN_PATH . '/comuni/comuni.json'), true);
             if (!is_array($comuni)) {

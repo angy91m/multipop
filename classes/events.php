@@ -298,4 +298,56 @@ class MultipopEventsPlugin {
   public static function events_page() {
     require MULTIPOP_PLUGIN_PATH . '/pages/events.php';
   }
+  public static function curl_init($url, $settings = []) {
+    $curlObj = curl_init($url);
+    $settings += [
+      CURLOPT_AUTOREFERER => true,
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_FOLLOWLOCATION => true,
+      CURLOPT_NOSIGNAL => true,
+      CURLOPT_TIMEOUT => 5
+    ];
+    foreach($settings as $key => $value) {
+      curl_setopt($curlObj, $key, $value);
+    }
+    return $curlObj;
+  }
+  public static function geocode($address, $key) {
+    $curlObj = self::curl_init('https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($address) . "&key=$key");
+    $data = curl_exec($curlObj);
+    if ($data === false) return false;
+    $data = json_decode($data, true);
+    if ($data['status'] != 'OK' || empty($data['results'])) return false;
+    $data = $data['results'][0];
+    $comune_name = false;
+    $sigla = false;
+    $res = $data['geometry']['location'] + [
+      'codiceCatastale' => false
+    ];
+    foreach($data['address_components'] as $c) {
+      if (in_array('administrative_area_level_3', $c['types'])) {
+        $comune_name = mb_strtoupper(isset($c['long_name']) && $c['long_name'] ? $c['long_name'] : $c['short_name'], 'UTF-8');
+        if ($sigla) break;
+      } else if (in_array('administrative_area_level_2', $c['types'])) {
+        $sigla = $c['short_name'];
+        if ($comune_name) break;
+      }
+    }
+    if (!$comune_name || !$sigla) return $res;
+    $comuni = array_map(function($c) use ($comune_name) {
+      similar_text($c['nome'], $comune_name, $perc);
+      $c['similarity'] = $perc;
+      return $c;
+    }, array_filter(MultipopPlugin::$instances[0]->get_comuni_all(), function($c) use ($sigla) {
+      return $c['soppresso'] !== true && $c['provincia']['sigla'] == $sigla;
+    }));
+    $comune = false;
+    foreach($comuni as $c) {
+      if (!$comune || $c['similarity'] > $comune['similarity']) {
+        $comune = $c;
+      }
+    }
+    if ($comune) $res['codiceCatastale'] = $comune['codiceCatastale'];
+    return $res;
+  }
 }
