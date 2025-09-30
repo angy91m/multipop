@@ -5,7 +5,7 @@
 @import '/wp-content/plugins/multipop/css/leaflet.css';
 </style>
 <script setup>
-import { ref, onBeforeMount } from 'vue';
+import { ref, onMounted } from 'vue';
 import L from '/wp-content/plugins/multipop/js/leaflet.js';
 const makeId = (length = 5) => {
     let result = '';
@@ -17,7 +17,7 @@ const makeId = (length = 5) => {
 },
 elId = ref('mpop-map-' + makeId('5')),
 map = ref(null);
-onBeforeMount(() => {
+onMounted(() => {
    map.value = L.map(elId.value).setView([41.9028, 12.4964], 6);
 });
 </script>
