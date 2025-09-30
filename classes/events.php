@@ -141,8 +141,6 @@ class MultipopEventsPlugin {
       return MultipopPlugin::html_to_string([self::class, 'events_page']);
     });
 
-    remove_filter( 'the_content', 'wpautop' );
-    add_filter( 'the_content', 'wpautop' , 12);
     add_filter('run_wptexturize', function($run_texturize) {
       $p = get_post();
       if (wp_get_theme()->get_page_templates()[$p->page_template] == 'Eventi') return false;
