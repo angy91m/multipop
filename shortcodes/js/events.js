@@ -1,5 +1,5 @@
 import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
-const { createApp, defineAsyncComponent } = Vue,
+const { createApp, defineAsyncComponent, reactive, onMounted } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
   const loaded = [];
@@ -28,12 +28,15 @@ createApp({
     'mpop-map': defineAsyncComponent(() => mpopMap)
   },
   setup() {
-    const testEvents = [{
+    const testEvents = reactive([{
       title: 'Prova',
       location: 'Via Laurentina, 3 Roma',
       lat: 41.8503514,
       lng: 12.4777725
-    }];
+    }]);
+    onMounted(()=>{
+      setTimeout(() => testEvents.length = 0, 10000);
+    });
     return {
       testEvents
     };
