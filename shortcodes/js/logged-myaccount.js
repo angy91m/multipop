@@ -745,7 +745,7 @@ createApp({
         async function searchZones(txt, ctx, target, zonesKey = 'zones') {
             if (zoneSearch[ctx]) {
                 const res = await serverReq({
-                    action: 'admin_search_zones',
+                    action: (profile.role == 'administrator' ? 'admin' : 'resp') + '_search_zones',
                     search: txt.trim()
                 });
                 if (res.ok) {

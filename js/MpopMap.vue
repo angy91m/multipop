@@ -35,15 +35,10 @@ addEventsToMap = () => {
     }
   })
 };
-watch(props.events, (newValue) => {
-  console.log('EDITED');
-  console.log(newValue);
-  console.log(props.events);
-  console.log(eventsLayer);
+watch(props.events, () => {
   if (mounted) addEventsToMap();
 });
 onMounted(() => {
-  console.log('MOUNTED');
   mounted = true;
   L.Marker.prototype.options.icon.options.imagePath = 'https://unpkg.com/leaflet@1.9.4/dist/images/';
   map = L.map(elId.value).setView([41.9028, 12.4964], 6);

@@ -2369,7 +2369,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         return $comuni;
     }
-    private function search_zones($search = '', $soppressi = false) {
+    public function search_zones($search = '', $soppressi = false) {
         $zones = [];
         if (!is_string($search) || mb_strlen(trim($search), 'UTF-8') < 2) {
             return $zones;

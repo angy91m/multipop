@@ -370,4 +370,13 @@ class MultipopEventsPlugin {
     if ($comune) $res['codiceCatastale'] = $comune['codiceCatastale'];
     return $res;
   }
+  public static function get_events($options = []) {
+    $options += [
+      'txt' => null,
+      'reg' => null,
+      'prov' => null,
+      'comune' => null
+    ];
+
+  }
 }

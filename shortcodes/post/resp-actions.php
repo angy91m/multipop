@@ -607,7 +607,7 @@ switch( $post_data['action'] ) {
             exit;
         }
         break;
-    case 'admin_save_sub_notes':
+    case 'resp_save_sub_notes':
         if (!isset($post_data['id']) || !is_int($post_data['id'])) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
@@ -651,6 +651,9 @@ switch( $post_data['action'] ) {
             exit;
         }
         $res_data['data'] = true;
+        break;
+    case 'resp_search_zones':
+        $res_data['data'] = $this->search_zones($post_data['search']);
         break;
     case 'resp_confirm_profile_pending_edits':
         if (!isset($post_data['ID']) || !is_int($post_data['ID'])) {

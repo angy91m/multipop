@@ -1,5 +1,6 @@
 import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
-const { createApp, defineAsyncComponent, reactive, onMounted } = Vue,
+import Fuse from '/wp-content/plugins/multipop/js/fuse.js';
+const { createApp, defineAsyncComponent, ref, reactive, onMounted } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
   const loaded = [];
@@ -21,24 +22,135 @@ loadVueModule = (...modules) => {
   })));
   return loaded;
 },
-[mpopMap] = loadVueModule('MpopMap.vue');
-
+[mpopMap, vSel] = loadVueModule('MpopMap.vue', 'vue-select.js'),
+eventsPageNonce = document.getElementById('mpop-events-page-nonce').value;
+let triggerSearchTimeout;
 createApp({
   components: {
-    'mpop-map': defineAsyncComponent(() => mpopMap)
+    'mpop-map': defineAsyncComponent(() => mpopMap),
+    'v-select': defineAsyncComponent(() => vSel)
   },
   setup() {
+    function searchOpen(tag) {
+      const openVar = eval(tag + 'Open');
+      openVar.value = true;
+      setTimeout(()=> document.querySelector('#'+tag+'-select .vs__search').select(),300);
+    }
+    function reduceZones(zones, target, zonesKey = 'zones') {
+      const added = zones[zones.length - 1];
+      if (added.type == 'nazione') {
+        if (added.code == 'ita') {
+          target[zonesKey] = target[zonesKey].filter(z => z.type == 'nazione');
+        } else if (added.code == 'ext') {
+          target[zonesKey] = target[zonesKey].filter(z => z.type != 'nazione' || ['ita','ext'].includes(z.code));
+        } else {
+          if (target[zonesKey].find(z => z.type == 'nazione' && z.code == 'ext')) {
+            target[zonesKey].pop();
+          }
+        }
+        return;
+      }
+      if (target[zonesKey].find(z => z.type == 'nazione' && z.code == 'ita')) {
+        target[zonesKey].pop();
+        return;
+      }
+      if (added.type == 'comune') {
+        if (target[zonesKey].find(z => (z.type == 'provincia' && z.codice == added.provincia.codice) || (z.type == 'regione' && z.nome == added.provincia.regione) ) ) {
+          target[zonesKey].pop();
+        }
+      }
+      if (added.type == 'provincia') {
+        if (target[zonesKey].find(z => (z.type == 'regione' && z.nome == added.regione) ) ) {
+          target[zonesKey].pop();
+        } else {
+          target[zonesKey] = target[zonesKey].filter(z => z.type != 'comune' || z.provincia.codice != added.codice);
+        }
+      }
+      if (added.type == 'regione') {
+        target[zonesKey] = target[zonesKey].filter(z => z.type == 'regione' || (z.type == 'provincia' && z.regione != added.nome) || (z.type == 'comune' && z.provincia.regione != added.nome));
+      }
+    }
+    function triggerSearch(txt, loading, callable, ...args) {
+      clearTimeout(triggerSearchTimeout);
+      loading(true);
+      const func = eval(callable);
+      triggerSearchTimeout = setTimeout( () => func(txt, ...args).then(() => loading(false)), 500);
+    }
+    function addSuppressToLabel(option) {
+      let res = '';
+      if (option.type == 'provincia' || option.type == 'regione') {
+        if (option.soppressa) res += ' (soppressa)';
+      } else {
+        if (option.soppresso) res += ' (soppresso)';
+      }
+      return res;
+    }
+    function fuseSearch(options, search) {
+      const fuse = new Fuse(options, {
+        keys: ['label'],
+        shouldSort: true
+      });
+      return search.trim().length ? fuse.search(search).map(({item}) => item) : fuse.list;
+    }
+    async function searchZones(txt, ctx, target, zonesKey = 'zones') {
+      if (zoneSearch[ctx]) {
+        const res = await serverReq({
+          action: 'search_zones',
+          search: txt.trim()
+        });
+        if (res.ok) {
+          const zones = await res.json();
+          if (zones.data) {
+            zoneSearch[ctx].length = 0;
+            zoneSearch[ctx].push(...target[zonesKey]);
+            zoneSearch[ctx].push(...zones.data.filter(z => !zoneSearch[ctx].find(zz => z.type == zz.type && (z.type == 'regione' ? z.nome == zz.nome : ( z.type == 'nazione' ? z.code == zz.code : z.codice == zz.codice)))));
+          } else {
+            console.error('Unknown error');
+          }
+        } else {
+          console.error('Unknown error');
+        }
+      }
+    }
+    function serverReq(obj) {
+      return fetch(location.origin + location.pathname, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...obj,
+          'mpop-events-page-nonce': eventsPageNonce
+        })
+      });
+    }
     const testEvents = reactive([{
       title: 'Prova',
       location: 'Via Laurentina, 3 Roma',
       lat: 41.8503514,
       lng: 12.4777725
-    }]);
+    }]),
+    eventSearchZoneOpen = ref(false),
+    eventSearch = reactive({
+      txt: '',
+      zones: []
+    }),
+    zoneSearch = reactive({
+      events: []
+    });
     onMounted(()=>{
       setTimeout(() => testEvents.length = 0, 10000);
     });
     return {
-      testEvents
+      testEvents,
+      eventSearch,
+      zoneSearch,
+      eventSearchZoneOpen,
+      searchOpen,
+      addSuppressToLabel,
+      fuseSearch,
+      reduceZones,
+      triggerSearch
     };
   }
 })
