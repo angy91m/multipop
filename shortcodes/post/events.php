@@ -11,7 +11,7 @@ if (isset($all_headers['content-type']) && $all_headers['content-type'] == 'appl
   }
 }
 save_test($all_headers);
-save_test($post_data);
+save_test($post_data, 1);
 $res_data = [];
 if (!isset($post_data['action']) || !is_string($post_data['action']) || !trim($post_data['action'])) {
   $res_data['error'] = ['action'];
