@@ -802,12 +802,12 @@ class MultipopPlugin {
         dbDelta( $q );
 
         // ALTER SETTINGS
-        // $q = "SHOW COLUMNS FROM " . $this::db_prefix('plugin_settings') . ";";
-        // $column_names = $wpdb->get_col($q);
-        // if (!in_array('seconds_between_login_attempts', $column_names)) {
-        //     $wpdb->query("ALTER TABLE " . $this::db_prefix('plugin_settings') . " ADD `seconds_between_login_attempts` BIGINT UNSIGNED NOT NULL, ADD `seconds_in_blacklist` BIGINT UNSIGNED NOT NULL;");
-        //     $wpdb->query("UPDATE " . $this::db_prefix('plugin_settings') . " SET `seconds_between_login_attempts` = 30, `seconds_in_blacklist` = 300 WHERE `id` = 1;");
-        // }
+        $q = "SHOW COLUMNS FROM " . $this::db_prefix('plugin_settings') . ";";
+        $column_names = $wpdb->get_col($q);
+        if (!in_array('gmaps_api_key', $column_names)) {
+            $wpdb->query("ALTER TABLE " . $this::db_prefix('plugin_settings') . " ADD `gmaps_api_key` VARCHAR(255) NULL;");
+            $wpdb->query("UPDATE " . $this::db_prefix('plugin_settings') . " SET `gmaps_api_key` = '';");
+        }
 
         // LOGS TABLE
         $q = "CREATE TABLE IF NOT EXISTS " . $this::db_prefix('logs') . " (
@@ -890,7 +890,8 @@ class MultipopPlugin {
                     `newsletter_policy`,
                     `publish_policy`,
                     `max_failed_login_attempts`,
-                    `last_auto_action`
+                    `last_auto_action`,
+                    `gmaps_api_key`
                 )"
                 . " VALUES (
                     1,
@@ -919,7 +920,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                         )
                     .",
                     5,
-                    " . time() . "
+                    " . time() . ",
+                    ''
                 ) ;";
             $wpdb->query($q);
         }
