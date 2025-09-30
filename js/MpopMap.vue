@@ -2,7 +2,7 @@
   <div :id="elId"></div>
 </template>
 <style>
-@import '/wp-content/plugins/multipop/css/leaflet.css';
+@import 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
 .leaflet-control-attribution > :first-child, .leaflet-control-attribution > :nth-child(2) {
   display: none;
 }
