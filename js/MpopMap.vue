@@ -25,14 +25,16 @@ props = defineProps({
   }
 }),
 elId = ref('mpop-map-' + makeId()),
-addEventsToMap = () => props.events.forEach(ev => {
+addEventsToMap = () => {
   eventsLayer.clearLayers();
-  if (ev.location && typeof ev.lat != 'undefined' ) {
-    const marker = L.marker([ev.lat, ev.lng]);
-    marker.bindPopup(`<strong>${ev.title}</strong><br>${ev.location}`);
-    eventsLayer.addLayer(marker);
-  }
-});
+  props.events.forEach(ev => {
+    if (ev.location && typeof ev.lat != 'undefined' ) {
+      const marker = L.marker([ev.lat, ev.lng]);
+      marker.bindPopup(`<strong>${ev.title}</strong><br>${ev.location}`);
+      eventsLayer.addLayer(marker);
+    }
+  })
+};
 watch(props.events, (newValue) => {
   console.log('EDITED');
   console.log(newValue);
