@@ -311,7 +311,7 @@ class MultipopEventsPlugin {
     }
   }
   public static function events_page() {
-    require MULTIPOP_PLUGIN_PATH . '/pages/events.php';
+    require MULTIPOP_PLUGIN_PATH . '/shortcodes/events.php';
   }
   public static function curl_init($url, $settings = []) {
     $curlObj = curl_init($url);
