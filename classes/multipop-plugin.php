@@ -926,7 +926,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     }
 
     // RETURN ECHO FROM FUNCTION NAME TO STRING
-    private function html_to_string( $html_func, ...$args ) {
+    public static function html_to_string( $html_func, ...$args ) {
         ob_start();
         $html_func(...$args);
         return ob_get_clean();
@@ -1953,7 +1953,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     
     // REGISTRATION PAGE SHORTCODE
     public function register_sc() {
-        return $this->html_to_string( [$this, 'register_form'] );
+        return $this::html_to_string( [$this, 'register_form'] );
     }
 
     // MYACCOUNT PAGE HTML
@@ -1963,7 +1963,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
 
     // MYACCOUNT PAGE SHORTCODE
     public function myaccount_sc() {
-        return $this->html_to_string( [$this, 'myaccount_page'] );
+        return $this::html_to_string( [$this, 'myaccount_page'] );
     }
 
     // ENTER LINK SHORTCODE

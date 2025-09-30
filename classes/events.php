@@ -137,6 +137,10 @@ class MultipopEventsPlugin {
       return '<p>' . MultipopPlugin::dashicon('clock') .' ' . $start_date . ' ' . $start_time . ($end_string ? ' - ' . $end_string : '') . $location . '</p>';
     });
 
+    add_shortcode('mpop_events_page', function () {
+      return MultipopPlugin::html_to_string([self::class, 'events_page']);
+    });
+
     // HIDING META INFO FROM EVENT RENDERING
     add_filter( 'render_block', function($block_content, $block) {
       if (
@@ -290,5 +294,8 @@ class MultipopEventsPlugin {
     if (!$valid_date && $post->post_status == 'publish') {
       wp_update_post(['ID'=>$post_id, 'post_status'=>'draft']);
     }
+  }
+  public static function events_page() {
+    require '../pages/events.php';
   }
 }
