@@ -141,6 +141,12 @@ class MultipopEventsPlugin {
       return MultipopPlugin::html_to_string([self::class, 'events_page']);
     });
 
+
+    add_filter('run_wptexturize', function() {
+      save_test(get_page_template());
+      return $run_texturize;
+    });
+
     // HIDING META INFO FROM EVENT RENDERING
     add_filter( 'render_block', function($block_content, $block) {
       if (

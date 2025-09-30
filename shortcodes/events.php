@@ -1,6 +1,5 @@
 <?php
 defined( 'ABSPATH' ) || exit;
-add_filter('run_wptexturize', function() {return false;});
 if (
   !str_starts_with( $_SERVER['REQUEST_URI'], '/wp-admin' )
   && !str_starts_with( $_SERVER['REQUEST_URI'], '/wp-json' )
