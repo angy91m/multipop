@@ -5,7 +5,7 @@
 @import '/wp-content/plugins/multipop/css/leaflet.css';
 </style>
 <script setup>
-import { reactive, onBeforeMount } from 'vue';
+import { ref, onBeforeMount } from 'vue';
 import L from '/wp-content/plugins/multipop/js/leaflet.js';
 const makeId = (length = 5) => {
     let result = '';
