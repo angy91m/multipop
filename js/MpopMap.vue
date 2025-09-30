@@ -8,8 +8,9 @@
 }
 </style>
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, defineModel } from 'vue';
 import L from '/wp-content/plugins/multipop/js/leaflet.js';
+let map, eventsLayer, mounted;
 const makeId = (length = 5) => {
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -18,13 +19,24 @@ const makeId = (length = 5) => {
   }
   return result;
 },
+events = defineModel({default: []}),
 elId = ref('mpop-map-' + makeId('5')),
-map = ref(null);
+addEventsToMap = () => events.value.forEach(ev => {
+  eventsLayer.clearLayers();
+  if (ev.location && typeof ev.lat != 'undefined' ) {
+    const marker = L.marker([ev.lat, ev.lng]);
+    marker.bindPopup(`<strong>${ev.title}</strong><br>${ev.location}`);
+    eventsLayer.addLayer(marker);
+  }
+});
 onMounted(() => {
-  map.value = L.map(elId.value).setView([41.9028, 12.4964], 6);
+  mounted = true;
+  map = L.map(elId.value).setView([41.9028, 12.4964], 6);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map.value);
+  }).addTo(map);
+  eventsLayer = L.layerGroup().addTo(map);
+  addEventsToMap();
 });
 </script>
 
