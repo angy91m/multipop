@@ -33,8 +33,10 @@ addEventsToMap = () => props.events.forEach(ev => {
     eventsLayer.addLayer(marker);
   }
 });
-watch(props.events, () => {
+watch(props.events, (newValue) => {
   console.log('EDITED');
+  console.log(newValue);
+  console.log(props.events);
   if (mounted) addEventsToMap();
 });
 onMounted(() => {
