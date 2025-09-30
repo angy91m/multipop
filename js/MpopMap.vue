@@ -31,6 +31,7 @@ addEventsToMap = () => events.value.forEach(ev => {
 });
 onMounted(() => {
   mounted = true;
+  L.Marker.prototype.options.icon.options.imagePath = '/prova/';
   map = L.map(elId.value).setView([41.9028, 12.4964], 6);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
