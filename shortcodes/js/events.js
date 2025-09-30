@@ -1,5 +1,5 @@
 import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
-const { createApp } = Vue,
+const { createApp, defineAsyncComponent } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
     const loaded = [];
