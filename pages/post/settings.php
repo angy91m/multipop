@@ -173,6 +173,9 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-settings-nonce'], 'mpop-admin-setti
         if (is_string($_REQUEST['pp_client_secret'])) {
             $edits['pp_client_secret'] = trim($_REQUEST['pp_client_secret']);
         }
+        if (is_string($_REQUEST['gmaps_api_key'])) {
+            $edits['gmaps_api_key'] = trim($_REQUEST['gmaps_api_key']);
+        }
         $policies = ['marketing', 'newsletter', 'publish'];
         foreach ($policies as $p) {
             if (is_string($_REQUEST[$p.'_policy']) ) {

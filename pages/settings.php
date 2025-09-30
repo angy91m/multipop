@@ -85,6 +85,9 @@ do_action('mpop_settings_notices', $this->get_settings());
     <h4>PayPal Client Secret</h4>
     <input type="password" name="pp_client_secret" value="<?=$this->settings['pp_client_secret']?>" />
     <hr>
+    <h4>Google Maps API key</h4>
+    <input type="password" name="gmaps_api_key" value="<?=$this->settings['gmaps_api_key'] ?? '' ?>" />
+    <hr>
     <h3>Master key</h3>
     <button class="button" id="master_doc_key_button"><?=!$this->settings['master_doc_key'] ? 'Imposta' : 'Aggiorna'?> master key</button>
     <span id="master_doc_key_field" style="display:none">
