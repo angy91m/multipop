@@ -1,15 +1,13 @@
 <?php
 defined( 'ABSPATH' ) || exit;
-$all_headers = getallheaders();
-if (isset($all_headers['Content-Type']) && $all_headers['Content-Type'] == 'application/json') {
+$all_headers = getallheaders_lower();
+if (isset($all_headers['content-type']) && $all_headers['content-type'] == 'application/json') {
     $post_data = json_decode( file_get_contents('php://input'), true );
-} else {
-    if (isset($_POST['data']) && $_POST['data'] ) {
-        $jData = urldecode($_POST['data']);
-        $jData = @json_decode($jData, true);
-        if (is_array($jData)) {
-            $post_data = $jData;
-        }
+} elseif (isset($_POST['data']) && $_POST['data']) {
+    $jData = urldecode($_POST['data']);
+    $jData = @json_decode($jData, true);
+    if (is_array($jData)) {
+        $post_data = $jData;
     }
 }
 $res_data = [];

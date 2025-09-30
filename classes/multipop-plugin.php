@@ -20,6 +20,14 @@ function save_test($obj, $id=0, $append = false) {
     file_put_contents(MULTIPOP_PLUGIN_PATH ."/test-$id.txt", $txt . html_dump($obj));
 }
 
+function getallheaders_lower() {
+    $res = [];
+    foreach(getallheaders() as $k => $v) {
+        $res[mb_strtolower($k, 'UTF-8')] = $v;
+    }
+    return $v;
+}
+
 class MultipopPlugin {
 
     private ?array $settings;

@@ -1,7 +1,7 @@
 <?php
 defined( 'ABSPATH' ) || exit;
-$all_headers = getallheaders();
-if (isset($all_headers['Content-Type']) && $all_headers['Content-Type'] == 'application/json') {
+$all_headers = getallheaders_lower();
+if (isset($all_headers['content-type']) && $all_headers['content-type'] == 'application/json') {
   $post_data = json_decode( file_get_contents('php://input'), true );
 } elseif (isset($_POST['data']) && $_POST['data']) {
   $jData = urldecode($_POST['data']);
@@ -10,9 +10,6 @@ if (isset($all_headers['Content-Type']) && $all_headers['Content-Type'] == 'appl
     $post_data = $jData;
   }
 }
-save_test(file_get_contents('php://input'));
-save_test($post_data,1);
-save_test($all_headers,2);
 $res_data = [];
 if (!isset($post_data['action']) || !is_string($post_data['action']) || !trim($post_data['action'])) {
   $res_data['error'] = ['action'];
