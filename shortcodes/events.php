@@ -3,7 +3,7 @@ defined( 'ABSPATH' ) || exit;
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
 <div id="app" style="max-width: unset">
-    <mpop-map style="min-height: 500px;" v-model="testEvents"></mpop-map>
+    <mpop-map style="min-height: 500px;" :events="testEvents"></mpop-map>
 </div>
 <script src="<?=plugins_url()?>/multipop/js/vue.global.min.js"></script>
 <script src="<?=plugins_url()?>/multipop/js/quasar.umd.prod.js"></script>

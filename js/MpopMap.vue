@@ -8,7 +8,7 @@
 }
 </style>
 <script setup>
-import { ref, onMounted, defineModel } from 'vue';
+import { ref, onMounted, defineProps, watch } from 'vue';
 import L from '/wp-content/plugins/multipop/js/leaflet.js';
 let map, eventsLayer, mounted;
 const makeId = (length = 5) => {
@@ -19,15 +19,22 @@ const makeId = (length = 5) => {
   }
   return result;
 },
-events = defineModel({default: []}),
-elId = ref('mpop-map-' + makeId('5')),
-addEventsToMap = () => events.value.forEach(ev => {
+props = defineProps({
+  events: {
+    default: []
+  }
+}),
+elId = ref('mpop-map-' + makeId()),
+addEventsToMap = () => props.events.forEach(ev => {
   eventsLayer.clearLayers();
   if (ev.location && typeof ev.lat != 'undefined' ) {
     const marker = L.marker([ev.lat, ev.lng]);
     marker.bindPopup(`<strong>${ev.title}</strong><br>${ev.location}`);
     eventsLayer.addLayer(marker);
   }
+});
+watch(props.events, () => {
+  if (mounted) addEventsToMap();
 });
 onMounted(() => {
   mounted = true;
