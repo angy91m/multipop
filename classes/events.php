@@ -276,7 +276,22 @@ class MultipopEventsPlugin {
       return;
     }
     if (isset($_POST['mpop_event_location'])) {
-      update_post_meta($post_id, '_mpop_event_location', trim($_POST['mpop_event_location']));
+      $location = trim($_POST['mpop_event_location']);
+      update_post_meta($post_id, '_mpop_event_location', $location);
+      $geo = self::geocode($location);
+      if (!$geo) {
+        delete_post_meta($post_id, '_mpop_event_lat');
+        delete_post_meta($post_id, '_mpop_event_lng');
+        delete_post_meta($post_id, '_mpop_event_codice_catastale');
+      } else {
+        update_post_meta($post_id, '_mpop_event_lat', $geo['lat']);
+        update_post_meta($post_id, '_mpop_event_lng', $geo['lng']);
+        if ($geo['codiceCatastale']) {
+          update_post_meta($post_id, '_mpop_event_codice_catastale', $geo['codiceCatastale']);
+        } else {
+          delete_post_meta($post_id, '_mpop_event_codice_catastale');
+        }
+      }
     }
     try {
       $start_date = MultipopPlugin::validate_date($_POST['mpop_event_start_date']);
@@ -312,10 +327,15 @@ class MultipopEventsPlugin {
     }
     return $curlObj;
   }
-  public static function geocode($address, $key) {
+  public static function geocode($address, $key = '') {
+    if (!$address) return false;
+    $mpop_plugin = MultipopPlugin::$instances[0];
+    if (!$key) {
+      $key = $mpop_plugin->get_settings()['gmaps_api_key'];
+    }
     $curlObj = self::curl_init('https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($address) . "&key=$key");
     $data = curl_exec($curlObj);
-    if ($data === false) return false;
+    if (!$data) return false;
     $data = json_decode($data, true);
     if ($data['status'] != 'OK' || empty($data['results'])) return false;
     $data = $data['results'][0];
@@ -338,7 +358,7 @@ class MultipopEventsPlugin {
       similar_text($c['nome'], $comune_name, $perc);
       $c['similarity'] = $perc;
       return $c;
-    }, array_filter(MultipopPlugin::$instances[0]->get_comuni_all(), function($c) use ($sigla) {
+    }, array_filter($mpop_plugin->get_comuni_all(), function($c) use ($sigla) {
       return $c['soppresso'] !== true && $c['provincia']['sigla'] == $sigla;
     }));
     $comune = false;
