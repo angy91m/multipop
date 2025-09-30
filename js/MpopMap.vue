@@ -37,6 +37,7 @@ watch(props.events, (newValue) => {
   console.log('EDITED');
   console.log(newValue);
   console.log(props.events);
+  console.log(eventsLayer);
   if (mounted) addEventsToMap();
 });
 onMounted(() => {
