@@ -38,17 +38,17 @@ if (
           v-bind="attributes"
           v-on="events"
         />
+      </template>
+      <template v-slot:option="zone">
+        {{zone.untouched_label + addSuppressToLabel(zone)}}
+      </template>
+      <template v-slot:no-options="{search}">
+        <template v-if="search.trim().length > 1">
+          Nessun risultato per "{{search}}"
         </template>
-        <template v-slot:option="zone">
-          {{zone.untouched_label + addSuppressToLabel(zone)}}
+        <template v-else>
+          Inserisci almeno 2 caratteri
         </template>
-        <template v-slot:no-options="{search}">
-          <template v-if="search.trim().length > 1">
-            Nessun risultato per "{{search}}"
-          </template>
-          <template v-else>
-            Inserisci almeno 2 caratteri
-          </template>
       </template>
     </v-select>
     <mpop-map style="min-height: 500px;" :events="testEvents"></mpop-map>
