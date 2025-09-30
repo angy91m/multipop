@@ -802,12 +802,12 @@ class MultipopPlugin {
         dbDelta( $q );
 
         // ALTER SETTINGS
-        $q = "SHOW COLUMNS FROM " . $this::db_prefix('plugin_settings') . ";";
-        $column_names = $wpdb->get_col($q);
-        if (!in_array('gmaps_api_key', $column_names)) {
-            $wpdb->query("ALTER TABLE " . $this::db_prefix('plugin_settings') . " ADD `gmaps_api_key` VARCHAR(255) NULL;");
-            $wpdb->query("UPDATE " . $this::db_prefix('plugin_settings') . " SET `gmaps_api_key` = '';");
-        }
+        // $q = "SHOW COLUMNS FROM " . $this::db_prefix('plugin_settings') . ";";
+        // $column_names = $wpdb->get_col($q);
+        // if (!in_array('gmaps_api_key', $column_names)) {
+        //     $wpdb->query("ALTER TABLE " . $this::db_prefix('plugin_settings') . " ADD `gmaps_api_key` VARCHAR(255) NULL;");
+        //     $wpdb->query("UPDATE " . $this::db_prefix('plugin_settings') . " SET `gmaps_api_key` = '';");
+        // }
 
         // LOGS TABLE
         $q = "CREATE TABLE IF NOT EXISTS " . $this::db_prefix('logs') . " (
