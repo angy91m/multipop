@@ -1,5 +1,5 @@
 <template>
-    <div :id="elId">MAPPA</div>
+    <div :id="elId"></div>
 </template>
 <style>
 @import '/wp-content/plugins/multipop/css/leaflet.css';
