@@ -1,5 +1,5 @@
 <template>
-  <div :id="elId" style="min-height: 300px;"></div>
+  <div :id="elId" style="min-height: 450px;"></div>
 </template>
 <style>
 @import '/wp-content/plugins/multipop/css/leaflet.css';
