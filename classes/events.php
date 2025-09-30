@@ -143,7 +143,8 @@ class MultipopEventsPlugin {
 
 
     add_filter('run_wptexturize', function($run_texturize) {
-      save_test(get_page_template());
+      $p = get_post();
+      save_test($p->page_template);
       return $run_texturize;
     });
 
