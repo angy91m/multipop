@@ -296,6 +296,6 @@ class MultipopEventsPlugin {
     }
   }
   public static function events_page() {
-    require '../pages/events.php';
+    require MULTIPOP_PLUGIN_PATH . '/pages/events.php';
   }
 }
