@@ -1,8 +1,11 @@
 <template>
-  <div :id="elId" style="height: 500px;"></div>
+  <div :id="elId" style="min-height: 300px;"></div>
 </template>
 <style>
 @import '/wp-content/plugins/multipop/css/leaflet.css';
+.leaflet-control-attribution > :first-child, .leaflet-control-attribution > :nth-child(2) {
+  display: none;
+}
 </style>
 <script setup>
 import { ref, onMounted } from 'vue';
