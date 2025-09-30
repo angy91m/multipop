@@ -9,6 +9,7 @@ if (
   exit;
 }
 ?>
+<link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
 <div id="app" style="max-width: unset">
   <v-select
