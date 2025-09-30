@@ -25,7 +25,7 @@ function getallheaders_lower() {
     foreach(getallheaders() as $k => $v) {
         $res[mb_strtolower($k, 'UTF-8')] = $v;
     }
-    return $v;
+    return $res;
 }
 
 class MultipopPlugin {
