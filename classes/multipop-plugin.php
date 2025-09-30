@@ -2377,7 +2377,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         return $comuni;
     }
-    public function search_zones($search = '', $soppressi = false) {
+    public function search_zones($search = '', $soppressi = false, $countries_add = true) {
         $zones = [];
         if (!is_string($search) || mb_strlen(trim($search), 'UTF-8') < 2) {
             return $zones;
@@ -2490,23 +2490,25 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         });
 
         //MOD FOR COUNTRIES
-        $countries = $this->get_countries_all();
-        if (!empty($countries)) {
-            foreach ($countries as $c) {
-                $zone = [
-                    'nome' => $c['name'],
-                    'type' => 'nazione',
-                    'code' => $c['code'],
-                    'untouched_label' => "Nazione: $c[name]"
-                ];
-                $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT', $zone['untouched_label']);
-                if ($c['code'] == 'ita') {
-                    array_unshift($zones, $zone);
-                } else {
-                    $zones[] = $zone;
+        if ($countries_add) {
+            $countries = $this->get_countries_all();
+            if (!empty($countries)) {
+                foreach ($countries as $c) {
+                    $zone = [
+                        'nome' => $c['name'],
+                        'type' => 'nazione',
+                        'code' => $c['code'],
+                        'untouched_label' => "Nazione: $c[name]"
+                    ];
+                    $zone['label'] = iconv('UTF-8','ASCII//TRANSLIT', $zone['untouched_label']);
+                    if ($c['code'] == 'ita') {
+                        array_unshift($zones, $zone);
+                    } else {
+                        $zones[] = $zone;
+                    }
                 }
+                $zones[] = $this->estero_zone();
             }
-            $zones[] = $this->estero_zone();
         }
 
         return $zones;

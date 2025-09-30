@@ -37,7 +37,7 @@ if (!wp_verify_nonce($post_data['mpop-events-page-nonce'], 'mpop-events-page')) 
 
 switch ($post_data['action']) {
   case 'search_zones':
-    $res_data['data'] = MultipopPlugin::$instances[0]->search_zones($post_data['search']);
+    $res_data['data'] = MultipopPlugin::$instances[0]->search_zones($post_data['search'], false, false);
     break;
   default:
     $res_data['error'] = ['action'];
