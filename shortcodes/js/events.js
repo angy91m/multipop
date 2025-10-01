@@ -22,13 +22,14 @@ loadVueModule = (...modules) => {
   })));
   return loaded;
 },
-[mpopMap, vSel] = loadVueModule('MpopMap.vue', 'vue-select.js'),
+[mpopMap, vSel, mpopSelect] = loadVueModule('MpopMap.vue', 'vue-select.js', 'MpopSelect.vue'),
 eventsPageNonce = document.getElementById('mpop-events-page-nonce').value;
 let triggerSearchTimeout;
 createApp({
   components: {
     'mpop-map': defineAsyncComponent(() => mpopMap),
-    'v-select': defineAsyncComponent(() => vSel)
+    'v-select': defineAsyncComponent(() => vSel),
+    'mpop-select': defineAsyncComponent(() => mpopSelect)
   },
   setup() {
     function searchOpen(tag) {
