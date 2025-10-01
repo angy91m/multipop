@@ -3,6 +3,7 @@
     v-model="model"
     ref="element"
     v-on="$attrs"
+    @close="()=>console.log('no')"
   >
     <template v-for="(_, name) in $slots" v-slot:[name]="slotData"><slot :name="name" v-bind="slotData" /></template>
   </VSelect>
