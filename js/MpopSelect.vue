@@ -6,9 +6,9 @@
 </template>
 <script setup>
     import VSelect from '/wp-content/plugins/multipop/js/vue-select.js';
-    import {ref, onBeforeMount} from 'vue';
+    import {ref, onMounted} from 'vue';
     const element = ref('element')
-    onBeforeMount(() => {
+    onMounted(() => {
         console.log(element.value);
     });
 </script>
