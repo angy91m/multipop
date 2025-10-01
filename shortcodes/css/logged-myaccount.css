@@ -58,9 +58,9 @@ span.mpop-app-notice > span > span.dashicons-before.dashicons-no-alt {
     width: fit-content;
 }
 #mpop-profile-table td:nth-child(2),
-#mpop-profile-table td:nth-child(2) input,
+#mpop-profile-table td:nth-child(2) input:not(.vs__search),
 #mpop-user-table td:nth-child(2),
-#mpop-user-table td:nth-child(2) input,
+#mpop-user-table td:nth-child(2) input:not(.vs__search),
 #mpop-passwordChange input,
 #mpop-mkChange input {
     width: 100%;
