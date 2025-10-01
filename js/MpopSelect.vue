@@ -7,12 +7,20 @@
     @close="open = false"
     :filter="filter"
   >
+    <template v-if="!$slots.search" #search="{attributes, events}">
+      <input
+        class="vs__search"
+        :style="'display: ' + (open ? 'unset' : 'none')"
+        v-bind="attributes"
+        v-on="events"
+      />
+    </template>
     <template v-for="(_, name) in $slots" v-slot:[name]="slotData"><slot :name="name" v-bind="slotData" /></template>
   </VSelect>
 </template>
 <script setup>
 import VSelect from '/wp-content/plugins/multipop/js/vue-select.js';
-import {ref, onMounted, defineModel, defineProps, computed, useSlots} from 'vue';
+import {ref, defineModel, defineProps, computed, defineExpose, useSlots} from 'vue';
 import Fuse from 'fuse';
 function fuseSearch(options, search) {
   const fuse = new Fuse(options, {
@@ -31,15 +39,10 @@ props = defineProps({
 }),
 open = ref(false),
 filter = computed(() => props.filter || fuseSearch);
-
-const slots = useSlots();
-console.log(slots);
+defineExpose({open});
+console.log(useSlots())
 function onOpen() {
   open.value = false;
   setTimeout(()=>element.value.$el.querySelector('input.vs__search').select(), 300);
 }
-
-onMounted(() => {
-  console.log(element.value);
-});
 </script>
