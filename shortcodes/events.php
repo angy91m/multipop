@@ -26,6 +26,7 @@ if (
     @search="(searchTxt, loading) => {
       triggerSearch(searchTxt, loading, 'searchZones', 'events', eventSearch);
     }"
+    prova
   >
     <template v-slot:option="zone">
       {{zone.untouched_label + addSuppressToLabel(zone)}}

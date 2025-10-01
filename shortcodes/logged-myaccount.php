@@ -166,6 +166,15 @@ if ($this->settings['pp_client_id']) {
                         <td><strong>Nazione di nascita:</strong></td>
                         <td v-if="!profileEditing">{{showCountryName(profile.mpop_birthplace_country)}}</td>
                         <td v-else>
+                            <mpop-select
+                                id="birthplaceCountry-select"
+                                :class="savingProfileErrors.includes('mpop_birthplace_country') ? 'bad-input' : ''"
+                                v-model="profileInEditing.mpop_birthplace_country"
+                                :options="countries"
+                                label="name"
+                                :reduce="c=>c.code"
+                            >
+                            </mpop-select>
                             <v-select
                                 id="birthplaceCountry-select"
                                 :class="savingProfileErrors.includes('mpop_birthplace_country') ? 'bad-input' : ''"

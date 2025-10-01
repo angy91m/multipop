@@ -6,8 +6,8 @@ const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAs
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
     const loaded = [];
-    modules.forEach(path => loaded.push(loadModule('/wp-content/plugins/multipop/js/'+ path, {
-        moduleCache: { vue: Vue },
+    modules.forEach(module => loaded.push(loadModule('/wp-content/plugins/multipop/js/'+ (typeof module == 'string' ? module : module.path), {
+    moduleCache: { vue: Vue, ...(typeof module.modules == 'undefined' ? {} : module.modules) },
         async getFile(url) {
             const response = await fetch(url);
             if ( !response.ok ){
@@ -24,7 +24,7 @@ loadVueModule = (...modules) => {
     })));
     return loaded;
 },
-[vSel, mpopUploader, mpopPaypalButton] = loadVueModule('vue-select.js', 'MpopUploader.vue', 'MpopPaypalButton.vue'),
+[vSel, mpopUploader, mpopPaypalButton, mpopSelect] = loadVueModule('vue-select.js', 'MpopUploader.vue', 'MpopPaypalButton.vue', {path: 'MpopSelect.vue', modules: {fuse: Fuse}}),
 mailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/s,
 passwordRegex = {
     rr: [
@@ -234,6 +234,7 @@ let searchUsersTimeout, triggerSearchTimeout, decryptPasswordSaveTimeout;
 createApp({
     components: {
         'v-select': defineAsyncComponent(() => vSel),
+        'mpop-select': defineAsyncComponent(() => mpopSelect),
         'v-intl-phone': IntlTelInput,
         'mpop-uploader': defineAsyncComponent(() => mpopUploader),
         'mpop-pp-btn': defineAsyncComponent(() => mpopPaypalButton),

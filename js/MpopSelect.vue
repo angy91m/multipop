@@ -1,6 +1,6 @@
 <template>
   <VSelect
-    v-model="model"
+    v-model="modelValue"
     ref="element"
     v-on="$attrs"
     @open="onOpen"
@@ -11,7 +11,7 @@
     <template v-if="!$slots.search" #search="{attributes, events}">
       <input
         class="vs__search"
-        :style="'display: ' + (open ? 'unset' : 'none')"
+        :style="'display: ' + (open || (props.multiple ? true : !modelValue) ? 'unset' : 'none')"
         v-bind="attributes"
         v-on="events"
       />
@@ -29,7 +29,7 @@
 </template>
 <script setup>
 import VSelect from '/wp-content/plugins/multipop/js/vue-select.js';
-import {ref, defineModel, defineProps, computed, defineExpose, defineEmits} from 'vue';
+import {ref, defineModel, defineProps, computed, defineExpose, defineEmits, useAttrs} from 'vue';
 import Fuse from 'fuse';
 function fuseSearch(options, search) {
   const fuse = new Fuse(options, {
@@ -39,14 +39,17 @@ function fuseSearch(options, search) {
   return (props.trim ? search.trim() : search).length ? fuse.search(search).map(({item}) => item) : fuse.list;
 }
 const element = ref('element'),
-model = defineModel(),
+modelValue = defineModel(),
 props = defineProps({
   filter: {
     type: Function
   },
+  multiple: {
+    default: false
+  },
   minChars: {
     type: Number,
-    default: 2
+    default: 0
   },
   trim: {
     default: true
@@ -65,4 +68,5 @@ function onSearch(searchTxt, loading) {
   if ( searchTxt.length < props.minChars) return loading(false);
   emit('search', searchTxt, loading);
 }
+console.log(useAttrs());
 </script>
