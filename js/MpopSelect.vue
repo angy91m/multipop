@@ -16,9 +16,9 @@
         v-on="events"
       />
     </template>
-    <template v-if="!$slots['no-options']" #no-options="{searchTxt}">
-      <template v-if="(props.trim ? searchTxt.trim() : searchTxt).length >= props.minChars">
-        Nessun risultato per "{{searchTxt}}"
+    <template v-if="!$slots['no-options']" #no-options="{search}">
+      <template v-if="(props.trim ? search.trim() : search).length >= props.minChars">
+        Nessun risultato per "{{search}}"
       </template>
       <template v-else>
         Inserisci almeno {{ props.minChars }} caratteri
@@ -61,8 +61,8 @@ function onOpen() {
   setTimeout(()=>element.value.$el.querySelector('input.vs__search').select(), 300);
 }
 function onSearch(searchTxt, loading) {
-  // searchTxt = props.trim ? searchTxt.trim() : searchTxt;
-  // if ( searchTxt.length < props.minChars) return loading(false);
-  // emit('search', searchTxt, loading);
+  searchTxt = props.trim ? searchTxt.trim() : searchTxt;
+  if ( searchTxt.length < props.minChars) return loading(false);
+  emit('search', searchTxt, loading);
 }
 </script>
