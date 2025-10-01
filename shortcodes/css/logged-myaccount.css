@@ -78,15 +78,15 @@ span.mpop-app-notice > span > span.dashicons-before.dashicons-no-alt {
 #mpop-user-table textarea {
     min-width: 200px;
 }
-#mpop-profile-table input,
+#mpop-profile-table input:not(.vs__search),
 #mpop-profile-table select,
 #mpop-profile-table textarea,
-#mpop-user-table input,
+#mpop-user-table input:not(.vs__search),
 #mpop-user-table select,
 #mpop-user-table textarea,
 #mpop-passwordChange input,
 #mpop-mkChange input,
-#mpop-user-search input {
+#mpop-user-search input:not(.vs__search) {
     font-size: var(--wp--preset--font-size--medium);
     padding: 5px;
     font-family: inherit;
