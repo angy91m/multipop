@@ -4,8 +4,8 @@ const { createApp, defineAsyncComponent, ref, reactive, onMounted } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
   const loaded = [];
-  modules.forEach(path => loaded.push(loadModule('/wp-content/plugins/multipop/js/'+ path, {
-    moduleCache: { vue: Vue },
+  modules.forEach(module => loaded.push(loadModule('/wp-content/plugins/multipop/js/'+ (typeof module == 'string' ? module : module.path), {
+    moduleCache: { vue: Vue, ...(typeof module.modules == 'undefined' ? {} : module.modules) },
     async getFile(url) {
       const response = await fetch(url);
       if ( !response.ok ){
@@ -22,7 +22,7 @@ loadVueModule = (...modules) => {
   })));
   return loaded;
 },
-[mpopMap, vSel, mpopSelect] = loadVueModule('MpopMap.vue', 'vue-select.js', 'MpopSelect.vue'),
+[mpopMap, vSel, mpopSelect] = loadVueModule('MpopMap.vue', 'vue-select.js', {path: 'MpopSelect.vue', modules: {fuse: Fuse}}),
 eventsPageNonce = document.getElementById('mpop-events-page-nonce').value;
 let triggerSearchTimeout;
 createApp({
