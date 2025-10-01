@@ -27,9 +27,6 @@ if (
     @option:deselected="triggerSearchUsers"
     @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'searchZones', 'events', eventSearch)"
   >
-    <template v-slot:option="zone">
-      {{zone.untouched_label + addSuppressToLabel(zone)}}
-    </template>
   </mpop-select>
   <mpop-map style="min-height: 500px;" :events="testEvents"></mpop-map>
 </div>
