@@ -12,7 +12,16 @@ if (
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
 <div id="app" style="max-width: unset">
-  <mpop-select @close="()=>console.log('ciao')"></mpop-select>
+  <mpop-select @close="()=>console.log('ciao')">
+    <template #search="{ attributes, events }">
+      <input
+        class="vs__search"
+        :style="'display: ' + (eventSearchZoneOpen ? 'unset' : 'none')"
+        v-bind="attributes"
+        v-on="events"
+      />
+    </template>
+  </mpop-select>
   <v-select
     multiple
     id="eventSearchZone-select"
