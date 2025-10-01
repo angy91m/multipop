@@ -13,8 +13,23 @@ if (
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
 <div id="app" style="max-width: unset">
   <mpop-select
+    multiple
     @search="()=>console.log('ciao')"
+    v-model="eventSearch.zones"
+    :options="zoneSearch.events"
+    @close="eventSearchZoneOpen = false"
+    @open="searchOpen('eventSearchZone')"
+    :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
+    @option:selected="zones => {
+      const oldLen = zones.length;
+      reduceZones(zones, eventSearch);
+      //if (oldLen == zones.length) triggerSearchUsers();
+    }"
+    @option:deselected="triggerSearchUsers"
   >
+    <template v-slot:option="zone">
+      {{zone.untouched_label + addSuppressToLabel(zone)}}
+    </template>
   </mpop-select>
   <v-select
     multiple
