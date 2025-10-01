@@ -22,21 +22,15 @@ loadVueModule = (...modules) => {
   })));
   return loaded;
 },
-[mpopMap, vSel, mpopSelect] = loadVueModule('MpopMap.vue', 'vue-select.js', {path: 'MpopSelect.vue', modules: {fuse: Fuse}}),
+[mpopMap, mpopSelect] = loadVueModule('MpopMap.vue', {path: 'MpopSelect.vue', modules: {fuse: Fuse}}),
 eventsPageNonce = document.getElementById('mpop-events-page-nonce').value;
 let triggerSearchTimeout;
 createApp({
   components: {
     'mpop-map': defineAsyncComponent(() => mpopMap),
-    'v-select': defineAsyncComponent(() => vSel),
     'mpop-select': defineAsyncComponent(() => mpopSelect)
   },
   setup() {
-    function searchOpen(tag) {
-      const openVar = eval(tag + 'Open');
-      openVar.value = true;
-      setTimeout(()=> document.querySelector('#'+tag+'-select .vs__search').select(),300);
-    }
     function reduceZones(zones, target, zonesKey = 'zones') {
       const added = zones[zones.length - 1];
       if (added.type == 'nazione') {
@@ -76,22 +70,6 @@ createApp({
       loading(true);
       const func = eval(callable);
       triggerSearchTimeout = setTimeout( () => func(txt, ...args).then(() => loading(false)), 500);
-    }
-    function addSuppressToLabel(option) {
-      let res = '';
-      if (option.type == 'provincia' || option.type == 'regione') {
-        if (option.soppressa) res += ' (soppressa)';
-      } else {
-        if (option.soppresso) res += ' (soppresso)';
-      }
-      return res;
-    }
-    function fuseSearch(options, search) {
-      const fuse = new Fuse(options, {
-        keys: ['label'],
-        shouldSort: true
-      });
-      return search.trim().length ? fuse.search(search).map(({item}) => item) : fuse.list;
     }
     async function searchZones(txt, ctx, target, zonesKey = 'zones') {
       if (zoneSearch[ctx]) {
@@ -146,10 +124,6 @@ createApp({
       testEvents,
       eventSearch,
       zoneSearch,
-      eventSearchZoneOpen,
-      searchOpen,
-      addSuppressToLabel,
-      fuseSearch,
       reduceZones,
       triggerSearch
     };

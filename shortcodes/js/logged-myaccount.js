@@ -564,13 +564,6 @@ createApp({
             moduleUploadData.idCardExpiration = null;
             moduleUploadData.generalPolicyAccept = false;
         }
-        function fuseSearch(options, search) {
-            const fuse = new Fuse(options, {
-                keys: ['label'],
-                shouldSort: true
-            });
-            return search.trim().length ? fuse.search(search).map(({item}) => item) : fuse.list;
-        }
         function saveCachedProp(propName = '', expiry = 3 * 60 * 1000) {
             if (!propName) throw new Error('Empty property');
             cachedProps[propName] = (new Date()).getTime() + expiry;
@@ -2225,7 +2218,6 @@ createApp({
             editUser,
             cancelEditUser,
             updateUser,
-            fuseSearch,
             zoneSearch,
             triggerSearch,
             reduceZones,

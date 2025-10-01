@@ -18,7 +18,7 @@ if (
     :minLen="2"
     v-model="eventSearch.zones"
     :options="zoneSearch.events"
-    :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
+    label="untouched_label"
     @option:selected="zones => {
       const oldLen = zones.length;
       reduceZones(zones, eventSearch);
