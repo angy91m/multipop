@@ -14,7 +14,6 @@ if (
 <div id="app" style="max-width: unset">
   <mpop-select
     multiple
-    @search="()=>console.log('ciao')"
     v-model="eventSearch.zones"
     :options="zoneSearch.events"
     :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
@@ -25,7 +24,6 @@ if (
     }"
     @option:deselected="triggerSearchUsers"
     @search="(searchTxt, loading) => {
-      if (searchTxt.trim().length < 2) return loading(false);
       triggerSearch(searchTxt, loading, 'searchZones', 'events', eventSearch);
     }"
   >
