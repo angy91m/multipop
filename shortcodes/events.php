@@ -12,15 +12,9 @@ if (
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
 <div id="app" style="max-width: unset">
-  <mpop-select>
-    <template v-slot:no-options="{search}">
-      <template v-if="search.trim().length > 1">
-        Nessun risultato per "{{search}}"
-      </template>
-      <template v-else>
-        Inserisci almeno 2 caratteri
-      </template>
-    </template>
+  <mpop-select
+    @search="()=>console.log('ciao')"
+  >
   </mpop-select>
   <v-select
     multiple
