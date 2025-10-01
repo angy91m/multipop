@@ -53,7 +53,7 @@ filter = computed(() => props.filter || fuseSearch),
 emit = defineEmits(['search']);
 defineExpose({open});
 function onOpen() {
-  open.value = false;
+  open.value = true;
   setTimeout(()=>element.value.$el.querySelector('input.vs__search').select(), 300);
 }
 </script>
