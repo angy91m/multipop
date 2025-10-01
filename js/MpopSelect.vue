@@ -11,17 +11,17 @@
     <template v-if="!$slots.search" #search="{attributes, events}">
       <input
         class="vs__search"
-        :style="'display: ' + (open || (props.multiple ? true : !modelValue) ? 'unset' : 'none')"
+        :style="'display: ' + (open || (typeof $attrs.multiple != 'undefined' ? true : !modelValue) ? 'unset' : 'none')"
         v-bind="attributes"
         v-on="events"
       />
     </template>
     <template v-if="!$slots['no-options']" #no-options="{search}">
-      <template v-if="(props.trim ? search.trim() : search).length >= props.minChars">
+      <template v-if="(props.trim ? search.trim() : search).length >= props.minLen">
         Nessun risultato per "{{search}}"
       </template>
       <template v-else>
-        Inserisci almeno {{ props.minChars }} caratteri
+        Inserisci almeno {{ props.minLen }} caratteri
       </template>
     </template>
     <template v-for="(_, name) in $slots" v-slot:[name]="slotData"><slot :name="name" v-bind="slotData" /></template>
@@ -42,12 +42,10 @@ const element = ref('element'),
 modelValue = defineModel(),
 props = defineProps({
   filter: {
-    type: Function
+    type: Function,
+    default: undefined
   },
-  multiple: {
-    default: false
-  },
-  minChars: {
+  minLen: {
     type: Number,
     default: 0
   },
@@ -55,8 +53,9 @@ props = defineProps({
     default: true
   }
 }),
+attrs = useAttrs(),
 open = ref(false),
-filter = computed(() => props.filter || fuseSearch),
+filter = computed(() => props.filter || (typeof attrs['fuse-search'] != 'undefined' ?  fuseSearch : undefined)),
 emit = defineEmits(['search']);
 defineExpose({open});
 function onOpen() {
@@ -65,8 +64,7 @@ function onOpen() {
 }
 function onSearch(searchTxt, loading) {
   searchTxt = props.trim ? searchTxt.trim() : searchTxt;
-  if ( searchTxt.length < props.minChars) return loading(false);
+  if ( searchTxt.length < props.minLen) return loading(false);
   emit('search', searchTxt, loading);
 }
-console.log(useAttrs());
 </script>

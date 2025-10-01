@@ -14,6 +14,8 @@ if (
 <div id="app" style="max-width: unset">
   <mpop-select
     multiple
+    fuse-search
+    :minLen="2"
     v-model="eventSearch.zones"
     :options="zoneSearch.events"
     :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
@@ -23,56 +25,13 @@ if (
       //if (oldLen == zones.length) triggerSearchUsers();
     }"
     @option:deselected="triggerSearchUsers"
-    @search="(searchTxt, loading) => {
-      triggerSearch(searchTxt, loading, 'searchZones', 'events', eventSearch);
-    }"
-    prova
+    @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'searchZones', 'events', eventSearch)"
   >
     <template v-slot:option="zone">
       {{zone.untouched_label + addSuppressToLabel(zone)}}
     </template>
   </mpop-select>
-  <v-select
-    multiple
-    id="eventSearchZone-select"
-    v-model="eventSearch.zones"
-    :options="zoneSearch.events"
-    @close="eventSearchZoneOpen = false"
-    @open="searchOpen('eventSearchZone')"
-    :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
-    :filter="fuseSearch"
-    @option:selected="zones => {
-      const oldLen = zones.length;
-      reduceZones(zones, eventSearch);
-      //if (oldLen == zones.length) triggerSearchUsers();
-    }"
-    @option:deselected="triggerSearchUsers"
-    @search="(searchTxt, loading) => {
-      if (searchTxt.trim().length < 2) return loading(false);
-      triggerSearch(searchTxt, loading, 'searchZones', 'events', eventSearch);
-    }"
-    >
-      <template #search="{ attributes, events }">
-        <input
-          class="vs__search"
-          :style="'display: ' + (eventSearchZoneOpen ? 'unset' : 'none')"
-          v-bind="attributes"
-          v-on="events"
-        />
-      </template>
-      <template v-slot:option="zone">
-        {{zone.untouched_label + addSuppressToLabel(zone)}}
-      </template>
-      <template v-slot:no-options="{search}">
-        <template v-if="search.trim().length > 1">
-          Nessun risultato per "{{search}}"
-        </template>
-        <template v-else>
-          Inserisci almeno 2 caratteri
-        </template>
-      </template>
-    </v-select>
-    <mpop-map style="min-height: 500px;" :events="testEvents"></mpop-map>
+  <mpop-map style="min-height: 500px;" :events="testEvents"></mpop-map>
 </div>
 <?php wp_nonce_field( 'mpop-events-page', 'mpop-events-page-nonce' ); ?>
 <script src="<?=plugins_url()?>/multipop/js/vue.global.min.js"></script>

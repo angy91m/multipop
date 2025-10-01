@@ -175,7 +175,7 @@ if ($this->settings['pp_client_id']) {
                                 :reduce="c=>c.code"
                             >
                             </mpop-select>
-                            <v-select
+                            <!-- <v-select
                                 id="birthplaceCountry-select"
                                 :class="savingProfileErrors.includes('mpop_birthplace_country') ? 'bad-input' : ''"
                                 v-model="profileInEditing.mpop_birthplace_country"
@@ -193,14 +193,29 @@ if ($this->settings['pp_client_id']) {
                                         v-on="events"
                                     />
                                 </template>
-                            </v-select>
+                            </v-select> -->
                         </td>
                     </tr>
                     <tr v-if="(profileEditing ? profileInEditing : profile).mpop_birthplace_country == 'ita'">
                         <td><strong>Comune di nascita:</strong></td>
                         <td v-if="!profileEditing">{{profile.mpop_birthplace ? (profile.mpop_birthplace.nome + ' (' + profile.mpop_birthplace.provincia.sigla +')' + addSuppressToLabel(profile.mpop_birthplace) ) : ''}}</td>
                         <td v-else>
-                            <v-select
+                            <mpop-select
+                                fuse-search
+                                :minLen="2"
+                                id="birthplace-select"
+                                :class="savingProfileErrors.includes('mpop_birthplace') ? 'bad-input' : ''"
+                                v-model="profileInEditing.mpop_birthplace"
+                                :options="birthCities"
+                                :disabled="!profileInEditing.mpop_birthdate"
+                                :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
+                                @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'birthCitiesSearch')"
+                            >
+                                <template v-slot:option="city">
+                                    {{city.untouched_label + addSuppressToLabel(city)}}
+                                </template>
+                            </mpop-select>
+                            <!-- <v-select
                                 id="birthplace-select"
                                 :class="savingProfileErrors.includes('mpop_birthplace') ? 'bad-input' : ''"
                                 v-model="profileInEditing.mpop_birthplace"
@@ -234,14 +249,23 @@ if ($this->settings['pp_client_id']) {
                                         Inserisci almeno 2 caratteri
                                     </template>
                                 </template>
-                            </v-select>
+                            </v-select> -->
                         </td>
                     </tr>
                     <tr>
                         <td><strong>Nazione di residenza:</strong></td>
                         <td v-if="!profileEditing">{{showCountryName(profile.mpop_billing_country)}}</td>
                         <td v-else>
-                            <v-select
+                            <mpop-select
+                                id="billingCountry-select"
+                                :class="savingProfileErrors.includes('mpop_billing_country') ? 'bad-input' : ''"
+                                v-model="profileInEditing.mpop_billing_country"
+                                :options="countries"
+                                label="name"
+                                :reduce="c=>c.code"
+                            >
+                            </mpop-select>
+                            <!-- <v-select
                                 id="billingCountry-select"
                                 :class="savingProfileErrors.includes('mpop_billing_country') ? 'bad-input' : ''"
                                 v-model="profileInEditing.mpop_billing_country"
@@ -259,7 +283,7 @@ if ($this->settings['pp_client_id']) {
                                         v-on="events"
                                     />
                                 </template>
-                            </v-select>
+                            </v-select> -->
                         </td>
                     </tr>
                     <template v-if="(profileEditing ? profileInEditing : profile).mpop_billing_country == 'ita'">
@@ -267,7 +291,33 @@ if ($this->settings['pp_client_id']) {
                             <td><strong>Comune di residenza:</strong></td>
                             <td v-if="!profileEditing">{{ profile.mpop_billing_city ? profile.mpop_billing_city.nome + addSuppressToLabel(profile.mpop_billing_city) : ''}}</td>
                             <td v-else>
-                                <v-select
+                                <mpop-select
+                                    fuse-search
+                                    :minLen="2"
+                                    id="billingCity-select"
+                                    v-model="profileInEditing.mpop_billing_city"
+                                    :class="savingProfileErrors.includes('mpop_billing_city') ? 'bad-input' : ''"
+                                    :options="billingCities"
+                                    :get-option-label="(option) => option.nome + addSuppressToLabel(option)"
+                                    @option:selected="c => {
+                                        profileInEditing.mpop_billing_state = c.provincia.sigla;
+                                        if (c.cap.length == 1) {
+                                            profileInEditing.mpop_billing_zip = c.cap[0];
+                                        } else {
+                                            profileInEditing.mpop_billing_zip = '';
+                                        }
+                                    }"
+                                    @option:deselected="() => {
+                                        profileInEditing.mpop_billing_state = '';
+                                        profileInEditing.mpop_billing_zip = '';
+                                    }"
+                                    @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'billingCitiesSearch')"
+                                >
+                                    <template v-slot:option="city">
+                                        {{city.nome}} ({{city.provincia.sigla}}){{addSuppressToLabel(city)}}
+                                    </template>
+                                </mpop-select>
+                                <!-- <v-select
                                     id="billingCity-select"
                                     v-model="profileInEditing.mpop_billing_city"
                                     :class="savingProfileErrors.includes('mpop_billing_city') ? 'bad-input' : ''"
@@ -312,7 +362,7 @@ if ($this->settings['pp_client_id']) {
                                             Inserisci almeno 2 caratteri
                                         </template>
                                     </template>
-                                </v-select>
+                                </v-select> -->
                             </td>
                         </tr>
                         <tr>
@@ -697,7 +747,27 @@ if ($this->settings['pp_client_id']) {
                 <div>
                     <div class="mpop-user-search-field mpop-50-wid">
                         <label for="userSearchZone-select">Residenza&nbsp;
-                            <v-select
+                            <mpop-select
+                                multiple
+                                fuse-search
+                                :minLen="2"
+                                id="userSearchZone-select"
+                                v-model="userSearch.zones"
+                                :options="zoneSearch.users"
+                                :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
+                                @option:selected="zones => {
+                                    const oldLen = zones.length;
+                                    reduceZones(zones, userSearch);
+                                    if (oldLen == zones.length) triggerSearchUsers();
+                                }"
+                                @option:deselected="triggerSearchUsers"
+                                @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'searchZones', 'users', userSearch)"
+                            >
+                                <template v-slot:option="zone">
+                                    {{zone.untouched_label + addSuppressToLabel(zone)}}
+                                </template>
+                            </mpop-select>
+                            <!-- <v-select
                                 multiple
                                 id="userSearchZone-select"
                                 v-model="userSearch.zones"
@@ -736,12 +806,33 @@ if ($this->settings['pp_client_id']) {
                                         Inserisci almeno 2 caratteri
                                     </template>
                                 </template>
-                            </v-select>
+                            </v-select> -->
                         </label>
                     </div>
                     <div v-if="profile.role == 'administrator'" class="mpop-user-search-field mpop-50-wid">
                         <label for="userSearchRespZone-select">Zone gestite&nbsp;
-                            <v-select
+
+                            <mpop-select
+                                multiple
+                                fuse-search
+                                :minLen="2"
+                                id="userSearchRespZone-select"
+                                v-model="userSearch.resp_zones"
+                                :options="zoneSearch.users_resp"
+                                :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
+                                @option:selected="zones => {
+                                    const oldLen = zones.length;
+                                    reduceZones(zones, userSearch, 'resp_zones');
+                                    if (oldLen == zones.length) triggerSearchUsers();
+                                }"
+                                @option:deselected="triggerSearchUsers"
+                                @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'searchZones', 'users_resp', userSearch, 'resp_zones')"
+                            >
+                                <template v-slot:option="zone">
+                                    {{zone.untouched_label + addSuppressToLabel(zone)}}
+                                </template>
+                            </mpop-select>
+                            <!-- <v-select
                                 multiple
                                 id="userSearchRespZone-select"
                                 v-model="userSearch.resp_zones"
@@ -780,7 +871,7 @@ if ($this->settings['pp_client_id']) {
                                         Inserisci almeno 2 caratteri
                                     </template>
                                 </template>
-                            </v-select>
+                            </v-select> -->
                         </label>
                     </div>
                 </div>
@@ -852,7 +943,16 @@ if ($this->settings['pp_client_id']) {
                     <tr>
                         <td><strong>Nazione di nascita:</strong></td>
                         <td>
-                            <v-select
+                            <mpop-select
+                                id="birthplaceCountry-select"
+                                :class="savingUserAddErrors.includes('mpop_birthplace_country') ? 'bad-input' : ''"
+                                v-model="userInAdd.mpop_birthplace_country"
+                                :options="countries"
+                                label="name"
+                                :reduce="c=>c.code"
+                            >
+                            </mpop-select>
+                            <!-- <v-select
                                 id="birthplaceCountry-select"
                                 :class="savingUserAddErrors.includes('mpop_birthplace_country') ? 'bad-input' : ''"
                                 v-model="userInAdd.mpop_birthplace_country"
@@ -870,13 +970,28 @@ if ($this->settings['pp_client_id']) {
                                         v-on="events"
                                     />
                                 </template>
-                            </v-select>
+                            </v-select> -->
                         </td>
                     </tr>
                     <tr v-if="userInAdd.mpop_birthplace_country == 'ita'">
                         <td><strong>Comune di nascita:</strong></td>
                         <td>
-                            <v-select
+                            <mpop-select
+                                fuse-search
+                                :minLen="2"
+                                id="birthplace-select"
+                                :class="savingUserAddErrors.includes('mpop_birthplace') ? 'bad-input' : ''"
+                                v-model="userInAdd.mpop_birthplace"
+                                :options="birthCities"
+                                :disabled="!userInAdd.mpop_birthdate"
+                                :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
+                                @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'birthCitiesSearch')"
+                            >
+                                <template v-slot:option="city">
+                                    {{city.untouched_label + addSuppressToLabel(city)}}
+                                </template>
+                            </mpop-select>
+                            <!-- <v-select
                                 id="birthplace-select"
                                 :class="savingUserAddErrors.includes('mpop_birthplace') ? 'bad-input' : ''"
                                 v-model="userInAdd.mpop_birthplace"
@@ -910,13 +1025,22 @@ if ($this->settings['pp_client_id']) {
                                         Inserisci almeno 2 caratteri
                                     </template>
                                 </template>
-                            </v-select>
+                            </v-select> -->
                         </td>
                     </tr>
                     <tr>
                         <td><strong>Nazione di residenza:</strong></td>
                         <td>
-                            <v-select
+                            <mpop-select
+                                id="billingCountry-select"
+                                :class="savingUserAddErrors.includes('mpop_billing_country') ? 'bad-input' : ''"
+                                v-model="userInAdd.mpop_billing_country"
+                                :options="countries"
+                                label="name"
+                                :reduce="c=>c.code"
+                            >
+                            </mpop-select>
+                            <!-- <v-select
                                 id="billingCountry-select"
                                 :class="savingUserAddErrors.includes('mpop_billing_country') ? 'bad-input' : ''"
                                 v-model="userInAdd.mpop_billing_country"
@@ -934,14 +1058,40 @@ if ($this->settings['pp_client_id']) {
                                         v-on="events"
                                     />
                                 </template>
-                            </v-select>
+                            </v-select> -->
                         </td>
                     </tr>
                     <template v-if="userInAdd.mpop_billing_country == 'ita'">
                         <tr>
                             <td><strong>Comune di residenza:</strong></td>
                             <td>
-                                <v-select
+                                <mpop-select
+                                    fuse-search
+                                    :minLen="2"
+                                    id="billingCity-select"
+                                    v-model="userInAdd.mpop_billing_city"
+                                    :class="savingUserAddErrors.includes('mpop_billing_city') ? 'bad-input' : ''"
+                                    :options="billingCities"
+                                    :get-option-label="(option) => option.nome + addSuppressToLabel(option)"
+                                    @option:selected="c => {
+                                        userInAdd.mpop_billing_state = c.provincia.sigla;
+                                        if (c.cap.length == 1) {
+                                            userInAdd.mpop_billing_zip = c.cap[0];
+                                        } else {
+                                            userInAdd.mpop_billing_zip = '';
+                                        }
+                                    }"
+                                    @option:deselected="() => {
+                                        userInAdd.mpop_billing_state = '';
+                                        userInAdd.mpop_billing_zip = '';
+                                    }"
+                                    @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'billingCitiesSearch')"
+                                >
+                                    <template v-slot:option="city">
+                                        {{city.nome}} ({{city.provincia.sigla}}){{addSuppressToLabel(city)}}
+                                    </template>
+                                </mpop-select>
+                                <!-- <v-select
                                     id="billingCity-select"
                                     v-model="userInAdd.mpop_billing_city"
                                     :class="savingUserAddErrors.includes('mpop_billing_city') ? 'bad-input' : ''"
@@ -986,7 +1136,7 @@ if ($this->settings['pp_client_id']) {
                                             Inserisci almeno 2 caratteri
                                         </template>
                                     </template>
-                                </v-select>
+                                </v-select> -->
                             </td>
                         </tr>
                         <tr>
@@ -1275,7 +1425,22 @@ if ($this->settings['pp_client_id']) {
                             </template>
                         </td>
                         <td v-else>
-                            <v-select
+                            <mpop-select
+                                multiple
+                                fuse-search
+                                :minLen="2"
+                                id="userEditingRespZone-select"
+                                v-model="userInEditing.mpop_resp_zones"
+                                :options="zoneSearch.mpop_resp"
+                                :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
+                                @option:selected="zones => reduceZones(zones, userInEditing, 'mpop_resp_zones')"
+                                @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'searchZones', 'mpop_resp', userInEditing, 'mpop_resp_zones')"
+                            >
+                                <template v-slot:option="zone">
+                                    {{zone.untouched_label + addSuppressToLabel(zone)}}
+                                </template>
+                            </mpop-select>
+                            <!-- <v-select
                                 multiple
                                 id="userEditingRespZone-select"
                                 v-model="userInEditing.mpop_resp_zones"
@@ -1309,7 +1474,7 @@ if ($this->settings['pp_client_id']) {
                                         Inserisci almeno 2 caratteri
                                     </template>
                                 </template>
-                            </v-select>
+                            </v-select> -->
                         </td>
                     </tr>
                     <tr>
@@ -1328,7 +1493,16 @@ if ($this->settings['pp_client_id']) {
                         <td><strong>Nazione di nascita:</strong></td>
                         <td v-if="!userEditing">{{showCountryName(userInView.mpop_birthplace_country)}}</td>
                         <td v-else>
-                            <v-select
+                            <mpop-select
+                                id="birthplaceCountry-select"
+                                :class="savingUserErrors.includes('mpop_birthplace_country') ? 'bad-input' : ''"
+                                v-model="userInEditing.mpop_birthplace_country"
+                                :options="countries"
+                                label="name"
+                                :reduce="c=>c.code"
+                            >
+                            </mpop-select>
+                            <!-- <v-select
                                 id="birthplaceCountry-select"
                                 :class="savingUserErrors.includes('mpop_birthplace_country') ? 'bad-input' : ''"
                                 v-model="userInEditing.mpop_birthplace_country"
@@ -1346,14 +1520,29 @@ if ($this->settings['pp_client_id']) {
                                         v-on="events"
                                     />
                                 </template>
-                            </v-select>
+                            </v-select> -->
                         </td>
                     </tr>
                     <tr v-if="(userEditing ? userInEditing : userInView).mpop_birthplace_country == 'ita'">
                         <td><strong>Comune di nascita:</strong></td>
                         <td v-if="!userEditing">{{userInView.mpop_birthplace ? (userInView.mpop_birthplace.nome + ' (' + userInView.mpop_birthplace.provincia.sigla +')' + addSuppressToLabel(userInView.mpop_birthplace) ) : ''}}</td>
                         <td v-else>
-                            <v-select
+                            <mpop-select
+                                fuse-search
+                                :minLen="2"
+                                id="birthplace-select"
+                                :class="savingUserErrors.includes('mpop_birthplace') ? 'bad-input' : ''"
+                                v-model="userInEditing.mpop_birthplace"
+                                :options="birthCities"
+                                :disabled="!userInEditing.mpop_birthdate"
+                                :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
+                                @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'birthCitiesSearch', true)"
+                            >
+                                <template v-slot:option="city">
+                                    {{city.untouched_label + addSuppressToLabel(city)}}
+                                </template>
+                            </mpop-select>
+                            <!-- <v-select
                                 id="birthplace-select"
                                 :class="savingUserErrors.includes('mpop_birthplace') ? 'bad-input' : ''"
                                 v-model="userInEditing.mpop_birthplace"
@@ -1387,14 +1576,23 @@ if ($this->settings['pp_client_id']) {
                                         Inserisci almeno 2 caratteri
                                     </template>
                                 </template>
-                            </v-select>
+                            </v-select> -->
                         </td>
                     </tr>
                     <tr>
                         <td><strong>Nazione di residenza:</strong></td>
                         <td v-if="!userEditing">{{showCountryName(userInView.mpop_billing_country)}}</td>
                         <td v-else>
-                            <v-select
+                            <mpop-select
+                                id="billingCountry-select"
+                                :class="savingUserErrors.includes('mpop_billing_country') ? 'bad-input' : ''"
+                                v-model="userInEditing.mpop_billing_country"
+                                :options="countries"
+                                label="name"
+                                :reduce="c=>c.code"
+                            >
+                            </mpop-select>
+                            <!-- <v-select
                                 id="billingCountry-select"
                                 :class="savingUserErrors.includes('mpop_billing_country') ? 'bad-input' : ''"
                                 v-model="userInEditing.mpop_billing_country"
@@ -1412,7 +1610,7 @@ if ($this->settings['pp_client_id']) {
                                         v-on="events"
                                     />
                                 </template>
-                            </v-select>
+                            </v-select> -->
                         </td>
                     </tr>
                     <template v-if="(userEditing ? userInEditing : userInView).mpop_billing_country == 'ita'">
@@ -1420,7 +1618,33 @@ if ($this->settings['pp_client_id']) {
                             <td><strong>Comune di residenza:</strong></td>
                             <td v-if="!userEditing">{{ userInView.mpop_billing_city ? userInView.mpop_billing_city.nome + addSuppressToLabel(userInView.mpop_billing_city) : ''}}</td>
                             <td v-else>
-                                <v-select
+                                <mpop-select
+                                    fuse-search
+                                    :minLen="2"
+                                    id="billingCity-select"
+                                    v-model="userInEditing.mpop_billing_city"
+                                    :class="savingUserErrors.includes('mpop_billing_city') ? 'bad-input' : ''"
+                                    :options="billingCities"
+                                    :get-option-label="(option) => option.nome + addSuppressToLabel(option)"
+                                    @option:selected="c => {
+                                        userInEditing.mpop_billing_state = c.provincia.sigla;
+                                        if (c.cap.length == 1) {
+                                            userInEditing.mpop_billing_zip = c.cap[0];
+                                        } else {
+                                            userInEditing.mpop_billing_zip = '';
+                                        }
+                                    }"
+                                    @option:deselected="() => {
+                                        userInEditing.mpop_billing_state = '';
+                                        userInEditing.mpop_billing_zip = '';
+                                    }"
+                                    @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'billingCitiesSearch')"
+                                >
+                                    <template v-slot:option="city">
+                                        {{city.nome}} ({{city.provincia.sigla}}){{addSuppressToLabel(city)}}
+                                    </template>
+                                </mpop-select>
+                                <!-- <v-select
                                     id="billingCity-select"
                                     v-model="userInEditing.mpop_billing_city"
                                     :class="savingUserErrors.includes('mpop_billing_city') ? 'bad-input' : ''"
@@ -1465,7 +1689,7 @@ if ($this->settings['pp_client_id']) {
                                             Inserisci almeno 2 caratteri
                                         </template>
                                     </template>
-                                </v-select>
+                                </v-select> -->
                             </td>
                         </tr>
                         <tr>

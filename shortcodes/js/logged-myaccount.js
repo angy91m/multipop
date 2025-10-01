@@ -24,7 +24,7 @@ loadVueModule = (...modules) => {
     })));
     return loaded;
 },
-[vSel, mpopUploader, mpopPaypalButton, mpopSelect] = loadVueModule('vue-select.js', 'MpopUploader.vue', 'MpopPaypalButton.vue', {path: 'MpopSelect.vue', modules: {fuse: Fuse}}),
+[mpopUploader, mpopPaypalButton, mpopSelect] = loadVueModule('MpopUploader.vue', 'MpopPaypalButton.vue', {path: 'MpopSelect.vue', modules: {fuse: Fuse}}),
 mailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/s,
 passwordRegex = {
     rr: [
@@ -233,7 +233,6 @@ let searchUsersTimeout, triggerSearchTimeout, decryptPasswordSaveTimeout;
 
 createApp({
     components: {
-        'v-select': defineAsyncComponent(() => vSel),
         'mpop-select': defineAsyncComponent(() => mpopSelect),
         'v-intl-phone': IntlTelInput,
         'mpop-uploader': defineAsyncComponent(() => mpopUploader),
@@ -303,13 +302,6 @@ createApp({
         subModuleUploadFiles = reactive([]),
         profileEditing = ref(false),
         userEditing = ref(false),
-        birthplaceCountryOpen = ref(false),
-        birthplaceOpen = ref(false),
-        billingCountryOpen = ref(false),
-        billingCityOpen = ref(false),
-        userSearchZoneOpen = ref(false),
-        userSearchRespZoneOpen = ref(false),
-        userEditingRespZoneOpen = ref(false),
         subInstructionOpen = ref(true),
         regInstructionOpen = ref(true),
         mainOptions = reactive({
@@ -2112,11 +2104,6 @@ createApp({
             userSearch.page = page;
             searchUsers();
         }
-        function searchOpen(tag) {
-            const openVar = eval(tag + 'Open');
-            openVar.value = true;
-            setTimeout(()=> document.querySelector('#'+tag+'-select .vs__search').select(),300);
-        }
         function showRole(role = '') {
             if (!role) return 'Nessuno';
             switch(role) {
@@ -2204,13 +2191,8 @@ createApp({
             selectTab,
             displayLocalDate,
             birthCities,
-            birthplaceCountryOpen,
-            birthplaceOpen,
-            billingCountryOpen,
-            billingCityOpen,
             billingCities,
             updateProfile,
-            searchOpen,
             saving,
             savingProfileErrors,
             savingUserErrors,
@@ -2244,9 +2226,6 @@ createApp({
             cancelEditUser,
             updateUser,
             fuseSearch,
-            userSearchZoneOpen,
-            userSearchRespZoneOpen,
-            userEditingRespZoneOpen,
             zoneSearch,
             triggerSearch,
             reduceZones,
