@@ -24,6 +24,10 @@ if (
       //if (oldLen == zones.length) triggerSearchUsers();
     }"
     @option:deselected="triggerSearchUsers"
+    @search="(searchTxt, loading) => {
+      if (searchTxt.trim().length < 2) return loading(false);
+      triggerSearch(searchTxt, loading, 'searchZones', 'events', eventSearch);
+    }"
   >
     <template v-slot:option="zone">
       {{zone.untouched_label + addSuppressToLabel(zone)}}
