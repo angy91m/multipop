@@ -17,8 +17,6 @@ if (
     @search="()=>console.log('ciao')"
     v-model="eventSearch.zones"
     :options="zoneSearch.events"
-    @close="eventSearchZoneOpen = false"
-    @open="searchOpen('eventSearchZone')"
     :get-option-label="(option) => option.untouched_label + addSuppressToLabel(option)"
     @option:selected="zones => {
       const oldLen = zones.length;
