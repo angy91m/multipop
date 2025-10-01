@@ -61,8 +61,8 @@ function onOpen() {
   setTimeout(()=>element.value.$el.querySelector('input.vs__search').select(), 300);
 }
 function onSearch(searchTxt, loading) {
-  searchTxt = props.trim ? searchTxt.trim() : searchTxt;
-  if ( searchTxt.length < props.minChars) return loading(false);
-  emit('search', searchTxt, loading);
+  // searchTxt = props.trim ? searchTxt.trim() : searchTxt;
+  // if ( searchTxt.length < props.minChars) return loading(false);
+  // emit('search', searchTxt, loading);
 }
 </script>
