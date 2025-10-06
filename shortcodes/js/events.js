@@ -31,6 +31,7 @@ createApp({
     'mpop-select': defineAsyncComponent(() => mpopSelect)
   },
   setup() {
+    const mapEl = ref('mapEl');
     function reduceZones(zones, target, zonesKey = 'zones') {
       const added = zones[zones.length - 1];
       if (added.type == 'nazione') {
@@ -118,13 +119,15 @@ createApp({
     });
     onMounted(()=>{
       setTimeout(() => testEvents.length = 0, 10000);
+      console.log(mapEl.value.$el);
     });
     return {
       testEvents,
       eventSearch,
       zoneSearch,
       reduceZones,
-      triggerSearch
+      triggerSearch,
+      mapEl
     };
   }
 })

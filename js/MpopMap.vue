@@ -8,7 +8,7 @@
 }
 </style>
 <script setup>
-import { ref, onMounted, defineProps, watch } from 'vue';
+import { ref, onMounted, defineProps, watch, defineExpose } from 'vue';
 import L from '/wp-content/plugins/multipop/js/leaflet.js';
 let map, eventsLayer, mounted;
 const makeId = (length = 5) => {
@@ -22,8 +22,21 @@ const makeId = (length = 5) => {
 props = defineProps({
   events: {
     default: []
+  },
+  lat: {
+    type: Number,
+    default: 41.9028
+  },
+  lng: {
+    type: Number,
+    default: 12.4964
+  },
+  zoom: {
+    type: Number,
+    default: 6
   }
 }),
+mapRef = ref(null),
 elId = ref('mpop-map-' + makeId()),
 addEventsToMap = () => {
   eventsLayer.clearLayers();
@@ -35,13 +48,18 @@ addEventsToMap = () => {
     }
   })
 };
+defineExpose({
+  map: mapRef,
+  L
+});
 watch(props.events, () => {
   if (mounted) addEventsToMap();
 });
 onMounted(() => {
   mounted = true;
   L.Marker.prototype.options.icon.options.imagePath = 'https://unpkg.com/leaflet@1.9.4/dist/images/';
-  map = L.map(elId.value).setView([41.9028, 12.4964], 6);
+  map = L.map(elId.value).setView([props.lat, props.lng], props.zoom);
+  mapRef.value = map;
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
