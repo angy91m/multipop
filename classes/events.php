@@ -143,6 +143,7 @@ class MultipopEventsPlugin {
 
     add_filter('run_wptexturize', function($run_texturize) {
       $p = get_post();
+      if (!$p) return $run_texturize;
       if ((wp_get_theme()->get_page_templates()[$p->page_template] ?? '') == 'Eventi') return false;
       return $run_texturize;
     });
@@ -380,17 +381,6 @@ class MultipopEventsPlugin {
     ];
     return $res;
   }
-  public static function search_events_posts_join($join, $q) {
-    save_test($join);
-    remove_filter('posts_join', [self::class, 'search_events_posts_join'], 10);
-    return $join;
-  }
-  public static function search_events_posts_where($where, $q) {
-    save_test($where,1);
-    save_test($q,4);
-    remove_filter('posts_where', [self::class, 'search_events_posts_where'], 10);
-    return $where;
-  }
   public static function search_events_posts_orderby($orderby, $q) {
     if (isset($q->query_vars['mp_extra_sort'])) {
       global $wpdb;
@@ -423,20 +413,28 @@ class MultipopEventsPlugin {
       'zones' => null,
       'min' => null,
       'max' => null,
-      'sort_by' => $default_sort
+      'sortby' => $default_sort,
+      'p' => '1'
     ];
-    $allowed_field_sorts = [
-      'title'
-    ];
-    $allowed_meta_sorts = [
-      'start',
-      'end'
-    ];
+    $page = 0;
+    if (is_string($options['p'])) {
+      $page = intval($options['p']);
+      if ($page > 0) {
+        $page--;
+      } else {
+        $page = 0;
+      }
+    } elseif($options['p'] === true) {
+      $page = true;
+    } else {
+      $page = 0;
+    }
     $query_args = [
       'post_type' => 'mpop_event',
       'post_status' => 'publish',
       'suppress_filters' => false,
-      'numberposts' => -1
+      'numberposts' => $page === true ? -1 : 25,
+      'paged' => $page === true ? 0 : $page
     ];
     $meta_q = ['relation' => 'AND'];
     if (is_string($options['txt']) && !empty(trim($options['txt']))) $query_args['s'] = trim($options['txt']);
@@ -484,30 +482,35 @@ class MultipopEventsPlugin {
         ];
       }
     }
-    if (!is_array($options['sort_by'])) {
-      $options['sort_by'] = $default_sort;
+    $allowed_field_sorts = [
+      'title'
+    ];
+    $allowed_meta_sorts = [
+      'start',
+      'end'
+    ];
+    if (!is_array($options['sortby'])) {
+      $options['sortby'] = $default_sort;
     } else {
-      $sort_keys = array_keys($options['sort_by']);
+      $sort_keys = array_keys($options['sortby']);
       $fsort_by = [];
       foreach ($sort_keys as $k) {
         if (in_array($k, $allowed_field_sorts)) {
-          $fsort_by[$k] = boolval($options['sort_by'][$k]);
+          $fsort_by[$k] = boolval($options['sortby'][$k]);
         } else if (in_array($k, $allowed_meta_sorts)) {
-          $fsort_by[$k] = boolval($options['sort_by'][$k]);
+          $fsort_by[$k] = boolval($options['sortby'][$k]);
         } else {
-          unset($options['sort_by'][$k]);
+          unset($options['sortby'][$k]);
         }
       }
-      $options['sort_by'] = $fsort_by;
-      if (empty($options['sort_by'])) {
-        $options['sort_by'] = $default_sort;
+      $options['sortby'] = $fsort_by;
+      if (empty($options['sortby'])) {
+        $options['sortby'] = $default_sort;
       }
     }
-    $query_args['mp_extra_sort'] = $options['sort_by'];
+    $query_args['mp_extra_sort'] = $options['sortby'];
     $query_args['meta_query'] = $meta_q;
-    add_filter('posts_join', [self::class, 'search_events_posts_join'], 10, 2);
-    add_filter('posts_where', [self::class, 'search_events_posts_where'], 10, 2);
     add_filter('posts_orderby', [self::class, 'search_events_posts_orderby'], 10, 2);
-    $posts = get_posts($query_args);
+    return get_posts($query_args);
   }
 }
