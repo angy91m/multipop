@@ -288,14 +288,14 @@ class MultipopEventsPlugin {
       if (!$geo) {
         delete_post_meta($post_id, '_mpop_event_lat');
         delete_post_meta($post_id, '_mpop_event_lng');
-        delete_post_meta($post_id, '_mpop_event_codice_catastale');
+        delete_post_meta($post_id, '_mpop_event_zones');
       } else {
         update_post_meta($post_id, '_mpop_event_lat', $geo['lat']);
         update_post_meta($post_id, '_mpop_event_lng', $geo['lng']);
-        if ($geo['codiceCatastale']) {
-          update_post_meta($post_id, '_mpop_event_codice_catastale', $geo['codiceCatastale']);
+        if ($geo['zones']) {
+          update_post_meta($post_id, '_mpop_event_zones', $geo['zones']);
         } else {
-          delete_post_meta($post_id, '_mpop_event_codice_catastale');
+          delete_post_meta($post_id, '_mpop_event_zones');
         }
       }
     }
@@ -348,7 +348,7 @@ class MultipopEventsPlugin {
     $comune_name = false;
     $sigla = false;
     $res = $data['geometry']['location'] + [
-      'codiceCatastale' => false
+      'zones' => false
     ];
     foreach($data['address_components'] as $c) {
       if (in_array('administrative_area_level_3', $c['types'])) {
@@ -373,16 +373,117 @@ class MultipopEventsPlugin {
         $comune = $c;
       }
     }
-    if ($comune) $res['codiceCatastale'] = $comune['codiceCatastale'];
+    if ($comune) $res['zones'] = [
+      $comune['codiceCatastale'],
+      $comune['provincia']['sigla'],
+      'reg_' + $comune['provincia']['regione']
+    ];
     return $res;
   }
-  public static function get_events($options = []) {
+  public static function search_events_pre_get_posts($q) {
+    save_test($q);
+    remove_action('pre_get_posts', [self::class, 'search_events_pre_get_posts']);
+  }
+  public static function search_events($options = []) {
     $options += [
       'txt' => null,
-      'reg' => null,
-      'prov' => null,
-      'comune' => null
+      'zones' => null,
+      'min' => null,
+      'max' => null,
+      'sort_by' => [
+        'end' => true,
+        'title' => true
+      ]
     ];
-
+    $allowed_field_sorts = [
+      'title'
+    ];
+    $allowed_meta_sorts = [
+      'start' => '_mpop_event_start',
+      'end' => '_mpop_event_end'
+    ];
+    $query_args = [
+      'post_type' => 'mpop_event',
+      'post_status' => 'publish',
+      'numberposts' => -1
+    ];
+    $meta_q = ['relation' => 'AND'];
+    if (is_string($options['txt']) && !empty(trim($options['txt']))) $query_args['s'] = trim($options['txt']);
+    $zones = [];
+    if (is_array($options['zones']) && count($options['zones'])) {
+      $zones = array_filter($options['zones'], function($z) {return is_string($z) && (str_starts_with($z, 'reg_') || preg_match('/^([A-Z]{2})|([A-Z]\d{3})$/', $z));});
+      $zones = array_unique($zones);
+      $zones = array_values($zones);
+    }
+    if (count($zones)) {
+      $meta_q['_mpop_event_zones'] = [
+        'relation' => 'OR'
+      ];
+      foreach($zones as $zone) {
+        $meta_q['_mpop_event_zones'][] = [
+          'key' => '_mpop_event_zones',
+          'value' => "\"$zone\"",
+          'compare' => 'LIKE'
+        ];
+      }
+    }
+    if (is_string($options['min'])) {
+      $min_date = MultipopPlugin::validate_date($options['min']);
+    } else {
+      $min_date = date_create('now', new DateTimeZone(current_time('e')));
+      $min_date->setTime(0,0,0,0);
+    }
+    $meta_q['_mpop_event_start'] = [
+      'key' => '_mpop_event_start',
+      'value' => $min_date->getTimestamp(),
+      'compare' => '>=',
+      'type' => 'NUMERIC'
+    ];
+    if (is_string($options['max'])) {
+      $max_date = MultipopPlugin::validate_date($options['max']);
+    } else {
+      $max_date = date_create('now', new DateTimeZone(current_time('e')));
+      $max_date->setTimestamp($min_date->getTimestamp());
+      $max_date->add(new DateInterval('P1M'));
+    }
+    $max_date->setTime(23,59,59);
+    $meta_q['_mpop_event_end'] = [
+      'key' => '_mpop_event_end',
+      'value' => $max_date->getTimestamp(),
+      'compare' => '<=',
+      'type' => 'NUMERIC'
+    ];
+    if (!is_array($options['sort_by'])) {
+      $options['sort_by'] = [
+        $allowed_meta_sorts['end'] => 'ASC',
+        'title' => 'ASC'
+      ];
+    } else {
+      $sort_keys = array_keys($options['sort_by']);
+      $fsort_by = [];
+      foreach ($sort_keys as $k) {
+        if (in_array($k, $allowed_field_sorts)) {
+          $fsort_by[$k] = boolval($options['sort_by'][$k]) ? 'ASC' : 'DESC';
+        } else if (isset($allowed_meta_sorts[$k])) {
+          $fsort_by[$allowed_meta_sorts[$k]] = boolval($options['sort_by'][$k]) ? 'ASC' : 'DESC';
+        } else {
+          unset($options['sort_by'][$k]);
+        }
+      }
+      $options['sort_by'] = $fsort_by;
+      if (empty($options['sort_by'])) {
+        $options['sort_by'] = [
+          $allowed_meta_sorts['end'] => 'ASC',
+          'title' => 'ASC'
+        ];
+      }
+    }
+    $extra_meta = [];
+    foreach($options['sort_by'] as $k=>$v) {
+      if (str_starts_with($k, '_')) $extra_meta[$k] = 'NUMERIC';
+    }
+    $query_args['meta_query'] = $meta_q;
+    add_action('pre_get_posts', [self::class, 'search_events_pre_get_posts']);
+    $posts = get_posts($query_args);
   }
 }

@@ -653,7 +653,7 @@ switch( $post_data['action'] ) {
         $res_data['data'] = true;
         break;
     case 'resp_search_zones':
-        $res_data['data'] = $this->search_zones($post_data['search']);
+        $res_data['data'] = $this->search_zones($post_data['search'], true);
         break;
     case 'resp_confirm_profile_pending_edits':
         if (!isset($post_data['ID']) || !is_int($post_data['ID'])) {

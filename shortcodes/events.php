@@ -8,6 +8,7 @@ if (
   require_once('post/events.php');
   exit;
 }
+MultipopEventsPlugin::search_events();
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">

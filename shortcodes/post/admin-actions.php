@@ -430,7 +430,7 @@ switch( $post_data['action'] ) {
         $res_data['data'] = $res;
         break;
     case 'admin_search_zones':
-        $res_data['data'] = $this->search_zones($post_data['search']);
+        $res_data['data'] = $this->search_zones($post_data['search'], true);
         break;
     case 'admin_import_rows':
         $res_rows = [];
