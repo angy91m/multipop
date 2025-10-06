@@ -8,12 +8,12 @@ if (
   require_once('post/events.php');
   exit;
 }
-MultipopEventsPlugin::search_events($_GET);
+$found_events = MultipopEventsPlugin::search_events($_GET);
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
 <div id="app" style="max-width: unset">
-  <pre><?=html_dump($_GET)?></pre>
+  <pre><?=html_dump($found_events)?></pre>
   <mpop-select
     multiple
     fuse-search
