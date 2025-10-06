@@ -381,22 +381,26 @@ class MultipopEventsPlugin {
     return $res;
   }
   public static function search_events_posts_join($join, $q) {
+    if($q->query_vars['post_type'] != 'mpop_event') return $join;
     save_test($join);
     remove_filter('posts_join', [self::class, 'search_events_posts_join'], 10);
     return $join;
   }
   public static function search_events_posts_where($where, $q) {
+    if($q->query_vars['post_type'] != 'mpop_event') return $where;
     save_test($where,1);
     save_test($q,4);
     remove_filter('posts_where', [self::class, 'search_events_posts_where'], 10);
     return $where;
   }
   public static function search_events_posts_orderby($orderby, $q) {
+    if($q->query_vars['post_type'] != 'mpop_event') return $orderby;
     save_test($orderby,2);
     remove_filter('posts_orderby', [self::class, 'search_events_posts_orderby'], 10);
     return $orderby;
   }
   public static function search_events_posts_limits($limits, $q) {
+    if($q->query_vars['post_type'] != 'mpop_event') return $limits;
     save_test($limits,3);
     remove_filter('posts_limits', [self::class, 'search_events_posts_limits'], 10);
     return $limits;
