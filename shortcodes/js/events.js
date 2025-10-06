@@ -1,6 +1,6 @@
 import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.js';
-const { createApp, defineAsyncComponent, ref, reactive, onMounted } = Vue,
+const { createApp, defineAsyncComponent, ref, reactive, onMounted, nextTick } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
   const loaded = [];
@@ -119,7 +119,7 @@ createApp({
     });
     onMounted(()=>{
       setTimeout(() => testEvents.length = 0, 10000);
-      console.log(mapEl.value);
+      nextTick(()=>console.log(mapEl.value));
     });
     return {
       testEvents,
