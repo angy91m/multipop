@@ -380,9 +380,10 @@ class MultipopEventsPlugin {
     ];
     return $res;
   }
-  public static function search_events_pre_get_posts($q) {
-    save_test($q->query_from);
-    remove_action('pre_get_posts', [self::class, 'search_events_pre_get_posts']);
+  public static function search_events_post_join($join, $q) {
+    save_test($join);
+    save_test($q,1);
+    remove_action('posts_join', [self::class, 'search_events_post_join'], 10);
   }
   public static function search_events($options = []) {
     $options += [
@@ -483,7 +484,7 @@ class MultipopEventsPlugin {
       if (str_starts_with($k, '_')) $extra_meta[$k] = 'NUMERIC';
     }
     $query_args['meta_query'] = $meta_q;
-    add_action('pre_get_posts', [self::class, 'search_events_pre_get_posts']);
+    add_action('posts_join', [self::class, 'search_events_post_join'], 10, 2);
     $posts = get_posts($query_args);
   }
 }
