@@ -119,7 +119,7 @@ createApp({
     });
     onMounted(()=>{
       setTimeout(() => testEvents.length = 0, 10000);
-      console.log(mapEl.value.$el);
+      console.log(mapEl.value);
     });
     return {
       testEvents,
