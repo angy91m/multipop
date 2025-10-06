@@ -7,10 +7,8 @@ defined( 'ABSPATH' ) || exit;
 // DEBUG VARS
 function html_dump($obj) {
     ob_start();
-    echo '<pre>';
     var_dump($obj);
-    echo '</pre>';
-    return ob_get_clean();
+    return '<pre>' . htmlspecialchars(ob_get_clean()) . '</pre>';
 }
 function save_test($obj, $id=0, $append = false) {
     $txt = '';
