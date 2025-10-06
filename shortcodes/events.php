@@ -26,12 +26,11 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
       reduceZones(zones, eventSearch);
       //if (oldLen == zones.length) triggerSearchUsers();
     }"
-    style="margin: 10px 50px;"
     @option:deselected="triggerSearchUsers"
     @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'searchZones', 'events', eventSearch)"
   >
   </mpop-select>
-  <mpop-map style="min-height: 500px;" :events="testEvents"></mpop-map>
+  <mpop-map style="min-height: 500px; margin: 10px 50px;" :events="testEvents"></mpop-map>
 </div>
 <?php wp_nonce_field( 'mpop-events-page', 'mpop-events-page-nonce' ); ?>
 <script src="<?=plugins_url()?>/multipop/js/vue.global.min.js"></script>
