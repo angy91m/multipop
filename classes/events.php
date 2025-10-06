@@ -286,6 +286,7 @@ class MultipopEventsPlugin {
       $location = trim($_POST['mpop_event_location']);
       update_post_meta($post_id, '_mpop_event_location', $location);
       $geo = self::geocode($location);
+      save_test($geo);
       if (!$geo) {
         delete_post_meta($post_id, '_mpop_event_lat');
         delete_post_meta($post_id, '_mpop_event_lng');
