@@ -387,6 +387,7 @@ class MultipopEventsPlugin {
   }
   public static function search_events_posts_where($where, $q) {
     save_test($where,1);
+    save_test($q,4);
     remove_filter('posts_where', [self::class, 'search_events_posts_where'], 10);
     return $where;
   }
