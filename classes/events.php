@@ -380,11 +380,25 @@ class MultipopEventsPlugin {
     ];
     return $res;
   }
-  public static function search_events_post_join($join, $q) {
+  public static function search_events_posts_join($join, $q) {
     save_test($join);
-    save_test($q,1);
-    remove_filter('posts_join', [self::class, 'search_events_post_join'], 10);
+    remove_filter('posts_join', [self::class, 'search_events_posts_join'], 10);
     return $join;
+  }
+  public static function search_events_posts_where($where, $q) {
+    save_test($where,1);
+    remove_filter('posts_where', [self::class, 'search_events_posts_where'], 10);
+    return $where;
+  }
+  public static function search_events_posts_orderby($orderby, $q) {
+    save_test($orderby,2);
+    remove_filter('posts_orderby', [self::class, 'search_events_posts_orderby'], 10);
+    return $orderby;
+  }
+  public static function search_events_posts_limits($limits, $q) {
+    save_test($limits,3);
+    remove_filter('posts_limits', [self::class, 'search_events_posts_limits'], 10);
+    return $limits;
   }
   public static function search_events($options = []) {
     $options += [
@@ -485,7 +499,10 @@ class MultipopEventsPlugin {
       if (str_starts_with($k, '_')) $extra_meta[$k] = 'NUMERIC';
     }
     $query_args['meta_query'] = $meta_q;
-    add_filter('posts_join', [self::class, 'search_events_post_join'], 10, 2);
+    add_filter('posts_join', [self::class, 'search_events_posts_join'], 10, 2);
+    add_filter('posts_where', [self::class, 'search_events_posts_where'], 10, 2);
+    add_filter('posts_orderby', [self::class, 'search_events_posts_orderby'], 10, 2);
+    add_filter('posts_limits', [self::class, 'search_events_posts_limits'], 10, 2);
     $posts = get_posts($query_args);
   }
 }
