@@ -381,7 +381,7 @@ class MultipopEventsPlugin {
     return $res;
   }
   public static function search_events_pre_get_posts($q) {
-    save_test($q);
+    save_test($q->query_from);
     remove_action('pre_get_posts', [self::class, 'search_events_pre_get_posts']);
   }
   public static function search_events($options = []) {
