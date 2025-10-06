@@ -378,7 +378,7 @@ class MultipopEventsPlugin {
     if ($comune) $res['zones'] = [
       $comune['codiceCatastale'],
       $comune['provincia']['sigla'],
-      'reg_' + $comune['provincia']['regione']
+      'reg_' . $comune['provincia']['regione']
     ];
     return $res;
   }
