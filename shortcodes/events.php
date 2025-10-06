@@ -12,7 +12,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
-<pre><?=html_dump($found_events)?></pre>
+<pre><?=htmlspecialchars(html_dump($found_events))?></pre>
 <div id="app" style="max-width: unset">
   <mpop-select
     multiple
