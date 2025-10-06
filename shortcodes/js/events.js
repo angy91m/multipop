@@ -109,7 +109,6 @@ createApp({
       lat: 41.8503514,
       lng: 12.4777725
     }]),
-    eventSearchZoneOpen = ref(false),
     eventSearch = reactive({
       txt: '',
       zones: []
