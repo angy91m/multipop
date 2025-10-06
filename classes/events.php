@@ -381,47 +381,56 @@ class MultipopEventsPlugin {
     return $res;
   }
   public static function search_events_posts_join($join, $q) {
-    // if($q->query_vars['post_type'] != 'mpop_event') return $join;
     save_test($join);
     remove_filter('posts_join', [self::class, 'search_events_posts_join'], 10);
     return $join;
   }
   public static function search_events_posts_where($where, $q) {
-    // if($q->query_vars['post_type'] != 'mpop_event') return $where;
     save_test($where,1);
     save_test($q,4);
     remove_filter('posts_where', [self::class, 'search_events_posts_where'], 10);
     return $where;
   }
   public static function search_events_posts_orderby($orderby, $q) {
-    // if($q->query_vars['post_type'] != 'mpop_event') return $orderby;
-    save_test($orderby,2);
+    if (isset($q->query_vars['mp_extra_sort'])) {
+      global $wpdb;
+      $orderby = '';
+      foreach($q->query_vars['mp_extra_sort'] as $k=>$sort) {
+        switch($k) {
+          case 'title':
+            $orderby += "$wpdb->posts.post_title " . ($sort ? 'ASC' : 'DESC') . ', ';
+            break;
+          case 'start':
+            $orderby += "CAST($wpdb->usermeta.meta_value AS UNSIGNED) " . ($sort ? 'ASC' : 'DESC') . ', ';
+            break;
+          case 'end':
+            $orderby += "CAST(mt1.meta_value AS UNSIGNED) " . ($sort ? 'ASC' : 'DESC') . ', ';
+            break;
+        }
+      }
+      $orderby = substr($orderby, -2);
+    }
     remove_filter('posts_orderby', [self::class, 'search_events_posts_orderby'], 10);
     return $orderby;
   }
-  public static function search_events_posts_limits($limits, $q) {
-    // if($q->query_vars['post_type'] != 'mpop_event') return $limits;
-    save_test($limits,3);
-    remove_filter('posts_limits', [self::class, 'search_events_posts_limits'], 10);
-    return $limits;
-  }
   public static function search_events($options = []) {
+    $default_sort = [
+      'end' => true,
+      'title' => true
+    ];
     $options += [
       'txt' => null,
       'zones' => null,
       'min' => null,
       'max' => null,
-      'sort_by' => [
-        'end' => true,
-        'title' => true
-      ]
+      'sort_by' => $default_sort
     ];
     $allowed_field_sorts = [
       'title'
     ];
     $allowed_meta_sorts = [
-      'start' => '_mpop_event_start',
-      'end' => '_mpop_event_end'
+      'start',
+      'end'
     ];
     $query_args = [
       'post_type' => 'mpop_event',
@@ -431,6 +440,32 @@ class MultipopEventsPlugin {
     ];
     $meta_q = ['relation' => 'AND'];
     if (is_string($options['txt']) && !empty(trim($options['txt']))) $query_args['s'] = trim($options['txt']);
+    if (is_string($options['min'])) {
+      $min_date = MultipopPlugin::validate_date($options['min']);
+    } else {
+      $min_date = date_create('now', new DateTimeZone(current_time('e')));
+      $min_date->setTime(0,0,0,0);
+    }
+    $meta_q['_mpop_event_start'] = [
+      'key' => '_mpop_event_start',
+      'value' => $min_date->getTimestamp(),
+      'compare' => '>=',
+      'type' => 'UNSIGNED'
+    ];
+    if (is_string($options['max'])) {
+      $max_date = MultipopPlugin::validate_date($options['max']);
+    } else {
+      $max_date = date_create('now', new DateTimeZone(current_time('e')));
+      $max_date->setTimestamp($min_date->getTimestamp());
+      $max_date->add(new DateInterval('P1M'));
+    }
+    $max_date->setTime(23,59,59);
+    $meta_q['_mpop_event_end'] = [
+      'key' => '_mpop_event_end',
+      'value' => $max_date->getTimestamp(),
+      'compare' => '<=',
+      'type' => 'UNSIGNED'
+    ];
     $zones = [];
     if (is_array($options['zones']) && count($options['zones'])) {
       $zones = array_filter($options['zones'], function($z) {return is_string($z) && (str_starts_with($z, 'reg_') || preg_match('/^([A-Z]{2})|([A-Z]\d{3})$/', $z));});
@@ -449,66 +484,30 @@ class MultipopEventsPlugin {
         ];
       }
     }
-    if (is_string($options['min'])) {
-      $min_date = MultipopPlugin::validate_date($options['min']);
-    } else {
-      $min_date = date_create('now', new DateTimeZone(current_time('e')));
-      $min_date->setTime(0,0,0,0);
-    }
-    $meta_q['_mpop_event_start'] = [
-      'key' => '_mpop_event_start',
-      'value' => $min_date->getTimestamp(),
-      'compare' => '>=',
-      'type' => 'NUMERIC'
-    ];
-    if (is_string($options['max'])) {
-      $max_date = MultipopPlugin::validate_date($options['max']);
-    } else {
-      $max_date = date_create('now', new DateTimeZone(current_time('e')));
-      $max_date->setTimestamp($min_date->getTimestamp());
-      $max_date->add(new DateInterval('P1M'));
-    }
-    $max_date->setTime(23,59,59);
-    $meta_q['_mpop_event_end'] = [
-      'key' => '_mpop_event_end',
-      'value' => $max_date->getTimestamp(),
-      'compare' => '<=',
-      'type' => 'NUMERIC'
-    ];
     if (!is_array($options['sort_by'])) {
-      $options['sort_by'] = [
-        $allowed_meta_sorts['end'] => 'ASC',
-        'title' => 'ASC'
-      ];
+      $options['sort_by'] = $default_sort;
     } else {
       $sort_keys = array_keys($options['sort_by']);
       $fsort_by = [];
       foreach ($sort_keys as $k) {
         if (in_array($k, $allowed_field_sorts)) {
-          $fsort_by[$k] = boolval($options['sort_by'][$k]) ? 'ASC' : 'DESC';
-        } else if (isset($allowed_meta_sorts[$k])) {
-          $fsort_by[$allowed_meta_sorts[$k]] = boolval($options['sort_by'][$k]) ? 'ASC' : 'DESC';
+          $fsort_by[$k] = boolval($options['sort_by'][$k]);
+        } else if (in_array($k, $allowed_meta_sorts)) {
+          $fsort_by[$k] = boolval($options['sort_by'][$k]);
         } else {
           unset($options['sort_by'][$k]);
         }
       }
       $options['sort_by'] = $fsort_by;
       if (empty($options['sort_by'])) {
-        $options['sort_by'] = [
-          $allowed_meta_sorts['end'] => 'ASC',
-          'title' => 'ASC'
-        ];
+        $options['sort_by'] = $default_sort;
       }
     }
-    $extra_meta = [];
-    foreach($options['sort_by'] as $k=>$v) {
-      if (str_starts_with($k, '_')) $extra_meta[$k] = 'NUMERIC';
-    }
+    $query_args['mp_extra_sort'] = $options['sort_by'];
     $query_args['meta_query'] = $meta_q;
     add_filter('posts_join', [self::class, 'search_events_posts_join'], 10, 2);
     add_filter('posts_where', [self::class, 'search_events_posts_where'], 10, 2);
     add_filter('posts_orderby', [self::class, 'search_events_posts_orderby'], 10, 2);
-    add_filter('posts_limits', [self::class, 'search_events_posts_limits'], 10, 2);
     $posts = get_posts($query_args);
   }
 }
