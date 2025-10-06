@@ -196,7 +196,7 @@ class MultipopEventsPlugin {
     if ($end_ts) {
       $end_date->setTimestamp(intval($end_ts));
     }
-
+    $location_name = get_post_meta( $post->ID, '_mpop_event_location_name', true );
     $location = get_post_meta( $post->ID, '_mpop_event_location', true );
   ?>
     <p>
@@ -234,7 +234,16 @@ class MultipopEventsPlugin {
       />
     </p>
     <p>
-      <label for="mpop_event_location">Luogo</label>
+      <label for="mpop_event_location_name">Nome luogo</label>
+      <input
+        id="mpop_event_location_name"
+        name="mpop_event_location_name"
+        type="text"
+        value="<?=$location_name?>"
+      />
+    </p>
+    <p>
+      <label for="mpop_event_location">Indirizzo</label>
       <input
         id="mpop_event_location"
         name="mpop_event_location"
@@ -282,11 +291,13 @@ class MultipopEventsPlugin {
     ) {
       return;
     }
+    if (isset($_POST['mpop_event_location_name'])) {
+      update_post_meta($post_id, '_mpop_event_location_name', trim($_POST['mpop_event_location_name']));
+    }
     if (isset($_POST['mpop_event_location'])) {
       $location = trim($_POST['mpop_event_location']);
       update_post_meta($post_id, '_mpop_event_location', $location);
       $geo = self::geocode($location);
-      save_test($geo);
       if (!$geo) {
         delete_post_meta($post_id, '_mpop_event_lat');
         delete_post_meta($post_id, '_mpop_event_lng');
@@ -392,10 +403,10 @@ class MultipopEventsPlugin {
             $orderby .= "$wpdb->posts.post_title " . ($sort ? 'ASC' : 'DESC') . ', ';
             break;
           case 'start':
-            $orderby .= "CAST($wpdb->usermeta.meta_value AS UNSIGNED) " . ($sort ? 'ASC' : 'DESC') . ', ';
+            $orderby .= "CAST(mt1.meta_value AS UNSIGNED) " . ($sort ? 'ASC' : 'DESC') . ', ';
             break;
           case 'end':
-            $orderby .= "CAST(mt1.meta_value AS UNSIGNED) " . ($sort ? 'ASC' : 'DESC') . ', ';
+            $orderby .= "CAST($wpdb->postmeta.meta_value AS UNSIGNED) " . ($sort ? 'ASC' : 'DESC') . ', ';
             break;
         }
       }
@@ -445,8 +456,8 @@ class MultipopEventsPlugin {
       $min_date = date_create('now', new DateTimeZone(current_time('e')));
       $min_date->setTime(0,0,0,0);
     }
-    $meta_q['_mpop_event_start'] = [
-      'key' => '_mpop_event_start',
+    $meta_q['_mpop_event_end'] = [
+      'key' => '_mpop_event_end',
       'value' => $min_date->getTimestamp(),
       'compare' => '>=',
       'type' => 'UNSIGNED'
@@ -459,8 +470,8 @@ class MultipopEventsPlugin {
       $max_date->add(new DateInterval('P1M'));
     }
     $max_date->setTime(23,59,59);
-    $meta_q['_mpop_event_end'] = [
-      'key' => '_mpop_event_end',
+    $meta_q['_mpop_event_start'] = [
+      'key' => '_mpop_event_start',
       'value' => $max_date->getTimestamp(),
       'compare' => '<=',
       'type' => 'UNSIGNED'
@@ -513,5 +524,37 @@ class MultipopEventsPlugin {
     $query_args['meta_query'] = $meta_q;
     add_filter('posts_orderby', [self::class, 'search_events_posts_orderby'], 10, 2);
     return get_posts($query_args);
+  }
+  public static function event2ld_json($event) {
+    $start_date = date_create('now', new DateTimeZone(current_time('e')));
+    $start_date->setTimestamp(intval($event->_mpop_event_start));
+    $end_date = date_create('now', new DateTimeZone(current_time('e')));
+    $end_date->setTimestamp(intval($event->_mpop_event_end));
+    $location = [
+      '@type' => 'Place'
+    ];
+    if ($event->_mpop_event_location_name) $location['name'] = $event->_mpop_event_location_name;
+    if ($event->_mpop_event_location) $location['address'] = [
+      '@type' => 'PostalAddress',
+      'name' => $event->_mpop_event_location
+    ];
+    $thumbnail = get_the_post_thumbnail_url($event, 'full');
+    $json = [
+      '@context' => 'https://schema.org',
+      '@type' => 'Event',
+      'name' => $event->post_title,
+      'startDate' => $start_date->format('c'),
+      'endDate' => $end_date->format('c'),
+      'eventStatus' => 'https://schema.org/EventScheduled',
+      'image' => $thumbnail ? [$thumbnail] : [],
+      'description' => $event->post_excerpt,
+      'organizer' => [
+        '@type' => 'Organization',
+        'name' => 'Multipopolare A.P.S.',
+        'url' => site_url('/')
+      ]
+    ];
+    if (isset($location['name']) || isset($location['address'])) $json['location'] = $location;
+    return json_encode($json);
   }
 }
