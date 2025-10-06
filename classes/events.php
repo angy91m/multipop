@@ -398,13 +398,13 @@ class MultipopEventsPlugin {
       foreach($q->query_vars['mp_extra_sort'] as $k=>$sort) {
         switch($k) {
           case 'title':
-            $orderby += "$wpdb->posts.post_title " . ($sort ? 'ASC' : 'DESC') . ', ';
+            $orderby .= "$wpdb->posts.post_title " . ($sort ? 'ASC' : 'DESC') . ', ';
             break;
           case 'start':
-            $orderby += "CAST($wpdb->usermeta.meta_value AS UNSIGNED) " . ($sort ? 'ASC' : 'DESC') . ', ';
+            $orderby .= "CAST($wpdb->usermeta.meta_value AS UNSIGNED) " . ($sort ? 'ASC' : 'DESC') . ', ';
             break;
           case 'end':
-            $orderby += "CAST(mt1.meta_value AS UNSIGNED) " . ($sort ? 'ASC' : 'DESC') . ', ';
+            $orderby .= "CAST(mt1.meta_value AS UNSIGNED) " . ($sort ? 'ASC' : 'DESC') . ', ';
             break;
         }
       }
