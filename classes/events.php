@@ -408,7 +408,7 @@ class MultipopEventsPlugin {
             break;
         }
       }
-      $orderby = substr($orderby, -2);
+      $orderby = substr($orderby,0,-2);
     }
     remove_filter('posts_orderby', [self::class, 'search_events_posts_orderby'], 10);
     return $orderby;
