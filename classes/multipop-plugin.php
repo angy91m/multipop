@@ -15,7 +15,9 @@ function save_test($obj, $id=0, $append = false) {
     if ($append && file_exists(MULTIPOP_PLUGIN_PATH ."/test-$id.txt")) {
         $txt = file_get_contents(MULTIPOP_PLUGIN_PATH ."/test-$id.txt");
     }
-    file_put_contents(MULTIPOP_PLUGIN_PATH ."/test-$id.txt", $txt . html_dump($obj));
+    ob_start();
+    var_dump($obj);
+    file_put_contents(MULTIPOP_PLUGIN_PATH ."/test-$id.txt", $txt . ob_get_clean());
 }
 
 function getallheaders_lower() {
