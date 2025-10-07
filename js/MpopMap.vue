@@ -53,7 +53,10 @@ function addEventsToMap () {
       const content = L.DomUtil.create('span', 'event-marker-popup'),
       marker = L.marker([ev.lat, ev.lng]);
       content.innerHTML = `<strong>${ev.title}</strong><br>${ev.location}`;
-      const onClick = () => emit('eventClick', ev);
+      const onClick = () => {
+        console.log('clicked');
+        emit('eventClick', ev);
+      };
       listenerClears.push(()=>content.removeEventListener('click', onClick));
       content.addEventListener('click', onClick);
       marker.bindPopup(content);
