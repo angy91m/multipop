@@ -6,9 +6,6 @@
 .leaflet-control-attribution > :first-child, .leaflet-control-attribution > :nth-child(2) {
   display: none;
 }
-.event-marker-popup {
-  cursor: default;
-}
 </style>
 <script setup>
 import { ref, onMounted, defineProps, watch, defineExpose, defineEmits } from 'vue';
@@ -61,7 +58,7 @@ function addEventsToMap () {
   eventsLayer.clearLayers();
   props.events.forEach(ev => {
     if (ev.location && typeof ev.lat != 'undefined' ) {
-      const content = L.DomUtil.create('div', 'event-marker-popup'),
+      const content = L.DomUtil.create('div', 'event-map-marker-popup'),
       marker = L.marker([ev.lat, ev.lng]);
       let html =`${showEventDate(ev)}<br><strong>${ev.title}</strong>`;
       if (ev.location_name) html += `<br>${ev.location_name}`;

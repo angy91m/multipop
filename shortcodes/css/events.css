@@ -6,7 +6,10 @@
 }
 .event-card,
 .event-card * {
-  cursor: default;
+  cursor: pointer;
+}
+.event-map-marker-popup {
+  cursor: pointer;
 }
 @media only screen and (min-width: 430px) {
   .event-card {
