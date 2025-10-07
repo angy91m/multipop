@@ -194,11 +194,8 @@ createApp({
       clearTimeout(searchEventsTimeout);
       searchEventsTimeout = setTimeout(searchEvents, 500);
     }
-    function dateString(d = new Date()) {
-      return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2);
-    }
-    function changeLocation(l = location.href) {
-      if (l != location.href) location.href = l;
+    function openTab(l) {
+      open(l, '_blank');
     }
     function onPopState(e) {
       if (typeof e.state == 'object') {
@@ -226,7 +223,7 @@ createApp({
       onDateInput,
       pages,
       eventsToShow,
-      changeLocation,
+      openTab,
       setUrlOptions,
       sortOptions,
       onSortChange

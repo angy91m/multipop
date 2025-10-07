@@ -100,7 +100,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
                   class="event-card"
                   style="margin-bottom: 10px;"
                   :event="event"
-                  @clicked="changeLocation(event.url)"
+                  @clicked="openTab(event.url)"
                 ><mpop-event-card>
               </div>
             </div>
@@ -112,7 +112,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
         ref="mapEl"
         :events="events"
         style="min-height: 550px; margin: 10px 50px;"
-        @event-click="event=>changeLocation(event.url)">
+        @event-click="event=>openTab(event.url)">
       </mpop-map>
     </q-page-container>
   </q-layout>
