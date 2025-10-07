@@ -14,7 +14,30 @@
 import { ref, onMounted, defineProps, watch, defineExpose, defineEmits } from 'vue';
 import L from '/wp-content/plugins/multipop/js/leaflet.js';
 let map, eventsLayer, mounted;
-const makeId = (length = 5) => {
+const dayNames = [
+  'Domenica',
+  'Lunedì',
+  'Martedì',
+  'Mercoledì',
+  'Giovedì',
+  'Venerdì',
+  'Sabato'
+],
+monthNames = [
+  'Gennaio',
+  'Febbraio',
+  'Marzo',
+  'Aprile',
+  'Maggio',
+  'Giugno',
+  'Luglio',
+  'Agosto',
+  'Settembre',
+  'Ottobre',
+  'Novembre',
+  'Dicembre'
+],
+makeId = (length = 5) => {
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   for ( let i = 0; i < length; i++ ) {
@@ -44,7 +67,21 @@ emit = defineEmits(['eventClick']),
 mapRef = ref(null),
 elId = ref('mpop-map-' + makeId()),
 listenerClears = [];
-
+function humanDate(d = new Date()) {
+  return dayNames[d.getDay()].slice(0,3) + ' ' + d.getDate() + ' ' + monthNames[d.getMonth()].slice(0,3) + ' ' + d.getFullYear();
+}
+function humanTime(d = new Date()) {
+  return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+}
+function showEventDate(event) {
+  const start = new Date(event.start),
+  end = new Date(event.end),
+  startDate = humanDate(start),
+  endDate = humanDate(end),
+  startTime = humanTime(start),
+  endTime = humanTime(end);
+  return startDate + ' ' + startTime + (startDate == endDate ? (startTime == endTime ? '' : ' - ' + endTime) : '<br>' + endDate + ' ' + endTime );
+}
 function addEventsToMap () {
   listenerClears.forEach(cb => cb());
   eventsLayer.clearLayers();
@@ -52,7 +89,10 @@ function addEventsToMap () {
     if (ev.location && typeof ev.lat != 'undefined' ) {
       const content = L.DomUtil.create('span', 'event-marker-popup'),
       marker = L.marker([ev.lat, ev.lng]);
-      content.innerHTML = `<strong>${ev.title}</strong><br>${ev.location}`;
+      let html =`<strong>${ev.title}</strong><br>${showEventDate(ev)}`;
+      if (ev.location_name) html += `<br>${ev.location_name}`;
+      if (ev.location) html += `<br>${ev.location}`;
+      content.innerHTML = html;
       const onClick = () => emit('eventClick', ev);
       listenerClears.push(()=>content.removeEventListener('click', onClick));
       content.addEventListener('click', onClick);
