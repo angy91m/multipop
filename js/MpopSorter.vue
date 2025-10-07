@@ -1,7 +1,10 @@
 <template>
     <div class="row">
-        <div>
+        <div class="column col">
             <q-select v-model="activeKey" :options="props.options" v-bind="$attrs" />
+        </div>
+        <div class="column col">
+            <q-icon :name="activeOrder ? 'arrow_drop_up' : 'arrow_drop_down'" @click="invertOrder"/>
         </div>
     </div>
 </template>
@@ -23,10 +26,8 @@ activeKey = computed({
         console.log(v);
     }
 }),
-activeOrder = computed({
-    get: () => Object.values(modelValue.value)[0],
-    set: v => {
-        console.log(v);
-    }
-});
+activeOrder = computed(()=>Object.values(modelValue.value)[0]);
+function invertOrder() {
+    modelValue.value[Object.keys(modelValue.value)[0]] = !modelValue.value[Object.keys(modelValue.value)[0]];
+}
 </script>
