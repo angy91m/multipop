@@ -426,17 +426,17 @@ class MultipopEventsPlugin {
       'min' => null,
       'max' => null,
       'sortby' => $default_sort,
-      'page' => '1'
+      'pag' => '1'
     ];
     $page = 0;
-    if (is_string($options['page'])) {
-      $page = intval($options['page']);
+    if (is_string($options['pag'])) {
+      $page = intval($options['pag']);
       if ($page > 0) {
         $page--;
       } else {
         $page = 0;
       }
-    } elseif($options['page'] === true) {
+    } elseif($options['pag'] === true) {
       $page = true;
     } else {
       $page = 0;
