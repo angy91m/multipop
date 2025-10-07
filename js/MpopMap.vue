@@ -6,9 +6,12 @@
 .leaflet-control-attribution > :first-child, .leaflet-control-attribution > :nth-child(2) {
   display: none;
 }
+.event-marker-popup {
+  cursor: default;
+}
 </style>
 <script setup>
-import { ref, onMounted, defineProps, watch, defineExpose } from 'vue';
+import { ref, onMounted, defineProps, watch, defineExpose, defineEmits } from 'vue';
 import L from '/wp-content/plugins/multipop/js/leaflet.js';
 let map, eventsLayer, mounted;
 const makeId = (length = 5) => {
@@ -37,21 +40,24 @@ props = defineProps({
     default: 6
   }
 }),
+emit = defineEmits(['eventClick']),
 mapRef = ref(null),
 elId = ref('mpop-map-' + makeId()),
-addEventsToMap = () => {
+listenerClears = [];
+
+function addEventsToMap () {
+  listenerClears.forEach(cb => cb());
   eventsLayer.clearLayers();
   props.events.forEach(ev => {
     if (ev.location && typeof ev.lat != 'undefined' ) {
-      const content = L.DomUtil.create('span'),
+      const content = L.DomUtil.create('span', 'event-marker-popup'),
       marker = L.marker([ev.lat, ev.lng]);
       content.innerHTML = `<strong>${ev.title}</strong><br>${ev.location}`;
-      content.addEventListener('click', ()=>console.log('clickk'));
+      const onClick = () => emit('eventClick', ev);
+      listenerClears.push(()=>content.removeEventListener('click', onClick));
+      content.addEventListener('click', onClick);
       marker.bindPopup(content);
       eventsLayer.addLayer(marker);
-      // const marker = L.marker([ev.lat, ev.lng]);
-      // marker.bindPopup(`<strong>${ev.title}</strong><br>${ev.location}`);
-      // eventsLayer.addLayer(marker);
     }
   })
 };

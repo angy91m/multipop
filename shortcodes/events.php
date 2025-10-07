@@ -95,7 +95,8 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
         v-if="eventTab == 'map'"
         ref="mapEl"
         :events="events"
-        style="min-height: 550px; margin: 10px 50px;">
+        style="min-height: 550px; margin: 10px 50px;"
+        @eventClick="event=>changeLocation(event.url)">
       </mpop-map>
     </q-page-container>
   </q-layout>
