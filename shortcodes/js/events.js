@@ -123,7 +123,7 @@ createApp({
           searchParams.append(k, eventSearch[k]);
         }
       }
-      history[replace ? 'replaceState' : 'pushState'](eventSearch, '', location.origin + location.pathname + '?' + searchParams.toString());
+      history[replace ? 'replaceState' : 'pushState'](JSON.stringify(eventSearch), '', location.origin + location.pathname + '?' + searchParams.toString());
     }
     async function searchEvents(back = false, init = false) {
       const res = await serverReq({
