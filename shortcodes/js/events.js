@@ -23,7 +23,8 @@ loadVueModule = (...modules) => {
   return loaded;
 },
 [mpopMap, mpopSelect] = loadVueModule('MpopMap.vue', {path: 'MpopSelect.vue', modules: {fuse: Fuse}}),
-eventsPageNonce = document.getElementById('mpop-events-page-nonce').value;
+eventsPageNonce = document.getElementById('mpop-events-page-nonce').value,
+eventsEtc = JSON.parse(document.getElementById('events-etc').innerText);
 let triggerSearchTimeout, searchEventsTimeout;
 
 createApp({
@@ -168,7 +169,22 @@ createApp({
     }
     function dateString(d = new Date()) {
       return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2);
-    } 
+    }
+    function humanDate(d = new Date()) {
+      return eventsEtc.dayNames[d.getDay()].slice(0,3) + ' ' + d.getDate() + ' ' + eventsEtc.monthNames[d.getMonth()].slice(0,3) + ' ' + d.getFullYear();
+    }
+    function humanTime(d = new Date()) {
+      return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+    }
+    function showEventDate(event) {
+      const start = new Date(event.start),
+      end = new Date(event.end),
+      startDate = humanDate(start),
+      endDate = humanDate(end),
+      startTime = humanTime(start),
+      endTime = humanTime(end);
+      return startDate + ' ' + startTime + (startDate == endDate ? (startTime == endTime ? '' : ' - ' + endTime) : ' - ' + endDate + ' ' + endTime );
+    }
     function onPopState(e) {
       if (typeof e.state == 'object') {
         Object.assign(eventSearch, e.state);
@@ -192,7 +208,6 @@ createApp({
       searchEvents,
       eventTab,
       mapEl,
-      dateString,
       onDateInput
     };
   }

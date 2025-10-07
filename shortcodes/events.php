@@ -19,6 +19,12 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
 <script id="search-options" type="application/json">
 <?=json_encode($found_events['options'], JSON_UNESCAPED_SLASHES)?>
 </script>
+<script id="events-etc" type="application/json">
+{
+  "monthNames": <?=json_encode(MultipopEventsPlugin::MONTH_NAMES)?>,
+  "dayNames": <?=json_encode(MultipopEventsPlugin::DAY_NAMES)?>
+}
+</script>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/events.css">
@@ -76,7 +82,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
           <q-card flat bordered>
             <q-card-section horizontal>
               <q-card-section class="q-pt-xs">
-                <div class="text-overline">Overline</div>
+                <div class="text-overline">{{showEventDate(event)}}</div>
                 <div class="text-h5 q-mt-sm q-mb-xs">{{event.title}}</div>
                 <div class="text-caption text-grey">{{event.excerpt}}</div>
               </q-card-section>
