@@ -120,7 +120,7 @@ class MultipopEventsPlugin {
     add_shortcode('mpop_event_details', function () {
       $post = get_post();
       if (!$post || $post->post_type != 'mpop_event' || !$post->_mpop_event_start) return '';
-      $json_event = '<script type="application/ld+json">' . json_encode(self::event2ld_json($post), JSON_UNESCAPED_SLASHES) . '</script>';
+      $json_event = '<script type="application/ld+json">' . self::event2ld_json($post) . '</script>';
       $sd = date_create('now', new DateTimeZone(current_time('e')));
       $sd->setTimestamp(intval($post->_mpop_event_start));
       $start_date = self::human_date($sd);
