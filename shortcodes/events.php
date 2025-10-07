@@ -27,7 +27,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
     <q-page-container>
       <div class="row">
         <div class="col">
-          <q-input v-model="eventSearch.txt" label="Titolo o descrizione"></q-input>
+          <q-input v-model="eventSearch.txt" label="Titolo o descrizione" filled></q-input>
         </div>
         <div class="col">
           <q-input v-model="eventSearch.min" type="date" label="Dal"></q-input>
