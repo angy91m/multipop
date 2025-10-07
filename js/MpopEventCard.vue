@@ -1,5 +1,5 @@
 <template>
-  <q-card class="event-card" flat bordered style="margin-bottom: 10px;">
+  <q-card ref="cardEl" class="event-card" flat bordered style="margin-bottom: 10px;">
     <q-card-section horizontal>
       <q-card-section class="q-pt-xs" style="padding: 0 10px">
         <div
@@ -24,7 +24,7 @@
   </q-card>
 </template>
 <script setup>
-import {defineProps} from 'vue';
+import {defineProps, defineEmits, useTemplateRef, onMounted} from 'vue';
 const dayNames = [
   'Domenica',
   'Lunedì',
@@ -53,7 +53,8 @@ props = defineProps({
     type: Object,
     required: true
   }
-});
+}),
+cardEl = useTemplateRef('cardEl');
 function humanDate(d = new Date()) {
   return dayNames[d.getDay()].slice(0,3) + ' ' + d.getDate() + ' ' + monthNames[d.getMonth()].slice(0,3) + ' ' + d.getFullYear();
 }
@@ -69,4 +70,7 @@ function showEventDate(event) {
   endTime = humanTime(end);
   return startDate + ' ' + startTime + (startDate == endDate ? (startTime == endTime ? '' : ' - ' + endTime) : '<br>' + endDate + ' ' + endTime );
 }
+onMounted(()=> {
+  console.log(cardEl.value);
+});
 </script>

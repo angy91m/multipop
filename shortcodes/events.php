@@ -75,29 +75,6 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
         <div class="col-grow">
           <div class="row justify-center" v-for="(event, k) in eventsToShow" :key="k">
             <mpop-event-card class="event-card" flat bordered style="margin-bottom: 10px;" :event="event"><mpop-event-card>
-            <!-- <q-card class="event-card" flat bordered style="margin-bottom: 10px;">
-              <q-card-section horizontal>
-                <q-card-section class="q-pt-xs" style="padding: 0 10px">
-                  <div
-                    class="text-overline"
-                    v-html="showEventDate(event)"
-                    style="text-wrap: nowrap; text-transform: uppercase;"
-                  ></div>
-                </q-card-section>
-              </q-card-section>
-              <q-card-section horizontal class="event-card-description">
-                <q-card-section class="q-pt-xs col-grow">
-                  <div class="text-h5 q-mt-sm q-mb-xs">{{event.title}}</div>
-                  <div class="text-caption text-grey">{{event.excerpt}}</div>
-                </q-card-section>
-                <q-card-section v-if="event.thumbnail" class="event-card-img col-5 flex flex-center">
-                  <q-img
-                    class="rounded-borders"
-                    :src="event.thumbnail"
-                  />
-                </q-card-section>
-              </q-card-section>
-            </q-card> -->
           </div>
         </div>
       </div>
