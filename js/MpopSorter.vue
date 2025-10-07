@@ -21,7 +21,7 @@ const props = defineProps({
 }),
 modelValue = defineModel({
     type: Object,
-    default: props.options[0] || {}
+    required: true
 }),
 activeKey = computed({
     get: () => Object.keys(modelValue.value)[0],
