@@ -1130,7 +1130,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     private function pdf_create(array $pdf_config = [], $export = true) {
         require_once(MULTIPOP_PLUGIN_PATH . '/classes/multipopdf.php');
         $pdf = new MultipoPDF($pdf_config+['logo'=> MULTIPOP_PLUGIN_PATH . '/logo-pdf.png']);
-        require_once(MULTIPOP_PLUGIN_PATH . '/modulo-iscrizione.php');
+        require(MULTIPOP_PLUGIN_PATH . '/modulo-iscrizione.php');
         return $export ? $pdf->export_file() : $pdf;
     }
 

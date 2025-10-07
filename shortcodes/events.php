@@ -5,7 +5,7 @@ if (
   && !str_starts_with( $_SERVER['REQUEST_URI'], '/wp-json' )
   && $_SERVER['REQUEST_METHOD'] == 'POST'
 ) {
-  require_once('post/events.php');
+  require('post/events.php');
   exit;
 }
 $found_events = MultipopEventsPlugin::search_events($_GET);

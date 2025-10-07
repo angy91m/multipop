@@ -9,7 +9,7 @@ if (
     && !str_starts_with( $_SERVER['REQUEST_URI'], '/wp-json' )
     && $_SERVER['REQUEST_METHOD'] == 'POST'
 ) {
-    require_once('post/invitation-confirm.php');
+    require('post/invitation-confirm.php');
     exit;
 }
 $invitation_props = [

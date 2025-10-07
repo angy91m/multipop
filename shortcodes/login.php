@@ -5,7 +5,7 @@ if (
     && !str_starts_with( $_SERVER['REQUEST_URI'], '/wp-json' )
     && $_SERVER['REQUEST_METHOD'] == 'POST'
 ) {
-    require_once('post/login.php');
+    require('post/login.php');
     exit;
 }
 $this->show_hcaptcha_script();

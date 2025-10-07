@@ -5,7 +5,7 @@ if (
     && !str_starts_with( $_SERVER['REQUEST_URI'], '/wp-json' )
     && $_SERVER['REQUEST_METHOD'] == 'POST'
 ) {
-    require_once('post/logged-myaccount.php');
+    require('post/logged-myaccount.php');
     exit;
 }
 $parsed_user = $this->myaccount_get_profile($current_user, true, true);
