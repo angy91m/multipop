@@ -4,7 +4,7 @@
             <q-select v-model="activeOption" :options="props.options" v-bind="$attrs" />
         </div>
         <div class="column col-1">
-            <q-btn :icon="activeOrder ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" @click="invertOrder"/>
+            <q-btn primary :icon="activeOrder ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" @click="invertOrder"/>
         </div>
     </div>
 </template>

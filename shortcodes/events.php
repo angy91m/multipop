@@ -76,6 +76,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
           <mpop-sorter
             v-model="eventSearch.sortby"
             :options="sortOptions"
+            filled
             label="Ordina per: "
             @change="onSortChange"
           ></mpop-sorter>
