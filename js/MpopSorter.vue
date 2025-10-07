@@ -9,7 +9,7 @@
     </div>
 </template>
 <script setup>
-import {defineProps, defineModel, computed} from 'vue';
+import {defineProps, defineModel, computed, defineEmits} from 'vue';
 defineOptions({
   inheritAttrs: false
 });
@@ -23,14 +23,22 @@ modelValue = defineModel({
     type: Object,
     required: true
 }),
+emit = defineEmits(['change']),
 activeOption = computed({
     get: () => props.options.find(o => o.value == Object.keys(modelValue.value)[0]),
     set: v => {
-        console.log(v);
+        const obj = modelValue.value;
+        delete obj[Object.keys(obj)[1]];
+        modelValue.value = {
+            [v.value]: true,
+            ...obj
+        };
+        emit('change');
     }
 }),
 activeOrder = computed(()=>Object.values(modelValue.value)[0]);
 function invertOrder() {
     modelValue.value[Object.keys(modelValue.value)[0]] = !Object.values(modelValue.value)[0];
+    emit('change');
 }
 </script>
