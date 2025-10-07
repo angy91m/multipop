@@ -122,8 +122,10 @@ createApp({
         const valueA0 = sortOptions[0].k == 'title' ? a.title.toLowerCase() : new Date(a[sortOptions[0].k]).getTime(),
         valueB0 = sortOptions[0].k == 'title' ? b.title.toLowerCase() : new Date(b[sortOptions[0].k]).getTime(),
         valueA1 = sortOptions[1].k == 'title' ? a.title.toLowerCase() : new Date(a[sortOptions[1].k]).getTime(),
-        valueB1 = sortOptions[1].k == 'title' ? b.title.toLowerCase() : new Date(b[sortOptions[1].k]).getTime();
-        return valueA0 == valueB0 ? (valueA1 == valueB1 ? 0 : (valueA1 < valueB1 ? -1 : 1)) : (valueA0 < valueB0 ? -1 : 1 );
+        valueB1 = sortOptions[1].k == 'title' ? b.title.toLowerCase() : new Date(b[sortOptions[1].k]).getTime(),
+        sortOrder0 = v => sortOptions[0].v ? v : -v,
+        sortOrder1 = v => sortOptions[1].v ? v : -v;
+        return valueA0 == valueB0 ? (valueA1 == valueB1 ? 0 : (valueA1 < valueB1 ? sortOrder1(-1) : sortOrder1(1))) : (valueA0 < valueB0 ? sortOrder0(-1) : sortOrder0(1));
       });
       setUrlOptions();
     }
