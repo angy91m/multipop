@@ -92,14 +92,18 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
               @update:model-value="()=>setUrlOptions()"
             ></q-pagination>
           </div>
-          <div class="row justify-center" v-for="(event, k) in eventsToShow" :key="k">
-            <mpop-event-card
-              flat bordered
-              class="event-card"
-              style="margin-bottom: 10px;"
-              :event="event"
-              @clicked="changeLocation(event.url)"
-            ><mpop-event-card>
+          <div class="row justify-center">
+            <div class="col" v-for="(event, k) in eventsToShow" :key="k">
+              <div class="row justify-center">
+                <mpop-event-card
+                  flat bordered
+                  class="event-card"
+                  style="margin-bottom: 10px;"
+                  :event="event"
+                  @clicked="changeLocation(event.url)"
+                ><mpop-event-card>
+              </div>
+            </div>
           </div>
         </div>
       </div>
