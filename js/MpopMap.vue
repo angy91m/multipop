@@ -43,10 +43,11 @@ addEventsToMap = () => {
   eventsLayer.clearLayers();
   props.events.forEach(ev => {
     if (ev.location && typeof ev.lat != 'undefined' ) {
-      const content = L.DomUtil.create('span', `<strong>${ev.title}</strong><br>${ev.location}`),
+      const content = L.DomUtil.create('span'),
       marker = L.marker([ev.lat, ev.lng]);
-      marker.bindPopup(content);
+      content.innerHTML = `<strong>${ev.title}</strong><br>${ev.location}`;
       content.addEventListener('click', ()=>console.log('clickk'));
+      marker.bindPopup(content);
       eventsLayer.addLayer(marker);
       // const marker = L.marker([ev.lat, ev.lng]);
       // marker.bindPopup(`<strong>${ev.title}</strong><br>${ev.location}`);
