@@ -546,8 +546,8 @@ class MultipopEventsPlugin {
       'thumbnail' => get_the_post_thumbnail_url($event),
       'location_name' => $event->_mpop_event_location_name,
       'location' => $event->_mpop_event_location,
-      'lat' => $event->_mpop_event_lat,
-      'lng' => $event->_mpop_event_lng
+      'lat' => (double) $event->_mpop_event_lat,
+      'lng' => (double) $event->_mpop_event_lng
     ];
   }
   public static function event2ld_json($event) {
