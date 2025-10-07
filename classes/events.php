@@ -550,6 +550,7 @@ class MultipopEventsPlugin {
     return [
       'title' => $event->post_title,
       'excerpt' => $event->post_excerpt,
+      'url' => get_permalink($event),
       'start' => $start_date->format('c'),
       'end' => $end_date->format('c'),
       'thumbnail' => get_the_post_thumbnail_url($event),

@@ -1,0 +1,72 @@
+<template>
+  <q-card class="event-card" flat bordered style="margin-bottom: 10px;">
+    <q-card-section horizontal>
+      <q-card-section class="q-pt-xs" style="padding: 0 10px">
+        <div
+          class="text-overline"
+          v-html="showEventDate(props.event)"
+          style="text-wrap: nowrap; text-transform: uppercase;"
+        ></div>
+      </q-card-section>
+    </q-card-section>
+    <q-card-section horizontal class="event-card-description">
+      <q-card-section class="q-pt-xs col-grow">
+        <div class="text-h5 q-mt-sm q-mb-xs">{{props.event.title}}</div>
+        <div class="text-caption text-grey">{{props.event.excerpt}}</div>
+      </q-card-section>
+      <q-card-section v-if="props.event.thumbnail" class="event-card-img col-5 flex flex-center">
+        <q-img
+          class="rounded-borders"
+          :src="props.event.thumbnail"
+        />
+      </q-card-section>
+    </q-card-section>
+  </q-card>
+</template>
+<script setup>
+import {defineProps} from 'vue';
+const dayNames = [
+  'Domenica',
+  'Lunedì',
+  'Martedì',
+  'Mercoledì',
+  'Giovedì',
+  'Venerdì',
+  'Sabato'
+],
+monthNames = [
+  'Gennaio',
+  'Febbraio',
+  'Marzo',
+  'Aprile',
+  'Maggio',
+  'Giugno',
+  'Luglio',
+  'Agosto',
+  'Settembre',
+  'Ottobre',
+  'Novembre',
+  'Dicembre'
+],
+props = defineProps({
+  event: {
+    type: Object,
+    required: true
+  }
+});
+function humanDate(d = new Date()) {
+  return dayNames[d.getDay()].slice(0,3) + ' ' + d.getDate() + ' ' + monthNames[d.getMonth()].slice(0,3) + ' ' + d.getFullYear();
+}
+function humanTime(d = new Date()) {
+  return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+}
+function showEventDate(event) {
+  const start = new Date(event.start),
+  end = new Date(event.end),
+  startDate = humanDate(start),
+  endDate = humanDate(end),
+  startTime = humanTime(start),
+  endTime = humanTime(end);
+  return startDate + ' ' + startTime + (startDate == endDate ? (startTime == endTime ? '' : ' - ' + endTime) : '<br>' + endDate + ' ' + endTime );
+}
+</script>

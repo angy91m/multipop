@@ -19,12 +19,6 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
 <script id="search-options" type="application/json">
 <?=json_encode($found_events['options'], JSON_UNESCAPED_SLASHES)?>
 </script>
-<script id="events-etc" type="application/json">
-{
-  "monthNames": <?=json_encode(MultipopEventsPlugin::MONTH_NAMES)?>,
-  "dayNames": <?=json_encode(MultipopEventsPlugin::DAY_NAMES)?>
-}
-</script>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/events.css">
@@ -80,7 +74,8 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
       <div class="row" v-if="eventTab == 'list'">
         <div class="col-grow">
           <div class="row justify-center" v-for="(event, k) in eventsToShow" :key="k">
-            <q-card class="event-card" flat bordered style="margin-bottom: 10px;">
+            <mpop-event-card class="event-card" flat bordered style="margin-bottom: 10px;" :event="event"><mpop-event-card>
+            <!-- <q-card class="event-card" flat bordered style="margin-bottom: 10px;">
               <q-card-section horizontal>
                 <q-card-section class="q-pt-xs" style="padding: 0 10px">
                   <div
@@ -102,7 +97,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
                   />
                 </q-card-section>
               </q-card-section>
-            </q-card>
+            </q-card> -->
           </div>
         </div>
       </div>
