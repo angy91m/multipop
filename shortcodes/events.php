@@ -26,16 +26,16 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
   <q-layout view="hHh lpR fFf">
     <q-page-container>
       <div class="row">
-        <div class="col">
+        <div class="col event-search-option">
           <q-input v-model="eventSearch.txt" label="Titolo o descrizione" filled></q-input>
         </div>
-        <div class="col">
-          <q-input v-model="eventSearch.min" type="date" label="Dal"></q-input>
+        <div class="col event-search-option">
+          <q-input v-model="eventSearch.min" type="date" label="Dal" filled></q-input>
         </div>
-        <div class="col">
-          <q-input v-model="eventSearch.max" type="date" label="Al"></q-input>
+        <div class="col event-search-option">
+          <q-input v-model="eventSearch.max" type="date" label="Al" filled></q-input>
         </div>
-        <div class="col">
+        <div class="col event-search-option">
           <mpop-select
             multiple
             fuse-search
