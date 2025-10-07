@@ -24,7 +24,8 @@ loadVueModule = (...modules) => {
 },
 [mpopMap, mpopSelect] = loadVueModule('MpopMap.vue', {path: 'MpopSelect.vue', modules: {fuse: Fuse}}),
 eventsPageNonce = document.getElementById('mpop-events-page-nonce').value,
-eventsEtc = JSON.parse(document.getElementById('events-etc').innerText);
+eventsEtc = JSON.parse(document.getElementById('events-etc').innerText),
+maxShowEvents = 25;
 let triggerSearchTimeout, searchEventsTimeout;
 
 createApp({
@@ -37,6 +38,8 @@ createApp({
     eventTab = ref('list'),
     events = reactive([]),
     eventSearch = reactive(JSON.parse(document.getElementById('search-options').innerText)),
+    pages = computed(() => events.length ? Math.ceil(events.length / 25) : 1),
+    eventsToShow = computed(()=> events.slice((eventSearch.pag-1)*maxShowEvents, eventSearch.pag*maxShowEvents)),
     zoneSearch = reactive({
       events: JSON.parse(JSON.stringify(eventSearch.zones))
     });
@@ -209,7 +212,9 @@ createApp({
       eventTab,
       mapEl,
       onDateInput,
-      showEventDate
+      showEventDate,
+      pages,
+      eventsToShow
     };
   }
 })
