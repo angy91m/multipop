@@ -77,8 +77,8 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
         <q-tab name="list" icon="list" label="Elenco"></q-tab> 
         <q-tab name="map" icon="map" label="Mappa"></q-tab>
       </q-tabs>
-      <div v-if="eventTab == 'list'">
-        <div class="row" v-for="(event, k) in events" :key="k">
+      <div class="row" v-if="eventTab == 'list'">
+        <div v-for="(event, k) in events" :key="k">
           <q-card flat bordered>
             <q-card-section horizontal>
               <q-card-section class="q-pt-xs">
@@ -106,7 +106,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
           </q-card>
         </div>
       </div>
-      <div v-if="eventTab == 'map'">
+      <div class="row" v-if="eventTab == 'map'">
         <mpop-map
           ref="mapEl"
           :events="events"
