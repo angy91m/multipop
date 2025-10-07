@@ -5117,8 +5117,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                             }
                             $fsort_by[$k] = boolval($sort_by[$k]) ? 'ASC' : 'DESC';
                     }
-                } else {
-                    unset($sort_by[$k]);
                 }
             }
             $sort_by = $fsort_by;

@@ -514,8 +514,6 @@ class MultipopEventsPlugin {
           $fsort_by[$k] = boolval($options['sortby'][$k]);
         } else if (in_array($k, $allowed_meta_sorts)) {
           $fsort_by[$k] = boolval($options['sortby'][$k]);
-        } else {
-          unset($options['sortby'][$k]);
         }
       }
       $options['sortby'] = $fsort_by;
