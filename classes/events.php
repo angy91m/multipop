@@ -144,7 +144,7 @@ class MultipopEventsPlugin {
     add_filter('run_wptexturize', function($run_texturize) {
       $p = get_post();
       if (!$p) return $run_texturize;
-      if ((wp_get_theme()->get_page_templates()[$p->page_template] ?? '') == 'Eventi') return false;
+      if (in_array((wp_get_theme()->get_page_templates()[$p->page_template] ?? ''), ['Eventi', 'Evento'])) return false;
       return $run_texturize;
     });
 
