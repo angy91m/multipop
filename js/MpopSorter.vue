@@ -1,6 +1,8 @@
 <template>
     <div class="row">
-        <q-select v-model="activeKey" :options="props.options" v-bind="$attrs" />
+        <div>
+            <q-select v-model="activeKey" :options="props.options" v-bind="$attrs" />
+        </div>
     </div>
 </template>
 <script setup>
