@@ -102,9 +102,8 @@ createApp({
       }
     }
     function onDateInput(value, old) {
-      console.log(value.min);
-      if (!value.min) value.min = old.min;
-      if (!value.max) value.max = old.max;
+      if (!value.min) eventSearch.min = old.min;
+      if (!value.max) eventSearch.max = old.max;
     }
     watch(eventSearch, onDateInput);
     function serverReq(obj) {
