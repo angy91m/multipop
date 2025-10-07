@@ -74,7 +74,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
       <div class="row" v-if="eventTab == 'list'">
         <div class="col-grow">
           <div class="row justify-end">
-            <div class="col-3" style="min-width: 400px">
+            <div class="col-3" style="min-width: 340px">
               <mpop-sorter
                 v-model="eventSearch.sortby"
                 :options="sortOptions"
