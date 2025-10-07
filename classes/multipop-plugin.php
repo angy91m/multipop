@@ -312,6 +312,9 @@ class MultipopPlugin {
         add_action('admin_menu', function() {
             add_menu_page('Multipop Logs', 'Multipop Logs', 'edit_private_posts', 'multipop_logs', [$this, 'logs_page'], 'dashicons-database', 62);
         });
+        add_action('admin_menu', function() {
+            add_menu_page('Multipop Update', 'Multipop Update', 'edit_private_posts', 'multipop_update', [$this, 'update_page'], 'dashicons-update', 63);
+        });
         add_action('user_new_form', [$this, 'user_new_form']);
 
         add_action('show_user_profile', [$this, 'add_profile_meta']);
@@ -2002,6 +2005,11 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     // PLUGIN LOGS PAGE
     public function logs_page() {
         require(MULTIPOP_PLUGIN_PATH . '/pages/logs.php');
+    }
+
+    // PLUGIN UPDATE PAGE
+    public function update_page() {
+        require(MULTIPOP_PLUGIN_PATH . '/pages/update.php');
     }
 
     //
