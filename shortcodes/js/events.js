@@ -102,6 +102,7 @@ createApp({
       }
     }
     function onDateInput(value, old) {
+      console.log(value.min);
       if (!value.min) value.min = old.min;
       if (!value.max) value.max = old.max;
     }
