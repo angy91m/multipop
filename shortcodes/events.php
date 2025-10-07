@@ -41,7 +41,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
   </mpop-select>
   <mpop-map
     ref="mapEl"
-    :events="testEvents"
+    :events="events"
     @vue:mounted="mapMounted"
     style="min-height: 550px; margin: 10px 50px;">
   </mpop-map>

@@ -32,7 +32,11 @@ createApp({
   },
   setup() {
     const mapEl = useTemplateRef('mapEl'),
-    eventSearch = reactive(JSON.parse(document.getElementById('search-options').innerText));
+    events = reactive([]),
+    eventSearch = reactive(JSON.parse(document.getElementById('search-options').innerText)),
+    zoneSearch = reactive({
+      events: JSON.parse(JSON.stringify(eventSearch.zones))
+    });
     function reduceZones(zones, target, zonesKey = 'zones') {
       const added = zones[zones.length - 1];
       if (added.type == 'nazione') {
@@ -114,8 +118,16 @@ createApp({
         pag: true
       });
       if (res.ok) {
-        const json = await res.json();
-        console.log(json);
+        const {data} = await res.json();
+        Object.assign(eventSearch, data.options);
+        events.length = 0;
+        events.push(data.results);
+      } else {
+        try {
+          console.error(await res.json());
+        } catch {
+          console.error(await res.text());
+        }
       }
     }
     function triggerSearchEvents() {
@@ -125,20 +137,10 @@ createApp({
     function mapMounted() {
       console.log(mapEl.value);
     }
-    const testEvents = reactive([{
-      title: 'Prova',
-      location: 'Via Laurentina, 3 Roma',
-      lat: 41.8503514,
-      lng: 12.4777725
-    }]),
-    zoneSearch = reactive({
-      events: JSON.parse(JSON.stringify(eventSearch.zones))
-    });
     onMounted(()=>{
-      setTimeout(() => testEvents.length = 0, 10000);
+      //setTimeout(() => testEvents.length = 0, 10000);
     });
     return {
-      testEvents,
       eventSearch,
       zoneSearch,
       reduceZones,
