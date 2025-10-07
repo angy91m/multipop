@@ -80,10 +80,10 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
       <div class="row" v-if="eventTab == 'list'">
         <div class="col-grow">
           <div class="row justify-center" v-for="(event, k) in events" :key="k">
-            <q-card flat bordered style="min-width: 412px">
+            <q-card flat bordered style="min-width: 412px; margin-bottom: 10px;">
               <q-card-section horizontal>
                 <q-card-section class="q-pt-xs">
-                  <div class="text-overline">{{showEventDate(event)}}</div>
+                  <div class="text-overline" v-html="showEventDate(event)"></div>
                   <div class="text-h5 q-mt-sm q-mb-xs">{{event.title}}</div>
                   <div class="text-caption text-grey">{{event.excerpt}}</div>
                 </q-card-section>

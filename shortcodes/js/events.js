@@ -183,7 +183,7 @@ createApp({
       endDate = humanDate(end),
       startTime = humanTime(start),
       endTime = humanTime(end);
-      return startDate + ' ' + startTime + (startDate == endDate ? (startTime == endTime ? '' : ' - ' + endTime) : ' - ' + endDate + ' ' + endTime );
+      return startDate + '&nbsp;' + startTime + (startDate == endDate ? (startTime == endTime ? '' : '<br>' + endTime) : '<br>' + endDate + '&nbsp;' + endTime );
     }
     function onPopState(e) {
       if (typeof e.state == 'object') {
