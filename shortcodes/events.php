@@ -43,7 +43,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
             </div>
           </div>
         </div>
-        <div class="column col-grow event-search-option">
+        <div class="column col-grow event-search-option" style="min-width:220px">
           <label>Luogo</label>
           <mpop-select
             class="col-grow"
