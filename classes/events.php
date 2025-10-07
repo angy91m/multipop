@@ -291,22 +291,33 @@ class MultipopEventsPlugin {
     ) {
       return;
     }
+    $edits = [
+      'ID' => $post_id
+    ];
+    $meta_input = [];
+    $excerpt = strip_tags($post->post_content);
+    if (mb_strlen($excerpt, 'UTF-8') > 160) {
+      $excerpt = explode(' ', substr($excerpt, 0, 159));
+      unset($excerpt[count($excerpt-1)]);
+      $excerpt = implode(' ', $excerpt) . '…';
+    }
+    $edits['post_excerpt'] = $excerpt;
     if (isset($_POST['mpop_event_location_name'])) {
-      update_post_meta($post_id, '_mpop_event_location_name', trim($_POST['mpop_event_location_name']));
+      $meta_input['_mpop_event_location_name'] = trim($_POST['mpop_event_location_name']);
     }
     if (isset($_POST['mpop_event_location'])) {
       $location = trim($_POST['mpop_event_location']);
-      update_post_meta($post_id, '_mpop_event_location', $location);
+      $meta_input['_mpop_event_location'] = $location;
       $geo = self::geocode($location);
       if (!$geo) {
         delete_post_meta($post_id, '_mpop_event_lat');
         delete_post_meta($post_id, '_mpop_event_lng');
         delete_post_meta($post_id, '_mpop_event_zones');
       } else {
-        update_post_meta($post_id, '_mpop_event_lat', $geo['lat']);
-        update_post_meta($post_id, '_mpop_event_lng', $geo['lng']);
+        $meta_input['_mpop_event_lat'] = $geo['lat'];
+        $meta_input['_mpop_event_lng'] = $geo['lng'];
         if ($geo['zones']) {
-          update_post_meta($post_id, '_mpop_event_zones', $geo['zones']);
+          $meta_input['_mpop_event_zones'] = $geo['zones'];
         } else {
           delete_post_meta($post_id, '_mpop_event_zones');
         }
@@ -320,14 +331,16 @@ class MultipopEventsPlugin {
       $end_time = MultipopPlugin::validate_time($_POST['mpop_event_end_time']);
       $end_date->setTime($end_time[0], $end_time[1]);
       if ($start_date->getTimestamp() <= $end_date->getTimestamp()) {
-        update_post_meta($post_id, '_mpop_event_start', $start_date->getTimestamp());
-        update_post_meta($post_id, '_mpop_event_end', $end_date->getTimestamp());
+        $meta_input['_mpop_event_start'] = $start_date->getTimestamp();
+        $meta_input['_mpop_event_end'] = $end_date->getTimestamp();
         $valid_date = true;
       }
     } catch(Exception $e) {}
     if (!$valid_date && $post->post_status == 'publish') {
-      wp_update_post(['ID'=>$post_id, 'post_status'=>'draft']);
+      $edits['post_status'] = 'draft';
     }
+    $edits['meta_input'] = $meta_input;
+    wp_update_post($edits);
   }
   public static function events_page() {
     require MULTIPOP_PLUGIN_PATH . '/shortcodes/events.php';
