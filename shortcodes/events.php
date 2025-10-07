@@ -102,46 +102,16 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
                   />
                 </q-card-section>
               </q-card-section>
-              <!-- <q-card-section horizontal>
-                <q-card-section class="q-pt-xs">
-                  <div
-                    class="text-overline"
-                    v-html="showEventDate(event)"
-                    style="text-wrap: nowrap; text-transform: uppercase;"
-                  ></div>
-                  <div class="text-h5 q-mt-sm q-mb-xs">{{event.title}}</div>
-                  <div class="text-caption text-grey">{{event.excerpt}}</div>
-                </q-card-section>
-                <q-card-section v-if="event.thumbnail" class="col-5 flex flex-center">
-                  <q-img
-                    class="rounded-borders"
-                    :src="event.thumbnail"
-                  />
-                </q-card-section>
-              </q-card-section> -->
-
-
-              <!-- <q-separator />
-              <q-card-actions>
-                <q-btn flat round icon="event" />
-                <q-btn flat>
-                  7:30PM
-                </q-btn>
-                <q-btn flat color="primary">
-                  Reserve
-                </q-btn> -->
-              </q-card-actions>
             </q-card>
           </div>
         </div>
       </div>
-      <div class="row" v-if="eventTab == 'map'">
-        <mpop-map
-          ref="mapEl"
-          :events="events"
-          style="min-height: 550px; margin: 10px 50px;">
-        </mpop-map>
-      </div>
+      <mpop-map
+        v-if="eventTab == 'map'"
+        ref="mapEl"
+        :events="events"
+        style="min-height: 550px; margin: 10px 50px;">
+      </mpop-map>
     </q-page-container>
   </q-layout>
 </div>
