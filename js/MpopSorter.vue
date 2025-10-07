@@ -1,10 +1,10 @@
 <template>
-    <div class="row">
+    <div class="row items-center">
         <div class="column col">
             <q-select v-model="activeOption" :options="props.options" v-bind="$attrs" />
         </div>
-        <div class="column col">
-            <q-btn :icon="activeOrder ? 'arrow_drop_up' : 'arrow_drop_down'" @click="invertOrder"/>
+        <div class="column col-1">
+            <q-btn :icon="activeOrder ? 'arrow_warm_up' : 'arrow_cool_down'" @click="invertOrder"/>
         </div>
     </div>
 </template>
