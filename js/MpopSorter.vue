@@ -28,7 +28,8 @@ activeKey = computed({
 }),
 activeOrder = computed(()=>Object.values(modelValue.value)[0]);
 function invertOrder() {
-    console.log('ciao');
-    modelValue.value[Object.keys(modelValue.value)[0]] = !modelValue.value[Object.keys(modelValue.value)[0]];
+    const obj = modelValue.value;
+    obj[Object.keys(obj)[0]] = !obj[Object.keys(obj)[0]];
+    modelValue.value = obj;
 }
 </script>
