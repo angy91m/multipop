@@ -38,7 +38,7 @@ createApp({
     eventTab = ref('list'),
     events = reactive([]),
     eventSearch = reactive(JSON.parse(document.getElementById('search-options').innerText)),
-    pages = computed(() => events.length ? Math.ceil(events.length / 25) : 1),
+    pages = computed(() => events.length ? Math.ceil(events.length / maxShowEvents) : 1),
     eventsToShow = computed(()=> events.slice((eventSearch.pag-1)*maxShowEvents, eventSearch.pag*maxShowEvents)),
     zoneSearch = reactive({
       events: JSON.parse(JSON.stringify(eventSearch.zones))
