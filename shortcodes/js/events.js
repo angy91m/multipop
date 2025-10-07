@@ -121,7 +121,7 @@ createApp({
         const {data} = await res.json();
         Object.assign(eventSearch, data.options);
         events.length = 0;
-        events.push(data.results);
+        events.push(...data.results);
       } else {
         try {
           console.error(await res.json());

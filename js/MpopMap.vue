@@ -21,6 +21,7 @@ const makeId = (length = 5) => {
 },
 props = defineProps({
   events: {
+    type: Array,
     default: []
   },
   lat: {
