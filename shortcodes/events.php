@@ -29,15 +29,18 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
       <div class="row">
         <div class="col event-search-option">
           <label>Titolo o descrizione</label><br>
-          <q-input v-model="eventSearch.txt" label="Titolo o descrizione" filled></q-input>
+          <q-input v-model="eventSearch.txt" filled></q-input>
         </div>
         <div class="col event-search-option">
-          <q-input v-model="eventSearch.min" type="date" label="Dal" filled></q-input>
+          <label>Dal</label><br>
+          <q-input v-model="eventSearch.min" type="date" filled></q-input>
         </div>
         <div class="col event-search-option">
-          <q-input v-model="eventSearch.max" type="date" label="Al" filled></q-input>
+          <label>Al</label><br>
+          <q-input v-model="eventSearch.max" type="date" filled></q-input>
         </div>
         <div class="col event-search-option">
+          <label>Luogo</label><br>
           <mpop-select
             multiple
             fuse-search
