@@ -334,7 +334,9 @@ class MultipopEventsPlugin {
     }
     if (count($edits) > 1 || count($meta_input)) {
       $edits['meta_input'] = $meta_input;
-      //wp_update_post($edits);
+      remove_action('save_post_mpop_event', [self::class, 'extra_fields_save'], 10);
+      wp_update_post($edits);
+      add_action('save_post_mpop_event', [self::class, 'extra_fields_save'], 10, 2);
     }
   }
   public static function events_page() {
