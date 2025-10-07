@@ -38,6 +38,7 @@ createApp({
       events: JSON.parse(JSON.stringify(eventSearch.zones))
     });
     function reduceZones(zones, target, zonesKey = 'zones') {
+      if (!zones.length) return;
       const added = zones[zones.length - 1];
       if (added.type == 'nazione') {
         if (added.code == 'ita') {
