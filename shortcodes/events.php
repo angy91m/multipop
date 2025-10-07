@@ -78,7 +78,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
             <q-pagination
               v-model="eventSearch.pag"
               :max="pages"
-              @update:model-value="()=>setUrlOptions(true)"
+              @update:model-value="()=>setUrlOptions()"
             ></q-pagination>
           </div>
           <div class="row justify-center" v-for="(event, k) in eventsToShow" :key="k">
