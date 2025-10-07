@@ -526,7 +526,7 @@ class MultipopEventsPlugin {
     add_filter('posts_orderby', [self::class, 'search_events_posts_orderby'], 10, 2);
     return ['results' => get_posts($query_args), 'options' => [
       'txt' => $options['txt'],
-      'zones' => MultipopPlugin::$instances[0]->retrieve_zones_from_resp_zones($zones),
+      'zones' => $page === true ? [] : MultipopPlugin::$instances[0]->retrieve_zones_from_resp_zones($zones),
       'min' => $min_date->format('Y-m-d'),
       'max' => $max_date->format('Y-m-d'),
       'sortby' => $options['sortby'],
