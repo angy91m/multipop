@@ -15,21 +15,21 @@ if (!isset($post_data['action']) || !is_string($post_data['action']) || !trim($p
   $res_data['error'] = ['action'];
   $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
   http_response_code( 400 );
-  echo json_encode( $res_data );
+  echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
   exit;
 }
 if (!isset($post_data['mpop-events-page-nonce']) || !is_string($post_data['mpop-events-page-nonce'])) {
   $res_data['error'] = ['nonce'];
   $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
   http_response_code( 400 );
-  echo json_encode( $res_data );
+  echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
   exit;
 }
 if (!wp_verify_nonce($post_data['mpop-events-page-nonce'], 'mpop-events-page')) {
   $res_data['error'] = ['nonce'];
   $res_data['notices'] = [['type'=>'error', 'msg' => 'Pagina scaduta. Ricarica la pagina e riprova']];
   http_response_code( 401 );
-  echo json_encode( $res_data );
+  echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
   exit;
 }
 
@@ -45,7 +45,7 @@ switch ($post_data['action']) {
       $res_data['error'] = ['data'];
       $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
       http_response_code( 400 );
-      echo json_encode( $res_data );
+      echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
       exit;
     }
     break;
@@ -53,8 +53,8 @@ switch ($post_data['action']) {
     $res_data['error'] = ['action'];
     $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
     http_response_code( 400 );
-    echo json_encode( $res_data );
+    echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
     exit;
 }
-echo json_encode( $res_data );
+echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
 exit;

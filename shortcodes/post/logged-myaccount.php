@@ -15,21 +15,21 @@ if (!isset($post_data['action']) || !is_string($post_data['action']) || !trim($p
     $res_data['error'] = ['action'];
     $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
     http_response_code( 400 );
-    echo json_encode( $res_data );
+    echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
     exit;
 }
 if (!isset($post_data['mpop-logged-myaccount-nonce']) || !is_string($post_data['mpop-logged-myaccount-nonce'])) {
     $res_data['error'] = ['nonce'];
     $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
     http_response_code( 400 );
-    echo json_encode( $res_data );
+    echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
     exit;
 }
 if (!wp_verify_nonce($post_data['mpop-logged-myaccount-nonce'], 'mpop-logged-myaccount')) {
     $res_data['error'] = ['nonce'];
     $res_data['notices'] = [['type'=>'error', 'msg' => 'Pagina scaduta. Ricarica la pagina e riprova']];
     http_response_code( 401 );
-    echo json_encode( $res_data );
+    echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
     exit;
 }
 if (str_starts_with($post_data['action'], 'admin_')) {
@@ -79,13 +79,13 @@ switch ($post_data['action']) {
         if (!isset($post_data['mpop_birthplace'])) {
             $res_data['error'] = ['mpop_birthplace'];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         if (!isset($post_data['mpop_birthdate'])) {
             $res_data['error'] = ['mpop_birthdate'];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $post_birthdate = '';
@@ -95,7 +95,7 @@ switch ($post_data['action']) {
         } catch (Exception $err) {
             $res_data['error'] = explode(',',$err->getMessage());
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         break;
@@ -103,7 +103,7 @@ switch ($post_data['action']) {
         if (!isset($post_data['mpop_billing_city'])) {
             $res_data['error'] = ['mpop_billing_city'];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         try {
@@ -112,7 +112,7 @@ switch ($post_data['action']) {
         } catch(Exception $e) {
             $res_data['error'] = explode(',',$err->getMessage());
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         break;
@@ -269,7 +269,7 @@ switch ($post_data['action']) {
         }
         if (isset($res_data['error'])) {
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $user_edits = [];
@@ -281,7 +281,7 @@ switch ($post_data['action']) {
             if ($duplicated) {
                 $res_data['error'] = ['email'];
                 http_response_code( 400 );
-                echo json_encode( $res_data );
+                echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                 exit;
             }
             $duplicated = get_users([
@@ -294,7 +294,7 @@ switch ($post_data['action']) {
             if (count($duplicated)) {
                 $res_data['error'] = ['email'];
                 http_response_code( 400 );
-                echo json_encode( $res_data );
+                echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                 exit;
             } else {
                 $this->delete_temp_token_by_user_id($current_user->ID, 'email_confirmation_link');
@@ -303,7 +303,7 @@ switch ($post_data['action']) {
                     $this->delete_temp_token( $token );
                     $res_data['error'] = ['email'];
                     http_response_code( 400 );
-                    echo json_encode( $res_data );
+                    echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                     exit;
                 }
                 $user_edits['meta_input'] = [
@@ -450,7 +450,7 @@ switch ($post_data['action']) {
         }
         if (isset($res_data['error'])) {
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         wp_set_password($post_data['new'], $current_user->ID);
@@ -511,7 +511,7 @@ switch ($post_data['action']) {
             }
             $res_data['notices'][] = ['type' => 'error', 'msg' => 'Errore nei dati di input'];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $sub_id = $this->create_subscription(
@@ -543,7 +543,7 @@ switch ($post_data['action']) {
             }
             $res_data['notices'][] = ['type' => 'error', 'msg' => 'Errore nei dati di input'];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         header('Content-Type: application/pdf');
@@ -577,7 +577,7 @@ switch ($post_data['action']) {
             $res_data['error'] = [$err->getMessage()];
             $res_data['notices'] = [['type' =>'error', 'msg' => $err->getMessage()]];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         break;
@@ -586,7 +586,7 @@ switch ($post_data['action']) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip', 'pp_order_id', 'pp_capture_id']);
@@ -594,7 +594,7 @@ switch ($post_data['action']) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         try {
@@ -602,14 +602,14 @@ switch ($post_data['action']) {
                 $res_data['error'] = ['id'];
                 $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
                 http_response_code( 400 );
-                echo json_encode( $res_data );
+                echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                 exit;
             }
         } catch(Exception $err) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $res_data['data'] = true;
@@ -623,7 +623,7 @@ switch ($post_data['action']) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip', 'pp_capture_id']);
@@ -631,7 +631,7 @@ switch ($post_data['action']) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $order = $this->create_subscription_pp_order($sub);
@@ -639,7 +639,7 @@ switch ($post_data['action']) {
             $res_data['error'] = ['unknown'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $res_data['data'] = $order;
@@ -649,7 +649,7 @@ switch ($post_data['action']) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip', 'pp_capture_id']);
@@ -657,14 +657,14 @@ switch ($post_data['action']) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         if (!$this->capture_subscription_pp_order($sub)) {
             $res_data['error'] = ['unknown'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $res_data['data'] = true;
@@ -673,8 +673,8 @@ switch ($post_data['action']) {
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
         http_response_code( 400 );
-        echo json_encode( $res_data );
+        echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
         exit;
 }
-echo json_encode( $res_data );
+echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
 exit;

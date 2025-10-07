@@ -11,7 +11,7 @@ switch( $post_data['action'] ) {
                 $res_data['error'] = ['ID'];
                 $res_data['notices'] = [['type'=>'error', 'msg' => 'Impossibile modificare i tuoi dati']];
                 http_response_code( 400 );
-                echo json_encode( $res_data );
+                echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                 exit;
             }
             $res_user = $this->myaccount_get_profile($post_data['ID'], true, true);
@@ -19,7 +19,7 @@ switch( $post_data['action'] ) {
                 $res_data['error'] = ['ID'];
                 $res_data['notices'] = [['type'=>'error', 'msg' => 'Utente non trovato']];
                 http_response_code( 400 );
-                echo json_encode( $res_data );
+                echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                 exit;
             }
             $res_user['is_editable'] = $this->is_resp_of_user($post_data['ID']);
@@ -38,7 +38,7 @@ switch( $post_data['action'] ) {
             $res_data['notices'][] = ['type'=>'error', 'msg' => 'ID non valido'];
             $res_data['error'] = ['ID'];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $comuni = false;
@@ -231,7 +231,7 @@ switch( $post_data['action'] ) {
         }
         if (isset($res_data['error'])) {
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $user_edits = [];
@@ -239,7 +239,7 @@ switch( $post_data['action'] ) {
         if ($duplicated && $duplicated->ID != $user->ID) {
             $res_data['error'] = ['email'];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $duplicated = get_users([
@@ -252,7 +252,7 @@ switch( $post_data['action'] ) {
         if (!empty($duplicated)) {
             $res_data['error'] = ['email'];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $empty_user = new stdClass();
@@ -270,7 +270,7 @@ switch( $post_data['action'] ) {
             }
             $res_data['notices'][] = ['type' =>'error', 'msg' => 'Non puoi spostare un/a tesserato/a in una zona che non gestisci'];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         if ($post_data['mpop_mail_confirmed']) {
@@ -287,7 +287,7 @@ switch( $post_data['action'] ) {
                     $this->delete_temp_token( $token );
                     $res_data['error'] = ['email'];
                     http_response_code( 400 );
-                    echo json_encode( $res_data );
+                    echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                     exit;
                 }
                 if ($user->mpop_mail_to_confirm) {
@@ -307,7 +307,7 @@ switch( $post_data['action'] ) {
                     $this->delete_temp_token( $token );
                     $res_data['error'] = ['email'];
                     http_response_code( 400 );
-                    echo json_encode( $res_data );
+                    echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                     exit;
                 }
                 $user_edits['meta_input'] = [
@@ -359,7 +359,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['ID'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessun utente selezionato']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $user = get_user_by('ID', $post_data['ID']);
@@ -367,7 +367,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['ID'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Utente non valido']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $this->delete_temp_token_by_user_id($user->ID, 'invite_link');
@@ -376,7 +376,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['server'];
             $res_data['notices'] = [['type'=>'error', 'msg' => "Errore durante l'invio dell'invito" . ($this->last_mail_error ? ': ' . $this->last_mail_error : '')]];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $res_data['data'] = 'ok';
@@ -387,7 +387,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip', 'pp_capture_id']);
@@ -395,7 +395,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $sub_files = [];
@@ -429,7 +429,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip', 'pp_order_id', 'pp_capture_id']);
@@ -437,14 +437,14 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         if (!isset($post_data['password']) || !is_string($post_data['password']) || !$post_data['password']) {
             $res_data['error'] = ['password'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Password non valida']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         try {
@@ -453,7 +453,7 @@ switch( $post_data['action'] ) {
                 $res_data['error'] = ['password'];
                 $res_data['notices'] = [['type'=>'error', 'msg' => 'Password non valida']];
                 http_response_code( 400 );
-                echo json_encode( $res_data );
+                echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                 exit;
             }
             $res_data['data'] = $docs;
@@ -461,7 +461,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['password'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Password non valida']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         break;
@@ -470,7 +470,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['']);
@@ -478,7 +478,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $force_id_card = isset($post_data['forceIdCard']) ? boolval($post_data['forceIdCard']) : false;
@@ -487,7 +487,7 @@ switch( $post_data['action'] ) {
                 $res_data['error'] = ['unknown_error'];
                 $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
                 http_response_code( 400 );
-                echo json_encode( $res_data );
+                echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                 exit;
             }
             $res_data['data'] = true;
@@ -495,7 +495,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = [$err->getMessage()];
             $res_data['notices'] = [['type'=>'error', 'msg'=>$err->getMessage()]];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         break;
@@ -504,7 +504,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $sub = $this->get_subscription_by('id', $post_data['id'], 0, ['completer_ip', 'pp_order_id', 'pp_capture_id']);
@@ -512,7 +512,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         try {
@@ -520,7 +520,7 @@ switch( $post_data['action'] ) {
                 $res_data['error'] = ['unknown_error'];
                 $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
                 http_response_code( 400 );
-                echo json_encode( $res_data );
+                echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                 exit;
             }
             $res_data['data'] = true;
@@ -528,7 +528,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = [$err->getMessage()];
             $res_data['notices'] = [['type'=>'error', 'msg'=>$err->getMessage()]];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         break;
@@ -537,7 +537,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $sub = $this->get_subscription_by('id', $post_data['id']);
@@ -545,14 +545,14 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         if (!isset($post_data['signed_at']) || !is_string($post_data['signed_at'])) {
             $res_data['error'] = ['signed_at'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Data di iscrizione/rinnovo non valida']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         try {
@@ -561,7 +561,7 @@ switch( $post_data['action'] ) {
                 $res_data['error'] = ['signed_at'];
                 $res_data['notices'] = [['type'=>'error', 'msg' => 'Data di iscrizione/rinnovo non valida']];
                 http_response_code( 400 );
-                echo json_encode( $res_data );
+                echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                 exit;
             }
             $this->complete_subscription($sub['id'], $d->getTimestamp());
@@ -570,7 +570,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = [$err->getMessage()];
             $res_data['notices'] = [['type'=>'error', 'msg'=>$err->getMessage()]];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         break;
@@ -579,7 +579,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $sub = $this->get_subscription_by('id', $post_data['id']);
@@ -587,7 +587,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         try {
@@ -595,7 +595,7 @@ switch( $post_data['action'] ) {
                 $res_data['error'] = ['unknown_error'];
                 $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
                 http_response_code( 400 );
-                echo json_encode( $res_data );
+                echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                 exit;
             }
             $res_data['data'] = true;
@@ -603,7 +603,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = [$err->getMessage()];
             $res_data['notices'] = [['type'=>'error', 'msg'=>$err->getMessage()]];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         break;
@@ -612,14 +612,14 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         if (!isset($post_data['notes']) || !is_string($post_data['notes'])) {
             $res_data['error'] = ['notes'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Dati non validi']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $sub = $this->get_subscription_by('id', $post_data['id']);
@@ -627,7 +627,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $post_data['notes'] = trim($post_data['notes']);
@@ -647,7 +647,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['notes'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $res_data['data'] = true;
@@ -660,7 +660,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['ID'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessun utente selezionato']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $user = get_user_by('ID', $post_data['ID']);
@@ -668,7 +668,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['ID'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessun utente selezionato']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $pending_edits = json_decode($user->mpop_profile_pending_edits, true);
@@ -691,7 +691,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['ID'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessun utente selezionato']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         delete_user_meta($post_data['ID'], 'mpop_profile_pending_edits');
@@ -704,7 +704,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['unknown'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         break;
@@ -714,7 +714,7 @@ switch( $post_data['action'] ) {
                 $res_data['error'] = ['user_id'];
                 $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessun utente selezionato']];
                 http_response_code( 400 );
-                echo json_encode( $res_data );
+                echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                 exit;
             }
             $signed_at_date = false;
@@ -725,7 +725,7 @@ switch( $post_data['action'] ) {
                     $res_data['error'] = ['year'];
                     $res_data['notices'] = [['type'=>'error', 'msg' => 'Anno o data di iscrizione/rinnovo non validi']];
                     http_response_code( 400 );
-                    echo json_encode( $res_data );
+                    echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                     exit;
                 }
             }
@@ -744,7 +744,7 @@ switch( $post_data['action'] ) {
                 $res_data['error'] = ['unknown'];
                 $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
                 http_response_code( 400 );
-                echo json_encode( $res_data );
+                echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                 exit;
             }
             $res_data['data'] = $sub_id;
@@ -755,7 +755,7 @@ switch( $post_data['action'] ) {
             $res_data['error'] = ['unknown'];
             $res_data['notices'] = [['type'=>'error', 'msg' => $err->getMessage()]];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         break;
@@ -769,17 +769,17 @@ switch( $post_data['action'] ) {
         $res_data['error'] = ['action'];
         $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
         http_response_code( 400 );
-        echo json_encode( $res_data );
+        echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
         exit;
 }
 if (!isset($res_data['data'])) {
     $res_data['error'] = ['action'];
     $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
     http_response_code( 400 );
-    echo json_encode( $res_data );
+    echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
     exit;
 }
 if (isset($res_data['data'])) {
-    echo json_encode( $res_data );
+    echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
     exit;
 }

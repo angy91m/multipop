@@ -385,7 +385,7 @@ class MultipopPlugin {
                         }
                     }
                     if (!empty($errors)) {
-                        file_put_contents($file_name . '.error.log', json_encode($errors, JSON_PRETTY_PRINT));
+                        file_put_contents($file_name . '.error.log', json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
                     } else {
                         unlink($file_name);
                     }
@@ -3894,21 +3894,21 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $res_data['error'] = ['password'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Master key non impostata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         if (!isset($post_data['password']) || !is_string($post_data['password']) || !$post_data['password']) {
             $res_data['error'] = ['password'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Password non valida']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         if (!isset($post_data['id']) || !is_int($post_data['id'])) {
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $sub = $this->get_subscription_by('id', $post_data['id']);
@@ -3916,14 +3916,14 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $res_data['error'] = ['id'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna sottoscrizione selezionata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         if (!isset($post_data['files']) || !is_array($post_data['files']) || empty($post_data['files']) || count($post_data['files']) > 2 ) {
             $res_data['error'] = ['files'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'File non validi']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $curr_u = wp_get_current_user();
@@ -3938,7 +3938,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $res_data['error'] = ['password'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Password non valida']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $symkey = substr($master_key, 0, 32);
@@ -3955,7 +3955,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $res_data['error'] = ['files'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'File non validi']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         global $wpdb;
@@ -4496,14 +4496,14 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         if (isset($res_data['error'])) {
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $duplicated = get_user_by('email', $post_data['email']);
         if ($duplicated && $duplicated->ID != $user->ID) {
             $res_data['error'] = ['email'];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $duplicated = get_users([
@@ -4515,7 +4515,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if (!empty($duplicated)) {
             $res_data['error'] = ['email'];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         if ($resp) {
@@ -4534,7 +4534,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 }
                 $res_data['notices'][] = ['type' =>'error', 'msg' => 'Non puoi aggiungere un/a tesserato/a in una zona che non gestisci'];
                 http_response_code( 400 );
-                echo json_encode( $res_data );
+                echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
                 exit;
             }
         }
@@ -4571,7 +4571,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             }
             $res_data['notices'][] = ['type' =>'error', 'msg' => 'Error during user save: ' . $user_id->get_error_message()];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $this->log_data('USER CREATED', ['user_pass' => null] + $user_input, $user_id);
@@ -4583,7 +4583,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             }
             $res_data['notices'][] = ['type' =>'error', 'msg' => "Error while sending mail" . ($this->last_mail_error ? ': ' . $this->last_mail_error : '')];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $res_data['data'] = ['ID' => $user_id];
@@ -5486,21 +5486,21 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $res_data['error'] = ['ID'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nessuna master key impostata']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         if (!isset($post_data['current']) || !is_string($post_data['current']) || !$post_data['current']) {
             $res_data['error'] = ['current'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Master key corrente non valida']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         if (!isset($post_data['new']) || !is_string($post_data['new']) || !$this::is_strong_password($post_data['new'], MPOP_MASTER_KEY_LENGTH)) {
             $res_data['error'] = ['new'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Nuova master key non valida']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $master_key = @base64_decode(
@@ -5514,7 +5514,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $res_data['error'] = ['current'];
             $res_data['notices'] = [['type'=>'error', 'msg' => 'Master key corrente non valida']];
             http_response_code( 400 );
-            echo json_encode( $res_data );
+            echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
             exit;
         }
         $new_enc_master_key = base64_encode(

@@ -12,7 +12,7 @@ if (
 ) {
     $res_data['error'] = [];
     http_response_code( 400 );
-    echo json_encode( $res_data );
+    echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
     exit;
 }
 $post_data['email'] = mb_strtolower(trim($post_data['email']), 'UTF-8');
@@ -42,13 +42,13 @@ if ( !$this->verify_hcaptcha( $post_data['hcaptcha-response'] ) ) {
 
 if (isset($res_data['error'])) {
     http_response_code( 400 );
-    echo json_encode( $res_data );
+    echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
     exit;
 }
 if (get_user_by( 'email', $post_data['email'] )) {
     $res_data['error'] = ['email', 'duplicated'];
     http_response_code( 400 );
-    echo json_encode( $res_data );
+    echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
     exit;
 }
 $duplicated = get_users([
@@ -59,13 +59,13 @@ $duplicated = get_users([
 if (count($duplicated)) {
     $res_data['error'] = ['email', 'duplicated'];
     http_response_code( 400 );
-    echo json_encode( $res_data );
+    echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
     exit;
 }
 if (get_user_by( 'login', $post_data['username'] )) {
     $res_data['error'] = ['username', 'duplicated'];
     http_response_code( 400 );
-    echo json_encode( $res_data );
+    echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
     exit;
 }
 
@@ -113,5 +113,5 @@ if (is_int($user_id)) {
         http_response_code( 500 );
         $res_data['error'] = ['server'];
     }
-    echo json_encode( $res_data );
+    echo json_encode( $res_data, JSON_UNESCAPED_SLASHES );
 }
