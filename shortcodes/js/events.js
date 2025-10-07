@@ -172,6 +172,7 @@ createApp({
       reduceZones,
       triggerSearch,
       triggerSearchEvents,
+      searchEvents,
       eventTab,
       mapEl
     };
