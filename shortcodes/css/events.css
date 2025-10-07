@@ -9,3 +9,11 @@
     min-width: 412px;
   }
 }
+@media only screen and (max-width: 429px) {
+  .event-card-description {
+    display: block;
+  }
+  .event-card-img {
+    width: 100%;
+  }
+}

@@ -90,12 +90,12 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
                   ></div>
                 </q-card-section>
               </q-card-section>
-              <q-card-section horizontal>
+              <q-card-section horizontal class="event-card-description">
                 <q-card-section class="q-pt-xs col-grow">
                   <div class="text-h5 q-mt-sm q-mb-xs">{{event.title}}</div>
                   <div class="text-caption text-grey">{{event.excerpt}}</div>
                 </q-card-section>
-                <q-card-section v-if="event.thumbnail" class="col-5 flex flex-center">
+                <q-card-section v-if="event.thumbnail" class="event-card-img col-5 flex flex-center">
                   <q-img
                     class="rounded-borders"
                     :src="event.thumbnail"
