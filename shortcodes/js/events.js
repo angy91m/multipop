@@ -24,7 +24,7 @@ loadVueModule = (...modules) => {
 },
 [mpopMap, mpopSelect, mpopEventCard] = loadVueModule('MpopMap.vue', {path: 'MpopSelect.vue', modules: {fuse: Fuse}}, 'MpopEventCard.vue'),
 eventsPageNonce = document.getElementById('mpop-events-page-nonce').value,
-maxShowEvents = 1;
+maxShowEvents = 25;
 let triggerSearchTimeout, searchEventsTimeout;
 
 createApp({
