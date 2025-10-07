@@ -3,5 +3,5 @@
 }
 .event-search-option > .v-select,
 .event-search-option .vs__dropdown-toggle {
-    width: 100%;
+    height: 100%;
 }
