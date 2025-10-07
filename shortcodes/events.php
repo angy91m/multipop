@@ -79,6 +79,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
               class="event-card"
               style="margin-bottom: 10px;"
               :event="event"
+              @click="()=>console.log('ciao')"
               @clicked="()=>console.log(event)"
             ><mpop-event-card>
           </div>
