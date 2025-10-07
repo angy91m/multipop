@@ -21,8 +21,18 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
 </script>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
-<?=html_dump($_GET)?>
 <div id="app" style="max-width: unset">
+  <q-layout view="hHh lpR fFf">
+    <q-page-container>
+      <q-tabs
+        v-model="tab"
+        class="text-teal"
+      >
+        <q-tab name="list" icon="list" label="Elenco" />
+        <q-tab name="map" icon="map" label="Mappa" />
+      </q-tabs>
+    </q-page-container>
+  </q-layout>
   <mpop-select
     multiple
     fuse-search
