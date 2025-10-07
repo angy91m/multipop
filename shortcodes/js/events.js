@@ -67,6 +67,7 @@ createApp({
         target[zonesKey] = target[zonesKey].filter(z => z.type == 'regione' || (z.type == 'provincia' && z.regione != added.nome) || (z.type == 'comune' && z.provincia.regione != added.nome));
       }
     }
+    reduceZones(JSON.parse(JSON.stringify(eventSearch.zones)), eventSearch);
     function triggerSearch(txt, loading, callable, ...args) {
       clearTimeout(triggerSearchTimeout);
       loading(true);
@@ -131,7 +132,7 @@ createApp({
       lng: 12.4777725
     }]),
     zoneSearch = reactive({
-      events: []
+      events: JSON.parse(JSON.stringify(eventSearch.zones))
     });
     onMounted(()=>{
       setTimeout(() => testEvents.length = 0, 10000);
