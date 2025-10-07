@@ -24,13 +24,12 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
 <div id="app" style="max-width: unset">
   <q-layout view="hHh lpR fFf">
     <q-page-container>
-      <q-icon name="map" />
       <q-tabs
         v-model="tab"
         class="text-teal"
       >
-        <q-tab name="list" icon="list" label="Elenco" />
-        <q-tab name="map" icon="map" label="Mappa" />
+        <q-tab name="list" icon="list" label="Elenco"></q-tab> 
+        <q-tab name="map" icon="map" label="Mappa"></q-tab>
       </q-tabs>
     </q-page-container>
   </q-layout>
