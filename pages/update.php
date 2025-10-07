@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_REQUEST['mpop-admin-update-n
 <form method="POST" enctype="multipart/form-data">
   Carica il file zip:
   <input type="file" name="update" id="update-file" accept=".zip,application/zip">
-  <?php wp_nonce_field( 'mpop-admin-settings', 'mpop-admin-settings-nonce' ); ?>
+  <?php wp_nonce_field( 'mpop-admin-update', 'mpop-admin-update-nonce' ); ?>
   <input type="submit" value="Invia" name="submit">
 </form>
 <?php
