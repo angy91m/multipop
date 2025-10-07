@@ -102,7 +102,10 @@ createApp({
       }
     }
     function onDateInput(value, old) {
-      if (!value.min) nextTick(()=>eventSearch.min = old.min);
+      if (!value.min) nextTick(()=>{
+        eventSearch.min = old.min;
+        console.log(eventSearch);
+      });
       if (!value.max) nextTick(()=>eventSearch.max = old.max);
     }
     watch(eventSearch, onDateInput);
