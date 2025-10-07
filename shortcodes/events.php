@@ -77,7 +77,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
             v-model="eventSearch.sortby"
             :options="sortOptions"
             label="Ordina per: "
-            @change="()=>console.log('ciao')"
+            @change="onSortChange"
           ></mpop-sorter>
           <div class="row justify-end items-center" style="margin-right: 15px;">
             <div style="margin-right: 10px">Pagine</div>

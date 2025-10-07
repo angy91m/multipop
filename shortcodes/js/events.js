@@ -116,6 +116,17 @@ createApp({
         }
       }
     }
+    function onSortChange() {
+      const sortOptions = Object.entries(eventSearch.sortby).map(([k,v])=> ({k,v}));
+      events.sort((a,b) => {
+        const valueA0 = sortOptions[0].k == 'title' ? a.title.toLowerCase() : new Date(a[sortOptions[0].k]).getTime(),
+        valueB0 = sortOptions[0].k == 'title' ? b.title.toLowerCase() : new Date(b[sortOptions[0].k]).getTime(),
+        valueA1 = sortOptions[1].k == 'title' ? a.title.toLowerCase() : new Date(a[sortOptions[1].k]).getTime(),
+        valueB1 = sortOptions[1].k == 'title' ? b.title.toLowerCase() : new Date(b[sortOptions[1].k]).getTime();
+        return valueA0 == valueB0 ? (valueA1 == valueB1 ? 0 : (valueA1 < valueB1 ? -1 : 1)) : (valueA0 < valueB0 ? -1 : 1 );
+      });
+      setUrlOptions();
+    }
     const minDate = computed({
       get: () => eventSearch.min,
       set: v => eventSearch.min = v
@@ -215,7 +226,8 @@ createApp({
       eventsToShow,
       changeLocation,
       setUrlOptions,
-      sortOptions
+      sortOptions,
+      onSortChange
     };
   }
 })
