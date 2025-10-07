@@ -78,32 +78,34 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
         <q-tab name="map" icon="map" label="Mappa"></q-tab>
       </q-tabs>
       <div class="row" v-if="eventTab == 'list'">
-        <div v-for="(event, k) in events" :key="k">
-          <q-card flat bordered>
-            <q-card-section horizontal>
-              <q-card-section class="q-pt-xs">
-                <div class="text-overline">{{showEventDate(event)}}</div>
-                <div class="text-h5 q-mt-sm q-mb-xs">{{event.title}}</div>
-                <div class="text-caption text-grey">{{event.excerpt}}</div>
+        <div>
+          <div class="row" v-for="(event, k) in events" :key="k">
+            <q-card flat bordered>
+              <q-card-section horizontal>
+                <q-card-section class="q-pt-xs">
+                  <div class="text-overline">{{showEventDate(event)}}</div>
+                  <div class="text-h5 q-mt-sm q-mb-xs">{{event.title}}</div>
+                  <div class="text-caption text-grey">{{event.excerpt}}</div>
+                </q-card-section>
+                <q-card-section v-if="event.thumbnail" class="col-5 flex flex-center">
+                  <q-img
+                    class="rounded-borders"
+                    :src="event.thumbnail"
+                  />
+                </q-card-section>
               </q-card-section>
-              <q-card-section v-if="event.thumbnail" class="col-5 flex flex-center">
-                <q-img
-                  class="rounded-borders"
-                  :src="event.thumbnail"
-                />
-              </q-card-section>
-            </q-card-section>
-            <!-- <q-separator />
-            <q-card-actions>
-              <q-btn flat round icon="event" />
-              <q-btn flat>
-                7:30PM
-              </q-btn>
-              <q-btn flat color="primary">
-                Reserve
-              </q-btn> -->
-            </q-card-actions>
-          </q-card>
+              <!-- <q-separator />
+              <q-card-actions>
+                <q-btn flat round icon="event" />
+                <q-btn flat>
+                  7:30PM
+                </q-btn>
+                <q-btn flat color="primary">
+                  Reserve
+                </q-btn> -->
+              </q-card-actions>
+            </q-card>
+          </div>
         </div>
       </div>
       <div class="row" v-if="eventTab == 'map'">
