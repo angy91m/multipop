@@ -96,7 +96,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
         ref="mapEl"
         :events="events"
         style="min-height: 550px; margin: 10px 50px;"
-        @eventClick="event=>console.log(event)">
+        @event-click="event=>console.log(event)">
       </mpop-map>
     </q-page-container>
   </q-layout>
