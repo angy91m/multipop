@@ -112,10 +112,20 @@ createApp({
         })
       });
     }
-    function setUrlOptions() {
-      
+    function setUrlOptions(replace = false) {
+      const searchParams = new URLSearchParams();
+      for(const k in eventSearch) {
+        if (k == 'zones') {
+          Array.from(new Set(eventSearch.zones.map(z => z.type == 'regione' ? 'reg_' + z.nome : (z.type == 'provincia' ? z.sigla : z.codiceCatastale)))).forEach(el => searchParams.append(`${k}[]`, el));
+        } else if (k == 'sortby') {
+          for (const kk in eventSearch[k]) searchParams.append(`${k}[${kk}]`, eventSearch[k][kk] ? 1 : 0);
+        } else {
+          searchParams.append(k, eventSearch[k]);
+        }
+      }
+      history[replace ? 'replaceState' : 'pushState'](eventSearch, '', location.origin + location.pathname + '?' + searchParams.toString());
     }
-    async function searchEvents() {
+    async function searchEvents(back = false, init = false) {
       const res = await serverReq({
         action: 'search_events',
         ...eventSearch,
@@ -127,7 +137,9 @@ createApp({
         Object.assign(eventSearch, data.options);
         events.length = 0;
         events.push(...data.results);
-
+        if (!back) {
+          setUrlOptions(init);
+        }
       } else {
         try {
           console.error(await res.json());
@@ -141,6 +153,7 @@ createApp({
       searchEventsTimeout = setTimeout(searchEvents, 500);
     }
     onMounted(()=>{
+      searchEvents(false, true);
       //setTimeout(() => testEvents.length = 0, 10000);
     });
     return {
