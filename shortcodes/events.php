@@ -33,10 +33,10 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
     @option:selected="zones => {
       const oldLen = zones.length;
       reduceZones(zones, eventSearch);
-      //if (oldLen == zones.length) triggerSearchUsers();
+      if (oldLen == zones.length) triggerSearchEvents();
     }"
-    @option:deselected="triggerSearchUsers"
-    @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'searchZones', 'events', eventSearch)"
+    @option:deselected="triggerSearchEvents"
+    @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'searchEvents', 'events', eventSearch)"
   >
   </mpop-select>
   <mpop-map

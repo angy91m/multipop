@@ -37,6 +37,14 @@ switch ($post_data['action']) {
   case 'search_zones':
     $res_data['data'] = MultipopPlugin::$instances[0]->search_zones($post_data['search'], false, false);
     break;
+  case 'search_events':
+    try {
+      $res_data['data'] = MultipopEventsPlugin::search_events($post_data);
+    } catch(Exception $e) {
+      $res_data['error'] = ['data'];
+      $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
+    }
+    break;
   default:
     $res_data['error'] = ['action'];
     $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];

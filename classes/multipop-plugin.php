@@ -2520,7 +2520,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             'label' => 'ESTERO'
         ];
     }
-    private function retrieve_zones_from_resp_zones($resp_zones) {
+    public function retrieve_zones_from_resp_zones($resp_zones) {
         $zones = [];
         $regioni_all = false;
         $province_all = false;

@@ -23,17 +23,16 @@ loadVueModule = (...modules) => {
   return loaded;
 },
 [mpopMap, mpopSelect] = loadVueModule('MpopMap.vue', {path: 'MpopSelect.vue', modules: {fuse: Fuse}}),
-eventsPageNonce = document.getElementById('mpop-events-page-nonce').value,
-searchOptionEl = JSON.parse(document.getElementById('search-options').innerText);
-let triggerSearchTimeout;
+eventsPageNonce = document.getElementById('mpop-events-page-nonce').value;
+let triggerSearchTimeout, searchEventsTimeout;
 createApp({
   components: {
     'mpop-map': defineAsyncComponent(() => mpopMap),
     'mpop-select': defineAsyncComponent(() => mpopSelect)
   },
   setup() {
-    console.log(searchOptionEl);
-    const mapEl = useTemplateRef('mapEl');
+    const mapEl = useTemplateRef('mapEl'),
+    eventSearch = reactive(JSON.parse(document.getElementById('search-options').innerText));
     function reduceZones(zones, target, zonesKey = 'zones') {
       const added = zones[zones.length - 1];
       if (added.type == 'nazione') {
@@ -106,6 +105,18 @@ createApp({
         })
       });
     }
+    async function searchEvents() {
+      const res = await serverReq({
+        action: 'search_events',
+        ...eventSearch,
+        pag: true
+      });
+      console.log(res);
+    }
+    function triggerSearchEvents() {
+      clearTimeout(searchEventsTimeout);
+      searchEventsTimeout = setTimeout(searchEvents, 500);
+    }
     function mapMounted() {
       console.log(mapEl.value);
     }
@@ -115,10 +126,6 @@ createApp({
       lat: 41.8503514,
       lng: 12.4777725
     }]),
-    eventSearch = reactive({
-      txt: '',
-      zones: []
-    }),
     zoneSearch = reactive({
       events: []
     });
@@ -131,6 +138,7 @@ createApp({
       zoneSearch,
       reduceZones,
       triggerSearch,
+      triggerSearchEvents,
       mapMounted,
       mapEl
     };
