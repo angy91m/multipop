@@ -120,6 +120,7 @@ class MultipopEventsPlugin {
     add_shortcode('mpop_event_details', function () {
       $post = get_post();
       if (!$post || $post->post_type != 'mpop_event' || !$post->_mpop_event_start) return '';
+      $json_event = '<script type="application/ld+json">' . json_encode(self::event2ld_json($post), JSON_UNESCAPED_SLASHES) . '</script>';
       $sd = date_create('now', new DateTimeZone(current_time('e')));
       $sd->setTimestamp(intval($post->_mpop_event_start));
       $start_date = self::human_date($sd);
@@ -134,7 +135,7 @@ class MultipopEventsPlugin {
       if ($post->_mpop_event_location) {
         $location = '<br>'. MultipopPlugin::dashicon('location') .' <a href="https://www.google.com/maps/search/?api=1&query=' . urlencode($post->_mpop_event_location) . '" target="_blank">' . ($post->_mpop_event_location_name ? $post->_mpop_event_location_name . ' - ' : '') . $post->_mpop_event_location . '</a> ' . MultipopPlugin::dashicon('external');
       }
-      return '<p>' . MultipopPlugin::dashicon('clock') .' ' . $start_date . ' ' . $start_time . ($end_string ? ' - ' . $end_string : '') . $location . '</p>';
+      return $json_event . '<p>' . MultipopPlugin::dashicon('clock') .' ' . $start_date . ' ' . $start_time . ($end_string ? ' - ' . $end_string : '') . $location . '</p>';
     });
 
     add_shortcode('mpop_events_page', function () {
