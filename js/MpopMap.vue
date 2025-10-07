@@ -42,11 +42,16 @@ elId = ref('mpop-map-' + makeId()),
 addEventsToMap = () => {
   eventsLayer.clearLayers();
   props.events.forEach(ev => {
-    console.log(ev);
     if (ev.location && typeof ev.lat != 'undefined' ) {
-      const marker = L.marker([ev.lat, ev.lng]);
-      marker.bindPopup(`<strong>${ev.title}</strong><br>${ev.location}`);
+      const content = L.DomUtil.create('span', `<strong>${ev.title}</strong><br>${ev.location}`),
+      popup = L.popup().setContent(content),
+      marker = L.marker([ev.lat, ev.lng]);
+      marker.bindPopup(popup);
+      content.addEventListener('click', ()=>console.log('clickk'));
       eventsLayer.addLayer(marker);
+      // const marker = L.marker([ev.lat, ev.lng]);
+      // marker.bindPopup(`<strong>${ev.title}</strong><br>${ev.location}`);
+      // eventsLayer.addLayer(marker);
     }
   })
 };
