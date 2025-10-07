@@ -141,6 +141,7 @@ createApp({
       //setTimeout(() => testEvents.length = 0, 10000);
     });
     return {
+      events,
       eventSearch,
       zoneSearch,
       reduceZones,
