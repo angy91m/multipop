@@ -1,6 +1,6 @@
 import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.js';
-const { createApp, defineAsyncComponent, ref, reactive, onBeforeMount, useTemplateRef, onUnmounted, watch } = Vue,
+const { createApp, defineAsyncComponent, ref, reactive, onBeforeMount, useTemplateRef, onUnmounted, watch, nextTick } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
   const loaded = [];
@@ -102,8 +102,8 @@ createApp({
       }
     }
     function onDateInput(value, old) {
-      if (!value.min) eventSearch.min = old.min;
-      if (!value.max) eventSearch.max = old.max;
+      if (!value.min) nextTick(()=>eventSearch.min = old.min);
+      if (!value.max) nextTick(()=>eventSearch.max = old.max);
     }
     watch(eventSearch, onDateInput);
     function serverReq(obj) {
