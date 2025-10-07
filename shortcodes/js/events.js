@@ -109,6 +109,7 @@ createApp({
       const res = await serverReq({
         action: 'search_events',
         ...eventSearch,
+        zones: Array.from(new Set(eventSearch.zones.map(z => z.type == 'regione' ? 'reg_' + z.nome : (z.type == 'provincia' ? z.sigla : z.codiceCatastale)))),
         pag: true
       });
       if (res.ok) {
