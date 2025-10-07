@@ -539,7 +539,7 @@ class MultipopEventsPlugin {
       'sortby' => $options['sortby']
     ]];
     if ($page !== true) {
-      $res['pag'] = $options['pag'];
+      $res['options']['pag'] = $options['pag'];
       $res['options']['zones'] = MultipopPlugin::$instances[0]->retrieve_zones_from_resp_zones($zones);
     }
     return $res;
