@@ -365,6 +365,7 @@ class MultipopEventsPlugin {
     }
     $curlObj = self::curl_init('https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($address) . "&key=$key");
     $data = curl_exec($curlObj);
+    save_test($data);
     if (!$data) return false;
     $data = json_decode($data, true);
     if ($data['status'] != 'OK' || empty($data['results'])) return false;
@@ -402,6 +403,7 @@ class MultipopEventsPlugin {
       $comune['provincia']['sigla'],
       'reg_' . $comune['provincia']['regione']
     ];
+    save_test($res,1);
     return $res;
   }
   public static function search_events_posts_orderby($orderby, $q) {
