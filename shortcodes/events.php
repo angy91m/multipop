@@ -25,6 +25,35 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
 <div id="app" style="max-width: unset">
   <q-layout view="hHh lpR fFf">
     <q-page-container>
+      <div class="row">
+        <div class="col">
+          <q-input v-model="eventSearch.txt" label="Titolo o descrizione"></q-input>
+        </div>
+        <div class="col">
+          <q-input v-model="eventSearch.min" type="date" label="Dal"></q-input>
+        </div>
+        <div class="col">
+          <q-input v-model="eventSearch.max" type="date" label="Al"></q-input>
+        </div>
+        <div class="col">
+          <mpop-select
+            multiple
+            fuse-search
+            :minLen="2"
+            v-model="eventSearch.zones"
+            :options="zoneSearch.events"
+            label="untouched_label"
+            @option:selected="zones => {
+              const oldLen = zones.length;
+              reduceZones(zones, eventSearch);
+              if (oldLen == zones.length) triggerSearchEvents();
+            }"
+            @option:deselected="triggerSearchEvents"
+            @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'searchZones', 'events', eventSearch)"
+          >
+          </mpop-select>
+        </div>
+      </div>
       <q-tabs
         v-model="eventTab"
         align="left"
@@ -34,22 +63,6 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
       </q-tabs>
     </q-page-container>
   </q-layout>
-  <mpop-select
-    multiple
-    fuse-search
-    :minLen="2"
-    v-model="eventSearch.zones"
-    :options="zoneSearch.events"
-    label="untouched_label"
-    @option:selected="zones => {
-      const oldLen = zones.length;
-      reduceZones(zones, eventSearch);
-      if (oldLen == zones.length) triggerSearchEvents();
-    }"
-    @option:deselected="triggerSearchEvents"
-    @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'searchZones', 'events', eventSearch)"
-  >
-  </mpop-select>
   <mpop-map
     ref="mapEl"
     :events="events"
