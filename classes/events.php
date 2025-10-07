@@ -421,8 +421,8 @@ class MultipopEventsPlugin {
       'title' => true
     ];
     $options += [
-      'txt' => null,
-      'zones' => null,
+      'txt' => '',
+      'zones' => [],
       'min' => null,
       'max' => null,
       'sortby' => $default_sort,
@@ -523,7 +523,14 @@ class MultipopEventsPlugin {
     $query_args['mp_extra_sort'] = $options['sortby'];
     $query_args['meta_query'] = $meta_q;
     add_filter('posts_orderby', [self::class, 'search_events_posts_orderby'], 10, 2);
-    return get_posts($query_args);
+    return ['results' => get_posts($query_args), 'options' => [
+      'txt' => $options['txt'],
+      'zones' => $zones,
+      'min' => $min_date->format('c'),
+      'max' => $max_date->format('c'),
+      'sortby' => $options['sortby'],
+      'pag' => $options['pag']
+    ]];
   }
   public static function event2ld_json($event) {
     $start_date = date_create('now', new DateTimeZone(current_time('e')));

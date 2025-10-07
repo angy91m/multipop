@@ -8,12 +8,16 @@ if (
   require_once('post/events.php');
   exit;
 }
+$found_events = MultipopEventsPlugin::search_events($_GET);
 ?>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@graph": [<?=implode(',', array_map([MultipopEventsPlugin::class, 'event2ld_json'], MultipopEventsPlugin::search_events($_GET)))?>]
+  "@graph": [<?=implode(',', array_map([MultipopEventsPlugin::class, 'event2ld_json'], $found_events['results']))?>]
 }
+</script>
+<script id="pagination-option" type="application/json">
+<?=json_encode($found_events['options'], JSON_UNESCAPED_SLASHES)?>
 </script>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
