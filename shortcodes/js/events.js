@@ -104,6 +104,9 @@ createApp({
         })
       });
     }
+    function mapMounted() {
+      console.log(mapEl.value);
+    }
     const testEvents = reactive([{
       title: 'Prova',
       location: 'Via Laurentina, 3 Roma',
@@ -119,7 +122,6 @@ createApp({
     });
     onMounted(()=>{
       setTimeout(() => testEvents.length = 0, 10000);
-      setTimeout(() =>console.log(mapEl.value), 3000);
     });
     return {
       testEvents,
@@ -127,6 +129,7 @@ createApp({
       zoneSearch,
       reduceZones,
       triggerSearch,
+      mapMounted,
       mapEl
     };
   }
