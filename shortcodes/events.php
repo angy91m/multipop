@@ -73,8 +73,8 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
       </q-tabs>
       <div class="row" v-if="eventTab == 'list'">
         <div class="col-grow">
-          <div class="row justify-end">
-            Pagine&nbsp;
+          <div class="row justify-end items-center" style="margin-right: 15px;">
+            <div>Pagine</div>
             <q-pagination
               v-model="eventSearch.pag"
               :max="pages"
