@@ -101,18 +101,20 @@ createApp({
         }
       }
     }
-    function onDateInput(value, old) {
-      console.log('VALUE');
+    const minDate = computed({
+      get: () => eventSearch.min,
+      set: v => eventSearch.min = v
+    }),
+    maxDate = computed({
+      get: () => eventSearch.max,
+      set: v => eventSearch.max = v
+    });
+    function onDateInput(value, old, ref) {
       console.log(value);
-      console.log('OLD');
       console.log(old);
-      if (!value.min) nextTick(()=>{
-        eventSearch.min = old.min;
-        console.log(eventSearch);
-      });
-      if (!value.max) nextTick(()=>eventSearch.max = old.max);
     }
-    watch(eventSearch, onDateInput);
+    watch(minDate, (v,o) => onDateInput(v,o,minDate));
+    watch(maxDate, (v,o) => onDateInput(v,o,maxDate));
     function serverReq(obj) {
       return fetch(location.origin + location.pathname, {
         method: 'POST',
