@@ -32,6 +32,7 @@ createApp({
   },
   setup() {
     const mapEl = useTemplateRef('mapEl'),
+    eventTab = ref('list'),
     events = reactive([]),
     eventSearch = reactive(JSON.parse(document.getElementById('search-options').innerText)),
     zoneSearch = reactive({
@@ -111,6 +112,9 @@ createApp({
         })
       });
     }
+    function setUrlOptions() {
+      
+    }
     async function searchEvents() {
       const res = await serverReq({
         action: 'search_events',
@@ -123,6 +127,7 @@ createApp({
         Object.assign(eventSearch, data.options);
         events.length = 0;
         events.push(...data.results);
+
       } else {
         try {
           console.error(await res.json());
@@ -135,9 +140,6 @@ createApp({
       clearTimeout(searchEventsTimeout);
       searchEventsTimeout = setTimeout(searchEvents, 500);
     }
-    function mapMounted() {
-      console.log(mapEl.value);
-    }
     onMounted(()=>{
       //setTimeout(() => testEvents.length = 0, 10000);
     });
@@ -148,7 +150,7 @@ createApp({
       reduceZones,
       triggerSearch,
       triggerSearchEvents,
-      mapMounted,
+      eventTab,
       mapEl
     };
   }
