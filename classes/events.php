@@ -555,6 +555,6 @@ class MultipopEventsPlugin {
       ]
     ];
     if (isset($location['name']) || isset($location['address'])) $json['location'] = $location;
-    return json_encode($json);
+    return json_encode($json, JSON_UNESCAPED_SLASHES);
   }
 }
