@@ -79,7 +79,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
               class="event-card"
               style="margin-bottom: 10px;"
               :event="event"
-              @clicked="()=>location.href=event.url"
+              @clicked="()=>window.location.href=event.url"
             ><mpop-event-card>
           </div>
         </div>
