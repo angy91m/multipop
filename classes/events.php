@@ -336,6 +336,7 @@ class MultipopEventsPlugin {
     if (count($edits) > 1 || count($meta_input)) {
       $edits['meta_input'] = $meta_input;
       remove_action('save_post_mpop_event', [self::class, 'extra_fields_save'], 10);
+      save_test($edits);
       wp_update_post($edits);
       add_action('save_post_mpop_event', [self::class, 'extra_fields_save'], 10, 2);
     }
@@ -365,7 +366,6 @@ class MultipopEventsPlugin {
     }
     $curlObj = self::curl_init('https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($address) . "&key=$key");
     $data = curl_exec($curlObj);
-    save_test($data);
     if (!$data) return false;
     $data = json_decode($data, true);
     if ($data['status'] != 'OK' || empty($data['results'])) return false;
@@ -403,7 +403,6 @@ class MultipopEventsPlugin {
       $comune['provincia']['sigla'],
       'reg_' . $comune['provincia']['regione']
     ];
-    save_test($res,1);
     return $res;
   }
   public static function search_events_posts_orderby($orderby, $q) {
