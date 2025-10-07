@@ -25,6 +25,9 @@ loadVueModule = (...modules) => {
 [mpopMap, mpopSelect] = loadVueModule('MpopMap.vue', {path: 'MpopSelect.vue', modules: {fuse: Fuse}}),
 eventsPageNonce = document.getElementById('mpop-events-page-nonce').value;
 let triggerSearchTimeout, searchEventsTimeout;
+const maxDate = new Date();
+maxDate.setFullYear(maxDate.getFullYear());
+
 createApp({
   components: {
     'mpop-map': defineAsyncComponent(() => mpopMap),
@@ -100,6 +103,9 @@ createApp({
         }
       }
     }
+    function onDateInput(...args) {
+      console.log(args);
+    }
     function serverReq(obj) {
       return fetch(location.origin + location.pathname, {
         method: 'POST',
@@ -152,6 +158,9 @@ createApp({
       clearTimeout(searchEventsTimeout);
       searchEventsTimeout = setTimeout(searchEvents, 500);
     }
+    function dateString(d = new Date()) {
+      return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2);
+    } 
     function onPopState(e) {
       if (typeof e.state == 'object') {
         Object.assign(eventSearch, e.state);
@@ -174,7 +183,10 @@ createApp({
       triggerSearchEvents,
       searchEvents,
       eventTab,
-      mapEl
+      mapEl,
+      dateString,
+      maxDate,
+      onDateInput
     };
   }
 })
