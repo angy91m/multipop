@@ -25,8 +25,6 @@ loadVueModule = (...modules) => {
 [mpopMap, mpopSelect] = loadVueModule('MpopMap.vue', {path: 'MpopSelect.vue', modules: {fuse: Fuse}}),
 eventsPageNonce = document.getElementById('mpop-events-page-nonce').value;
 let triggerSearchTimeout, searchEventsTimeout;
-const maxDate = new Date();
-maxDate.setFullYear(maxDate.getFullYear());
 
 createApp({
   components: {
@@ -103,8 +101,9 @@ createApp({
         }
       }
     }
-    function onDateInput(...args) {
-      console.log(args);
+    function onDateInput(value, old) {
+      if (!value.min) value.min = old.min;
+      if (!value.max) value.max = old.max;
     }
     watch(eventSearch, onDateInput);
     function serverReq(obj) {
@@ -186,7 +185,6 @@ createApp({
       eventTab,
       mapEl,
       dateString,
-      maxDate,
       onDateInput
     };
   }
