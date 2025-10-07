@@ -1,13 +1,18 @@
 <template>
-    <div class="row items-center">
+    <div class="row items-center mpop-sorter">
         <div class="column col">
             <q-select v-model="activeOption" :options="props.options" v-bind="$attrs" />
         </div>
         <div class="column col-1">
-            <q-btn primary :icon="activeOrder ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" @click="invertOrder"/>
+            <q-btn class="primary" :icon="activeOrder ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" @click="invertOrder"/>
         </div>
     </div>
 </template>
+<style scoped>
+.mpop-sorter > * {
+    margin: 0 10px;
+}
+</style>
 <script setup>
 import {defineProps, defineModel, computed, defineEmits} from 'vue';
 defineOptions({
