@@ -14,30 +14,7 @@
 import { ref, onMounted, defineProps, watch, defineExpose, defineEmits } from 'vue';
 import L from '/wp-content/plugins/multipop/js/leaflet.js';
 let map, eventsLayer, mounted;
-const dayNames = [
-  'Domenica',
-  'Lunedì',
-  'Martedì',
-  'Mercoledì',
-  'Giovedì',
-  'Venerdì',
-  'Sabato'
-],
-monthNames = [
-  'Gennaio',
-  'Febbraio',
-  'Marzo',
-  'Aprile',
-  'Maggio',
-  'Giugno',
-  'Luglio',
-  'Agosto',
-  'Settembre',
-  'Ottobre',
-  'Novembre',
-  'Dicembre'
-],
-makeId = (length = 5) => {
+const makeId = (length = 5) => {
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   for ( let i = 0; i < length; i++ ) {
@@ -67,17 +44,14 @@ emit = defineEmits(['eventClick']),
 mapRef = ref(null),
 elId = ref('mpop-map-' + makeId()),
 listenerClears = [];
-function humanDate(d = new Date()) {
-  return dayNames[d.getDay()].slice(0,3) + ' ' + d.getDate() + ' ' + monthNames[d.getMonth()].slice(0,3) + ' ' + d.getFullYear();
-}
 function humanTime(d = new Date()) {
   return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
 }
 function showEventDate(event) {
   const start = new Date(event.start),
   end = new Date(event.end),
-  startDate = humanDate(start),
-  endDate = humanDate(end),
+  startDate = start.toLocaleDateString(),
+  endDate = end.toLocaleDateString(),
   startTime = humanTime(start),
   endTime = humanTime(end);
   return startDate + ' ' + startTime + (startDate == endDate ? (startTime == endTime ? '' : ' - ' + endTime) : '<br>' + endDate + ' ' + endTime );
