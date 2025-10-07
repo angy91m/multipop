@@ -39,9 +39,10 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
           <label>Al</label><br>
           <q-input v-model="eventSearch.max" type="date" filled></q-input>
         </div>
-        <div class="col event-search-option">
+        <div class="col column flex event-search-option">
           <label>Al</label><br>
           <mpop-select
+            class="col-grow"
             multiple
             fuse-search
             :minLen="2"
