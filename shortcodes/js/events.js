@@ -173,6 +173,9 @@ createApp({
     function dateString(d = new Date()) {
       return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2);
     }
+    function changeLocation(l = location.href) {
+      if (l != location.href) location.href = l;
+    }
     function onPopState(e) {
       if (typeof e.state == 'object') {
         Object.assign(eventSearch, e.state);
@@ -198,7 +201,8 @@ createApp({
       mapEl,
       onDateInput,
       pages,
-      eventsToShow
+      eventsToShow,
+      changeLocation
     };
   }
 })
