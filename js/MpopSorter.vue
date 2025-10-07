@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <q-select v-model="activeValue" :options="props.options" :label="props.label" v-bind="$attrs" />
+        <q-select v-model="activeKey" :options="props.options" v-bind="$attrs" />
     </div>
 </template>
 <script setup>
@@ -12,15 +12,17 @@ const props = defineProps({
     options: {
         type: Array,
         default: []
-    },
-    label: {
-        type: String,
-        default: 'Ordina per: '
     }
 }),
 modelValue = defineModel({default: []}),
-activeValue = computed({
+activeKey = computed({
     get: () => Object.keys(modelValue.value)[0],
+    set: v => {
+        console.log(v);
+    }
+}),
+activeOrder = computed({
+    get: () => Object.values(modelValue.value)[0],
     set: v => {
         console.log(v);
     }
