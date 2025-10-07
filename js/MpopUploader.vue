@@ -5,7 +5,7 @@
     </span>
 </template>
 <script setup>
-    import { ref, nextTick } from 'vue';
+    import { nextTick, useTemplateRef } from 'vue';
     defineOptions({
         inheritAttrs: false
     });
@@ -23,7 +23,7 @@
         }
     }),
     emit = defineEmits(['change', 'invalidMime']),
-    fileInput = ref(null);
+    fileInput = useTemplateRef('fileInput');
 
     function readFile(f) {
         return new Promise( (resolve, reject) => {

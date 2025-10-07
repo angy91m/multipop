@@ -1,6 +1,6 @@
 import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.js';
-const { createApp, defineAsyncComponent, ref, reactive, onMounted, nextTick } = Vue,
+const { createApp, defineAsyncComponent, ref, reactive, onMounted, nextTick, useTemplateRef } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
   const loaded = [];
@@ -31,7 +31,7 @@ createApp({
     'mpop-select': defineAsyncComponent(() => mpopSelect)
   },
   setup() {
-    const mapEl = ref('mapEl');
+    const mapEl = useTemplateRef('mapEl');
     function reduceZones(zones, target, zonesKey = 'zones') {
       const added = zones[zones.length - 1];
       if (added.type == 'nazione') {

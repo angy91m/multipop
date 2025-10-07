@@ -2,7 +2,7 @@ import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.js';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
 
-const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick } = Vue,
+const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick, useTemplateRef } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
     const loaded = [];
@@ -342,10 +342,10 @@ createApp({
             forceYear: false,
             delayedSend: true
         }),
-        intPhoneInstance = ref('intPhoneInstance'),
-        profilePhoneInput = ref('profilePhoneInput'),
-        userEditPhoneInput = ref('userEditPhoneInput'),
-        userAddPhoneInput = ref('userAddPhoneInput'),
+        intPhoneInstance = useTemplateRef('intPhoneInstance'),
+        profilePhoneInput = useTemplateRef('profilePhoneInput'),
+        userEditPhoneInput = useTemplateRef('userEditPhoneInput'),
+        userAddPhoneInput = useTemplateRef('userAddPhoneInput'),
         userSearchTablePagination = ref({
             sortBy: 'ID',
             descending: false,

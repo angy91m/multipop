@@ -29,7 +29,7 @@
 </template>
 <script setup>
 import VSelect from '/wp-content/plugins/multipop/js/vue-select.js';
-import {ref, defineModel, defineProps, computed, defineExpose, defineEmits, useAttrs} from 'vue';
+import {ref, defineModel, defineProps, computed, defineExpose, defineEmits, useAttrs, useTemplateRef} from 'vue';
 import Fuse from 'fuse';
 function fuseSearch(options, search) {
   const fuse = new Fuse(options, {
@@ -38,7 +38,7 @@ function fuseSearch(options, search) {
   });
   return (props.trim ? search.trim() : search).length ? fuse.search(search).map(({item}) => item) : fuse.list;
 }
-const element = ref('element'),
+const element = useTemplateRef('element'),
 modelValue = defineModel(),
 props = defineProps({
   filter: {
