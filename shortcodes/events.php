@@ -18,7 +18,6 @@ if (
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
 <?=html_dump($_GET)?>
-<?=html_dump($found_events)?>
 <div id="app" style="max-width: unset">
   <mpop-select
     multiple
