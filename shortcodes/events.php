@@ -33,11 +33,11 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
         </div>
         <div class="col event-search-option">
           <label>Dal</label><br>
-          <q-input v-model="eventSearch.min" type="date" filled @update:model-value="searchEvents"></q-input>
+          <q-input v-model="eventSearch.min" type="date" filled @update:model-value="searchEvents" required></q-input>
         </div>
         <div class="col event-search-option">
           <label>Al</label><br>
-          <q-input v-model="eventSearch.max" type="date" filled @update:model-value="searchEvents"></q-input>
+          <q-input v-model="eventSearch.max" type="date" filled @update:model-value="searchEvents" required></q-input>
         </div>
         <div class="col column event-search-option">
           <label>Luogo</label>
