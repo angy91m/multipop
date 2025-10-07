@@ -41,6 +41,7 @@ elId = ref('mpop-map-' + makeId()),
 addEventsToMap = () => {
   eventsLayer.clearLayers();
   props.events.forEach(ev => {
+    console.log(ev);
     if (ev.location && typeof ev.lat != 'undefined' ) {
       const marker = L.marker([ev.lat, ev.lng]);
       marker.bindPopup(`<strong>${ev.title}</strong><br>${ev.location}`);
