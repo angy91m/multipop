@@ -4,8 +4,3 @@
 .event-search-option .vs__dropdown-toggle {
     height: 100%;
 }
-.event-search-option input[type="date"]::-moz-clear,
-.event-search-option input[type="date"]::-ms-clear,
-.event-search-option input[type="date"]::clear {
-    display: none;
-}
