@@ -23,22 +23,21 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/events.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/fonts.css">
-<?=html_dump($_GET)?>
 <div id="app" style="max-width: unset">
   <q-layout view="hHh lpR fFf">
     <q-page-container>
       <div class="row">
         <div class="col event-search-option">
           <label>Titolo o descrizione</label><br>
-          <q-input v-model="eventSearch.txt" filled></q-input>
+          <q-input v-model="eventSearch.txt" filled @update:model-value="triggerSearchEvents"></q-input>
         </div>
         <div class="col event-search-option">
           <label>Dal</label><br>
-          <q-input v-model="eventSearch.min" type="date" filled></q-input>
+          <q-input v-model="eventSearch.min" type="date" filled @update:model-value="searchEvents"></q-input>
         </div>
         <div class="col event-search-option">
           <label>Al</label><br>
-          <q-input v-model="eventSearch.max" type="date" filled></q-input>
+          <q-input v-model="eventSearch.max" type="date" filled @update:model-value="searchEvents"></q-input>
         </div>
         <div class="col column event-search-option">
           <label>Luogo</label>

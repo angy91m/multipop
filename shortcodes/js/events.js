@@ -1,6 +1,6 @@
 import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.js';
-const { createApp, defineAsyncComponent, ref, reactive, onMounted, nextTick, useTemplateRef } = Vue,
+const { createApp, defineAsyncComponent, ref, reactive, onBeforeMount, useTemplateRef, onUnmounted } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
 loadVueModule = (...modules) => {
   const loaded = [];
@@ -123,7 +123,7 @@ createApp({
           searchParams.append(k, eventSearch[k]);
         }
       }
-      history[replace ? 'replaceState' : 'pushState'](JSON.stringify(eventSearch), '', location.origin + location.pathname + '?' + searchParams.toString());
+      history[replace ? 'replaceState' : 'pushState'](JSON.parse(JSON.stringify(eventSearch)), '', location.origin + location.pathname + '?' + searchParams.toString());
     }
     async function searchEvents(back = false, init = false) {
       const res = await serverReq({
@@ -152,9 +152,18 @@ createApp({
       clearTimeout(searchEventsTimeout);
       searchEventsTimeout = setTimeout(searchEvents, 500);
     }
-    onMounted(()=>{
+    function onPopState(e) {
+      if (typeof e.state == 'object') {
+        Object.assign(eventSearch, e.state);
+        searchEvents(false);
+      }
+    }
+    onBeforeMount(()=>{
       searchEvents(false, true);
-      //setTimeout(() => testEvents.length = 0, 10000);
+      addEventListener('popstate', onPopState);
+    });
+    onUnmounted(()=>{
+      removeEventListener('popstate', onPopState);
     });
     return {
       events,
