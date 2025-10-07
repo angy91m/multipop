@@ -119,7 +119,7 @@ createApp({
     });
     onMounted(()=>{
       setTimeout(() => testEvents.length = 0, 10000);
-      nextTick(()=>console.log(mapEl.value));
+      setTimeout(() =>console.log(mapEl.value), 3000);
     });
     return {
       testEvents,
