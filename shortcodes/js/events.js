@@ -102,6 +102,10 @@ createApp({
       }
     }
     function onDateInput(value, old) {
+      console.log('VALUE');
+      console.log(value);
+      console.log('OLD');
+      console.log(old);
       if (!value.min) nextTick(()=>{
         eventSearch.min = old.min;
         console.log(eventSearch);
