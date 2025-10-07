@@ -111,7 +111,10 @@ createApp({
         ...eventSearch,
         pag: true
       });
-      console.log(res);
+      if (res.ok) {
+        const json = await res.json();
+        console.log(json);
+      }
     }
     function triggerSearchEvents() {
       clearTimeout(searchEventsTimeout);
