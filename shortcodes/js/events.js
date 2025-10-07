@@ -202,7 +202,8 @@ createApp({
       onDateInput,
       pages,
       eventsToShow,
-      changeLocation
+      changeLocation,
+      setUrlOptions
     };
   }
 })
