@@ -49,7 +49,7 @@ class MultipopEventsPlugin {
         'new_item'              => 'Nuovo Evento',
         'edit_item'             => 'Modifica Evento',
         'view_item'             => 'Vedi Evento',
-        'all_items'             => 'Tutti gli Articoli Eventi',
+        'all_items'             => 'Tutti gli Eventi',
         'search_items'          => 'Cerca Eventi',
         'not_found'             => 'Nessun evento trovato.',
         'not_found_in_trash'    => 'Nessun evento trovato nel cestino.'
@@ -336,7 +336,6 @@ class MultipopEventsPlugin {
     if (count($edits) > 1 || count($meta_input)) {
       $edits['meta_input'] = $meta_input;
       remove_action('save_post_mpop_event', [self::class, 'extra_fields_save'], 10);
-      save_test($edits);
       wp_update_post($edits);
       add_action('save_post_mpop_event', [self::class, 'extra_fields_save'], 10, 2);
     }
