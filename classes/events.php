@@ -436,11 +436,14 @@ class MultipopEventsPlugin {
       } else {
         $page = 0;
       }
+    } elseif(is_int($options['pag']) && $options['pag'] > 0) {
+      $page = $options['pag']-1;
     } elseif($options['pag'] === true) {
       $page = true;
     } else {
       $page = 0;
     }
+    if ($page !== true) $options['pag'] = $page +1;
     $query_args = [
       'post_type' => 'mpop_event',
       'post_status' => 'publish',
