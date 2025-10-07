@@ -106,8 +106,7 @@ createApp({
     function onDateInput(...args) {
       console.log(args);
     }
-    watch(eventSearch.min, onDateInput);
-    watch(eventSearch.max, onDateInput);
+    watch(eventSearch, onDateInput);
     function serverReq(obj) {
       return fetch(location.origin + location.pathname, {
         method: 'POST',
