@@ -4,6 +4,10 @@
 .event-search-option .vs__dropdown-toggle {
   height: 100%;
 }
+.event-card,
+.event-card * {
+  cursor: default;
+}
 @media only screen and (min-width: 430px) {
   .event-card {
     min-width: 412px;
