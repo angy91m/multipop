@@ -88,12 +88,14 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
                     v-html="showEventDate(event)"
                     style="text-wrap: nowrap; text-transform: uppercase;"
                   ></div>
+                </q-card-section>
+              </q-card-section>
+              <q-card-section horizontal>
+                <q-card-section class="q-pt-xs">
                   <div class="text-h5 q-mt-sm q-mb-xs">{{event.title}}</div>
                   <div class="text-caption text-grey">{{event.excerpt}}</div>
                 </q-card-section>
-              </q-card-section>
-              <q-card-section horizontal v-if="event.thumbnail">
-                <q-card-section class="col-5 flex flex-center">
+                <q-card-section v-if="event.thumbnail" class="col-5 flex flex-center">
                   <q-img
                     class="rounded-borders"
                     :src="event.thumbnail"
