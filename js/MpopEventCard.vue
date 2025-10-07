@@ -54,7 +54,8 @@ props = defineProps({
     required: true
   }
 }),
-cardEl = useTemplateRef('cardEl');
+cardEl = useTemplateRef('cardEl'),
+emit = defineEmits(['clicked']);
 function humanDate(d = new Date()) {
   return dayNames[d.getDay()].slice(0,3) + ' ' + d.getDate() + ' ' + monthNames[d.getMonth()].slice(0,3) + ' ' + d.getFullYear();
 }
@@ -71,6 +72,8 @@ function showEventDate(event) {
   return startDate + ' ' + startTime + (startDate == endDate ? (startTime == endTime ? '' : ' - ' + endTime) : '<br>' + endDate + ' ' + endTime );
 }
 onMounted(()=> {
-  console.log(cardEl.value);
+  cardEl.value.$el.addEventListener('mouseup', e => {
+    if (!e.button) emit('clicked');
+  });
 });
 </script>

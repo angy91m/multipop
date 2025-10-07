@@ -74,7 +74,13 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
       <div class="row" v-if="eventTab == 'list'">
         <div class="col-grow">
           <div class="row justify-center" v-for="(event, k) in eventsToShow" :key="k">
-            <mpop-event-card class="event-card" flat bordered style="margin-bottom: 10px;" :event="event"><mpop-event-card>
+            <mpop-event-card
+              flat bordered
+              class="event-card"
+              style="margin-bottom: 10px;"
+              :event="event"
+              @clicked="()=>console.log(event)"
+            ><mpop-event-card>
           </div>
         </div>
       </div>
