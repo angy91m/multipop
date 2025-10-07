@@ -22,16 +22,27 @@ loadVueModule = (...modules) => {
   })));
   return loaded;
 },
-[mpopMap, mpopSelect, mpopEventCard] = loadVueModule('MpopMap.vue', {path: 'MpopSelect.vue', modules: {fuse: Fuse}}, 'MpopEventCard.vue'),
+[mpopMap, mpopSelect, mpopEventCard, mpopSorter] = loadVueModule('MpopMap.vue', {path: 'MpopSelect.vue', modules: {fuse: Fuse}}, 'MpopEventCard.vue', 'MpopSorter.vue'),
 eventsPageNonce = document.getElementById('mpop-events-page-nonce').value,
-maxShowEvents = 25;
+maxShowEvents = 25,
+sortOptions = [{
+  label: 'Fine evento',
+  value: 'end'
+},{
+  label: 'Inizio evento',
+  value: 'start'
+},{
+  label: 'Titolo',
+  value: 'title'
+}];
 let triggerSearchTimeout, searchEventsTimeout;
 
 createApp({
   components: {
     'mpop-map': defineAsyncComponent(() => mpopMap),
     'mpop-select': defineAsyncComponent(() => mpopSelect),
-    'mpop-event-card': defineAsyncComponent(() => mpopEventCard)
+    'mpop-event-card': defineAsyncComponent(() => mpopEventCard),
+    'mpop-sorter': defineAsyncComponent(() => mpopSorter)
   },
   setup() {
     const mapEl = useTemplateRef('mapEl'),
@@ -203,7 +214,8 @@ createApp({
       pages,
       eventsToShow,
       changeLocation,
-      setUrlOptions
+      setUrlOptions,
+      sortOptions
     };
   }
 })
