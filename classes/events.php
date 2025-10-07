@@ -536,10 +536,12 @@ class MultipopEventsPlugin {
       'txt' => $options['txt'],
       'min' => $min_date->format('Y-m-d'),
       'max' => $max_date->format('Y-m-d'),
-      'sortby' => $options['sortby'],
-      'pag' => $options['pag']
+      'sortby' => $options['sortby']
     ]];
-    if ($page !== true) $res['options']['zones'] = MultipopPlugin::$instances[0]->retrieve_zones_from_resp_zones($zones);
+    if ($page !== true) {
+      $res['pag'] = $options['pag'];
+      $res['options']['zones'] = MultipopPlugin::$instances[0]->retrieve_zones_from_resp_zones($zones);
+    }
     return $res;
   }
   public static function event2json($event) {
