@@ -9,6 +9,6 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-update-nonce'], 'mpop-admin-update'
     $zip->extractTo(MULTIPOP_PLUGIN_PATH . '/._update/');
     $zip->close();
   }
-  unlink(MULTIPOP_PLUGIN_PATH . '/._update/');
+  remove_dir(MULTIPOP_PLUGIN_PATH . '/._update/');
   unlink($_FILES["update"]["tmp_name"]);
 }

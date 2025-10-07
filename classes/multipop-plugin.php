@@ -20,6 +20,19 @@ function save_test($obj, $id=0, $append = false) {
     file_put_contents(MULTIPOP_PLUGIN_PATH ."/test-$id.txt", $txt . ob_get_clean());
 }
 
+function remove_dir(string $dir) {
+  $it = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS);
+  $files = new RecursiveIteratorIterator($it,RecursiveIteratorIterator::CHILD_FIRST);
+  foreach($files as $file) {
+    if ($file->isDir()){
+      rmdir($file->getPathname());
+    } else {
+      unlink($file->getPathname());
+    }
+  }
+  rmdir($dir);
+}
+
 function getallheaders_lower() {
     $res = [];
     foreach(getallheaders() as $k => $v) {
