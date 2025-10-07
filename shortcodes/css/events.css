@@ -1,6 +1,11 @@
 .event-search-option {
-    margin: 0 10px;
+  margin: 0 10px;
 }
 .event-search-option .vs__dropdown-toggle {
-    height: 100%;
+  height: 100%;
+}
+@media only screen and (min-width: 430px) {
+  .event-card {
+    min-width: 412px;
+  }
 }
