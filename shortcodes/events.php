@@ -93,7 +93,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
             ></q-pagination>
           </div>
           <div class="row justify-center">
-            <div class="col" v-for="(event, k) in eventsToShow" :key="k">
+            <div class="col" style="min-width:fit-content" v-for="(event, k) in eventsToShow" :key="k">
               <div class="row justify-center">
                 <mpop-event-card
                   flat bordered
