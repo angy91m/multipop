@@ -23,7 +23,8 @@ loadVueModule = (...modules) => {
   return loaded;
 },
 [mpopMap, mpopSelect] = loadVueModule('MpopMap.vue', {path: 'MpopSelect.vue', modules: {fuse: Fuse}}),
-eventsPageNonce = document.getElementById('mpop-events-page-nonce').value;
+eventsPageNonce = document.getElementById('mpop-events-page-nonce').value,
+searchOptionEl = JSON.parse(document.getElementById('search-options').innerText);
 let triggerSearchTimeout;
 createApp({
   components: {
@@ -31,6 +32,7 @@ createApp({
     'mpop-select': defineAsyncComponent(() => mpopSelect)
   },
   setup() {
+    console.log(searchOptionEl);
     const mapEl = useTemplateRef('mapEl');
     function reduceZones(zones, target, zonesKey = 'zones') {
       const added = zones[zones.length - 1];

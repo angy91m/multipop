@@ -16,7 +16,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
   "@graph": [<?=implode(',', array_map([MultipopEventsPlugin::class, 'event2ld_json'], $found_events['results']))?>]
 }
 </script>
-<script id="pagination-option" type="application/json">
+<script id="search-options" type="application/json">
 <?=json_encode($found_events['options'], JSON_UNESCAPED_SLASHES)?>
 </script>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
@@ -43,7 +43,8 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
     ref="mapEl"
     :events="testEvents"
     @vue:mounted="mapMounted"
-    style="min-height: 550px; margin: 10px 50px;"></mpop-map>
+    style="min-height: 550px; margin: 10px 50px;">
+  </mpop-map>
 </div>
 <?php wp_nonce_field( 'mpop-events-page', 'mpop-events-page-nonce' ); ?>
 <script src="<?=plugins_url()?>/multipop/js/vue.global.min.js"></script>
