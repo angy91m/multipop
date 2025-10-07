@@ -63,7 +63,7 @@ function addEventsToMap () {
     if (ev.location && typeof ev.lat != 'undefined' ) {
       const content = L.DomUtil.create('span', 'event-marker-popup'),
       marker = L.marker([ev.lat, ev.lng]);
-      let html =`<strong>${ev.title}</strong><br>${showEventDate(ev)}`;
+      let html =`${showEventDate(ev)}<br><strong>${ev.title}</strong>`;
       if (ev.location_name) html += `<br>${ev.location_name}`;
       if (ev.location) html += `<br>${ev.location}`;
       content.innerHTML = html;
