@@ -8,7 +8,7 @@ if (
   require_once('post/events.php');
   exit;
 }
-$found_events = !str_starts_with( $_SERVER['REQUEST_URI'], '/wp-admin' ) && !str_starts_with( $_SERVER['REQUEST_URI'], '/wp-json' ) ? MultipopEventsPlugin::search_events($_GET) : [];
+$found_events = MultipopEventsPlugin::search_events($_GET);
 ?>
 <script type="application/ld+json">
 {
