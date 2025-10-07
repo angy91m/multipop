@@ -110,8 +110,7 @@ createApp({
       set: v => eventSearch.max = v
     });
     function onDateInput(value, old, ref) {
-      console.log(value);
-      console.log(old);
+      if (!value) ref.value = old;
     }
     watch(minDate, (v,o) => onDateInput(v,o,minDate));
     watch(maxDate, (v,o) => onDateInput(v,o,maxDate));
