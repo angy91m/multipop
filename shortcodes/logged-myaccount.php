@@ -21,7 +21,7 @@ if ($this->discourse_utilities()) {
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-tel-input.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/logged-myaccount.css">
-<link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/logged-myaccount-fonts.css">
+<link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/fonts.css">
 <?php
 if ($this->settings['pp_client_id']) {
     ?>

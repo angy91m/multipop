@@ -21,6 +21,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
 </script>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
+<link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/fonts.css">
 <div id="app" style="max-width: unset">
   <q-layout view="hHh lpR fFf">
     <q-page-container>
