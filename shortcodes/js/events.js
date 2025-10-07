@@ -179,7 +179,7 @@ createApp({
     function onPopState(e) {
       if (typeof e.state == 'object') {
         Object.assign(eventSearch, e.state);
-        searchEvents(false);
+        searchEvents(true);
       }
     }
     onBeforeMount(()=>{
