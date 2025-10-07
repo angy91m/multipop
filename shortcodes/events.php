@@ -82,19 +82,23 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
           <div class="row justify-center" v-for="(event, k) in events" :key="k">
             <q-card flat bordered style="min-width: 412px; margin-bottom: 10px;">
               <q-card-section horizontal>
-                <div
-                  class="text-overline"
-                  v-html="showEventDate(event)"
-                  style="text-wrap: nowrap; text-transform: uppercase;"
-                ></div>
-                <div class="text-h5 q-mt-sm q-mb-xs">{{event.title}}</div>
-                <div class="text-caption text-grey">{{event.excerpt}}</div>
+                <q-card-section class="q-pt-xs">
+                  <div
+                    class="text-overline"
+                    v-html="showEventDate(event)"
+                    style="text-wrap: nowrap; text-transform: uppercase;"
+                  ></div>
+                  <div class="text-h5 q-mt-sm q-mb-xs">{{event.title}}</div>
+                  <div class="text-caption text-grey">{{event.excerpt}}</div>
+                </q-card-section>
               </q-card-section>
               <q-card-section horizontal v-if="event.thumbnail">
+                <q-card-section class="col-5 flex flex-center">
                   <q-img
                     class="rounded-borders"
                     :src="event.thumbnail"
                   />
+                </q-card-section>
               </q-card-section>
               <!-- <q-card-section horizontal>
                 <q-card-section class="q-pt-xs">
@@ -114,7 +118,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
                 </q-card-section>
               </q-card-section> -->
 
-              
+
               <!-- <q-separator />
               <q-card-actions>
                 <q-btn flat round icon="event" />
