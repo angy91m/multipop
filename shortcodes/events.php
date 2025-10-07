@@ -91,7 +91,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
                 </q-card-section>
               </q-card-section>
               <q-card-section horizontal>
-                <q-card-section class="q-pt-xs">
+                <q-card-section class="q-pt-xs col-grow">
                   <div class="text-h5 q-mt-sm q-mb-xs">{{event.title}}</div>
                   <div class="text-caption text-grey">{{event.excerpt}}</div>
                 </q-card-section>
