@@ -295,13 +295,6 @@ class MultipopEventsPlugin {
       'ID' => $post_id
     ];
     $meta_input = [];
-    $excerpt = strip_tags($post->post_content);
-    if (mb_strlen($excerpt, 'UTF-8') > 160) {
-      $excerpt = explode(' ', substr($excerpt, 0, 159));
-      unset($excerpt[count($excerpt-1)]);
-      $excerpt = implode(' ', $excerpt) . '…';
-    }
-    $edits['post_excerpt'] = $excerpt;
     if (isset($_POST['mpop_event_location_name'])) {
       $meta_input['_mpop_event_location_name'] = trim($_POST['mpop_event_location_name']);
     }
@@ -339,8 +332,10 @@ class MultipopEventsPlugin {
     if (!$valid_date && $post->post_status == 'publish') {
       $edits['post_status'] = 'draft';
     }
-    $edits['meta_input'] = $meta_input;
-    wp_update_post($edits);
+    if (count($edits) > 1 || count($meta_input)) {
+      $edits['meta_input'] = $meta_input;
+      wp_update_post($edits);
+    }
   }
   public static function events_page() {
     require MULTIPOP_PLUGIN_PATH . '/shortcodes/events.php';
