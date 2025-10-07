@@ -73,13 +73,17 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
       </q-tabs>
       <div class="row" v-if="eventTab == 'list'">
         <div class="col-grow">
-          <mpop-sorter
-            v-model="eventSearch.sortby"
-            :options="sortOptions"
-            filled
-            label="Ordina per: "
-            @change="onSortChange"
-          ></mpop-sorter>
+          <div class="row">
+            <div class="col">
+              <mpop-sorter
+                v-model="eventSearch.sortby"
+                :options="sortOptions"
+                filled
+                label="Ordina per: "
+                @change="onSortChange"
+              ></mpop-sorter>
+            </div>
+          </div>
           <div class="row justify-end items-center" style="margin-right: 15px;">
             <div style="margin-right: 10px">Pagine</div>
             <q-pagination
