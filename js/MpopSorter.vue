@@ -19,7 +19,10 @@ const props = defineProps({
         default: []
     }
 }),
-modelValue = defineModel({default: []}),
+modelValue = defineModel({
+    type: Object,
+    default: {}
+}),
 activeKey = computed({
     get: () => Object.keys(modelValue.value)[0],
     set: v => {
@@ -28,6 +31,7 @@ activeKey = computed({
 }),
 activeOrder = computed(()=>Object.values(modelValue.value)[0]);
 function invertOrder() {
+    console.log(modelValue);
     modelValue.value[Object.keys(modelValue.value)[0]] = !Object.values(modelValue.value)[0];
 }
 </script>
