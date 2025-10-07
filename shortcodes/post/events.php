@@ -40,9 +40,13 @@ switch ($post_data['action']) {
   case 'search_events':
     try {
       $res_data['data'] = MultipopEventsPlugin::search_events($post_data);
+      $res_data['data']['results'] = array_map([MultipopEventsPlugin::class,'event2json'], $res_data['data']['results']);
     } catch(Exception $e) {
       $res_data['error'] = ['data'];
       $res_data['notices'] = [['type'=>'error', 'msg' => 'Richiesta non valida']];
+      http_response_code( 400 );
+      echo json_encode( $res_data );
+      exit;
     }
     break;
   default:

@@ -533,6 +533,23 @@ class MultipopEventsPlugin {
       'pag' => $options['pag']
     ]];
   }
+  public static function event2json($event) {
+    $start_date = date_create('now', new DateTimeZone(current_time('e')));
+    $start_date->setTimestamp(intval($event->_mpop_event_start));
+    $end_date = date_create('now', new DateTimeZone(current_time('e')));
+    $end_date->setTimestamp(intval($event->_mpop_event_end));
+    return json_encode([
+      'title' => $event->post_title,
+      'excerpt' => $event->post_excerpt,
+      'start' => $start_date->format('c'),
+      'end' => $end_date->format('c'),
+      'thumbnail' => get_the_post_thumbnail_url($event),
+      'location_name' => $event->_mpop_event_location_name,
+      'location' => $event->_mpop_event_location,
+      'lat' => $event->_mpop_event_lat,
+      'lng' => $event->_mpop_event_lng
+    ], JSON_UNESCAPED_SLASHES);
+  }
   public static function event2ld_json($event) {
     $start_date = date_create('now', new DateTimeZone(current_time('e')));
     $start_date->setTimestamp(intval($event->_mpop_event_start));
