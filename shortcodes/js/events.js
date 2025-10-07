@@ -208,7 +208,8 @@ createApp({
       searchEvents,
       eventTab,
       mapEl,
-      onDateInput
+      onDateInput,
+      showEventDate
     };
   }
 })
