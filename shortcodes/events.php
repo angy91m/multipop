@@ -40,25 +40,23 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
           <q-input v-model="eventSearch.max" type="date" filled></q-input>
         </div>
         <div class="col event-search-option">
-          <div>
-            <label>Luogo</label><br>
-            <mpop-select
-              multiple
-              fuse-search
-              :minLen="2"
-              v-model="eventSearch.zones"
-              :options="zoneSearch.events"
-              label="untouched_label"
-              @option:selected="zones => {
-                const oldLen = zones.length;
-                reduceZones(zones, eventSearch);
-                if (oldLen == zones.length) triggerSearchEvents();
-              }"
-              @option:deselected="triggerSearchEvents"
-              @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'searchZones', 'events', eventSearch)"
-            >
-            </mpop-select>
-          </div>
+          <label>Al</label><br>
+          <mpop-select
+            multiple
+            fuse-search
+            :minLen="2"
+            v-model="eventSearch.zones"
+            :options="zoneSearch.events"
+            label="untouched_label"
+            @option:selected="zones => {
+              const oldLen = zones.length;
+              reduceZones(zones, eventSearch);
+              if (oldLen == zones.length) triggerSearchEvents();
+            }"
+            @option:deselected="triggerSearchEvents"
+            @search="(searchTxt, loading) => triggerSearch(searchTxt, loading, 'searchZones', 'events', eventSearch)"
+          >
+          </mpop-select>
         </div>
       </div>
       <q-tabs
