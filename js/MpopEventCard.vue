@@ -69,15 +69,15 @@ function showEventDate(event) {
   endDate = humanDate(end),
   startTime = humanTime(start),
   endTime = humanTime(end),
-  res = startDate + ' ' + startTime + (startDate == endDate ? (startTime == endTime ? '' : ' - ' + endTime) : '<br><i class="q-icon mdi mdi-source-commit-end" aria-hidden="true" role="presentation"></i>' + endDate + ' ' + endTime );
-  return (res.includes('<br>') ? '<i class="q-icon mdi mdi-source-commit-start" aria-hidden="true" role="presentation" style="top:-3px"></i>' : '') + res;
+  res = startDate + ' ' + startTime + (startDate == endDate ? (startTime == endTime ? '' : ' - ' + endTime) : '<br><i class="q-icon mdi mdi-source-commit-end" aria-hidden="true" role="presentation" style="font-size: medium; margin-right: 5px"></i>' + endDate + ' ' + endTime );
+  return (res.includes('<br>') ? '<i class="q-icon mdi mdi-source-commit-start" aria-hidden="true" role="presentation" style="top:-3px; font-size: medium; margin-right: 5px"></i>' : '') + res;
 }
 function locationString(event) {
   const res = [
     event.location_name,
     event.location
   ].filter(v => v).join(' - ');
-  return (res ? '<i class="q-icon material-icons notranslate" aria-hidden="true" role="img">location_on</i>' : '') + res;
+  return (res ? '<i class="q-icon material-icons notranslate" aria-hidden="true" role="presentation">location_on</i>' : '') + res;
 }
 onMounted(()=> {
   cardEl.value.$el.addEventListener('mouseup', e => {
