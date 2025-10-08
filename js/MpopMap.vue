@@ -47,8 +47,8 @@ function humanTime(d = new Date()) {
 function showEventDate(event) {
   const start = new Date(event.start),
   end = new Date(event.end),
-  startDate = humanDate(start),
-  endDate = humanDate(end),
+  startDate = start.toLocaleDateString(),
+  endDate = end.toLocaleDateString(),
   startTime = humanTime(start),
   endTime = humanTime(end),
   res = startDate + ' ' + startTime + (startDate == endDate ? (startTime == endTime ? '' : ' - ' + endTime) : '<br><i class="q-icon mdi mdi-source-commit-end" aria-hidden="true" role="presentation" style="font-size: medium; margin-right: 5px"></i>' + endDate + ' ' + endTime );
