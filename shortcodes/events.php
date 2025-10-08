@@ -96,13 +96,14 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
           <div class="row justify-center">
             <div class="col" style="min-width:fit-content" v-for="(event, k) in eventsToShow" :key="k">
               <div class="row justify-center">
-                <mpop-event-card
-                  flat bordered
-                  class="event-card"
-                  style="margin-bottom: 10px;"
-                  :event="event"
-                  @clicked="openTab(event.url)"
-                ><mpop-event-card>
+                <a :href="event.url" target="_blank">
+                  <mpop-event-card
+                    flat bordered
+                    class="event-card"
+                    style="margin-bottom: 10px;"
+                    :event="event"
+                  ><mpop-event-card>
+                </a>
               </div>
             </div>
           </div>
