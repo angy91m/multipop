@@ -68,8 +68,9 @@ function showEventDate(event) {
   startDate = humanDate(start),
   endDate = humanDate(end),
   startTime = humanTime(start),
-  endTime = humanTime(end);
-  return startDate + ' ' + startTime + (startDate == endDate ? (startTime == endTime ? '' : ' - ' + endTime) : '<br>' + endDate + ' ' + endTime );
+  endTime = humanTime(end),
+  res = startDate + ' ' + startTime + (startDate == endDate ? (startTime == endTime ? '' : ' - ' + endTime) : '<br><i class="q-icon mdi mdi-source-commit-end" aria-hidden="true" role="presentation"></i>' + endDate + ' ' + endTime );
+  return (res.includes('<br>') ? '<i class="q-icon mdi mdi-source-commit-start" aria-hidden="true" role="presentation"></i>' : '') + res;
 }
 onMounted(()=> {
   cardEl.value.$el.addEventListener('mouseup', e => {
