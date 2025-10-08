@@ -39,8 +39,7 @@ props = defineProps({
 }),
 emit = defineEmits(['eventClick']),
 mapRef = ref(null),
-elId = ref('mpop-map-' + makeId()),
-listenerClears = [];
+elId = ref('mpop-map-' + makeId());
 function humanTime(d = new Date()) {
   return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
 }
@@ -61,7 +60,6 @@ function stripTags(html) {
   return div.textContent || div.innerText || '';
 }
 function addEventsToMap () {
-  listenerClears.forEach(cb => cb());
   eventsLayer.clearLayers();
   props.events.forEach(ev => {
     if (ev.location && typeof ev.lat != 'undefined' ) {
@@ -71,9 +69,6 @@ function addEventsToMap () {
       if (ev.location_name) html += `<br>${stripTags(ev.location_name)}`;
       if (ev.location) html += `<br>${stripTags(ev.location)}`;
       content.innerHTML = `<a href="${ev.url}" target="_blank" style="text-decoration:none">${html}</a>`;
-      // const onClick = () => emit('eventClick', ev);
-      // listenerClears.push(()=>content.removeEventListener('click', onClick));
-      // content.addEventListener('click', onClick);
       marker.bindPopup(content);
       eventsLayer.addLayer(marker);
     }
