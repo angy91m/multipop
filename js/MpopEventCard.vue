@@ -72,10 +72,16 @@ function showEventDate(event) {
   res = startDate + ' ' + startTime + (startDate == endDate ? (startTime == endTime ? '' : ' - ' + endTime) : '<br><i class="q-icon mdi mdi-source-commit-end" aria-hidden="true" role="presentation" style="font-size: medium; margin-right: 5px"></i>' + endDate + ' ' + endTime );
   return (res.includes('<br>') ? '<i class="q-icon mdi mdi-source-commit-start" aria-hidden="true" role="presentation" style="top:-3px; font-size: medium; margin-right: 5px"></i>' : '') + res;
 }
+function stripTags(html) {
+  if (!html) return '';
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent || div.innerText || '';
+}
 function locationString(event) {
   return (event.location ? '<i class="q-icon material-icons notranslate" aria-hidden="true" role="presentation" style="font-size: medium; margin-right: 5px; top: -1px">location_on</i>' : '') + [
-    event.location_name,
-    event.location
+    stripTags(event.location_name),
+    stripTags(event.location)
   ].filter(v => v).join(' - ');
 }
 onMounted(()=> {
