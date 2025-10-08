@@ -8,7 +8,7 @@
 }
 </style>
 <script setup>
-import { ref, onMounted, defineProps, watch, defineExpose, defineEmits } from 'vue';
+import { ref, onMounted, defineProps, watch, defineExpose } from 'vue';
 import L from '/wp-content/plugins/multipop/js/leaflet.js';
 let map, eventsLayer, mounted;
 const makeId = (length = 5) => {
@@ -37,7 +37,6 @@ props = defineProps({
     default: 6
   }
 }),
-emit = defineEmits(['eventClick']),
 mapRef = ref(null),
 elId = ref('mpop-map-' + makeId());
 function humanTime(d = new Date()) {
