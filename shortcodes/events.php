@@ -29,17 +29,17 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
     <q-page-container>
       <div class="row">
         <div class="column col-grow event-search-option">
-          <label>Titolo o descrizione</label><br>
+          <label>Titolo o descrizione</label>
           <q-input v-model="eventSearch.txt" filled @update:model-value="triggerSearchEvents"></q-input>
         </div>
         <div class="column col-grow">
           <div class="row">
             <div class="column col-grow event-search-option">
-              <label>Dal</label><br>
+              <label>Dal</label>
               <q-input v-model="eventSearch.min" type="date" filled @blur="()=>searchEvents()"></q-input>
             </div>
             <div class="column col-grow event-search-option">
-              <label>Al</label><br>
+              <label>Al</label>
               <q-input v-model="eventSearch.max" type="date" filled @blur="()=>searchEvents()"></q-input>
             </div>
           </div>
