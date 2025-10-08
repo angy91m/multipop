@@ -9,6 +9,7 @@ if (
   exit;
 }
 $found_events = MultipopEventsPlugin::search_events($_GET);
+save_test(wp_get_theme()->get_page_templates());
 ?>
 <script type="application/ld+json">
 {
