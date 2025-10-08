@@ -73,8 +73,11 @@ function showEventDate(event) {
   return (res.includes('<br>') ? '<i class="q-icon mdi mdi-source-commit-start" aria-hidden="true" role="presentation" style="top:-3px"></i>' : '') + res;
 }
 function locationString(event) {
-  return [event.location_name || '',
-  event.location || ''].join(' - ');
+  const res = [
+    event.location_name,
+    event.location
+  ].filter(v => v).join(' - ');
+  return (res ? '<i class="q-icon material-icons notranslate" aria-hidden="true" role="img">location_on</i>' : '') + res;
 }
 onMounted(()=> {
   cardEl.value.$el.addEventListener('mouseup', e => {
