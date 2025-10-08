@@ -20,6 +20,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
 <?=json_encode($found_events['options'], JSON_UNESCAPED_SLASHES)?>
 </script>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/vue-select.css">
+<link href="https://cdn.jsdelivr.net/npm/@mdi/font@^7.0.0/css/materialdesignicons.min.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/quasar.prod.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/events.css">
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/shortcodes/css/fonts.css">
