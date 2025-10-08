@@ -70,10 +70,10 @@ function addEventsToMap () {
       let html =`${showEventDate(ev)}<br><strong>${ev.title}</strong>`;
       if (ev.location_name) html += `<br>${stripTags(ev.location_name)}`;
       if (ev.location) html += `<br>${stripTags(ev.location)}`;
-      content.innerHTML = html;
-      const onClick = () => emit('eventClick', ev);
-      listenerClears.push(()=>content.removeEventListener('click', onClick));
-      content.addEventListener('click', onClick);
+      content.innerHTML = `<a href="${ev.url}" target="_blank" style="text-decoration:none">${html}</a>`;
+      // const onClick = () => emit('eventClick', ev);
+      // listenerClears.push(()=>content.removeEventListener('click', onClick));
+      // content.addEventListener('click', onClick);
       marker.bindPopup(content);
       eventsLayer.addLayer(marker);
     }
