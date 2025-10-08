@@ -77,7 +77,7 @@ function locationString(event) {
     event.location_name,
     event.location
   ].filter(v => v).join(' - ');
-  return (res ? '<i class="q-icon material-icons notranslate" aria-hidden="true" role="presentation">location_on</i>' : '') + res;
+  return (res ? '<i class="q-icon material-icons notranslate" aria-hidden="true" role="presentation" style="font-size: medium; margin-right: 5px">location_on</i>' : '') + res;
 }
 onMounted(()=> {
   cardEl.value.$el.addEventListener('mouseup', e => {
