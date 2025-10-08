@@ -47,11 +47,18 @@ function humanTime(d = new Date()) {
 function showEventDate(event) {
   const start = new Date(event.start),
   end = new Date(event.end),
-  startDate = start.toLocaleDateString(),
-  endDate = end.toLocaleDateString(),
+  startDate = humanDate(start),
+  endDate = humanDate(end),
   startTime = humanTime(start),
-  endTime = humanTime(end);
-  return startDate + ' ' + startTime + (startDate == endDate ? (startTime == endTime ? '' : ' - ' + endTime) : '<br>' + endDate + ' ' + endTime );
+  endTime = humanTime(end),
+  res = startDate + ' ' + startTime + (startDate == endDate ? (startTime == endTime ? '' : ' - ' + endTime) : '<br><i class="q-icon mdi mdi-source-commit-end" aria-hidden="true" role="presentation" style="font-size: medium; margin-right: 5px"></i>' + endDate + ' ' + endTime );
+  return (res.includes('<br>') ? '<i class="q-icon mdi mdi-source-commit-start" aria-hidden="true" role="presentation" style="top:-3px; font-size: medium; margin-right: 5px"></i>' : '') + res;
+}
+function stripTags(html) {
+  if (!html) return '';
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent || div.innerText || '';
 }
 function addEventsToMap () {
   listenerClears.forEach(cb => cb());
@@ -61,8 +68,8 @@ function addEventsToMap () {
       const content = L.DomUtil.create('div', 'event-map-marker-popup'),
       marker = L.marker([ev.lat, ev.lng]);
       let html =`${showEventDate(ev)}<br><strong>${ev.title}</strong>`;
-      if (ev.location_name) html += `<br>${ev.location_name}`;
-      if (ev.location) html += `<br>${ev.location}`;
+      if (ev.location_name) html += `<br>${stripTags(ev.location_name)}`;
+      if (ev.location) html += `<br>${stripTags(ev.location)}`;
       content.innerHTML = html;
       const onClick = () => emit('eventClick', ev);
       listenerClears.push(()=>content.removeEventListener('click', onClick));
