@@ -38,7 +38,7 @@ $found_events = MultipopEventsPlugin::search_events($_GET);
               <q-input v-model="eventSearch.min" type="date" filled @blur="()=>searchEvents()"></q-input>
             </div>
             <div class="column col-grow event-search-option">
-              <label>Al</label><br>
+              <label><q-icon name="source-commit-start"></q-icon>Al</label><br>
               <q-input v-model="eventSearch.max" type="date" filled @blur="()=>searchEvents()"></q-input>
             </div>
           </div>
