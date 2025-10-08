@@ -1,3 +1,7 @@
+header {
+  font-family: var(--wp--preset--font-family--body);
+  font-size: var(--wp--preset--font-size--medium);
+}
 .mpop-form > *,
 .mpop-form > * > input:not([type="checkbox"]),
 .mpop-form > * > label > input:not([type="checkbox"]) {
