@@ -295,6 +295,10 @@ class MultipopEventsPlugin {
     $edits = [
       'ID' => $post_id
     ];
+    $event_template = array_search('Evento', wp_get_theme()->get_page_templates(), true);
+    if ($event_template) {
+      $edits['page_template'] = $event_template;
+    }
     $meta_input = [];
     if (isset($_POST['mpop_event_location_name'])) {
       $meta_input['_mpop_event_location_name'] = trim($_POST['mpop_event_location_name']);
