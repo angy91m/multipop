@@ -4,7 +4,7 @@
       <q-card-section class="q-pt-xs" style="padding: 0 10px">
         <div
           class="text-overline"
-          v-html="showEventDate(props.event)"
+          v-html="showEventDate(props.event) + '<br>' + locationString(event)"
           style="text-wrap: nowrap; text-transform: uppercase;"
         ></div>
       </q-card-section>
@@ -70,7 +70,11 @@ function showEventDate(event) {
   startTime = humanTime(start),
   endTime = humanTime(end),
   res = startDate + ' ' + startTime + (startDate == endDate ? (startTime == endTime ? '' : ' - ' + endTime) : '<br><i class="q-icon mdi mdi-source-commit-end" aria-hidden="true" role="presentation"></i>' + endDate + ' ' + endTime );
-  return (res.includes('<br>') ? '<i class="q-icon mdi mdi-source-commit-start" aria-hidden="true" role="presentation"></i>' : '') + res;
+  return (res.includes('<br>') ? '<i class="q-icon mdi mdi-source-commit-start" aria-hidden="true" role="presentation" style="top:-3px"></i>' : '') + res;
+}
+function locationString(event) {
+  return [event.location_name || '',
+  event.location || ''].join(' - ');
 }
 onMounted(()=> {
   cardEl.value.$el.addEventListener('mouseup', e => {
