@@ -142,9 +142,9 @@ if (!$errors->has_errors()) {
                     }
                     delete_user_meta($user->ID, '_edit_mpop_events');
                     $userObj = get_user_data($user->ID);
-                    if (isset($_POST['edit_mpop_events']) && $_POST['edit_mpop_events'] == '1' && !$userObj->has_cap(MultipopEventsPlugin::CAPS[0])) {
+                    if (isset($_POST['edit_mpop_events']) && $_POST['edit_mpop_events'] == '1' && !$userObj->has_cap(MultipopEventsPlugin::CAPS[1])) {
                         foreach(MultipopEventsPlugin::CAPS as $cap) $userObj->add_cap($cap);
-                    } elseif ($userObj->has_cap(MultipopEventsPlugin::CAPS[0])) {
+                    } elseif ($userObj->has_cap(MultipopEventsPlugin::CAPS[1])) {
                         foreach(MultipopEventsPlugin::CAPS as $cap) $userObj->remove_cap($cap);
                     }
                 } else {
