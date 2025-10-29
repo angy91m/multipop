@@ -36,6 +36,15 @@ class MultipopEventsPlugin {
     return substr(self::get_day_name($d), 0, 3) . ', ' . $d->format('j') . ' ' . substr(self::get_month_name($d), 0, 3) . ' ' . $d->format('Y');
   }
   public static function init() {
+    $role = get_role('administrator');
+    $role->add_cap('edit_mpop_event');
+    $role->add_cap('read_mpop_event');
+    $role->add_cap('delete_mpop_event');
+    $role->add_cap('edit_mpop_events');
+    $role->add_cap('delete_mpop_events');
+    $role->add_cap('edit_others_mpop_events');
+    $role->add_cap('publish_mpop_events');
+    $role->add_cap('read_private_mpop_events');
 
     // ADD mpop_event POST TYPE
     add_action( 'init', function () {
