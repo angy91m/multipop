@@ -108,9 +108,9 @@ class MultipopEventsPlugin {
         ) {
           $allcaps[ $args[0] ] = true;
         }
+        save_test($args);
+        save_test($allcaps, 1);
       }
-      save_test($args);
-      save_test($allcaps, 1);
       return $allcaps;
     }, 10, 4);
 
