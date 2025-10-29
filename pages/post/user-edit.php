@@ -140,6 +140,11 @@ if (!$errors->has_errors()) {
                             }
                         }
                     }
+                    if (isset($_POST['edit_mpop_events']) && $_POST['edit_mpop_events'] == '1') {
+                        $user_meta['_edit_mpop_events'] = true;
+                    } elseif ($old_user->_edit_mpop_events) {
+                        delete_user_meta($user->ID, '_edit_mpop_events');
+                    }
                 } else {
                     // FLOW FOR NEW USERS
                     if (isset($_POST['email_confirmed']) && $_POST['email_confirmed']) {
@@ -148,10 +153,12 @@ if (!$errors->has_errors()) {
                     } else {
                         $user_meta['mpop_mail_to_confirm'] = true;
                     }
+                    if (isset($_POST['edit_mpop_events']) && $_POST['edit_mpop_events'] == '1') $user_meta['_edit_mpop_events'] = true;
                 }
             } else if ($update) {
                 delete_user_meta($user->ID, '_new_email');
                 // FLOW FOR OTHER ROLES UPDATE
+                delete_user_meta($user->ID, '_edit_mpop_events');
                 if ($user->role == 'administrator') {
                     delete_user_meta($user->ID, 'mpop_mail_to_confirm');
                 } else {

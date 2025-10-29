@@ -31,6 +31,10 @@ if ($this->current_user_is_admin()) {
                 <th>Tessera attiva</th>
                 <td><?= $user->mpop_card_active ? $this->dashicon('yes') : $this->dashicon('no') ?></td>
             </tr>
+            <tr>
+                <th>Gestione eventi</th>
+                <td><input type="checkbox" name="edit_mpop_events" value="1" <?=$user->_edit_mpop_events ? 'checked' : ''?>/>/td>
+            </tr>
             <?php
             if (isset($user->roles[0]) && in_array($user->roles[0], ['administrator', 'multipopolare_resp']) && $this->user_has_master_key() ) { ?>
                 <tr>
