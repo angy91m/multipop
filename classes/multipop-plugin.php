@@ -2057,7 +2057,12 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
 
     public function personal_options_update($user_id) {
         define('MPOP_PERSONAL_UPDATE', true);
-        if (!$this->current_user_is_admin() && isset($_POST['email'])) $_POST['email'] = get_user_by('ID', $user_id)->user_email;
+        $user = get_user_by('ID', $user_id);
+        if ($user && !empty($user->roles) && str_starts_with($user->roles[0], 'multipopola')) {
+            $_POST['email'] = $user->user_email;
+            $_POST['pass1'] = '';
+            $_POST['pass2'] = '';
+        }
     }
 
     // PERSONAL CARD PAGE CONTENT

@@ -53,7 +53,6 @@ if (!$errors->has_errors()) {
             }
             $user = $old_user;
             $user->role = !empty($old_user->roles) ? $old_user->roles[0] : '';
-            save_test($user);
         }
     } else {
         $old_user = false;

@@ -11,7 +11,10 @@ $current_user = $current_user ?? wp_get_current_user();
     .user-url-wrap {
         display: none;
     }
-    <?=str_starts_with($current_user->roles[0], 'multipopola') ? '#application-passwords-section {display: none;}' : ''?>
+    <?=str_starts_with($current_user->roles[0], 'multipopola') ?
+        '#application-passwords-section {display: none;}
+        #password {display: none;}'
+    : ''?>
 </style>
 <script id="__MULTIPOP_DATA__" type="application/json"><?=json_encode([
   'role' => $current_user->roles[0]
