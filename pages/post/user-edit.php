@@ -140,7 +140,6 @@ if (!$errors->has_errors()) {
                             }
                         }
                     }
-                    delete_user_meta($user->ID, '_edit_mpop_events');
                     $userObj = get_userdata($user->ID);
                     if (isset($_POST['edit_mpop_events']) && $_POST['edit_mpop_events'] == '1') {
                         if (!$userObj->has_cap('edit_mpop_events')) foreach(MultipopEventsPlugin::CAPS as $cap) $userObj->add_cap($cap);
