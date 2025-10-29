@@ -1,6 +1,6 @@
 <?php
 defined( 'ABSPATH' ) || exit;
-
+$current_user = $current_user ?? wp_get_current_user();
 ?>
 <link rel="stylesheet" href="<?=plugins_url()?>/multipop/css/main.css">
 <style type="text/css">
@@ -11,9 +11,10 @@ defined( 'ABSPATH' ) || exit;
     .user-url-wrap {
         display: none;
     }
+    <?=str_starts_with($current_user->roles[0], 'multipopola') ? '#application-passwords-section {display: none;}' : ''?>
 </style>
 <script id="__MULTIPOP_DATA__" type="application/json"><?=json_encode([
-  'role' => wp_get_current_user()->roles[0]
+  'role' => $current_user->roles[0]
 ], JSON_UNESCAPED_SLASHES)?></script>
 <script type="text/javascript" src="<?=plugins_url()?>/multipop/js/profile.js"></script>
 <?php
