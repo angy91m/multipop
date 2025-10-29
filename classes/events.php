@@ -93,9 +93,11 @@ class MultipopEventsPlugin {
       $caps = [];
       $caps_count = count(self::CAPS);
       $caps_keys = str_replace('mpop_event', 'post', self::CAPS);
+      save_test($caps_keys);
       for($i=0; $i<$caps_count; $i++) {
         $caps[$caps_keys[$i]] = self::CAPS[$i];
       }
+      save_test($caps,1);
       $args = array(
         'labels'             => $labels,
         'public'             => true,
