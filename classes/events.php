@@ -26,6 +26,21 @@ class MultipopEventsPlugin {
     'Novembre',
     'Dicembre'
   ];
+  const CAPS = [
+    'edit_mpop_event',
+    'read_mpop_event',
+    'delete_mpop_event',
+    'edit_mpop_events',
+    'delete_mpop_events',
+    'edit_others_mpop_events',
+    'publish_mpop_events',
+    'read_private_mpop_events',
+    'delete_private_mpop_events',
+    'delete_published_mpop_events',
+    'delete_others_mpop_events',
+    'edit_private_mpop_events',
+    'edit_published_mpop_events'
+  ];
   public static function get_day_name($d) {
     return self::DAY_NAMES[intval($d->format('w'))];
   }
@@ -35,16 +50,27 @@ class MultipopEventsPlugin {
   public static function human_date($d) {
     return substr(self::get_day_name($d), 0, 3) . ', ' . $d->format('j') . ' ' . substr(self::get_month_name($d), 0, 3) . ' ' . $d->format('Y');
   }
+  public static function activate() {
+    $roles = ['administrator', 'editor'];
+    $caps = [''];
+    foreach($roles as $r) {
+      $role = get_role($r);
+      foreach(self::CAPS as $cap) {
+        $role->add_cap($cap);
+      }
+    }
+  }
+  public static function deactivate() {
+    $roles = ['administrator', 'editor'];
+    $caps = [''];
+    foreach($roles as $r) {
+      $role = get_role($r);
+      foreach(self::CAPS as $cap) {
+        $role->remove_cap($cap);
+      }
+    }
+  }
   public static function init() {
-    // $role = get_role('administrator');
-    // $role->add_cap('edit_mpop_event');
-    // $role->add_cap('read_mpop_event');
-    // $role->add_cap('delete_mpop_event');
-    // $role->add_cap('edit_mpop_events');
-    // $role->add_cap('delete_mpop_events');
-    // $role->add_cap('edit_others_mpop_events');
-    // $role->add_cap('publish_mpop_events');
-    // $role->add_cap('read_private_mpop_events');
 
     // ADD mpop_event POST TYPE
     add_action( 'init', function () {
@@ -64,6 +90,12 @@ class MultipopEventsPlugin {
         'not_found_in_trash'    => 'Nessun evento trovato nel cestino.'
       );
 
+      $caps = [];
+      $caps_count = count(self::CAPS);
+      $caps_keys = str_replace('mpop_event', 'post', self::CAPS);
+      for($i=0; $i<$caps_count; $i++) {
+        $caps[$caps_keys[0]] = self::CAPS[0];
+      }
       $args = array(
         'labels'             => $labels,
         'public'             => true,
@@ -92,21 +124,7 @@ class MultipopEventsPlugin {
         'taxonomies'         => array( 'category', 'post_tag' ),
         'map_meta_cap'       => true,
         'capability_type'    => ['mpop_event', 'mpop_events'],
-        'capabilities'       => [
-          'read_post'           => 'read_mpop_event',
-          'edit_post'           => 'edit_mpop_event',
-          'delete_post'         => 'delete_mpop_event',
-          'edit_posts'          => 'edit_mpop_events',
-          'delete_posts'        => 'delete_mpop_events',
-          'edit_others_posts'   => 'edit_others_mpop_events',
-          'publish_posts'       => 'publish_mpop_events',
-          'read_private_posts'  => 'read_private_mpop_events',
-          'delete_private_posts' => 'delete_private_posts',
-          'delete_published_posts' => 'delete_published_posts',
-          'delete_others_posts' => 'delete_others_posts',
-          'edit_private_posts' => 'edit_private_posts',
-          'edit_published_posts' => 'edit_published_posts'
-        ]
+        'capabilities'       => $caps
       );
 
       register_post_type( 'mpop_event', $args );

@@ -674,6 +674,8 @@ class MultipopPlugin {
             'read' => true
         ]);
 
+        MultipopEventsPlugin::activate();
+
         // ADD DYNAMIC PAGES
         // add_rewrite_endpoint( 'card', EP_ROOT | EP_PAGES );
         // flush_rewrite_rules();
@@ -714,7 +716,7 @@ class MultipopPlugin {
 
     // PLUGIN DEACTIVATION HOOK
     public static function deactivate() {
-
+        MultipopEventsPlugin::deactivate();
     }
 
     public function wp_head() {?>
