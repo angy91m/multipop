@@ -5,7 +5,9 @@ window.onload = () => {
         '.user-nickname-wrap input',
         '.user-display-name-wrap select',
         '.user-url-wrap input'
-    ];
+    ],
+    mpopData = JSON.parse(document.getElementById('__MULTIPOP_DATA__').textContent);
+    if (mpopData.role.startsWith('multipopola')) toDisable.push('#email');
     toDisable.forEach(e => document.querySelector(e).readOnly = true);
     const changeMasterKeyButton = document.getElementById('change_master_key_button');
     if (changeMasterKeyButton) {
