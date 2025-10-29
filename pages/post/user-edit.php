@@ -140,10 +140,11 @@ if (!$errors->has_errors()) {
                             }
                         }
                     }
+                    delete_user_meta($user->ID, '_edit_mpop_events');
                     if (isset($_POST['edit_mpop_events']) && $_POST['edit_mpop_events'] == '1') {
-                        $user_meta['_edit_mpop_events'] = true;
+                        if (!$user->has_cap(MultipopEventsPlugin::CAPS[0])) foreach(MultipopEventsPlugin::CAPS as $cap) $user->add_cap($cap);
                     } elseif ($old_user->_edit_mpop_events) {
-                        delete_user_meta($user->ID, '_edit_mpop_events');
+                        if ($user->has_cap(MultipopEventsPlugin::CAPS[0])) foreach(MultipopEventsPlugin::CAPS as $cap) $user->remove_cap($cap);
                     }
                 } else {
                     // FLOW FOR NEW USERS

@@ -42,7 +42,11 @@ function getallheaders_lower() {
 }
 
 class MultipopPlugin {
-
+    const ROLES = [
+        'multipopolano' => 'Multipopolano',
+        'multipopolare_resp' => 'Responsabile Multipopolare',
+        'multipopolare_friend' => 'Amico di Multipopolare'
+    ];
     private ?array $settings;
     private bool $wp_yet_loaded = false;
     private string $req_url = '';
@@ -660,19 +664,9 @@ class MultipopPlugin {
 
         $this->set_db_tables($register_page, $myaccount_page);
     
-        // remove_role('multipopolare_resp');
-        // ADD MULTIPOPOLANO ROLE
-        add_role('multipopolano', 'Multipopolano', [
-            'read' => true
-        ]);
-        // ADD RESPONSABILE ROLE
-        add_role('multipopolare_resp', 'Responsabile Multipopolare', [
-            'read' => true
-        ]);
-        // ADD RESPONSABILE ROLE
-        add_role('multipopolare_friend', 'Amico di Multipopolare', [
-            'read' => true
-        ]);
+        foreach(self::ROLES as $role => $display_name) {
+            add_role($role, $display_name, ['read' => true]);
+        }
 
         MultipopEventsPlugin::activate();
 
