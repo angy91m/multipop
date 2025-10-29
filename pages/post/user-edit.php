@@ -140,11 +140,10 @@ if (!$errors->has_errors()) {
                             }
                         }
                     }
-                    $userObj = get_userdata($user->ID);
                     if (isset($_POST['edit_mpop_events']) && $_POST['edit_mpop_events'] == '1') {
-                        if (!$userObj->has_cap('edit_mpop_events')) foreach(MultipopEventsPlugin::CAPS as $cap) $userObj->add_cap($cap);
-                    } elseif ($userObj->has_cap('edit_mpop_events')) {
-                        foreach(MultipopEventsPlugin::CAPS as $cap) $userObj->remove_cap($cap);
+                        if (!$old_user->has_cap('edit_mpop_events')) foreach(MultipopEventsPlugin::CAPS as $cap) $old_user->add_cap($cap);
+                    } elseif ($old_user->has_cap('edit_mpop_events')) {
+                        foreach(MultipopEventsPlugin::CAPS as $cap) $old_user->remove_cap($cap);
                     }
                 } else {
                     // FLOW FOR NEW USERS
@@ -154,12 +153,10 @@ if (!$errors->has_errors()) {
                     } else {
                         $user_meta['mpop_mail_to_confirm'] = true;
                     }
-                    if (isset($_POST['edit_mpop_events']) && $_POST['edit_mpop_events'] == '1') $user_meta['_edit_mpop_events'] = true;
                 }
             } else if ($update) {
                 delete_user_meta($user->ID, '_new_email');
                 // FLOW FOR OTHER ROLES UPDATE
-                delete_user_meta($user->ID, '_edit_mpop_events');
                 if ($user->role == 'administrator') {
                     delete_user_meta($user->ID, 'mpop_mail_to_confirm');
                 } else {
