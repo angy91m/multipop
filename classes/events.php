@@ -118,7 +118,7 @@ class MultipopEventsPlugin {
         } elseif (isset( $_REQUEST['post_type'] )) {
           $post_type = sanitize_text_field( $_REQUEST['post_type'] );
         }
-        if ($post_type == 'mpop_event' && get_user_meta( $user->ID, '_edit_mpop_events', true )) $allcaps[ $args[0] ] = true;
+        if ($post_type == 'mpop_event' && $user->_edit_mpop_events) $allcaps[ $args[0] ] = true;
       }
       return $allcaps;
     }, 10, 4);

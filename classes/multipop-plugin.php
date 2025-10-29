@@ -764,7 +764,7 @@ class MultipopPlugin {
     public function admin_init() {
         $current_user = wp_get_current_user();
 
-        if (count($current_user->roles) == 1 && in_array($current_user->roles[0], ['multipopolano','multipopolare_resp','multipopolare_friend']) && !get_user_meta( $current_user->ID, '_edit_mpop_events', true )) {
+        if (count($current_user->roles) == 1 && in_array($current_user->roles[0], ['multipopolano','multipopolare_resp','multipopolare_friend']) && !$user->_edit_mpop_events) {
             wp_redirect(site_url('/'), 303);
             exit();
         }
