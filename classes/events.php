@@ -51,7 +51,7 @@ class MultipopEventsPlugin {
     return substr(self::get_day_name($d), 0, 3) . ', ' . $d->format('j') . ' ' . substr(self::get_month_name($d), 0, 3) . ' ' . $d->format('Y');
   }
   public static function activate() {
-    $roles = ['administrator', 'editor'];
+    $roles = ['administrator'];
     $caps = [''];
     foreach($roles as $r) {
       $role = get_role($r);
@@ -61,7 +61,7 @@ class MultipopEventsPlugin {
     }
   }
   public static function deactivate() {
-    $roles = ['administrator', 'editor'];
+    $roles = ['administrator'];
     $caps = [''];
     foreach($roles as $r) {
       $role = get_role($r);
