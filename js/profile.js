@@ -4,8 +4,7 @@ window.onload = () => {
         '.user-last-name-wrap input',
         '.user-nickname-wrap input',
         '.user-display-name-wrap select',
-        '.user-url-wrap input',
-        '#email'
+        '.user-url-wrap input'
     ];
     toDisable.forEach(e => document.querySelector(e).readOnly = true);
     const changeMasterKeyButton = document.getElementById('change_master_key_button');

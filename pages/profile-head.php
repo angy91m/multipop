@@ -12,5 +12,8 @@ defined( 'ABSPATH' ) || exit;
         display: none;
     }
 </style>
+<script type="application/json"><?=json_encode([
+  'role' => get_current_user()->roles[0]
+], JSON_UNESCAPED_SLASHES)?></script>
 <script type="text/javascript" src="<?=plugins_url()?>/multipop/js/profile.js"></script>
 <?php
