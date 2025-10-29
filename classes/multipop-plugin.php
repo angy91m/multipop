@@ -2057,7 +2057,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
 
     public function personal_options_update($user_id) {
         define('MPOP_PERSONAL_UPDATE', true);
-        if (isset($_POST['email'])) get_user_by('ID', $user_id)->user_email;
+        if (isset($_POST['email'])) $_POST['email'] = get_user_by('ID', $user_id)->user_email;
     }
 
     // PERSONAL CARD PAGE CONTENT
