@@ -2055,8 +2055,9 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         require(MULTIPOP_PLUGIN_PATH . '/pages/post/user-edit.php');
     }
 
-    public function personal_options_update() {
+    public function personal_options_update($user_id) {
         define('MPOP_PERSONAL_UPDATE', true);
+        if (isset($_POST['email'])) get_user_by('ID', $user_id)->user_email;
     }
 
     // PERSONAL CARD PAGE CONTENT
