@@ -514,7 +514,7 @@ class MultipopPlugin {
         $current_user = wp_get_current_user();
 
         // HIDE ADMIN BAR
-        if (count($current_user->roles) == 1 && in_array($current_user->roles[0], ['multipopolano','multipopolare_resp','multipopolare_friend'])) {
+        if (count($current_user->roles) == 1 && in_array($current_user->roles[0], ['multipopolano','multipopolare_resp','multipopolare_friend']) && !$current_user->has_cap('edit_mpop_events')) {
             show_admin_bar(false);
         }
 
