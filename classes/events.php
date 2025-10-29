@@ -37,14 +37,14 @@ class MultipopEventsPlugin {
   }
   public static function init() {
     // $role = get_role('administrator');
-    // $role->add_cap('edit_mpop_event');
-    // $role->add_cap('read_mpop_event');
-    // $role->add_cap('delete_mpop_event');
-    // $role->add_cap('edit_mpop_events');
-    // $role->add_cap('delete_mpop_events');
-    // $role->add_cap('edit_others_mpop_events');
-    // $role->add_cap('publish_mpop_events');
-    // $role->add_cap('read_private_mpop_events');
+    // $role->add_cap('edit_post');
+    // $role->add_cap('read_post');
+    // $role->add_cap('delete_post');
+    // $role->add_cap('edit_posts');
+    // $role->add_cap('delete_posts');
+    // $role->add_cap('edit_others_posts');
+    // $role->add_cap('publish_posts');
+    // $role->add_cap('read_private_posts');
 
     // ADD mpop_event POST TYPE
     add_action( 'init', function () {
@@ -96,19 +96,32 @@ class MultipopEventsPlugin {
       register_post_type( 'mpop_event', $args );
     } );
 
-    // add_filter('user_has_cap', function( $allcaps, $caps, $args, $user ) {
-    //   if ( isset( $args[0] ) && preg_match('/_mpop_events?$/', $args[0]) ) {
-    //     if (
-    //       !empty($user->roles)
-    //       && (
-    //         in_array($user->roles[0], ['administrator', 'editor']))
-    //         || get_user_meta( $user->ID, '_edit_mpop_events', true )
-    //     ) {
-    //       $allcaps[ $args[0] ] = true;
-    //     }
-    //   }
-    //   return $allcaps;
-    // }, 10, 4);
+    add_filter('user_has_cap', function( $allcaps, $caps, $args, $user ) {
+      if (
+        !empty($user->roles)
+        && str_starts_with($user->roles[0], 'multipopola')
+        && isset( $args[0] )
+        && in_array($args[0], [
+          'edit_post',
+          'delete_post',
+          'edit_posts',
+          'delete_posts',
+          'edit_others_posts',
+          'publish_posts',
+          'read_private_posts'
+        ])
+      ) {
+        $post_type = '';
+        if (isset($args[2])) {
+          $post = get_post($args[2]);
+          $post_type = $post->post_type;
+        } elseif (isset( $_REQUEST['post_type'] )) {
+          $post_type = sanitize_text_field( $_REQUEST['post_type'] );
+        }
+        if ($post_type == 'mpop_event' && get_user_meta( $user->ID, '_edit_mpop_events', true )) $allcaps[ $args[0] ] = true;
+      }
+      return $allcaps;
+    }, 10, 4);
 
     // SHORTCODES
 
