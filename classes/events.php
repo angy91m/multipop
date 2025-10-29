@@ -94,7 +94,6 @@ class MultipopEventsPlugin {
         'capability_type'    => ['mpop_event', 'mpop_events'],
         'capabilities'       => [
           'edit_post'           => 'edit_mpop_event',
-          'read_post'           => 'read_mpop_event',
           'delete_post'         => 'delete_mpop_event',
           'edit_posts'          => 'edit_mpop_events',
           'delete_posts'        => 'delete_mpop_events',
