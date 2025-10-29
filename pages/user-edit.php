@@ -33,7 +33,7 @@ if ($this->current_user_is_admin()) {
             </tr>
             <tr>
                 <th>Gestione eventi</th>
-                <td><input type="checkbox" name="edit_mpop_events" value="1" <?=$user->_edit_mpop_events ? 'checked' : ''?>/>/td>
+                <td><input type="checkbox" name="edit_mpop_events" value="1" <?=$user->_edit_mpop_events ? 'checked' : ''?>/></td>
             </tr>
             <?php
             if (isset($user->roles[0]) && in_array($user->roles[0], ['administrator', 'multipopolare_resp']) && $this->user_has_master_key() ) { ?>
