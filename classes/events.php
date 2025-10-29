@@ -81,11 +81,36 @@ class MultipopEventsPlugin {
           'post-formats'
         ),
         'taxonomies'         => array( 'category', 'post_tag' ),
-        'map_meta_cap'       => true
+        'map_meta_cap'       => true,
+        'capability_type'    => ['mpop_event', 'mpop_events'],
+        'capabilities'       => [
+          'edit_post'           => 'edit_mpop_event',
+          'read_post'           => 'read_mpop_event',
+          'delete_post'         => 'delete_mpop_event',
+          'edit_posts'          => 'edit_mpop_events',
+          'delete_posts'        => 'delete_mpop_events',
+          'edit_others_posts'   => 'edit_others_mpop_events',
+          'publish_posts'       => 'publish_mpop_events',
+          'read_private_posts'  => 'read_private_mpop_events'
+        ]
       );
 
       register_post_type( 'mpop_event', $args );
     } );
+
+    add_filter('user_has_cap', function( $allcaps, $caps, $args, $user ) {
+      if ( isset( $args[0] ) && preg_match('/_mpop_events?$/', $args[0]) ) {
+        if (
+          !empty($user->roles)
+          && (
+            in_array($user->roles[0], ['administrator', 'editor']))
+            || get_user_meta( $user->ID, '_edit_mpop_events', true )
+        ) {
+          $allcaps[ $args[0] ] = true;
+        }
+      }
+      return $allcaps;
+    }, 10, 4);
 
     // SHORTCODES
 
