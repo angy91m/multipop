@@ -94,7 +94,7 @@ class MultipopEventsPlugin {
       $caps_count = count(self::CAPS);
       $caps_keys = str_replace('mpop_event', 'post', self::CAPS);
       for($i=0; $i<$caps_count; $i++) {
-        $caps[$caps_keys[0]] = self::CAPS[0];
+        $caps[$caps_keys[$i]] = self::CAPS[$i];
       }
       $args = array(
         'labels'             => $labels,
@@ -129,20 +129,6 @@ class MultipopEventsPlugin {
 
       register_post_type( 'mpop_event', $args );
     } );
-
-    add_filter('user_has_cap', function( $allcaps, $caps, $args, $user ) {
-      if ( isset( $args[0] ) && preg_match('/_mpop_events?$/', $args[0]) ) {
-        if (
-          !empty($user->roles)
-          && (
-            in_array($user->roles[0], ['administrator', 'editor']))
-            || get_user_meta( $user->ID, '_edit_mpop_events', true )
-        ) {
-          $allcaps[ $args[0] ] = true;
-        }
-      }
-      return $allcaps;
-    }, 10, 4);
 
     // SHORTCODES
 
