@@ -534,7 +534,7 @@ if ($this->settings['pp_client_id']) {
                                 :disabled="moduleUploadData.signedModuleFiles.length == 2"
                             >Seleziona file da caricare</mpop-uploader>
                         </template>
-                        <br><br><button :disabled="!moduleUploadData.signedModuleFiles.length" @click="()=>moduleUploadData.step+= (isValidIdCard ? 2 : 1)">Avanti</button>
+                        <br><br><button :disabled="moduleUploadData.withSignature ? moduleSigPad.sigPad.isEmpty() : !moduleUploadData.signedModuleFiles.length" @click="()=>moduleUploadData.step+= (isValidIdCard ? 2 : 1)">Avanti</button>
                     </q-step>
                     <q-step
                         v-if="!isValidIdCard"

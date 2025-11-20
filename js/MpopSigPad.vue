@@ -4,12 +4,7 @@
 <script setup>
 import {useTemplateRef, onMounted, onBeforeUnmount, defineExpose, defineProps} from 'vue';
 import SignaturePad from 'signature_pad';
-const TRANSPARENT_PNG = {
-  src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
-  x: 0,
-  y: 0
-},
-props = defineProps({
+const props = defineProps({
   width: {
     type: String,
     default: '600px'

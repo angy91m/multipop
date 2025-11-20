@@ -2311,7 +2311,8 @@ createApp({
             userSubModuleFilesUpload,
             paypalOptions,
             subInstructionOpen,
-            regInstructionOpen
+            regInstructionOpen,
+            moduleSigPad
         };
     }
 })
