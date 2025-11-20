@@ -22,8 +22,8 @@ let sigPad;
 function resizeCanvas() {
   const canvas = canvasRef.value,
   ratio =  Math.max(window.devicePixelRatio || 1, 1);
-  canvas.width = canvas.offsetWidth * ratio;
-  canvas.height = canvas.offsetHeight * ratio;
+  canvas.width = parseInt(props.width) * ratio;
+  canvas.height = parseInt(props.height) * canvas.offsetHeight * ratio;
   canvas.getContext("2d").scale(ratio, ratio);
   sigPad.clear();
 }
