@@ -16,8 +16,6 @@ function resizeCanvas() {
   ratio =  Math.max(devicePixelRatio || 1, 1);
   canvas.width = canvas.offsetWidth * ratio;
   canvas.height = canvas.offsetHeight * ratio;
-  console.log(canvas.offsetWidth * ratio);
-  console.log(canvas.offsetHeight * ratio);
   canvas.getContext("2d").scale(ratio, ratio);
   sigPad.clear();
 }
@@ -27,10 +25,10 @@ defineExpose({
 });
 onMounted(()=>{
   sigPad = new SignaturePad(canvasRef.value);
-  addEventListener('resize', resizeCanvas);
-  resizeCanvas();
+  // addEventListener('resize', resizeCanvas);
+  // resizeCanvas();
 });
 onBeforeUnmount(()=>{
-  removeEventListener('resize', resizeCanvas);
+  // removeEventListener('resize', resizeCanvas);
 });
 </script>
