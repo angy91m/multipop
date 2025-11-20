@@ -512,11 +512,10 @@ if ($this->settings['pp_client_id']) {
                             <q-btn
                                 dense
                                 color="primary"
-                                size="sm"
                                 label="Genera modulo"
                                 @click="generateSubscriptionPdf(moduleUploadData.sub.id)"
                                 style="margin-bottom: 2px;"
-                            ></q-btn><br>
+                            ></q-btn><br><br>
                             <template v-if="moduleUploadData.signedModuleFiles.length">
                                 <div v-for="(f, k) in moduleUploadData.signedModuleFiles" :key="k">
                                     - {{f.name}}&nbsp;&nbsp;<button @click="() => moduleUploadData.signedModuleFiles.splice(k, 1)">Rimuovi</button>
@@ -534,7 +533,7 @@ if ($this->settings['pp_client_id']) {
                                 :disabled="moduleUploadData.signedModuleFiles.length == 2"
                             >Seleziona file da caricare</mpop-uploader>
                         </template>
-                        <br><button :disabled="!moduleUploadData.signedModuleFiles.length" @click="()=>moduleUploadData.step+= (isValidIdCard ? 2 : 1)">Avanti</button>
+                        <br><br><button :disabled="!moduleUploadData.signedModuleFiles.length" @click="()=>moduleUploadData.step+= (isValidIdCard ? 2 : 1)">Avanti</button>
                     </q-step>
                     <q-step
                         v-if="!isValidIdCard"
