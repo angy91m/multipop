@@ -549,7 +549,7 @@ if ($this->settings['pp_client_id']) {
                             <div v-for="(f, k) in moduleUploadData.idCardFiles" :key="k">
                                 - {{f.name}}&nbsp;&nbsp;<button @click="() => moduleUploadData.idCardFiles.splice(k, 1)">Rimuovi</button>
                                 <br>
-                                <iframe v-if="f.type == 'application/pdf'" :src="createObjectURL(base64ToBlob(f.content,f.type))" style="width:100%; max-height:500px;"></iframe>
+                                <iframe v-if="f.type == 'application/pdf'" :src="createObjectURL(base64ToBlob(f.content,f.type))" height="500" style="width:100%; max-height:500px;"></iframe>
                                 <image v-if="f.type != 'application/pdf'" :src="createObjectURL(base64ToBlob(f.content,f.type))" style="max-height:250px;" />
                             </div>
                         </template>
@@ -1047,7 +1047,7 @@ if ($this->settings['pp_client_id']) {
                     <hr>
                     <button @click="subInView.documentToShow = null">Chiudi</button>
                     <br>
-                    <iframe v-if="subInView.documentToShow.type == 'application/pdf'" :src="subInView.documentToShow.content" style="width:100%; min-height: 1000px;"></iframe>
+                    <iframe v-if="subInView.documentToShow.type == 'application/pdf'" :src="subInView.documentToShow.content" height="1000" style="width:100%; min-height: 1000px;"></iframe>
                     <image v-if="subInView.documentToShow.type != 'application/pdf'" :src="subInView.documentToShow.content" />
                 </template>
             </div>
