@@ -2331,7 +2331,8 @@ createApp({
             isValidSignature,
             nextStep1,
             moduleSigPadClear,
-            createObjectURL
+            createObjectURL,
+            base64ToBlob
         };
     }
 })
