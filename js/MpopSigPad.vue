@@ -1,20 +1,29 @@
 <template>
-  <canvas ref="canvas" :width="props.width" :height="props.height"></canvas>
+  <canvas ref="canvas"></canvas>
 </template>
-<style scoped>
-canvas {
-  border: 1px #bbb solid;
-}
-</style>
 <script setup>
 import {useTemplateRef, onMounted, onBeforeUnmount, defineExpose, defineProps} from 'vue';
 import SignaturePad from 'signature_pad';
 const props = defineProps({
   width: {
-    default: 600
+    type: String,
+    default: '600px'
   },
   height: {
-    default: 200
+    type: String,
+    default: '200px'
+  },
+  borderWidth: {
+    type: String,
+    default: '1px'
+  },
+  borderColor: {
+    type: String,
+    default: '#bbb'
+  },
+  borderStyle: {
+    type: String,
+    default: 'solid'
   }
 }),
 canvasRef = useTemplateRef('canvas');
@@ -32,8 +41,12 @@ defineExpose({
   signaturePad: sigPad
 });
 onMounted(()=>{
-  canvasRef.value.style.width = `${props.width}px`;
-  canvasRef.value.style.height = `${props.height}px`;
+  const {style} = canvasRef.value;
+  style.width = props.width;
+  style.height = props.height;
+  style['border-width'] = props.borderWidth;
+  style['border-color'] = props.borderColor;
+  style['border-style'] = props.borderStyle;
   sigPad = new SignaturePad(canvasRef.value);
   addEventListener('resize', resizeCanvas);
   resizeCanvas();
