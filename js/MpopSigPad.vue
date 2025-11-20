@@ -12,10 +12,15 @@ import SignaturePad from 'signature_pad';
 const canvasRef = useTemplateRef('canvas');
 let sigPad;
 function resizeCanvas() {
+  console.log(canvas.width);
+  console.log(canvas.height);
+  console.log(devicePixelRatio);
   const canvas = canvasRef.value,
-  ratio =  Math.max(window.devicePixelRatio || 1, 1);
+  ratio =  Math.max(devicePixelRatio || 1, 1);
   canvas.width = canvas.offsetWidth * ratio;
   canvas.height = canvas.offsetHeight * ratio;
+  console.log(canvas.width);
+  console.log(canvas.height);
   canvas.getContext("2d").scale(ratio, ratio);
   sigPad.clear();
 }
