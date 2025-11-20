@@ -4,7 +4,12 @@
 <script setup>
 import {useTemplateRef, onMounted, onBeforeUnmount, defineExpose, defineProps} from 'vue';
 import SignaturePad from 'signature_pad';
-const props = defineProps({
+const TRANSPARENT_PNG = {
+  src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+  x: 0,
+  y: 0
+},
+props = defineProps({
   width: {
     type: String,
     default: '600px'
@@ -31,10 +36,13 @@ let sigPad;
 function resizeCanvas() {
   const canvas = canvasRef.value,
   ratio =  Math.max(window.devicePixelRatio || 1, 1);
+  const filled = !sigPad.isEmpty();
+  if (filled) const data = sigPad.toData();
   canvas.width = canvas.offsetWidth * ratio;
   canvas.height = canvas.offsetHeight * ratio;
   canvas.getContext("2d").scale(ratio, ratio);
   sigPad.clear();
+  if (filled) sigPad.fromData(data);
 }
 defineExpose({
   canvas: canvasRef,
