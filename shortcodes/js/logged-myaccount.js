@@ -2193,6 +2193,9 @@ createApp({
             }
             moduleUploadData.step+= (isValidIdCard.value ? 2 : 1);
         }
+        function moduleSigPadClear() {
+            moduleSigPad.value.signaturePad.clear();
+        }
         return {
             selectedTab,
             profile,
@@ -2323,7 +2326,8 @@ createApp({
             subInstructionOpen,
             regInstructionOpen,
             isValidSignature,
-            nextStep1
+            nextStep1,
+            moduleSigPadClear
         };
     }
 })

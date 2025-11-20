@@ -508,7 +508,7 @@ if ($this->settings['pp_client_id']) {
                         </div>
                         <template v-if="moduleUploadData.withSignature">
                             <mpop-sig-pad ref="moduleSigPad" :from-data-url="moduleUploadData.signature"></mpop-sig-pad>
-                            <button @click="()=>moduleSigPad?.signaturePad.clear()">Ricomincia</button>
+                            <button @click="moduleSigPadClear">Ricomincia</button>
                         </template>
                         <template v-if="moduleUploadData.withSignature === false">
                             <q-btn
