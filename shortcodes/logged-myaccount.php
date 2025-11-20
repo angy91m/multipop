@@ -523,8 +523,8 @@ if ($this->settings['pp_client_id']) {
                                 <div v-for="(f, k) in moduleUploadData.signedModuleFiles" :key="k">
                                     - {{f.name}}&nbsp;&nbsp;<button @click="() => moduleUploadData.signedModuleFiles.splice(k, 1)">Rimuovi</button>
                                     <br>
-                                    <iframe v-if="f.type == 'application/pdf'" :src="f.content" style="width:100%; max-height:250px;"></iframe>
-                                    <image v-if="f.type != 'application/pdf'" :src="f.content" style="max-height:250px;" />
+                                    <iframe v-if="f.type == 'application/pdf'" :src="URL.createObjectURL(base64ToBlob(f.content,f.type))" style="width:100%; max-height:250px;"></iframe>
+                                    <image v-if="f.type != 'application/pdf'" :src="URL.createObjectURL(base64ToBlob(f.content,f.type))" style="max-height:250px;" />
                                 </div>
                             </template>
                             <div v-if="!moduleUploadData.signedModuleFiles.length">Nessun file selezionato</div>
