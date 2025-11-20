@@ -30,7 +30,7 @@ props = defineProps({
   fromData: {
     default: undefined
   },
-  fromDataURL: {
+  fromDataUrl: {
     default: undefined
   }
 }),
@@ -75,8 +75,8 @@ onMounted(()=>{
     sigPad.fromData(props.fromData);
     initiated.value = true;
   }
-  if (props.fromDataURL) {
-    sigPad.fromDataURL(props.fromDataURL);
+  if (props.fromDataUrl) {
+    sigPad.fromDataURL(props.fromDataUrl);
     initiated.value = true;
   }
 });
