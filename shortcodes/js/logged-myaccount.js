@@ -534,6 +534,7 @@ createApp({
         }),
         isValidSignature = computed(()=>{
             const sigPad = moduleSigPad.value?.sigPad;
+            console.log(sigPad.initiated);
             return sigPad && sigPad.initiated;
         }),
         isValidIdCard = computed(()=> {
