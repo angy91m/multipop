@@ -43,7 +43,8 @@ function resizeCanvas() {
 }
 defineExpose({
   canvas: canvasRef,
-  signaturePad: sigPad
+  signaturePad: sigPad,
+  initiated
 });
 onMounted(()=>{
   const {style} = canvasRef.value;
