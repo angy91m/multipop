@@ -521,6 +521,8 @@ createApp({
         ? true : false ),
         moduleUploadData = reactive({
             sub: null,
+            withSignature: null,
+            signature: null,
             signedModuleFiles: [],
             idCardFiles: [],
             idCardType: null,
@@ -564,6 +566,8 @@ createApp({
         function cancelModuleUploadData() {
             moduleUploadData.step = 1;
             moduleUploadData.sub = null;
+            moduleUploadData.withSignature = null;
+            moduleUploadData.signature = null;
             moduleUploadData.signedModuleFiles.length = 0;
             moduleUploadData.idCardFiles.length = 0;
             moduleUploadData.idCardType = null;
@@ -1549,7 +1553,7 @@ createApp({
             if (
                 moduleUploadData.sub
                 && moduleUploadData.sub.id
-                && moduleUploadData.signedModuleFiles.length
+                && (moduleUploadData.withSignature ? moduleUploadData.signature : moduleUploadData.signedModuleFiles.length)
                 && (
                     isValidIdCard.value
                     || (
@@ -1565,6 +1569,7 @@ createApp({
                 const res = await serverReq({
                     action: 'module_upload',
                     id: moduleUploadData.sub.id,
+                    signature: moduleUploadData.signature,
                     signedModuleFiles: moduleUploadData.signedModuleFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
                     idCardFiles: moduleUploadData.idCardFiles.map(v => {const a = {...v}; delete a['name']; return a;}),
                     idCardType: moduleUploadData.idCardType,

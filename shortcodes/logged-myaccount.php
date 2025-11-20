@@ -497,26 +497,44 @@ if ($this->settings['pp_client_id']) {
                 >
                     <q-step
                         :name="1"
-                        title="Carica il modulo firmato"
+                        title="Firma o Carica il modulo firmato"
                         icon="upload_file"
                         :done="moduleUploadData.step > 1"
                     >
-                        <template v-if="moduleUploadData.signedModuleFiles.length">
-                            <div v-for="(f, k) in moduleUploadData.signedModuleFiles" :key="k">
-                                - {{f.name}}&nbsp;&nbsp;<button @click="() => moduleUploadData.signedModuleFiles.splice(k, 1)">Rimuovi</button>
-                                <br>
-                                <iframe v-if="f.type == 'application/pdf'" :src="f.content" style="width:100%; max-height:250px;"></iframe>
-                                <image v-if="f.type != 'application/pdf'" :src="f.content" style="max-height:250px;" />
-                            </div>
+                        <div>
+                            <input type="radio" v-model="moduleUploadData.withSignature" :value="true"/>
+                            <input type="radio" v-model="moduleUploadData.withSignature" :value="false"/>
+                        </div>
+                        <template v-if="moduleUploadData.withSignature">
+                            <mpop-sig-pad></mpop-sig-pad>
                         </template>
-                        <div v-if="!moduleUploadData.signedModuleFiles.length">Nessun file selezionato</div>
-                        <mpop-uploader 
-                            v-model="moduleUploadData.signedModuleFiles"
-                            :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']"
-                            :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type }; return f;}"
-                            @invalid-mime="onInvalidMime"
-                            :disabled="moduleUploadData.signedModuleFiles.length == 2"
-                        >Seleziona file da caricare</mpop-uploader>&nbsp;&nbsp;<button :disabled="!moduleUploadData.signedModuleFiles.length" @click="()=>moduleUploadData.step+= (isValidIdCard ? 2 : 1)">Avanti</button>
+                        <template v-if="moduleUploadData.withSignature === false">
+                            <q-btn
+                                dense
+                                color="primary"
+                                size="sm"
+                                label="Genera modulo"
+                                @click="generateSubscriptionPdf(moduleUploadData.sub.id)"
+                                style="margin-bottom: 2px;"
+                            ></q-btn><br>
+                            <template v-if="moduleUploadData.signedModuleFiles.length">
+                                <div v-for="(f, k) in moduleUploadData.signedModuleFiles" :key="k">
+                                    - {{f.name}}&nbsp;&nbsp;<button @click="() => moduleUploadData.signedModuleFiles.splice(k, 1)">Rimuovi</button>
+                                    <br>
+                                    <iframe v-if="f.type == 'application/pdf'" :src="f.content" style="width:100%; max-height:250px;"></iframe>
+                                    <image v-if="f.type != 'application/pdf'" :src="f.content" style="max-height:250px;" />
+                                </div>
+                            </template>
+                            <div v-if="!moduleUploadData.signedModuleFiles.length">Nessun file selezionato</div>
+                            <mpop-uploader 
+                                v-model="moduleUploadData.signedModuleFiles"
+                                :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']"
+                                :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type }; return f;}"
+                                @invalid-mime="onInvalidMime"
+                                :disabled="moduleUploadData.signedModuleFiles.length == 2"
+                            >Seleziona file da caricare</mpop-uploader>
+                        </template>
+                        <br><button :disabled="!moduleUploadData.signedModuleFiles.length" @click="()=>moduleUploadData.step+= (isValidIdCard ? 2 : 1)">Avanti</button>
                     </q-step>
                     <q-step
                         v-if="!isValidIdCard"
