@@ -1,5 +1,5 @@
 <template>
-  <canvas ref="canvas"></canvas>
+  <canvas ref="canvas" :width="props.width" :height="props.height"></canvas>
 </template>
 <style scoped>
 canvas {
@@ -7,22 +7,23 @@ canvas {
 }
 </style>
 <script setup>
-import {useTemplateRef, onMounted, onBeforeUnmount, defineExpose} from 'vue';
+import {useTemplateRef, onMounted, onBeforeUnmount, defineExpose, defineProps} from 'vue';
 import SignaturePad from 'signature_pad';
-const canvasRef = useTemplateRef('canvas');
+const props = defineProps({
+  width: {
+    default: 600
+  },
+  height: {
+    default: 200
+  }
+}),
+canvasRef = useTemplateRef('canvas');
 let sigPad;
 function resizeCanvas() {
   const canvas = canvasRef.value,
-  rect = canvas.getBoundingClientRect(),
-  ratio =  Math.max(devicePixelRatio || 1, 1);
-
-  console.log(canvas.width);
-  console.log(canvas.height);
-  console.log(devicePixelRatio);
-  canvas.width = rect.width * ratio;
-  canvas.height = rect.height * ratio;
-  console.log(canvas.width);
-  console.log(canvas.height);
+  ratio =  Math.max(window.devicePixelRatio || 1, 1);
+  canvas.width = canvas.offsetWidth * ratio;
+  canvas.height = canvas.offsetHeight * ratio;
   canvas.getContext("2d").scale(ratio, ratio);
   sigPad.clear();
 }
