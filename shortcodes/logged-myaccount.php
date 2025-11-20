@@ -507,7 +507,7 @@ if ($this->settings['pp_client_id']) {
                             <label><input type="radio" v-model="moduleUploadData.withSignature" :value="false"/>&nbsp;Scarico il modulo PDF e lo ricarico firmato</label>
                         </div>
                         <template v-if="moduleUploadData.withSignature">
-                            <mpop-sig-pad ref="moduleSigPad"></mpop-sig-pad>
+                            <mpop-sig-pad ref="moduleSigPad" width="600" height="200"></mpop-sig-pad>
                         </template>
                         <template v-if="moduleUploadData.withSignature === false">
                             <q-btn
