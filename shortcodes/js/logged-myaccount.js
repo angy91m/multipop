@@ -2186,7 +2186,7 @@ createApp({
         }
         function nextStep1() {
             if (moduleUploadData.withSignature) {
-                moduleUploadData.signature = moduleSigPad.value.sigPad.toDataURL();
+                moduleUploadData.signature = moduleSigPad.value.signaturePad.toDataURL();
                 moduleUploadData.signedModuleFiles.length = 0;
             } else {
                 moduleUploadData.signature = null;
