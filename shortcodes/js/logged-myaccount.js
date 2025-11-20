@@ -2196,6 +2196,9 @@ createApp({
         function moduleSigPadClear() {
             moduleSigPad.value.signaturePad.clear();
         }
+        function createObjectURL(...args) {
+            return URL.createObjectURL(...args);
+        }
         return {
             selectedTab,
             profile,
@@ -2327,7 +2330,8 @@ createApp({
             regInstructionOpen,
             isValidSignature,
             nextStep1,
-            moduleSigPadClear
+            moduleSigPadClear,
+            createObjectURL
         };
     }
 })
