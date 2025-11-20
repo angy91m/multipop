@@ -2322,7 +2322,8 @@ createApp({
             paypalOptions,
             subInstructionOpen,
             regInstructionOpen,
-            isValidSignature
+            isValidSignature,
+            nextStep1
         };
     }
 })
