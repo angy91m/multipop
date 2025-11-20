@@ -59,7 +59,10 @@ onMounted(()=>{
     initiated.value = false;
     return origClear.call(this, ...args);
   };
-  sigPad.addEventListener('beginStroke', ()=>initiated.value=true);
+  sigPad.addEventListener('beginStroke', ()=>{
+    initiated.value=true;
+    console.log('eccolo')
+  });
   addEventListener('resize', resizeCanvas);
   resizeCanvas();
 });
