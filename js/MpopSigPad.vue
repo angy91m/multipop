@@ -3,6 +3,11 @@
     <canvas ref="canvas"></canvas>
   </div>
 </template>
+<style scoped>
+canvas {
+  border: 1px #bbb solid;
+}
+</style>
 <script setup>
 import {useTemplateRef, onMounted, onBeforeUnmount, defineExpose} from 'vue';
 import SignaturePad from 'signature_pad';
