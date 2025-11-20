@@ -57,12 +57,10 @@ onMounted(()=>{
   const origClear = sigPad.clear;
   sigPad.clear = function(...args) {
     initiated.value = false;
+    sigPad.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
     return origClear.call(this, ...args);
   };
-  sigPad.addEventListener('beginStroke', ()=>{
-    initiated.value=true;
-    console.log('eccolo')
-  });
+  sigPad.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
   addEventListener('resize', resizeCanvas);
   resizeCanvas();
 });

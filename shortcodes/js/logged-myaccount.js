@@ -533,10 +533,7 @@ createApp({
             step: 1
         }),
         isValidSignature = computed(()=>{
-            const sigPad = moduleSigPad.value?.sigPad;
-            if (!sigPad) return;
-            console.log(sigPad.initiated);
-            return sigPad.initiated;
+            console.log(moduleSigPad.value);
         }),
         isValidIdCard = computed(()=> {
             if (!profile.mpop_id_card_expiration) return false;
