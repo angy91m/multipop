@@ -2,9 +2,10 @@
   <canvas ref="canvas"></canvas>
 </template>
 <script setup>
-import {useTemplateRef, onMounted, onBeforeUnmount, defineExpose, defineProps} from 'vue';
+import {useTemplateRef, onMounted, onBeforeUnmount, defineExpose, defineProps, ref} from 'vue';
 import SignaturePad from 'signature_pad';
-const props = defineProps({
+const initiated = ref(false),
+props = defineProps({
   width: {
     type: String,
     default: '600px'
@@ -52,6 +53,12 @@ onMounted(()=>{
   style['border-color'] = props.borderColor;
   style['border-style'] = props.borderStyle;
   sigPad = new SignaturePad(canvasRef.value);
+  const origClear = sigPad.clear;
+  sigPad.clear = function(...args) {
+    initiated.value = false;
+    return origClear.call(this, ...args);
+  };
+  sigPad.addEventListener('beginStroke', ()=>initiated.value=true);
   addEventListener('resize', resizeCanvas);
   resizeCanvas();
 });

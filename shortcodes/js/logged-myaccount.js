@@ -532,6 +532,10 @@ createApp({
             generalPolicyAccept: false,
             step: 1
         }),
+        isValidSignature = computed(()=>{
+            const sigPad = moduleSigPad.value?.sigPad;
+            return sigPad && !sigPad.isEmpty();
+        }),
         isValidIdCard = computed(()=> {
             if (!profile.mpop_id_card_expiration) return false;
             const d = new Date(profile.mpop_id_card_expiration);
@@ -2312,7 +2316,7 @@ createApp({
             paypalOptions,
             subInstructionOpen,
             regInstructionOpen,
-            moduleSigPad
+            isValidSignature
         };
     }
 })
