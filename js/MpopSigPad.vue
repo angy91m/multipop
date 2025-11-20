@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <canvas ref="canvas"></canvas>
-  </div>
+  <canvas ref="canvas"></canvas>
 </template>
 <style scoped>
 canvas {
@@ -23,11 +21,12 @@ function resizeCanvas() {
 }
 defineExpose({
   canvas: canvasRef,
-  sigPad
+  signaturePad: sigPad
 });
 onMounted(()=>{
   sigPad = new SignaturePad(canvasRef.value);
   addEventListener('resize', resizeCanvas);
+  resizeCanvas();
 });
 onBeforeUnmount(()=>{
   removeEventListener('resize', resizeCanvas);
