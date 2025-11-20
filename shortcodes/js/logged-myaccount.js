@@ -2,7 +2,6 @@ import '/wp-content/plugins/multipop/js/vue3-sfc-loader.js';
 import Fuse from '/wp-content/plugins/multipop/js/fuse.js';
 import IntlTelInput from '/wp-content/plugins/multipop/js/vue-tel-input.js';
 import SignaturePad from '/wp-content/plugins/multipop/js/signature_pad.min.js';
-console.log(SignaturePad);
 
 const { createApp, ref, computed, reactive, onUnmounted, onBeforeMount, defineAsyncComponent, nextTick, useTemplateRef } = Vue,
 { loadModule } = window['vue3-sfc-loader'],
@@ -26,7 +25,12 @@ loadVueModule = (...modules) => {
     })));
     return loaded;
 },
-[mpopUploader, mpopPaypalButton, mpopSelect] = loadVueModule('MpopUploader.vue', 'MpopPaypalButton.vue', {path: 'MpopSelect.vue', modules: {fuse: Fuse}}),
+[mpopUploader, mpopPaypalButton, mpopSelect, mpopSigPad] = loadVueModule(
+    'MpopUploader.vue',
+    'MpopPaypalButton.vue',
+    {path: 'MpopSelect.vue', modules: {fuse: Fuse}},
+    {path: 'MpopSigPad.vue', modules: {signature_pad: SignaturePad}}
+),
 mailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/s,
 passwordRegex = {
     rr: [
@@ -239,6 +243,7 @@ createApp({
         'v-intl-phone': IntlTelInput,
         'mpop-uploader': defineAsyncComponent(() => mpopUploader),
         'mpop-pp-btn': defineAsyncComponent(() => mpopPaypalButton),
+        'mpop-sig-pad': defineAsyncComponent(() => mpopSigPad)
     },
     setup() {
         function activeCardForYear(cards = [], year) {

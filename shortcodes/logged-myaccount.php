@@ -31,6 +31,7 @@ if ($this->settings['pp_client_id']) {
 ?>
 <div id="loaded-scripts" style="display:none"></div>
 <div id="app">
+    <mpop-sig-pad></mpop-sig-pad>
     <div style="display:none">
         <v-intl-phone
             ref="intPhoneInstance"
