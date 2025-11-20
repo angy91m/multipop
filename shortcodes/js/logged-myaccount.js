@@ -2184,6 +2184,15 @@ createApp({
                 }
             };
         }
+        function nextStep1() {
+            if (moduleUploadData.withSignature) {
+                moduleUploadData.signature = moduleSigPad.value.sigPad.toDataURL();
+                moduleUploadData.signedModuleFiles.length = 0;
+            } else {
+                moduleUploadData.signature = null;
+            }
+            moduleUploadData.step+= (isValidIdCard.value ? 2 : 1);
+        }
         return {
             selectedTab,
             profile,

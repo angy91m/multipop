@@ -25,6 +25,12 @@ props = defineProps({
   borderStyle: {
     type: String,
     default: 'solid'
+  },
+  fromData: {
+    default: undefined
+  },
+  fromDataURL: {
+    default: undefined
   }
 }),
 canvasRef = useTemplateRef('canvas');
@@ -63,6 +69,14 @@ onMounted(()=>{
   sigPad.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
   addEventListener('resize', resizeCanvas);
   resizeCanvas();
+  if (props.fromData) {
+    sigPad.fromData(props.fromData);
+    initiated.value = false;
+  }
+  if (props.fromDataURL) {
+    sigPad.fromDataURL(props.fromDataURL);
+    initiated.value = false;
+  }
 });
 onBeforeUnmount(()=>{
   removeEventListener('resize', resizeCanvas);
