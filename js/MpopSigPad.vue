@@ -37,7 +37,8 @@ function resizeCanvas() {
   const canvas = canvasRef.value,
   ratio =  Math.max(window.devicePixelRatio || 1, 1);
   const filled = !sigPad.isEmpty();
-  if (filled) const data = sigPad.toData();
+  let data;
+  if (filled) data = sigPad.toData();
   canvas.width = canvas.offsetWidth * ratio;
   canvas.height = canvas.offsetHeight * ratio;
   canvas.getContext("2d").scale(ratio, ratio);
