@@ -532,7 +532,7 @@ createApp({
             generalPolicyAccept: false,
             step: 1
         }),
-        isValidSignature = computed(()=>moduleSigPad.value.initiated),
+        isValidSignature = computed(()=>moduleSigPad.value && moduleSigPad.value.initiated),
         isValidIdCard = computed(()=> {
             if (!profile.mpop_id_card_expiration) return false;
             const d = new Date(profile.mpop_id_card_expiration);
