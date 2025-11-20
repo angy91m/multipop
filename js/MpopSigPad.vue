@@ -4,7 +4,7 @@
   </div>
 </template>
 <script setup>
-import {useTemplateRef, onMounted, beforeUnmount, defineExpose} from 'vue';
+import {useTemplateRef, onMounted, onBeforeUnmount, defineExpose} from 'vue';
 import SignaturePad from 'signature_pad';
 const canvasRef = useTemplateRef('canvas');
 let sigPad;
@@ -24,7 +24,7 @@ onMounted(()=>{
   sigPad = new SignaturePad(canvasRef.value);
   addEventListener('resize', resizeCanvas);
 });
-beforeUnmount(()=>{
+onBeforeUnmount(()=>{
   removeEventListener('resize', resizeCanvas);
 });
 </script>
