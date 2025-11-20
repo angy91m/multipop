@@ -502,11 +502,12 @@ if ($this->settings['pp_client_id']) {
                         :done="moduleUploadData.step > 1"
                     >
                         <div>
-                            <input type="radio" v-model="moduleUploadData.withSignature" :value="true"/>
-                            <input type="radio" v-model="moduleUploadData.withSignature" :value="false"/>
+                            <label><input type="radio" v-model="moduleUploadData.withSignature" :value="true"/>&nbsp;Firmo dal mio dispositivo</label>
+                            <br>
+                            <label><input type="radio" v-model="moduleUploadData.withSignature" :value="false"/>&nbsp;Scarico il modulo PDF e lo ricarico firmato</label>
                         </div>
                         <template v-if="moduleUploadData.withSignature">
-                            <mpop-sig-pad></mpop-sig-pad>
+                            <mpop-sig-pad ref="moduleSigPad"></mpop-sig-pad>
                         </template>
                         <template v-if="moduleUploadData.withSignature === false">
                             <q-btn

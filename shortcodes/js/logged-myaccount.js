@@ -353,6 +353,7 @@ createApp({
         profilePhoneInput = useTemplateRef('profilePhoneInput'),
         userEditPhoneInput = useTemplateRef('userEditPhoneInput'),
         userAddPhoneInput = useTemplateRef('userAddPhoneInput'),
+        moduleSigPad = useTemplateRef('moduleSigPad'),
         userSearchTablePagination = ref({
             sortBy: 'ID',
             descending: false,
