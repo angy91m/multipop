@@ -5,6 +5,7 @@
 import {useTemplateRef, onMounted, onBeforeUnmount, defineExpose, defineProps, ref} from 'vue';
 import SignaturePad from 'signature_pad';
 const initiated = ref(false),
+signaturePad = ref(null),
 props = defineProps({
   width: {
     type: String,
@@ -49,7 +50,7 @@ function resizeCanvas() {
 }
 defineExpose({
   canvas: canvasRef,
-  signaturePad: sigPad,
+  signaturePad,
   initiated
 });
 onMounted(()=>{
@@ -60,6 +61,7 @@ onMounted(()=>{
   style['border-color'] = props.borderColor;
   style['border-style'] = props.borderStyle;
   sigPad = new SignaturePad(canvasRef.value);
+  signaturePad.value = sigPad;
   const origClear = sigPad.clear;
   sigPad.clear = function(...args) {
     initiated.value = false;
