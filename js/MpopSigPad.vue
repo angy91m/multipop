@@ -22,8 +22,8 @@ let sigPad;
 function resizeCanvas() {
   const canvas = canvasRef.value,
   ratio =  Math.max(window.devicePixelRatio || 1, 1);
-  canvas.width = parseInt(props.width) * ratio;
-  canvas.height = parseInt(props.height) * ratio;
+  canvas.width = canvas.offsetWidth * ratio;
+  canvas.height = canvas.offsetHeight * ratio;
   canvas.getContext("2d").scale(ratio, ratio);
   sigPad.clear();
 }
@@ -32,11 +32,14 @@ defineExpose({
   signaturePad: sigPad
 });
 onMounted(()=>{
+  canvasRef.value.style.width = `${props.width}px`;
+  canvasRef.value.style.height = `${props.height}px`;
   sigPad = new SignaturePad(canvasRef.value);
   addEventListener('resize', resizeCanvas);
   resizeCanvas();
 });
 onBeforeUnmount(()=>{
   removeEventListener('resize', resizeCanvas);
+  sigPad.off();
 });
 </script>
