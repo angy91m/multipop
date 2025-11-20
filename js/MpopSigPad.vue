@@ -13,7 +13,7 @@ const canvasRef = useTemplateRef('canvas');
 let sigPad;
 function resizeCanvas() {
   const canvas = canvasRef.value,
-  ratio =  Math.max(devicePixelRatio || 1, 1);
+  ratio =  Math.max(window.devicePixelRatio || 1, 1);
   canvas.width = canvas.offsetWidth * ratio;
   canvas.height = canvas.offsetHeight * ratio;
   canvas.getContext("2d").scale(ratio, ratio);
@@ -25,10 +25,10 @@ defineExpose({
 });
 onMounted(()=>{
   sigPad = new SignaturePad(canvasRef.value);
-  // addEventListener('resize', resizeCanvas);
-  // resizeCanvas();
+  addEventListener('resize', resizeCanvas);
+  resizeCanvas();
 });
 onBeforeUnmount(()=>{
-  // removeEventListener('resize', resizeCanvas);
+  removeEventListener('resize', resizeCanvas);
 });
 </script>
