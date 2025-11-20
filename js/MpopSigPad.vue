@@ -71,11 +71,11 @@ onMounted(()=>{
   resizeCanvas();
   if (props.fromData) {
     sigPad.fromData(props.fromData);
-    initiated.value = false;
+    initiated.value = true;
   }
   if (props.fromDataURL) {
     sigPad.fromDataURL(props.fromDataURL);
-    initiated.value = false;
+    initiated.value = true;
   }
 });
 onBeforeUnmount(()=>{
