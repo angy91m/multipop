@@ -1401,12 +1401,12 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $pdf->Image('@'.$options['signature'], 144.5, 132, 45);
             $pdf->setXY(11.4,134.5);
             ob_start(); ?>
-            <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;">RESIDENZA</span>
+            <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;"><?=isset($bc) ? $bc['nome'] : $country['name'] ?></span>
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
             $pdf->setXY(67.4,134.5);
             ob_start(); ?>
-            <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;">LT</span>
+            <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;"><?=isset($bc) ? $bc['provincia']['sigla'] : '--'?></span>
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
             $pdf->setXY(78,134.5);
