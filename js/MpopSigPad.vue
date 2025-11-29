@@ -62,6 +62,7 @@ function initSigPad() {
   sigPad.addEventListener('beforeUpdateStroke', ()=>sigPad.edits.push(sigPad.toData()));
   sigPad.undo = function() {
     let l = sigPad.edits.length;
+    console.log(l);
     if (l) sigPad.fromData(sigPad.edits.splice(--l,1)[0]);
     if (!l) initiated.value = true;
   };
