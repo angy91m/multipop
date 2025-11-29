@@ -53,22 +53,14 @@ function initSigPad() {
   const origClear = sigPad.clear;
   sigPad.clear = function(...args) {
     initiated.value = false;
-    sigPad.edits.length = 0;
     this.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
     return origClear.call(this, ...args);
   };
   sigPad.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
-  sigPad.edits = [];
-  sigPad.addEventListener('beforeUpdateStroke', ()=>{
-    const data = sigPad.toData();
-    console.log(data);
-    sigPad.edits.push(data);
-  });
   sigPad.undo = function() {
-    let l = sigPad.edits.length;
-    console.log(l);
-    if (l) sigPad.fromData(sigPad.edits.splice(--l,1)[0]);
-    if (!l) initiated.value = true;
+    const edits = this.toData();
+    this.fromData(edits.slice(0,-1));
+    if (!(edits.length-1)) initiated.value = false;
   };
   return sigPad;
 }
