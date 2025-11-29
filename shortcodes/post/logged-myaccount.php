@@ -569,13 +569,20 @@ switch ($post_data['action']) {
         ])->export_file();
         exit;
         break;
-    case 'test_pdf':
-         $sub = $this->get_subscription_by('id', $post_data['id']);
+    case 'preview_pdf':
+        $sub = $this->get_subscription_by('id', $post_data['id']);
         if (!$sub || !isset($sub['user_id']) || $sub['user_id'] !== $current_user->ID || !isset($sub['status']) || $sub['status'] !== 'open') {
             if (!isset( $res_data['error'])) {
                 $res_data['error'] = [];
             }
             $res_data['error'][] = 'id';
+        }
+        $signature = isset($post_data['signature']) ? $this->get_signature($post_data['signature']) : false;
+        if (!$signature) {
+            if (!isset( $res_data['error'])) {
+                $res_data['error'] = [];
+            }
+            $res_data['error'][] = 'signature';
         }
         if (isset($res_data['error']) && !empty($res_data['error'])) {
             if (!isset( $res_data['notices'])) {
@@ -587,7 +594,7 @@ switch ($post_data['action']) {
             exit;
         }
         header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename="modulo.pdf"');
+        header('Content-Disposition: attachment; filename="anteprima-modulo.pdf"');
         echo $this->pdf_compile($this->pdf_create([], false), [
             'name' => $current_user->first_name . ' ' . $current_user->last_name,
             'quote' => $sub['quote'],
@@ -606,7 +613,7 @@ switch ($post_data['action']) {
             'mpop_publish_agree' => $sub['publish_agree'],
             'subscription_id' => $post_data['id'],
             'card_number' => "$current_user->ID",
-            'signature' => base64_decode(explode(',',$post_data['signature'],2)[1],true)
+            'signature' => $signature
         ])->export_file();
         exit;
         break;

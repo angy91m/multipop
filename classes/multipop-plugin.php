@@ -1097,6 +1097,16 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
     }
 
+    private function send_uploaded_module_to_user($sub, $module_pdf_content) {
+        $u = get_user($sub['user_id']);
+        if (!$u) return false;
+        $tmp_file = $this->temp_file($module_pdf_content);
+        if (!$tmp_file) return false;
+        $res = wp_mail($u->user_email,'Multipopolare - Nuovo modulo caricato',"Gentile $u->first_name $u->last_name,<br><br>in allegato troverai il modulo caricato per la richiesta di iscrizione.<br><br>Grazie.", '',$tmp_file);
+        unlink($tmp_file);
+        return $res;
+    }
+
 
     // SEND TOSEE SUBSCRIPTION NOTIFICATIONS
     private function send_tosee_subscription_notifications($year_min = null) {
@@ -1197,6 +1207,14 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $pdf->useTemplate($tpl);
         }
         return $pdf;
+    }
+    private function get_signature($signature) {
+        if (!is_string($signature) || !$signature) return false;
+        $signature = explode(',',$signature,2);
+        if (count($signature) != 2) return false;
+        $signature = base64_decode($signature[1], true);
+        if (!$signature) return false;
+        return $this->check_mime_type($signature, 'image/png') ? $signature : false;
     }
     private function pdf_compile($pdf, $options = []) {
         if (isset($options['name']) && is_string($options['name']) && $options['name']) {
@@ -3216,23 +3234,51 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             }
             $id_card_pdf = null;
             try {
-                $id_card_pdf = $this->merge_pdf_from_array($post_data['idCardFiles']);
+                $id_card_pdf = $this->merge_pdf_from_array($post_data['idCardFiles'])->export_file();
             } catch (Exception $err) {
                 throw new Exception('Invalid idCardFiles');
             }
         }
-        if (!isset($post_data['signedModuleFiles']) || !is_array($post_data['signedModuleFiles']) || empty($post_data['signedModuleFiles']) || count($post_data['signedModuleFiles']) > 2 ) {
-            throw new Exception('Invalid signedModuleFiles');
+        if (
+            (!isset($post_data['signature']) || !is_string($post_data['signature']) || !$post_data['signature'])
+            && (!isset($post_data['signedModuleFiles']) || !is_array($post_data['signedModuleFiles']) || empty($post_data['signedModuleFiles']) || count($post_data['signedModuleFiles']) > 2)
+        ) {
+            throw new Exception('Empty or invalid signature and/or signedModuleFiles');
         }
         $signed_module_pdf = null;
-        try {
-            $signed_module_pdf = $this->merge_pdf_from_array($post_data['signedModuleFiles']);
-        } catch (Exception $err) {
-            throw new Exception('Invalid signedModuleFiles');
+        if (isset($post_data['signature']) && is_string($post_data['signature']) && $post_data['signature']) {
+            $signature = $this->get_signature($post_data['signature']);
+            if (!$signature) throw new Exception('Invalid signature');
+            $signed_module_pdf = $this->pdf_compile($this->pdf_create([], false), [
+                'name' => $current_user->first_name . ' ' . $current_user->last_name,
+                'quote' => $sub['quote'],
+                'mpop_birthplace_country' => $current_user->mpop_birthplace_country,
+                'mpop_birthplace' => $current_user->mpop_birthplace,
+                'mpop_birthdate' => $current_user->mpop_birthdate,
+                'mpop_billing_country' => $current_user->mpop_billing_country,
+                'mpop_billing_city' => $current_user->mpop_billing_city,
+                'mpop_billing_address' => $current_user->mpop_billing_address,
+                'mpop_billing_zip' => $current_user->mpop_billing_zip,
+                'mpop_phone' => $current_user->mpop_phone,
+                'email' => $current_user->email,
+                'subscription_year' => $sub['year'],
+                'mpop_marketing_agree' => $sub['marketing_agree'],
+                'mpop_newsletter_agree' => $sub['newsletter_agree'],
+                'mpop_publish_agree' => $sub['publish_agree'],
+                'subscription_id' => $post_data['id'],
+                'card_number' => "$current_user->ID",
+                'signature' => $signature
+            ])->export_file();
+        } else {
+            try {
+                $signed_module_pdf = $this->merge_pdf_from_array($post_data['signedModuleFiles'])->export_file();
+            } catch (Exception $err) {
+                throw new Exception('Invalid signedModuleFiles');
+            }
         }
         $rand_file_name = $date_now->format('YmdHis');
         if ($require_id_card) {
-            file_put_contents( MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $rand_file_name . '-idcard-' . $post_data['id'] . '-' . $user->ID .'.pdf.enc', $this->encrypt_asym( $id_card_pdf->export_file(), base64_decode($this->settings['master_doc_pubkey'], true)));
+            file_put_contents( MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $rand_file_name . '-idcard-' . $post_data['id'] . '-' . $user->ID .'.pdf.enc', $this->encrypt_asym( $id_card_pdf, base64_decode($this->settings['master_doc_pubkey'], true)));
             wp_update_user([
                 'ID' => $user->ID,
                 'meta_input' => [
@@ -3242,7 +3288,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 ]
             ]);
         }
-        file_put_contents( MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $rand_file_name . '-sub-' . $post_data['id'] . '-' . $user->ID .'.pdf.enc', $this->encrypt_asym( $signed_module_pdf->export_file(), base64_decode($this->settings['master_doc_pubkey'], true)));
+        file_put_contents( MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $rand_file_name . '-sub-' . $post_data['id'] . '-' . $user->ID .'.pdf.enc', $this->encrypt_asym( $signed_module_pdf, base64_decode($this->settings['master_doc_pubkey'], true)));
         global $wpdb;
         if($wpdb->update(
             $wpdb->prefix . 'mpop_subscriptions',
@@ -3256,108 +3302,11 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             ]
         )) {
             $this->send_new_tosee_subscription($sub);
+            $this->send_uploaded_module_to_user($sub, $signed_module_pdf);
             return true;
         };
         return false;
     }
-    // private function test_module_upload(array &$post_data, $user) {
-    //     if (!$this->settings['master_doc_pubkey']) {
-    //         throw new Exception('Server not ready to get subscriptions');
-    //     }
-    //     $sub = $this->get_subscription_by('id', $post_data['id']);
-    //     if (!$sub || !isset($sub['user_id']) || $sub['user_id'] !== $user->ID || !isset($sub['status']) || $sub['status'] !== 'open') {
-    //         throw new Exception('Invalid id');
-    //     }
-    //     $date_now = date_create('now', new DateTimeZone(current_time('e')));
-    //     $require_id_card = !$this->user_has_valid_id_card($user);
-    //     if ($require_id_card) {
-    //         if (!isset($post_data['idCardNumber']) || !is_string($post_data['idCardNumber']) || !preg_match('/^[A-Z0-9]{7,}$/', $post_data['idCardNumber'])) {
-    //             throw new Exception('Invalid idCardNumber');
-    //         }
-    //         if (!empty(get_users([
-    //             'meta_query' => [
-    //                 [
-    //                     'key' => 'mpop_id_card_number',
-    //                     'value' => $post_data['idCardNumber']
-    //                 ],
-    //                 [
-    //                     'key' => 'mpop_id_card_confirmed',
-    //                     'value' => '1',
-    //                     'type' => 'NUMERIC'
-    //                 ]
-    //             ],
-    //             'login__not_in' => [$user->user_login],
-    //             'number' => 1
-    //         ]))) {
-    //             throw new Exception('Duplicated ID card number');
-    //         }
-    //         if (!isset($post_data['idCardType']) || !is_int($post_data['idCardType']) || !isset($this->id_card_types[$post_data['idCardType']])) {
-    //             throw new Exception('Invalid idCardType');
-    //         }
-    //         if (!isset($post_data['idCardExpiration']) || !is_string($post_data['idCardExpiration'])) {
-    //             throw new Exception('Invalid idCardExpiration');
-    //         }
-    //         $ex_date = null;
-    //         try {
-    //             $ex_date = static::validate_date($post_data['idCardExpiration']);
-    //             if ($date_now->getTimestamp() > $ex_date->getTimestamp()) {
-    //                 throw new Exception('Invalid idCardExpiration');
-    //             }
-    //         } catch (Exception $err) {
-    //             throw new Exception('Invalid idCardExpiration');
-    //         }
-    //         if (!isset($post_data['idCardFiles']) || !is_array($post_data['idCardFiles']) || empty($post_data['idCardFiles']) || count($post_data['idCardFiles']) > 2 ) {
-    //             throw new Exception('Invalid idCardFiles');
-    //         }
-    //         $id_card_pdf = null;
-    //         try {
-    //             $id_card_pdf = $this->merge_pdf_from_array($post_data['idCardFiles']);
-    //         } catch (Exception $err) {
-    //             throw new Exception('Invalid idCardFiles');
-    //         }
-    //     }
-    //     if (
-    //         (!isset($post_data['signature']) || !is_string($post_data['signature']) || !$post_data['signature'])
-    //         && (!isset($post_data['signedModuleFiles']) || !is_array($post_data['signedModuleFiles']) || empty($post_data['signedModuleFiles']) || count($post_data['signedModuleFiles']) > 2)
-    //     ) {
-    //         throw new Exception('Empty or invalid signature and/or signedModuleFiles');
-    //     }
-    //     $signed_module_pdf = null;
-    //     try {
-    //         $signed_module_pdf = $this->merge_pdf_from_array($post_data['signedModuleFiles']);
-    //     } catch (Exception $err) {
-    //         throw new Exception('Invalid signedModuleFiles');
-    //     }
-    //     $rand_file_name = $date_now->format('YmdHis');
-    //     if ($require_id_card) {
-    //         file_put_contents( MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $rand_file_name . '-idcard-' . $post_data['id'] . '-' . $user->ID .'.pdf.enc', $this->encrypt_asym( $id_card_pdf->export_file(), base64_decode($this->settings['master_doc_pubkey'], true)));
-    //         wp_update_user([
-    //             'ID' => $user->ID,
-    //             'meta_input' => [
-    //                 'mpop_id_card_type' => $post_data['idCardType'],
-    //                 'mpop_id_card_expiration' => $ex_date->format('Y-m-d'),
-    //                 'mpop_id_card_number' => $post_data['idCardNumber']
-    //             ]
-    //         ]);
-    //     }
-    //     file_put_contents( MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $rand_file_name . '-sub-' . $post_data['id'] . '-' . $user->ID .'.pdf.enc', $this->encrypt_asym( $signed_module_pdf->export_file(), base64_decode($this->settings['master_doc_pubkey'], true)));
-    //     global $wpdb;
-    //     if($wpdb->update(
-    //         $wpdb->prefix . 'mpop_subscriptions',
-    //         [
-    //             'status' => 'tosee',
-    //             'filename' => $rand_file_name,
-    //             'updated_at' => $date_now->getTimestamp()
-    //         ],
-    //         [
-    //             'id' => $post_data['id']
-    //         ]
-    //     )) {
-    //         $this->send_new_tosee_subscription($sub);
-    //         return true;
-    //     };
-    //     return false;
-    // }
     private function create_subscription(
         int $user_id,
         int $year,
@@ -5709,6 +5658,13 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             ]
         ]);
         $res_data['data'] = ['mkRes' => 'ok'];
+    }
+    private function temp_file(string $file_content) {
+        $tmp_name = MULTIPOP_PLUGIN_PATH . '/private/.mail_attachment_' . bin2hex(openssl_random_pseudo_bytes(8));
+        while(file_exists($tmp_name)) {
+            $tmp_name = MULTIPOP_PLUGIN_PATH . '/private/.mail_attachment_' . bin2hex(openssl_random_pseudo_bytes(8));
+        }
+        return file_put_contents($tmp_name, $file_content) ? $tmp_name : false;
     }
 }
 
