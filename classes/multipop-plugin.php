@@ -1409,9 +1409,10 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;">LT</span>
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
-            $pdf->setXY(77.1,134.5);
+            $pdf->setXY(78,134.5);
+            $date_arr = explode('/',current_time('d/m/Y'));
             ob_start(); ?>
-            <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;">LT</span>
+            <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;"><?=$date_arr[0]?>   <?=$date_arr[1]?>   <?=$date_arr[2]?></span>
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
             if (isset($options['mpop_marketing_agree']) && $options['mpop_marketing_agree']) {
