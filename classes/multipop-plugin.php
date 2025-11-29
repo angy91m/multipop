@@ -1100,10 +1100,16 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     private function send_uploaded_module_to_user($sub, $module_pdf_content) {
         $u = get_user_by( 'ID', $sub['user_id'] );
         if (!$u) return false;
-        $tmp_file = $this->temp_file($module_pdf_content);
-        if (!$tmp_file) return false;
-        $res = wp_mail($u->user_email,'Multipopolare - Nuovo modulo caricato',"Gentile $u->first_name $u->last_name,<br><br>in allegato troverai il modulo caricato per la richiesta di iscrizione.<br><br>Grazie.", '',$tmp_file);
-        unlink($tmp_file);
+        $tmp_dir = $this->temp_dir();
+        if (!$tmp_dir) return false;
+        $filename = 'Modulo caricato.pdf';
+        if(!file_put_contents("$tmp_dir/$filename", $module_pdf_content)) {
+            rmdir($tmp_dir);
+            return false;
+        }
+        $res = wp_mail($u->user_email,'Multipopolare - Nuovo modulo caricato',"Gentile $u->first_name $u->last_name,<br><br>in allegato troverai il modulo caricato per la richiesta di iscrizione.<br><br>Grazie.", '',"$tmp_dir/$filename");
+        unlink("$tmp_dir/$filename");
+        rmdir($tmp_dir);
         return $res;
     }
 
@@ -5659,12 +5665,12 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         ]);
         $res_data['data'] = ['mkRes' => 'ok'];
     }
-    private function temp_file(string $file_content) {
-        $tmp_name = MULTIPOP_PLUGIN_PATH . '/private/.mail_attachment_' . bin2hex(openssl_random_pseudo_bytes(8));
+    private function temp_dir() {
+        $tmp_name = MULTIPOP_PLUGIN_PATH . '/private/.mail_attachments_' . bin2hex(openssl_random_pseudo_bytes(8));
         while(file_exists($tmp_name)) {
             $tmp_name = MULTIPOP_PLUGIN_PATH . '/private/.mail_attachment_' . bin2hex(openssl_random_pseudo_bytes(8));
         }
-        return file_put_contents($tmp_name, $file_content) ? $tmp_name : false;
+        return mkdir($tmp_name, 0660) ? $tmp_name : false;
     }
 }
 
