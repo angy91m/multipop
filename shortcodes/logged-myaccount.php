@@ -510,6 +510,8 @@ if ($this->settings['pp_client_id']) {
                             <mpop-sig-pad ref="moduleSigPad" :from-data-url="moduleUploadData.signature"></mpop-sig-pad>
                             <br>
                             <button :disabled="!isValidSignature" @click="moduleSigPadUndo">Annulla</button>&nbsp;&nbsp;<button @click="moduleSigPadClear">Ricomincia</button>
+                            <br>
+                            <button @click="()=>previewModule(moduleUploadData.sub.id)">Anteprima documento</button>
                         </template>
                         <template v-if="moduleUploadData.withSignature === false">
                             <q-btn
@@ -587,7 +589,6 @@ if ($this->settings['pp_client_id']) {
                             <input type="checkbox" v-model="moduleUploadData.generalPolicyAccept"/>
                         </label>
                         <br>
-                        <button @click="()=>testPdf(moduleUploadData.sub.id, moduleUploadData.signature)">Prova</button>
                         <button :disabled="saving" @click="()=>moduleUploadData.step-= (isValidIdCard ? 2 : 1)">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.generalPolicyAccept || saving" @click="moduleUploadDataSend">Invia</button>
                     </q-step>
                 </q-stepper>

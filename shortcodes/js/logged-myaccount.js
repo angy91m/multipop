@@ -1751,7 +1751,7 @@ createApp({
             form.submit();
             document.body.removeChild(form);
         }
-        function testPdf(id, signature) {
+        function previewModule(id) {
             const form = document.createElement('form');
             form.method = 'POST';
             form.target = '_blank';
@@ -1762,9 +1762,9 @@ createApp({
             input.name = 'data';
             input.value = encodeURIComponent(JSON.stringify({
                 'mpop-logged-myaccount-nonce': loggedMyAccountNonce,
-                action: 'test_pdf',
+                action: 'preview_pdf',
                 id,
-                signature
+                signature: moduleSigPad.value.signaturePad.toDataURL()
             }));
             form.appendChild(input);
             document.body.appendChild(form);
@@ -2357,7 +2357,7 @@ createApp({
             moduleSigPadUndo,
             createObjectURL,
             base64ToBlob,
-            testPdf
+            previewModule
         };
     }
 })
