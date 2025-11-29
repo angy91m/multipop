@@ -67,7 +67,7 @@ function initSigPad() {
     let l = this.edits.length;
     if (l) this.fromData(this.edits.splice(--l,1)[0].slice(0,-1));
     console.log(initiated.value);
-    if (!l) initiated.value = false;
+    if (l) nextTick(()=>initiated.value=true);
     console.log(initiated.value);
   };
   return sigPad;
