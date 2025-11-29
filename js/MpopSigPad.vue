@@ -59,7 +59,7 @@ function initSigPad() {
   sigPad.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
   sigPad.undo = function() {
     const edits = this.toData();
-    this.fromData(edits.slice(0,-1));
+    this.fromData(...edits.slice(0,-1));
     if (!(edits.length-1)) initiated.value = false;
   };
   return sigPad;
