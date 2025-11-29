@@ -744,6 +744,7 @@ switch( $post_data['action'] ) {
             exit;
         }
         $res_data['data'] = true;
+        $res_data['notices'] = [['type'=>'success', 'msg'=>'Nota salvata']];
         break;
     case 'admin_confirm_profile_pending_edits':
         if (!isset($post_data['ID']) || !is_int($post_data['ID'])) {
