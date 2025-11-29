@@ -10,3 +10,4 @@ tempmail/list.txt
 test-*.txt
 privatedocs/*
 discourse.ca
+.generate-update/update/*

@@ -1,0 +1,11 @@
+.generate-update
+.gitignore
+.git
+tempmail
+privatedocs
+private
+*.DS_Store
+comuni
+includes
+old-logo-pdf.png
+modulo.pdf
