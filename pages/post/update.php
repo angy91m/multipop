@@ -14,7 +14,7 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-update-nonce'], 'mpop-admin-update'
         $line = trim($line);
         if (!$line) continue;
         if (file_exists(MULTIPOP_PLUGIN_PATH . "/._update/$line" )) {
-          mkdir(dirname(MULTIPOP_PLUGIN_PATH . "/$line"), 0770, true);
+          if (!file_exists(dirname(MULTIPOP_PLUGIN_PATH . "/$line"))) mkdir(dirname(MULTIPOP_PLUGIN_PATH . "/$line"), 0770, true);
           rename(MULTIPOP_PLUGIN_PATH . "/._update/$line", MULTIPOP_PLUGIN_PATH . "/$line");
         }
       }
