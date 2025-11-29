@@ -578,7 +578,7 @@ if ($this->settings['pp_client_id']) {
                         <label>Data di scadenza documento:&nbsp;&nbsp;<input type="date" :min="maxIdCardDate" v-model="moduleUploadData.idCardExpiration"/></label>
                         <br>
                         <br>
-                        <button @click="()=>moduleUploadData.step--">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.idCardFiles.length || mainOptions.idCardTypes === null || !moduleUploadData.idCardNumber || !moduleUploadData.idCardExpiration" @click="()=>moduleUploadData.step++">Avanti</button>
+                        <button @click="()=>moduleUploadData.step--">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.idCardFiles.length || moduleUploadData.idCardType === null || !moduleUploadData.idCardNumber || !moduleUploadData.idCardExpiration" @click="()=>moduleUploadData.step++">Avanti</button>
                     </q-step>
                     <q-step
                         :name="3"
