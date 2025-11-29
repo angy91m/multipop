@@ -509,7 +509,7 @@ if ($this->settings['pp_client_id']) {
                         <template v-if="moduleUploadData.withSignature">
                             <mpop-sig-pad ref="moduleSigPad" :from-data-url="moduleUploadData.signature"></mpop-sig-pad>
                             <br>
-                            <button :disabled="!moduleSigPadInitiated" @click="moduleSigPadUndo">Annulla</button>&nbsp;&nbsp;<button @click="moduleSigPadClear">Ricomincia</button>
+                            <button :disabled="!isValidSignature" @click="moduleSigPadUndo">Annulla</button>&nbsp;&nbsp;<button @click="moduleSigPadClear">Ricomincia</button>
                         </template>
                         <template v-if="moduleUploadData.withSignature === false">
                             <q-btn

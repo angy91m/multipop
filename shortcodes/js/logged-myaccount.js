@@ -532,7 +532,6 @@ createApp({
             generalPolicyAccept: false,
             step: 1
         }),
-        moduleSigPadInitiated = computed(()=>moduleSigPad.value.initiated),
         isValidSignature = computed(()=>moduleSigPad.value && moduleSigPad.value.initiated),
         isValidIdCard = computed(()=> {
             if (!profile.mpop_id_card_expiration) return false;
@@ -2356,7 +2355,6 @@ createApp({
             nextStep1,
             moduleSigPadClear,
             moduleSigPadUndo,
-            moduleSigPadInitiated,
             createObjectURL,
             base64ToBlob,
             testPdf
