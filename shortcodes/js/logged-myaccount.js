@@ -532,6 +532,7 @@ createApp({
             generalPolicyAccept: false,
             step: 1
         }),
+        moduleSigPadInitiated = computed(()=>moduleSigPad.value.initiated),
         isValidSignature = computed(()=>moduleSigPad.value && moduleSigPad.value.initiated),
         isValidIdCard = computed(()=> {
             if (!profile.mpop_id_card_expiration) return false;
@@ -2216,6 +2217,9 @@ createApp({
         function moduleSigPadClear() {
             moduleSigPad.value.signaturePad.clear();
         }
+        function moduleSigPadUndo() {
+            moduleSigPad.value.signaturePad.undo();
+        }
         function createObjectURL(...args) {
             return URL.createObjectURL(...args);
         }
@@ -2351,6 +2355,8 @@ createApp({
             isValidSignature,
             nextStep1,
             moduleSigPadClear,
+            moduleSigPadUndo,
+            moduleSigPadInitiated,
             createObjectURL,
             base64ToBlob,
             testPdf

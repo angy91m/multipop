@@ -48,6 +48,25 @@ function resizeCanvas() {
   sigPad.clear();
   if (filled) sigPad.fromData(data);
 }
+function initSigPad() {
+  sigPad = new SignaturePad(canvasRef.value);
+  const origClear = sigPad.clear;
+  sigPad.clear = function(...args) {
+    initiated.value = false;
+    sigPad.edits = [];
+    sigPad.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
+    return origClear.call(this, ...args);
+  };
+  sigPad.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
+  sigPad.edits = [];
+  sigPad.addEventListener('beforeUpdateStroke', ()=>sigPad.edits.push(sigPad.toData()));
+  sigPad.undo = () => {
+    let l = sigPad.edits.length;
+    if (l) sigPad.fromData(sigPad.edits.splice(--l,1)[0]);
+    if (!l) initiated.value = true;
+  };
+  return sigPad;
+}
 defineExpose({
   canvas: canvasRef,
   signaturePad,
@@ -60,15 +79,7 @@ onMounted(()=>{
   style['border-width'] = props.borderWidth;
   style['border-color'] = props.borderColor;
   style['border-style'] = props.borderStyle;
-  sigPad = new SignaturePad(canvasRef.value);
-  signaturePad.value = sigPad;
-  const origClear = sigPad.clear;
-  sigPad.clear = function(...args) {
-    initiated.value = false;
-    sigPad.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
-    return origClear.call(this, ...args);
-  };
-  sigPad.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
+  signaturePad.value = initSigPad();
   addEventListener('resize', resizeCanvas);
   resizeCanvas();
   if (props.fromData) {
