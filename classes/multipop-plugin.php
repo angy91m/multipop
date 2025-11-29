@@ -1399,6 +1399,21 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         if (isset($options['signature']) && is_string($options['signature']) && $options['signature']) {
             $pdf->Image('@'.$options['signature'], 144.5, 132, 45);
+            $pdf->setXY(11.4,134);
+            ob_start(); ?>
+            <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;">RESIDENZA</span>
+            <?php
+            $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+            $pdf->setXY(66.4,134);
+            ob_start(); ?>
+            <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;">LT</span>
+            <?php
+            $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+            $pdf->setXY(77.1,134);
+            ob_start(); ?>
+            <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;">LT</span>
+            <?php
+            $pdf->writeHTML(ob_get_clean(),true, false, false, false);
             if (isset($options['mpop_marketing_agree']) && $options['mpop_marketing_agree']) {
                 $pdf->Image('@'.$options['signature'], 144.5, 179.4, 45);
             }
