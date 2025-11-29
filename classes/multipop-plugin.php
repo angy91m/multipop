@@ -5684,7 +5684,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         while(file_exists($tmp_name)) {
             $tmp_name = MULTIPOP_PLUGIN_PATH . 'private/.mail_attachments_' . bin2hex(openssl_random_pseudo_bytes(8));
         }
-        return mkdir($tmp_name, 0770) ? $tmp_name : false;
+        return mkdir($tmp_name, 0750) ? $tmp_name : false;
     }
     private function find_files_by_sub($sub) {
         if (!is_array($sub)) $sub = $sub ? $this->get_subscription_by('id', $sub) : $sub;

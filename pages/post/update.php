@@ -8,23 +8,29 @@ if ( !wp_verify_nonce( $_REQUEST['mpop-admin-update-nonce'], 'mpop-admin-update'
   if ($res === TRUE) {
     $zip->extractTo(MULTIPOP_PLUGIN_PATH . '/._update/');
     $zip->close();
-    if (file_exists(MULTIPOP_PLUGIN_PATH . '/._update/.update_list')) {
-      $lines = preg_split("/(\r\n|\n|\r)/",file_get_contents(MULTIPOP_PLUGIN_PATH . '/._update/.update_list'));
+    $ul_path = MULTIPOP_PLUGIN_PATH . '/._update/.update_list';
+    if (file_exists($ul_path)) {
+      $lines = preg_split("/(\r\n|\n|\r)/",file_get_contents($ul_path));
       foreach($lines as $line) {
         $line = trim($line);
         if (!$line) continue;
-        if (file_exists(MULTIPOP_PLUGIN_PATH . "/._update/$line" )) {
-          if (!file_exists(dirname(MULTIPOP_PLUGIN_PATH . "/$line"))) mkdir(dirname(MULTIPOP_PLUGIN_PATH . "/$line"), 0770, true);
-          rename(MULTIPOP_PLUGIN_PATH . "/._update/$line", MULTIPOP_PLUGIN_PATH . "/$line");
+        $ofn = MULTIPOP_PLUGIN_PATH . "/._update/$line";
+        if (file_exists($ofn)) {
+          $nfn = MULTIPOP_PLUGIN_PATH . "/$line";
+          $dir = dirname($nfn);
+          if (!file_exists($dir)) mkdir($dir, 0750, true);
+          rename($ofn, $nfn);
         }
       }
     }
-    if (file_exists(MULTIPOP_PLUGIN_PATH . '/._update/.delete_list')) {
-      $lines = preg_split("/(\r\n|\n|\r)/",file_get_contents(MULTIPOP_PLUGIN_PATH . '/._update/.delete_list'));
+    $dl_path = MULTIPOP_PLUGIN_PATH . '/._update/.delete_list';
+    if (file_exists($dl_path)) {
+      $lines = preg_split("/(\r\n|\n|\r)/",file_get_contents($dl_path));
       foreach($lines as $line) {
         $line = trim($line);
         if (!$line) continue;
-        if (file_exists(MULTIPOP_PLUGIN_PATH . "/$line")) is_dir(MULTIPOP_PLUGIN_PATH . "/$line") ? remove_dir(MULTIPOP_PLUGIN_PATH . "/$line") : unlink(MULTIPOP_PLUGIN_PATH . "/$line");
+        $fn = MULTIPOP_PLUGIN_PATH . "/$line";
+        if (file_exists($fn)) is_dir($fn) ? remove_dir($fn) : unlink($fn);
       }
     }
   }
