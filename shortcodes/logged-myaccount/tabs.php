@@ -19,16 +19,16 @@ defined( 'ABSPATH' ) || exit;
 <div v-if="selectedTab.name == 'users'" id="mpop-user-search">
     <?php require __DIR__ . '/tabs/users.php' ?>
 </div>
-<div v-if="selectedTab.name == 'userAdd'" id="mpop-sub-view">
+<div v-if="selectedTab.name == 'userAdd'">
     <?php require __DIR__ . '/tabs/user-add.php' ?>
 </div>
-<div v-if="selectedTab.name == 'userView'" id="mpop-user-view">
+<div v-if="selectedTab.name == 'userView'">
     <?php require __DIR__ . '/tabs/user-view.php' ?>
 </div>
 <div v-if="selectedTab.name == 'subAdd'">
     <?php require __DIR__ . '/tabs/sub-add.php' ?>
 </div>
-<div v-if="selectedTab.name == 'subView'" id="mpop-sub-view">
+<div v-if="selectedTab.name == 'subView'">
     <?php require __DIR__ . '/tabs/sub-view.php' ?>
 </div>
 <div v-if="selectedTab.name == 'uploadUserCsv'">
