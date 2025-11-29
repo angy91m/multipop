@@ -12,8 +12,8 @@ fi
 rm -rf update
 mkdir -p update
 cd ..
-find .[^.]* * -maxdepth 0 "${EXCLUDE_ARGS[@]}" > "$SCRIPT_DIR/update/.update_list"
-UPDATE_LIST=($(cat "$SCRIPT_DIR/update/.update_list" |xargs))
-zip "$SCRIPT_DIR/update/update.zip" "${UPDATE_LIST[@]}" -x "*.DS_Store"
+find .[^.]* * -type f "${EXCLUDE_ARGS[@]}" > "$SCRIPT_DIR/update/.update_list"
+UPDATE_LIST=($(find .[^.]* * -maxdepth 0 "${EXCLUDE_ARGS[@]}" |xargs))
+zip -r "$SCRIPT_DIR/update/update.zip" "${UPDATE_LIST[@]}" -x "*.DS_Store"
 cd "$SCRIPT_DIR/update"
 zip -u "$SCRIPT_DIR/update/update.zip" ".update_list"
