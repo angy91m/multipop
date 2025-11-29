@@ -1099,16 +1099,18 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
 
     private function send_uploaded_module_to_user($sub, $module_pdf_content) {
         $u = get_user_by( 'ID', $sub['user_id'] );
+        save_test($u);
         if (!$u) return false;
         $tmp_dir = $this->temp_dir();
+        save_test($tmp_dir, 1);
         if (!$tmp_dir) return false;
-        $filename = 'Modulo-caricato.pdf';
+        $filename = 'Modulo caricato.pdf';
         if(!file_put_contents("$tmp_dir/$filename", $module_pdf_content)) {
+            save_test("$tmp_dir/$filename", 2);
             rmdir($tmp_dir);
             return false;
         }
         $res = wp_mail($u->user_email,'Multipopolare - Nuovo modulo caricato',"Gentile $u->first_name $u->last_name,<br><br>in allegato troverai il modulo caricato per la richiesta di iscrizione.<br><br>Grazie.", '',"$tmp_dir/$filename");
-        save_test($res);
         unlink("$tmp_dir/$filename");
         rmdir($tmp_dir);
         return $res;
