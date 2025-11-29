@@ -63,6 +63,7 @@ function initSigPad() {
   sigPad.undo = function() {
     console.log(sigPad.edits);
     let l = this.edits.length;
+    console.log(l);
     if (l) this.fromData(this.edits.splice(--l,1)[0]);
     if (!l) initiated.value = false;
   };
