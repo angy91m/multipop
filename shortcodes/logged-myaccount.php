@@ -511,6 +511,7 @@ if ($this->settings['pp_client_id']) {
                             <br>
                             <button :disabled="!isValidSignature" @click="moduleSigPadUndo">Annulla</button>&nbsp;&nbsp;<button @click="moduleSigPadClear">Ricomincia</button>
                             <br>
+                            <br>
                             <button @click="()=>previewModule(moduleUploadData.sub.id)">Anteprima documento</button>
                         </template>
                         <template v-if="moduleUploadData.withSignature === false">
