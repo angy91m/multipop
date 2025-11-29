@@ -53,7 +53,7 @@ function initSigPad() {
   const origClear = sigPad.clear;
   sigPad.clear = function(...args) {
     initiated.value = false;
-    this.edits = [];
+    sigPad.edits.length = 0;
     this.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
     return origClear.call(this, ...args);
   };
@@ -61,8 +61,8 @@ function initSigPad() {
   sigPad.edits = [];
   sigPad.addEventListener('beforeUpdateStroke', ()=>sigPad.edits.push(sigPad.toData()));
   sigPad.undo = function() {
-    let l = this.edits.length;
-    if (l) this.fromData(this.edits.splice(--l,1)[0]);
+    let l = sigPad.edits.length;
+    if (l) sigPad.fromData(sigPad.edits.splice(--l,1)[0]);
     if (!l) initiated.value = true;
   };
   return sigPad;
