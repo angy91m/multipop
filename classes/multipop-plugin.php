@@ -3087,7 +3087,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         return $res;
     }
-    private function cancel_subscription($sub, $remove_files = false) {
+    private function cancel_subscription($sub, $delete_files = false) {
         if ($sub['year'] == current_time('Y') && $sub['status'] == 'completed') {
             $sub_user = get_user_by('ID', $sub['user_id']);
             if ($sub_user) {
@@ -3107,7 +3107,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             ]
         );
         if ($res) {
-            if ($remove_files) $this->delete_files_by_sub($sub);
+            if ($delete_files) $this->delete_files_by_sub($sub);
             $this->log_data('SUBSCRIPTION CANCELED', ['sub_id' => $sub['id']], $sub['user_id']);
         }
         return $res;

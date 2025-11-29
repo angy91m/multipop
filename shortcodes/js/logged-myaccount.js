@@ -1200,10 +1200,12 @@ createApp({
         }
         async function subCancel() {
             if(confirm('Sei sicura/o di voler annullare la sottoscrizione?')) {
+                const deleteFiles = confirm('Vuoi anche eliminare il modulo relativo alla sottoscrizione?');
                 saving.value = true;
                 const res = await serverReq({
                     action: (profile.role == 'administrator' ? 'admin' : 'resp' ) + '_cancel_subscription',
-                    id: subInView.id
+                    id: subInView.id,
+                    deleteFiles
                 });
                 if (res.ok) {
                     const resData = await res.json();

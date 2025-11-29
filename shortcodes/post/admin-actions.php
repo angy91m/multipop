@@ -692,7 +692,7 @@ switch( $post_data['action'] ) {
         }
         $sub = $this->get_subscription_by('id', $post_data['id']);
         try {
-            if(!$this->cancel_subscription($sub)) {
+            if(!$this->cancel_subscription($sub, $post_data['deleteFiles'] ?? false)) {
                 $res_data['error'] = ['unknown_error'];
                 $res_data['notices'] = [['type'=>'error', 'msg' => 'Errore sconosciuto']];
                 http_response_code( 400 );
