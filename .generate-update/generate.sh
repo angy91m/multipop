@@ -16,4 +16,8 @@ find .[^.]* * -type f "${EXCLUDE_ARGS[@]}" > "$SCRIPT_DIR/update/.update_list"
 UPDATE_LIST=($(find .[^.]* * -maxdepth 0 "${EXCLUDE_ARGS[@]}" |xargs))
 zip -r "$SCRIPT_DIR/update/update.zip" "${UPDATE_LIST[@]}" -x "*.DS_Store"
 cd "$SCRIPT_DIR/update"
-zip -u "$SCRIPT_DIR/update/update.zip" ".update_list"
+zip -u "$SCRIPT_DIR/update/update.zip" .update_list
+if [ -f "../delete" ]; then
+  cp ../delete .delete_list
+  zip -u "$SCRIPT_DIR/update/update.zip" .delete_list
+fi

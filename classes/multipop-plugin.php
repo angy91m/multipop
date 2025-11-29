@@ -368,10 +368,12 @@ class MultipopPlugin {
         // LOG DELETED USERS
         add_action('deleted_user', function ($id) {
             global $wpdb;
-            $wpdb->query("UPDATE " . $this::db_prefix('subscriptions') . " SET `status` = 'canceled' WHERE `user_id` = $id AND `status` IN ('tosee','seen','open');");
-            $ids = $wpdb->get_col("SELECT `id` FROM ". $this::db_prefix('subscriptions') . " WHERE `user_id` = $id AND `status` IN ('canceled', 'refused');");
-            foreach($ids as $sub_id) {
-                $this->delete_files_by_sub($sub_id);
+            $sub_ids = $wpdb->get_col("SELECT `id` FROM ". $this::db_prefix('subscriptions') . " WHERE `user_id` = $id AND `status` IN ('tosee','seen','open');");
+            if (!empty($sub_ids)) {
+                $wpdb->query("UPDATE " . $this::db_prefix('subscriptions') . " SET `status` = 'canceled' WHERE `id` IN (" . implode(',', $sub_ids) . ");");
+                foreach($sub_ids as $sub_id) {
+                    $this->delete_files_by_sub($sub_id);
+                }
             }
             $this->log_data('USER DELETED', null, $id);
         }, 10, 1);
@@ -3085,7 +3087,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         return $res;
     }
-    private function cancel_subscription($sub) {
+    private function cancel_subscription($sub, $remove_files = false) {
         if ($sub['year'] == current_time('Y') && $sub['status'] == 'completed') {
             $sub_user = get_user_by('ID', $sub['user_id']);
             if ($sub_user) {
@@ -3105,7 +3107,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             ]
         );
         if ($res) {
-            $this->delete_files_by_sub($sub);
+            if ($remove_files) $this->delete_files_by_sub($sub);
             $this->log_data('SUBSCRIPTION CANCELED', ['sub_id' => $sub['id']], $sub['user_id']);
         }
         return $res;
