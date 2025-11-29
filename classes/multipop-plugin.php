@@ -1098,7 +1098,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     }
 
     private function send_uploaded_module_to_user($sub, $module_pdf_content) {
-        $u = get_user($sub['user_id']);
+        $u = get_user_by( 'ID', $sub['user_id'] );
         if (!$u) return false;
         $tmp_file = $this->temp_file($module_pdf_content);
         if (!$tmp_file) return false;
