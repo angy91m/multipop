@@ -1398,7 +1398,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
         }
         if (isset($options['signature']) && is_string($options['signature']) && $options['signature']) {
-            $pdf->Image('@'.$options['signature'], 140, 131.5);
+            $pdf->Image('@'.$options['signature'], 140, 131.5, 80);
         }
         if (isset($options['subscription_id']) && $options['subscription_id']) {
             $total_pages = $pdf->getNumPages();
