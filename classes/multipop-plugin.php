@@ -1417,12 +1417,60 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
             if (isset($options['mpop_marketing_agree']) && $options['mpop_marketing_agree']) {
                 $pdf->Image('@'.$options['signature'], 144.5, 179.4, 45);
+                $pdf->setXY(11.4,188.4);
+                ob_start(); ?>
+                <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;"><?=isset($bc) ? $bc['nome'] : $country['name'] ?></span>
+                <?php
+                $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+                $pdf->setXY(67.4,188.4);
+                ob_start(); ?>
+                <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;"><?=isset($bc) ? $bc['provincia']['sigla'] : '--'?></span>
+                <?php
+                $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+                $pdf->setXY(78,188.4);
+                $date_arr = explode('/',current_time('d/m/Y'));
+                ob_start(); ?>
+                <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;"><?=$date_arr[0].$this->nbsp(6).$date_arr[1].$this->nbsp(6).$date_arr[2].$this->nbsp(6)?></span>
+                <?php
+                $pdf->writeHTML(ob_get_clean(),true, false, false, false);
             }
             if (isset($options['mpop_newsletter_agree']) && $options['mpop_newsletter_agree']) {
                 $pdf->Image('@'.$options['signature'], 144.5, 216.2, 45);
+                $pdf->setXY(11.4,224.8);
+                ob_start(); ?>
+                <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;"><?=isset($bc) ? $bc['nome'] : $country['name'] ?></span>
+                <?php
+                $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+                $pdf->setXY(67.4,224.8);
+                ob_start(); ?>
+                <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;"><?=isset($bc) ? $bc['provincia']['sigla'] : '--'?></span>
+                <?php
+                $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+                $pdf->setXY(78,224.8);
+                $date_arr = explode('/',current_time('d/m/Y'));
+                ob_start(); ?>
+                <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;"><?=$date_arr[0].$this->nbsp(6).$date_arr[1].$this->nbsp(6).$date_arr[2].$this->nbsp(6)?></span>
+                <?php
+                $pdf->writeHTML(ob_get_clean(),true, false, false, false);
             }
             if (isset($options['mpop_publish_agree']) && $options['mpop_publish_agree']) {
                 $pdf->Image('@'.$options['signature'], 144.5, 256, 45);
+                $pdf->setXY(11.4,264.6);
+                ob_start(); ?>
+                <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;"><?=isset($bc) ? $bc['nome'] : $country['name'] ?></span>
+                <?php
+                $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+                $pdf->setXY(67.4,264.6);
+                ob_start(); ?>
+                <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;"><?=isset($bc) ? $bc['provincia']['sigla'] : '--'?></span>
+                <?php
+                $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+                $pdf->setXY(78,264.6);
+                $date_arr = explode('/',current_time('d/m/Y'));
+                ob_start(); ?>
+                <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;"><?=$date_arr[0].$this->nbsp(6).$date_arr[1].$this->nbsp(6).$date_arr[2].$this->nbsp(6)?></span>
+                <?php
+                $pdf->writeHTML(ob_get_clean(),true, false, false, false);
             }
         }
         if (isset($options['subscription_id']) && $options['subscription_id']) {
