@@ -57,13 +57,14 @@ function initSigPad() {
     return this.clear();
   };
   sigPad.addEventListener('beginStroke', ()=>{
-    console.log('ciao');
-    initiated.value=true
+    initiated.value = true;
     sigPad.edits.push(sigPad.toData());
   });
   sigPad.undo = function() {
     let l = this.edits.length;
-    if (l) this.fromData(this.edits.splice(--l,1)[0].slice(0,-1));
+    const edit = this.edits.splice(--l,1)[0].slice(0,-1);
+    console.log(edit);
+    if (l) this.fromData(edit);
     console.log(initiated.value);
     if (!l) initiated.value = false;
     console.log(initiated.value);
