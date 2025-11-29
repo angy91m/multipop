@@ -65,7 +65,6 @@ function initSigPad() {
     if (l) this.fromData(this.edits.splice(--l,1)[0]);
     if (!l) initiated.value = true;
   };
-  console.log(sigPad.undo);
   return sigPad;
 }
 defineExpose({

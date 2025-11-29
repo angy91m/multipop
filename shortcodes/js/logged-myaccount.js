@@ -2217,6 +2217,7 @@ createApp({
             moduleSigPad.value.signaturePad.clear();
         }
         function moduleSigPadUndo() {
+            console.log(moduleSigPad.value.signaturePad);
             moduleSigPad.value.signaturePad.undo();
         }
         function createObjectURL(...args) {
