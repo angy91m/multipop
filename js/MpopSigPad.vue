@@ -53,16 +53,16 @@ function initSigPad() {
   const origClear = sigPad.clear;
   sigPad.clear = function(...args) {
     initiated.value = false;
-    sigPad.edits = [];
-    sigPad.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
+    this.edits = [];
+    this.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
     return origClear.call(this, ...args);
   };
   sigPad.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
   sigPad.edits = [];
   sigPad.addEventListener('beforeUpdateStroke', ()=>sigPad.edits.push(sigPad.toData()));
-  sigPad.undo = () => {
-    let l = sigPad.edits.length;
-    if (l) sigPad.fromData(sigPad.edits.splice(--l,1)[0]);
+  sigPad.undo = function() {
+    let l = this.edits.length;
+    if (l) this.fromData(this.edits.splice(--l,1)[0]);
     if (!l) initiated.value = true;
   };
   return sigPad;
