@@ -1201,8 +1201,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
     private function pdf_compile($pdf, $options = []) {
         if (isset($options['name']) && is_string($options['name']) && $options['name']) {
             $pdf->setPage(1);
-            $pdf->setY(44);
-            $pdf->setX(70);
+            $pdf->setXY(70,44);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=mb_strtoupper( $options['name'], 'UTF-8' )?></span>
             <?php
@@ -1214,14 +1213,12 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                     $bp = $this->get_comune_by_catasto($options['mpop_birthplace'], true);
                     if ($bp) {
                         $pdf->setPage(1);
-                        $pdf->setY(49.5);
-                        $pdf->setX(32.5);
+                        $pdf->setXY(32.5,49.5);
                         ob_start(); ?>
                         <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$bp['nome']?></span>
                         <?php
                         $pdf->writeHTML(ob_get_clean(),true, false, false, false);
-                        $pdf->setY(49.5);
-                        $pdf->setX(154.7);
+                        $pdf->setXY(154.7,49.5);
                         ob_start(); ?>
                         <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$bp['provincia']['sigla']?></span>
                         <?php
@@ -1232,14 +1229,12 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 $country = $this->get_country_by_code($options['mpop_birthplace_country']);
                 if ($country) {
                     $pdf->setPage(1);
-                    $pdf->setY(49.5);
-                    $pdf->setX(32.5);
+                    $pdf->setXY(32.5,49.5);
                     ob_start(); ?>
                     <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$country['name']?></span>
                     <?php
                     $pdf->writeHTML(ob_get_clean(),true, false, false, false);
-                    $pdf->setY(49.5);
-                    $pdf->setX(155.2);
+                    $pdf->setXY(155.2,49.5);
                     ob_start(); ?>
                     <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">&nbsp;-</span>
                     <?php
@@ -1250,20 +1245,17 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if (isset($options['mpop_birthdate']) && is_string($options['mpop_birthdate']) && $options['mpop_birthdate']) {
             $date_arr = explode('-', $options['mpop_birthdate']);
             $pdf->setPage(1);
-            $pdf->setY(54.7);
-            $pdf->setX(35.8);
+            $pdf->setXY(35.8,54.7);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$date_arr[2]?></span>
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
-            $pdf->setY(54.7);
-            $pdf->setX(47);
+            $pdf->setXY(47,54.7);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$date_arr[1]?></span>
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
-            $pdf->setY(54.7);
-            $pdf->setX(60);
+            $pdf->setXY(60,54.7);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$date_arr[0]?></span>
             <?php
@@ -1275,14 +1267,12 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                     $bc = $this->get_comune_by_catasto($options['mpop_billing_city'], true);
                     if ($bc) {
                         $pdf->setPage(1);
-                        $pdf->setY(60.2);
-                        $pdf->setX(37);
+                        $pdf->setXY(37,60.2);
                         ob_start(); ?>
                         <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$bc['nome']?></span>
                         <?php
                         $pdf->writeHTML(ob_get_clean(),true, false, false, false);
-                        $pdf->setY(60.2);
-                        $pdf->setX(154.7);
+                        $pdf->setXY(154.7,60.2);
                         ob_start(); ?>
                         <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$bc['provincia']['sigla']?></span>
                         <?php
@@ -1291,8 +1281,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 }
                 if (isset($options['mpop_billing_zip']) && is_string($options['mpop_billing_zip'])) {
                     $pdf->setPage(1);
-                    $pdf->setY(70.6);
-                    $pdf->setX(20);
+                    $pdf->setXY(20,70.6);
                     ob_start(); ?>
                     <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['mpop_billing_zip']?></span>
                     <?php
@@ -1302,20 +1291,17 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
                 $country = $this->get_country_by_code($options['mpop_birthplace_country']);
                 if ($country) {
                     $pdf->setPage(1);
-                    $pdf->setY(60.2);
-                    $pdf->setX(37);
+                    $pdf->setXY(37,60.2);
                     ob_start(); ?>
                     <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$country['name']?></span>
                     <?php
                     $pdf->writeHTML(ob_get_clean(),true, false, false, false);
-                    $pdf->setY(60.2);
-                    $pdf->setX(155.2);
+                    $pdf->setXY(155.2,60.2);
                     ob_start(); ?>
                     <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">&nbsp;-</span>
                     <?php
                     $pdf->writeHTML(ob_get_clean(),true, false, false, false);
-                    $pdf->setY(70.6);
-                    $pdf->setX(20);
+                    $pdf->setXY(20,70.6);
                     ob_start(); ?>
                     <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">&nbsp;&nbsp;-</span>
                     <?php
@@ -1325,8 +1311,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         if (isset($options['mpop_billing_address']) && is_string($options['mpop_billing_address'])) {
             $pdf->setPage(1);
-            $pdf->setY(65.4);
-            $pdf->setX(27);
+            $pdf->setXY(27,65.4);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 11pt; line-height: 15px;"><?=implode(', ',array_map( 'trim',preg_split("/\r\n|\r|\n/",$options['mpop_billing_address'])))?></span>
             <?php
@@ -1334,8 +1319,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         if (isset($options['mpop_phone']) && is_string($options['mpop_phone'])) {
             $pdf->setPage(1);
-            $pdf->setY(75.8);
-            $pdf->setX(27.5);
+            $pdf->setXY(27.5,75.8);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['mpop_phone']?></span>
             <?php
@@ -1343,8 +1327,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         if (isset($options['email']) && is_string($options['email'])) {
             $pdf->setPage(1);
-            $pdf->setY(81.3);
-            $pdf->setX(22);
+            $pdf->setXY(22,81.3);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['email']?></span>
             <?php
@@ -1392,8 +1375,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if (isset($options['quote']) && (is_int($options['quote']) || is_float($options['quote'])) && $options['quote'] > 0) {
             $options['quote'] = number_format($options['quote'],2, ',','');
             $pdf->setPage(1);
-            $pdf->setY(102);
-            $pdf->setX(40);
+            $pdf->setXY(40,102);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;">€&nbsp;<?=$options['quote']?></span>
             <?php
@@ -1401,8 +1383,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         if (isset($options['card_number']) && is_string($options['card_number']) && $options['card_number']) {
             $pdf->setPage(1);
-            $pdf->setY(102);
-            $pdf->setX(99);
+            $pdf->setXY(99,102);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['card_number']?></span>
             <?php
@@ -1410,12 +1391,14 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         if (isset($options['subscription_year']) && $options['subscription_year']) {
             $pdf->setPage(1);
-            $pdf->setY(102);
-            $pdf->setX(174);
+            $pdf->setXY(174,102);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 12pt; line-height: 15px;"><?=$options['subscription_year']?></span>
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
+        }
+        if (isset($options['signature']) && is_string($options['signature']) && $options['signature']) {
+            $pdf->Image('@'.$options['signature'], 140, 131.5);
         }
         if (isset($options['subscription_id']) && $options['subscription_id']) {
             $total_pages = $pdf->getNumPages();
@@ -3204,6 +3187,104 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         };
         return false;
     }
+    // private function test_module_upload(array &$post_data, $user) {
+    //     if (!$this->settings['master_doc_pubkey']) {
+    //         throw new Exception('Server not ready to get subscriptions');
+    //     }
+    //     $sub = $this->get_subscription_by('id', $post_data['id']);
+    //     if (!$sub || !isset($sub['user_id']) || $sub['user_id'] !== $user->ID || !isset($sub['status']) || $sub['status'] !== 'open') {
+    //         throw new Exception('Invalid id');
+    //     }
+    //     $date_now = date_create('now', new DateTimeZone(current_time('e')));
+    //     $require_id_card = !$this->user_has_valid_id_card($user);
+    //     if ($require_id_card) {
+    //         if (!isset($post_data['idCardNumber']) || !is_string($post_data['idCardNumber']) || !preg_match('/^[A-Z0-9]{7,}$/', $post_data['idCardNumber'])) {
+    //             throw new Exception('Invalid idCardNumber');
+    //         }
+    //         if (!empty(get_users([
+    //             'meta_query' => [
+    //                 [
+    //                     'key' => 'mpop_id_card_number',
+    //                     'value' => $post_data['idCardNumber']
+    //                 ],
+    //                 [
+    //                     'key' => 'mpop_id_card_confirmed',
+    //                     'value' => '1',
+    //                     'type' => 'NUMERIC'
+    //                 ]
+    //             ],
+    //             'login__not_in' => [$user->user_login],
+    //             'number' => 1
+    //         ]))) {
+    //             throw new Exception('Duplicated ID card number');
+    //         }
+    //         if (!isset($post_data['idCardType']) || !is_int($post_data['idCardType']) || !isset($this->id_card_types[$post_data['idCardType']])) {
+    //             throw new Exception('Invalid idCardType');
+    //         }
+    //         if (!isset($post_data['idCardExpiration']) || !is_string($post_data['idCardExpiration'])) {
+    //             throw new Exception('Invalid idCardExpiration');
+    //         }
+    //         $ex_date = null;
+    //         try {
+    //             $ex_date = static::validate_date($post_data['idCardExpiration']);
+    //             if ($date_now->getTimestamp() > $ex_date->getTimestamp()) {
+    //                 throw new Exception('Invalid idCardExpiration');
+    //             }
+    //         } catch (Exception $err) {
+    //             throw new Exception('Invalid idCardExpiration');
+    //         }
+    //         if (!isset($post_data['idCardFiles']) || !is_array($post_data['idCardFiles']) || empty($post_data['idCardFiles']) || count($post_data['idCardFiles']) > 2 ) {
+    //             throw new Exception('Invalid idCardFiles');
+    //         }
+    //         $id_card_pdf = null;
+    //         try {
+    //             $id_card_pdf = $this->merge_pdf_from_array($post_data['idCardFiles']);
+    //         } catch (Exception $err) {
+    //             throw new Exception('Invalid idCardFiles');
+    //         }
+    //     }
+    //     if (
+    //         (!isset($post_data['signature']) || !is_string($post_data['signature']) || !$post_data['signature'])
+    //         && (!isset($post_data['signedModuleFiles']) || !is_array($post_data['signedModuleFiles']) || empty($post_data['signedModuleFiles']) || count($post_data['signedModuleFiles']) > 2)
+    //     ) {
+    //         throw new Exception('Empty or invalid signature and/or signedModuleFiles');
+    //     }
+    //     $signed_module_pdf = null;
+    //     try {
+    //         $signed_module_pdf = $this->merge_pdf_from_array($post_data['signedModuleFiles']);
+    //     } catch (Exception $err) {
+    //         throw new Exception('Invalid signedModuleFiles');
+    //     }
+    //     $rand_file_name = $date_now->format('YmdHis');
+    //     if ($require_id_card) {
+    //         file_put_contents( MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $rand_file_name . '-idcard-' . $post_data['id'] . '-' . $user->ID .'.pdf.enc', $this->encrypt_asym( $id_card_pdf->export_file(), base64_decode($this->settings['master_doc_pubkey'], true)));
+    //         wp_update_user([
+    //             'ID' => $user->ID,
+    //             'meta_input' => [
+    //                 'mpop_id_card_type' => $post_data['idCardType'],
+    //                 'mpop_id_card_expiration' => $ex_date->format('Y-m-d'),
+    //                 'mpop_id_card_number' => $post_data['idCardNumber']
+    //             ]
+    //         ]);
+    //     }
+    //     file_put_contents( MULTIPOP_PLUGIN_PATH . '/privatedocs/' . $rand_file_name . '-sub-' . $post_data['id'] . '-' . $user->ID .'.pdf.enc', $this->encrypt_asym( $signed_module_pdf->export_file(), base64_decode($this->settings['master_doc_pubkey'], true)));
+    //     global $wpdb;
+    //     if($wpdb->update(
+    //         $wpdb->prefix . 'mpop_subscriptions',
+    //         [
+    //             'status' => 'tosee',
+    //             'filename' => $rand_file_name,
+    //             'updated_at' => $date_now->getTimestamp()
+    //         ],
+    //         [
+    //             'id' => $post_data['id']
+    //         ]
+    //     )) {
+    //         $this->send_new_tosee_subscription($sub);
+    //         return true;
+    //     };
+    //     return false;
+    // }
     private function create_subscription(
         int $user_id,
         int $year,

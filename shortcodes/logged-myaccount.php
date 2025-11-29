@@ -587,6 +587,7 @@ if ($this->settings['pp_client_id']) {
                             <input type="checkbox" v-model="moduleUploadData.generalPolicyAccept"/>
                         </label>
                         <br>
+                        <button @click="()=>testPdf(moduleUploadData.sub.id, moduleUploadData.signature)">Prova</button>
                         <button :disabled="saving" @click="()=>moduleUploadData.step-= (isValidIdCard ? 2 : 1)">Indietro</button>&nbsp;&nbsp;<button :disabled="!moduleUploadData.generalPolicyAccept || saving" @click="moduleUploadDataSend">Invia</button>
                     </q-step>
                 </q-stepper>

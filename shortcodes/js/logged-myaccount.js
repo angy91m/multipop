@@ -1751,6 +1751,26 @@ createApp({
             form.submit();
             document.body.removeChild(form);
         }
+        function testPdf(id, signature) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.target = '_blank';
+            form.action = location.origin + location.pathname;
+            form.style.display = 'none';
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'data';
+            input.value = encodeURIComponent(JSON.stringify({
+                'mpop-logged-myaccount-nonce': loggedMyAccountNonce,
+                action: 'test_pdf',
+                id,
+                signature
+            }));
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
         async function searchUsers(options) {
             const newPagination = options ? options.pagination : userSearchTablePagination.value;
             try {
@@ -2332,7 +2352,8 @@ createApp({
             nextStep1,
             moduleSigPadClear,
             createObjectURL,
-            base64ToBlob
+            base64ToBlob,
+            testPdf
         };
     }
 })
