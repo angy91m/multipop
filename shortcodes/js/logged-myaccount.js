@@ -2214,7 +2214,7 @@ createApp({
             moduleUploadData.step+= (isValidIdCard.value ? 2 : 1);
         }
         function moduleSigPadClear() {
-            moduleSigPad.value.signaturePad.clear();
+            moduleSigPad.value.signaturePad.clearAll();
         }
         function moduleSigPadUndo() {
             moduleSigPad.value.signaturePad.undo();

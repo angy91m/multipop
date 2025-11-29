@@ -51,12 +51,11 @@ function resizeCanvas() {
 function initSigPad() {
   sigPad = new SignaturePad(canvasRef.value);
   sigPad.edits = [];
-  const origClear = sigPad.clear;
-  sigPad.clear = function(...args) {
+  sigPad.clearAll = function() {
     initiated.value = false;
     this.edits.length = 0
     this.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
-    return origClear.call(this, ...args);
+    return this.clear();
   };
   sigPad.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
   sigPad.addEventListener('beginStroke', ()=>{
@@ -67,7 +66,7 @@ function initSigPad() {
     let l = this.edits.length;
     if (l) this.fromData(this.edits.splice(--l,1)[0].slice(0,-1));
     console.log(initiated.value);
-    if (l) nextTick(()=>initiated.value=true);
+    if (!l) initiated.value = false;
     console.log(initiated.value);
   };
   return sigPad;
