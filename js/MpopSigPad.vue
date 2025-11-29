@@ -62,6 +62,7 @@ function initSigPad() {
     console.log('fatto');
   });
   sigPad.undo = function() {
+    this.clear();
     let l = this.edits.length;
     const edit = this.edits.splice(--l,1)[0];
     console.log(edit);
