@@ -61,10 +61,10 @@ function initSigPad() {
   sigPad.addEventListener('beginStroke', ()=>initiated.value=true, {once: true});
   sigPad.addEventListener('beginStroke', ()=>sigPad.edits.push(sigPad.toData()));
   sigPad.undo = function() {
-    console.log(sigPad.edits);
     let l = this.edits.length;
-    console.log(l);
-    if (l) this.fromData(this.edits.splice(--l,1)[0]);
+    const edit = this.edits.splice(--l,1)[0];
+    if (l) this.fromData(edit);
+    console.log(initiated.value);
     if (!l) initiated.value = false;
   };
   return sigPad;
