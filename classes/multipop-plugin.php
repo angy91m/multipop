@@ -1104,7 +1104,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         if (!$tmp_dir) return false;
         $filename = 'Modulo caricato.pdf';
         if(file_put_contents("$tmp_dir/$filename", $module_pdf_content) === false) {
-            save_test("$tmp_dir/$filename");
             rmdir($tmp_dir);
             return false;
         }
@@ -5671,7 +5670,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         while(file_exists($tmp_name)) {
             $tmp_name = MULTIPOP_PLUGIN_PATH . 'private/.mail_attachments_' . bin2hex(openssl_random_pseudo_bytes(8));
         }
-        return mkdir($tmp_name, 0660) ? $tmp_name : false;
+        return mkdir($tmp_name, 0770) ? $tmp_name : false;
     }
 }
 
