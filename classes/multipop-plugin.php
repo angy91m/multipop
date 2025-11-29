@@ -369,6 +369,10 @@ class MultipopPlugin {
         add_action('deleted_user', function ($id) {
             global $wpdb;
             $wpdb->query("UPDATE " . $this::db_prefix('subscriptions') . " SET `status` = 'canceled' WHERE `user_id` = $id AND `status` IN ('tosee','seen','open');");
+            $ids = $wpdb->get_col("SELECT `id` FROM ". $this::db_prefix('subscriptions') . " WHERE `user_id` = $id AND `status` IN ('canceled', 'refused');");
+            foreach($ids as $sub_id) {
+                $this->delete_files_by_sub($sub_id);
+            }
             $this->log_data('USER DELETED', null, $id);
         }, 10, 1);
         require_once('events.php');
@@ -1718,7 +1722,13 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         foreach ($users_to_disable as $u) {
             $this->disable_user_card($u);
         }
-        $wpdb->query("UPDATE " . $this::db_prefix('subscriptions') . " SET `status` = 'canceled' WHERE `year` < $this_year AND `status` IN ('tosee','seen','open');");
+        $sub_ids = $wpdb->get_col("SELECT `id` FROM " . $this::db_prefix('subscriptions') . " WHERE `year` < $this_year AND `status` IN ('tosee','seen','open');");
+        if (!empty($sub_ids)) {
+            $wpdb->query("UPDATE " . $this::db_prefix('subscriptions') . " SET `status` = 'canceled' WHERE `id` IN (" . implode(',', $sub_ids) . ");");
+            foreach($sub_ids as $sub_id) {
+                $this->delete_files_by_sub($sub_id);
+            }
+        }
 
         // SET NEW YEAR
         $wpdb->query("UPDATE " . $this::db_prefix('plugin_settings') . " SET `last_year_checked` = $this_year WHERE `id` = 1 ;");
@@ -3095,6 +3105,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             ]
         );
         if ($res) {
+            $this->delete_files_by_sub($sub);
             $this->log_data('SUBSCRIPTION CANCELED', ['sub_id' => $sub['id']], $sub['user_id']);
         }
         return $res;
@@ -3107,7 +3118,6 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             delete_user_meta($sub_user->ID, 'mpop_id_card_type');
             delete_user_meta($sub_user->ID, 'mpop_id_card_confirmed');
         }
-        unlink($this->get_filename_by_sub($sub, true, false));
         $date_now = date_create('now', new DateTimeZone(current_time('e')));
         global $wpdb;
         $res = $wpdb->update(
@@ -3121,7 +3131,8 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             ]
         );
         if ($res) {
-            $this->log_data('SUBSCRIPTION REFUSED', ['sub_id' => $sub['id']], $sub['user_id']);
+            $this->delete_files_by_sub($sub);
+            $this->log_data('SUBSCRIPTION ' . ($cancel ? 'CANCELED' : 'REFUSED'), ['sub_id' => $sub['id']], $sub['user_id']);
         }
         return $res;
     }
@@ -3309,6 +3320,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         )) {
             $this->send_new_tosee_subscription($sub);
             $this->send_uploaded_module_to_user($sub, $signed_module_pdf);
+            $this->log_data('SUBSCRIPTION MODULE UPLOADED', ['sub_id' => $post_data['id']], $sub['user_id']);
             return true;
         };
         return false;
@@ -5671,6 +5683,26 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $tmp_name = MULTIPOP_PLUGIN_PATH . 'private/.mail_attachments_' . bin2hex(openssl_random_pseudo_bytes(8));
         }
         return mkdir($tmp_name, 0770) ? $tmp_name : false;
+    }
+    private function find_files_by_sub($sub) {
+        if (!is_array($sub)) $sub = $sub ? $this->get_subscription_by('id', $sub) : $sub;
+        if (!$sub) return false;
+        $files = [];
+        foreach([0,1] as $id_card) {
+            foreach([0,1] as $enc) {
+                $res = $this->get_filename_by_sub($sub, $id_card, $enc);
+                if (file_exists($res)) $files[] = $res;
+            }
+        }
+        return $files;
+    }
+    private function delete_files_by_sub($sub) {
+        $files = $this->find_files_by_sub($sub);
+        if (!$files) return false;
+        foreach($files as $f) {
+            unlink($f);
+        }
+        return true;
     }
 }
 
