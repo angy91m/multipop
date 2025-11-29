@@ -63,6 +63,7 @@ function initSigPad() {
   });
   sigPad.undo = function() {
     this.clear();
+    let l = this.edits.length;
     if (l) this.fromDataURL(this.edits.splice(--l,1)[0]);
     if (!l) initiated.value = false;
   };
