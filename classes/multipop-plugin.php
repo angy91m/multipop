@@ -1399,6 +1399,15 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
         }
         if (isset($options['signature']) && is_string($options['signature']) && $options['signature']) {
             $pdf->Image('@'.$options['signature'], 144.5, 132, 45);
+            if (isset($options['mpop_marketing_agree']) && $options['mpop_marketing_agree']) {
+                $pdf->Image('@'.$options['signature'], 144.5, 178.4, 45);
+            }
+            if (isset($options['mpop_newsletter_agree']) && $options['mpop_newsletter_agree']) {
+                $pdf->Image('@'.$options['signature'], 144.5, 215.2, 45);
+            }
+            if (isset($options['mpop_publish_agree']) && $options['mpop_publish_agree']) {
+                $pdf->Image('@'.$options['signature'], 144.5, 255, 45);
+            }
         }
         if (isset($options['subscription_id']) && $options['subscription_id']) {
             $total_pages = $pdf->getNumPages();
