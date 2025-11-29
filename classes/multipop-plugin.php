@@ -1412,7 +1412,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $pdf->setXY(78,134.5);
             $date_arr = explode('/',current_time('d/m/Y'));
             ob_start(); ?>
-            <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;"><?=$date_arr[0]?>         <?=$date_arr[1]?>         <?=$date_arr[2]?></span>
+            <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;"><?=$date_arr[0].$this->nbsp(6).$date_arr[1].$this->nbsp(6).$date_arr[2].$this->nbsp(6)?></span>
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
             if (isset($options['mpop_marketing_agree']) && $options['mpop_marketing_agree']) {
