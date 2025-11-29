@@ -57,6 +57,7 @@ function initSigPad() {
     return this.clear();
   };
   sigPad.addEventListener('beginStroke', ()=>{
+    console.log('ciao');
     initiated.value=true
     sigPad.edits.push(sigPad.toData());
   });
