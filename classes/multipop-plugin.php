@@ -3256,23 +3256,23 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             $signature = $this->get_signature($post_data['signature']);
             if (!$signature) throw new Exception('Invalid signature');
             $signed_module_pdf = $this->pdf_compile($this->pdf_create([], false), [
-                'name' => $current_user->first_name . ' ' . $current_user->last_name,
+                'name' => $user->first_name . ' ' . $user->last_name,
                 'quote' => $sub['quote'],
-                'mpop_birthplace_country' => $current_user->mpop_birthplace_country,
-                'mpop_birthplace' => $current_user->mpop_birthplace,
-                'mpop_birthdate' => $current_user->mpop_birthdate,
-                'mpop_billing_country' => $current_user->mpop_billing_country,
-                'mpop_billing_city' => $current_user->mpop_billing_city,
-                'mpop_billing_address' => $current_user->mpop_billing_address,
-                'mpop_billing_zip' => $current_user->mpop_billing_zip,
-                'mpop_phone' => $current_user->mpop_phone,
-                'email' => $current_user->email,
+                'mpop_birthplace_country' => $user->mpop_birthplace_country,
+                'mpop_birthplace' => $user->mpop_birthplace,
+                'mpop_birthdate' => $user->mpop_birthdate,
+                'mpop_billing_country' => $user->mpop_billing_country,
+                'mpop_billing_city' => $user->mpop_billing_city,
+                'mpop_billing_address' => $user->mpop_billing_address,
+                'mpop_billing_zip' => $user->mpop_billing_zip,
+                'mpop_phone' => $user->mpop_phone,
+                'email' => $user->email,
                 'subscription_year' => $sub['year'],
                 'mpop_marketing_agree' => $sub['marketing_agree'],
                 'mpop_newsletter_agree' => $sub['newsletter_agree'],
                 'mpop_publish_agree' => $sub['publish_agree'],
                 'subscription_id' => $post_data['id'],
-                'card_number' => "$current_user->ID",
+                'card_number' => "$user->ID",
                 'signature' => $signature
             ])->export_file();
         } else {
