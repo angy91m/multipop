@@ -523,15 +523,15 @@ if ($this->settings['pp_client_id']) {
                                 <div v-for="(f, k) in moduleUploadData.signedModuleFiles" :key="k">
                                     - {{f.name}}&nbsp;&nbsp;<button @click="() => moduleUploadData.signedModuleFiles.splice(k, 1)">Rimuovi</button>
                                     <br>
-                                    <iframe v-if="f.type == 'application/pdf'" :src="createObjectURL(base64ToBlob(f.content,f.type))" height="500" style="width:100%; max-height:500px;"></iframe>
-                                    <image v-if="f.type != 'application/pdf'" :src="createObjectURL(base64ToBlob(f.content,f.type))" style="max-height:250px;" />
+                                    <iframe v-if="f.type == 'application/pdf'" :src="f.url" height="500" style="width:100%; max-height:500px;"></iframe>
+                                    <image v-if="f.type != 'application/pdf'" :src="f.url" style="max-height:250px;" />
                                 </div>
                             </template>
                             <div v-if="!moduleUploadData.signedModuleFiles.length">Nessun file selezionato</div>
                             <mpop-uploader 
                                 v-model="moduleUploadData.signedModuleFiles"
                                 :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']"
-                                :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type }; return f;}"
+                                :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type, url: createObjectURL(base64ToBlob(v.content,v.meta.type)) }; return f;}"
                                 @invalid-mime="onInvalidMime"
                                 :disabled="moduleUploadData.signedModuleFiles.length == 2"
                             >Seleziona file da caricare</mpop-uploader>
@@ -549,15 +549,15 @@ if ($this->settings['pp_client_id']) {
                             <div v-for="(f, k) in moduleUploadData.idCardFiles" :key="k">
                                 - {{f.name}}&nbsp;&nbsp;<button @click="() => moduleUploadData.idCardFiles.splice(k, 1)">Rimuovi</button>
                                 <br>
-                                <iframe v-if="f.type == 'application/pdf'" :src="createObjectURL(base64ToBlob(f.content,f.type))" height="500" style="width:100%; max-height:500px;"></iframe>
-                                <image v-if="f.type != 'application/pdf'" :src="createObjectURL(base64ToBlob(f.content,f.type))" style="max-height:250px;" />
+                                <iframe v-if="f.type == 'application/pdf'" :src="f.url" height="500" style="width:100%; max-height:500px;"></iframe>
+                                <image v-if="f.type != 'application/pdf'" :src="f.url" style="max-height:250px;" />
                             </div>
                         </template>
                         <div v-if="!moduleUploadData.idCardFiles.length">Nessun file selezionato</div>
                         <mpop-uploader 
                             v-model="moduleUploadData.idCardFiles"
                             :accepted-mime="['application/pdf', 'image/jpeg', 'image/png']"
-                            :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type }; return f;}"
+                            :formatter="v => {const f = {content: v.content, name: v.meta.name, type: v.meta.type, url: createObjectURL(base64ToBlob(v.content,v.meta.type)) }; return f;}"
                             @invalid-mime="onInvalidMime"
                             :disabled="moduleUploadData.idCardFiles.length == 2"
                         >Seleziona file da caricare</mpop-uploader>

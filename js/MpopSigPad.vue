@@ -59,7 +59,6 @@ function initSigPad() {
   sigPad.addEventListener('beginStroke', ()=>{
     initiated.value = true;
     sigPad.edits.push(sigPad.toDataURL());
-    console.log('fatto');
   });
   sigPad.undo = function() {
     this.clear();
