@@ -1404,7 +1404,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;">RESIDENZA</span>
             <?php
             $pdf->writeHTML(ob_get_clean(),true, false, false, false);
-            $pdf->setXY(65.4,134);
+            $pdf->setXY(67.4,134);
             ob_start(); ?>
             <span style="font-family: 'helveticamedium'; font-size: 10pt; line-height: 15px;">LT</span>
             <?php
