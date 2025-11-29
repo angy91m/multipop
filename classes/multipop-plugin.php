@@ -1108,6 +1108,7 @@ Il trattamento per attività di informazione dell’associazione avverrà con mo
             return false;
         }
         $res = wp_mail($u->user_email,'Multipopolare - Nuovo modulo caricato',"Gentile $u->first_name $u->last_name,<br><br>in allegato troverai il modulo caricato per la richiesta di iscrizione.<br><br>Grazie.", '',"$tmp_dir/$filename");
+        save_test($res);
         unlink("$tmp_dir/$filename");
         rmdir($tmp_dir);
         return $res;
