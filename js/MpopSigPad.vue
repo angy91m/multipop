@@ -2,7 +2,7 @@
   <canvas ref="canvas"></canvas>
 </template>
 <script setup>
-import {useTemplateRef, onMounted, onBeforeUnmount, defineExpose, defineProps, ref} from 'vue';
+import {useTemplateRef, onMounted, onBeforeUnmount, defineExpose, defineProps, ref, nextTick} from 'vue';
 import SignaturePad from 'signature_pad';
 const initiated = ref(false),
 signaturePad = ref(null),
